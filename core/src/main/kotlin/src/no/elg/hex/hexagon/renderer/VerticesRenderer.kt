@@ -84,13 +84,11 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     val currHex = InputHandler.cursorHex
 
     //Render the hexagons
-    for (hexagon in HexUtil.getHexagons(Hex.world.grid)) {
+    for (hexagon in Hex.world.grid.hexagons) {
       val data: HexagonData = HexUtil.getData(hexagon)
 //      data.brightness = if (highlighted.contains(hexagon)) HexagonData.BRIGHT else HexagonData.DIM
-      if (hexagon == currHex) {
-        data.brightness += HexagonData.SELECTED
-      }
-      data.type.render(this, data.color, data.brightness, hexagon)
+      val brightness = if (hexagon == currHex) data.brightness + HexagonData.SELECTED else data.brightness
+      data.type.render(this, data.color, brightness, hexagon)
     }
     flush()
   }

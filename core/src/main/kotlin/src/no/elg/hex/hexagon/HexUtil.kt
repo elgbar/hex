@@ -3,7 +3,6 @@ package src.no.elg.hex.hexagon
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex.world
 import org.hexworks.mixite.core.api.Hexagon
-import org.hexworks.mixite.core.api.HexagonalGrid
 import java.util.ArrayList
 import java.util.HashSet
 
@@ -39,31 +38,6 @@ object HexUtil {
   fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
     return world.grid.getByPixelCoordinate(x, y).let { if (it.isPresent) it.get() else null }
   }
-
-  /**
-   * @param grid
-   * The grid to get all hexagons from
-   *
-   * @return Get all the hexagons in a grid
-   */
-  fun getHexagons(grid: HexagonalGrid<HexagonData>): List<Hexagon<HexagonData>> {
-    return ArrayList<Hexagon<HexagonData>>().also { it.addAll(grid.hexagons) }
-  }
-
-  /**
-   * Get the hexagons in a more simple way
-   *
-   * @return All hexagons from the default game grid.
-   */
-  val hexagons: List<Hexagon<HexagonData>>
-    get() {
-      if (hexes.size == 0 || world.hashCode() != worldHash) {
-        println("regenerating the grid | old size " + hexes.size)
-        hexes = getHexagons(world.grid)
-        worldHash = world.hashCode()
-      }
-      return hexes
-    }
 
   /**
    * @param start
