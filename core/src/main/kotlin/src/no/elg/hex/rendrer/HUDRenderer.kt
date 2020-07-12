@@ -1,8 +1,11 @@
 package src.no.elg.hex.rendrer
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
 import src.no.elg.hex.FrameUpdatable
+import src.no.elg.hex.InputHandler.MAX_ZOOM
+import src.no.elg.hex.InputHandler.MIN_ZOOM
 import src.no.elg.hex.InputHandler.cameraOffsetX
 import src.no.elg.hex.InputHandler.cameraOffsetY
 import src.no.elg.hex.InputHandler.cursorHex
@@ -24,18 +27,17 @@ object HUDRenderer : FrameUpdatable {
       return
     }
     if (modus == DEBUG) {
-      val fps = String.format("FPS: %4d delta: %.5f", Gdx.graphics.framesPerSecond,
+      val fps = String.format("FPS: %4d delta: %.5f zoom: ", Gdx.graphics.framesPerSecond,
         Gdx.graphics.deltaTime)
       val screenPos = String.format("Screen pos (% 4d,% 4d)", mouseX, mouseY)
       val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX + cameraOffsetX, mouseY + cameraOffsetY)
 
       drawAll(screenTexts = *arrayOf(
-        ScreenText(fps),
+        ScreenText(fps, next = validatedText(Hex.camera.zoom, MIN_ZOOM, MAX_ZOOM)),
         ScreenText(screenPos),
         ScreenText(realPos),
-        ScreenText("Pointing at hex ", next = if (cursorHex != null) ScreenText(cursorHex?.prettyPrint()
-          ?: "") else nullText()))
-      )
+        ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex)
+        )))
     }
     //        else {
 //            sr.begin();

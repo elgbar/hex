@@ -38,6 +38,16 @@ data class ScreenText(
   }
 }
 
+fun nullCheckedText(value: Any?, next: ScreenText? = null) = if (value == null) nullText(next) else ScreenText(value.toString())
+
+fun <T : Comparable<T>> validatedText(value: T, min: T, max: T, next: ScreenText? = null): ScreenText {
+  return if (value < min || value >= max) {
+    ScreenText(value.toString(), RED, bold = true, next = next)
+  } else {
+    ScreenText(value.toString(), next = next)
+  }
+}
+
 fun nullText(next: ScreenText? = null) = ScreenText(
   "null",
   RED,
