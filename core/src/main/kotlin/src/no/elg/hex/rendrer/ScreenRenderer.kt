@@ -40,8 +40,14 @@ data class ScreenText(
 
 fun nullCheckedText(value: Any?, next: ScreenText? = null) = if (value == null) nullText(next) else ScreenText(value.toString())
 
+/**
+ * Display the value if it is outside the given range
+ *
+ * @param min minimum allowed value of [value], exclusive
+ * @param max maximum allowed value of [value], exclusive
+ */
 fun <T : Comparable<T>> validatedText(value: T, min: T, max: T, next: ScreenText? = null): ScreenText {
-  return if (value < min || value >= max) {
+  return if (value < min || value > max) {
     ScreenText(value.toString(), RED, bold = true, next = next)
   } else {
     ScreenText(value.toString(), next = next)

@@ -7,7 +7,6 @@ import org.hexworks.mixite.core.api.Hexagon
 import src.no.elg.hex.hexagon.HexUtil
 import src.no.elg.hex.hexagon.HexagonData
 import java.awt.Toolkit
-import kotlin.Float.Companion
 import kotlin.math.abs
 import kotlin.math.sign
 
@@ -61,7 +60,7 @@ object InputHandler : InputAdapter() {
 
   override fun scrolled(amount: Int): Boolean {
     val dir = sign(amount.toFloat())
-    Hex.camera.zoom = (dir * ZOOM_SPEED + Hex.camera.zoom).coerceIn(Float.MIN_VALUE, Companion.MAX_VALUE)
+    Hex.camera.zoom = (dir * ZOOM_SPEED + Hex.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 }
