@@ -18,7 +18,7 @@ fun main() {
 
   config.backgroundFPS = 10
   config.foregroundFPS = 9999
-  config.vSyncEnabled = true //Why not? it's not like this is a competitive FPS
+  config.vSyncEnabled = false //Why not? it's not like this is a competitive FPS
   config.samples = 16 //max out the samples as this isn't a very heavy game.
   config.useHDPI = true;
   LwjglApplication(Hex, config)
