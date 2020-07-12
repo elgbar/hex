@@ -26,15 +26,15 @@ object HUDRenderer : FrameUpdatable {
     if (modus == DEBUG) {
       val fps = String.format("FPS: %4d delta: %.5f", Gdx.graphics.framesPerSecond,
         Gdx.graphics.deltaTime)
-      val screenPos = String.format("Screen pos (% 8.2f,% 8.2f)", mouseX, mouseY)
+      val screenPos = String.format("Screen pos (% 4d,% 4d)", mouseX, mouseY)
       val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX + cameraOffsetX, mouseY + cameraOffsetY)
-      val currentHex = cursorHex
-      val hexScreenText = if (currentHex != null) ScreenText(currentHex.prettyPrint()) else nullText()
 
-      drawAll(screenTexts = *arrayOf(ScreenText(fps),
+      drawAll(screenTexts = *arrayOf(
+        ScreenText(fps),
         ScreenText(screenPos),
         ScreenText(realPos),
-        ScreenText("Pointing at hex ", next = hexScreenText))
+        ScreenText("Pointing at hex ", next = if (cursorHex != null) ScreenText(cursorHex?.prettyPrint()
+          ?: "") else nullText()))
       )
     }
     //        else {

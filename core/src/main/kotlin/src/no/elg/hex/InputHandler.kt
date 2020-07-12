@@ -2,8 +2,6 @@ package src.no.elg.hex
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
 import src.no.elg.hex.hexagon.HexUtil
@@ -14,7 +12,7 @@ import kotlin.math.abs
 /**
  * @author Elg
  */
-object InputHandler : InputAdapter(), FrameUpdatable {
+object InputHandler : InputAdapter() {
 
   private const val ZOOM_ENABLE = false
   private var totalZoom = 1f
@@ -34,18 +32,10 @@ object InputHandler : InputAdapter(), FrameUpdatable {
 
   val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
 
-  private val mouse = Vector2()
-  private val mouseVec = Vector3()
-
-  val mouseX get() = mouseVec.x
-  val mouseY get() = mouseVec.y
+  val mouseX get() = Gdx.input.x
+  val mouseY get() = Gdx.input.y
 
   val cursorHex: Hexagon<HexagonData>? get() = HexUtil.getHexagon(mouseX.toDouble() - cameraOffsetX, mouseY.toDouble() - cameraOffsetY)
-
-  override fun frameUpdate() {
-    mouseVec.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
-    mouse.set(mouseX, mouseY)
-  }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     val x: Float = Gdx.input.deltaX * totalZoom
@@ -66,12 +56,5 @@ object InputHandler : InputAdapter(), FrameUpdatable {
     val data = Hex.world.grid.gridData
     cameraOffsetX = -((data.gridWidth * data.hexagonWidth + data.gridWidth / 2f - Gdx.graphics.width) / 2f).toFloat()
     cameraOffsetY = ((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
-    Hex.camera.translate(cameraOffsetX, cameraOffsetY)
-  }
-
-  private fun moveCamera(dx: Float, dy: Float) {
-    cameraOffsetX += dx
-    cameraOffsetY += dy
-    Hex.camera.translate(cameraOffsetX, cameraOffsetY)
   }
 }

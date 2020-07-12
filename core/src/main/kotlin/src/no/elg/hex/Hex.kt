@@ -39,8 +39,6 @@ object Hex : ApplicationAdapter() {
 
     camera.update()
 
-    InputHandler.frameUpdate()
-
     VerticesRenderer.frameUpdate()
     OutlineRenderer.frameUpdate()
 
@@ -50,5 +48,6 @@ object Hex : ApplicationAdapter() {
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(true, width.toFloat(), height.toFloat())
     ScreenRenderer.resize(width, height)
+    InputHandler.resetCamera()
   }
 }
