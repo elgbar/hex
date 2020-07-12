@@ -2,6 +2,7 @@ package src.no.elg.hex.rendrer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -11,20 +12,72 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import src.no.elg.hex.InputHandler.scale
 import src.no.elg.hex.Resizable
+import src.no.elg.hex.rendrer.ScreenDrawPosition.BOTTOM
+import src.no.elg.hex.rendrer.ScreenDrawPosition.TOP
 import java.io.File
+
+
+enum class ScreenDrawPosition {
+  TOP,
+  BOTTOM
+}
+
+data class ScreenText(
+  val text: String,
+  val color: Color = Color.WHITE,
+  val bold: Boolean = false,
+  val italic: Boolean = false,
+  val next: ScreenText? = null
+) {
+  val font: BitmapFont = when {
+    !bold && !italic -> ScreenRenderer.regularFont
+    !bold && italic -> ScreenRenderer.regularItalicFont
+    bold && !italic -> ScreenRenderer.boldFont
+    bold && italic -> ScreenRenderer.boldItalicFont
+    else -> error("This should really not happen!")
+  }
+}
+
+fun nullText(next: ScreenText? = null) = ScreenText(
+  "null",
+  RED,
+  bold = true,
+  italic = false,
+  next = next
+)
 
 object ScreenRenderer : Disposable, Resizable {
 
-  val spacing: Int
-  val font: BitmapFont
+  val spacing: Float
   val batch: SpriteBatch
 
-  fun drawTop(text: String?, line: Int) {
-    font.draw(batch, text, spacing.toFloat(), Gdx.graphics.height - spacing * line * 2f)
+
+  val regularFont: BitmapFont
+  val regularItalicFont: BitmapFont
+  val boldFont: BitmapFont
+  val boldItalicFont: BitmapFont
+
+
+  fun ScreenText.draw(line: Int, position: ScreenDrawPosition = TOP, offsetX: Float = spacing) {
+    val y = when (position) {
+      TOP -> Gdx.graphics.height - spacing * line * 2f
+      BOTTOM -> spacing * line * 2f + spacing
+    }
+
+    font.color = color
+    font.draw(batch, text, offsetX, y)
+    next?.draw(line, position, offsetX + spacing * text.length)
   }
 
-  fun drawBottom(text: String?, line: Int) {
-    font.draw(batch, text, spacing.toFloat(), spacing * (line + 1).toFloat())
+  /**
+   * Draw all given text on different lines
+   */
+  fun drawAll(position: ScreenDrawPosition = TOP, vararg screenTexts: ScreenText) {
+    begin()
+    for ((line, screenText) in screenTexts.withIndex()) {
+      screenText.draw(line + 1, position)
+    }
+    end()
   }
 
   fun begin() {
@@ -35,13 +88,9 @@ object ScreenRenderer : Disposable, Resizable {
     batch.end()
   }
 
-  fun resetFontColor() {
-    font.color = Color.WHITE
-  }
-
   override fun dispose() {
     batch.dispose()
-    font.dispose()
+    regularFont.dispose()
   }
 
   override fun resize(width: Int, height: Int) {
@@ -52,15 +101,24 @@ object ScreenRenderer : Disposable, Resizable {
   const val FONT_SIZE = 20
 
   init {
-    val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
+    fun font(bold: Boolean, italic: Boolean): FreeTypeFontGenerator {
+      val boldness = if (bold) "B" else "R"
+      val italicness = if (italic) "I" else ""
+      return FreeTypeFontGenerator(Gdx.files.internal("${FONTS_FOLDER}UbuntuMono-$boldness$italicness.ttf"))
+    }
+
     val parameter = FreeTypeFontParameter()
     parameter.size = FONT_SIZE * scale
     parameter.minFilter = Linear
 
-    font = generator.generateFont(parameter)
-    spacing = FONT_SIZE * scale / 2
+    regularFont = font(bold = false, italic = false).generateFont(parameter)
+    regularItalicFont = font(bold = false, italic = true).generateFont(parameter)
+    boldFont = font(bold = true, italic = false).generateFont(parameter)
+    boldItalicFont = font(bold = true, italic = true).generateFont(parameter)
+
+    spacing = FONT_SIZE * scale / 2f
 
     batch = SpriteBatch()
-    batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+    resize(Gdx.graphics.width, Gdx.graphics.height)
   }
 }
