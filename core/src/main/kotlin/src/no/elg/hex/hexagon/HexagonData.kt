@@ -2,8 +2,8 @@ package src.no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
-import src.no.elg.hex.hexagon.HexType.DIAMOND
 import src.no.elg.hex.randomColor
+import kotlin.random.Random
 
 data class HexagonData(
   /**
@@ -13,7 +13,7 @@ data class HexagonData(
 
   var color: Color = randomColor(),
 
-  var type: HexType = DIAMOND
+  var type: HexType = HexType.values()[Random.nextInt(HexType.values().size)]
 ) : DefaultSatelliteData() {
 
 
