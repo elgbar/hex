@@ -55,6 +55,6 @@ object InputHandler : InputAdapter() {
   fun resetCamera() {
     val data = Hex.world.grid.gridData
     cameraOffsetX = -((data.gridWidth * data.hexagonWidth + data.gridWidth / 2f - Gdx.graphics.width) / 2f).toFloat()
-    cameraOffsetY = ((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
+    cameraOffsetY = -((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
   }
 }
