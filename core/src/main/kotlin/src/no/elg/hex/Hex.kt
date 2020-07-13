@@ -21,6 +21,8 @@ object Hex : ApplicationAdapter() {
   val map = Map(10, 10)
   val camera: OrthographicCamera = OrthographicCamera()
 
+  private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
+
   override fun create() {
     Gdx.input.inputProcessor = InputHandler
     if (InputHandler.scale > 1) {
@@ -34,19 +36,21 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun render() {
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or
-      if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
 
     camera.update()
+
+    InputHandler.frameUpdate()
 
     VerticesRenderer.frameUpdate()
     OutlineRenderer.frameUpdate()
 
     HUDRenderer.frameUpdate()
+
   }
 
   override fun resize(width: Int, height: Int) {
-    camera.setToOrtho(true, width.toFloat(), height.toFloat())
+    camera.setToOrtho(false, width.toFloat(), height.toFloat())
     ScreenRenderer.resize(width, height)
     InputHandler.resetCamera()
   }

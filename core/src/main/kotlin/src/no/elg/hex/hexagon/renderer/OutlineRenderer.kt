@@ -8,8 +8,6 @@ import no.elg.hex.Hex.map
 import org.hexworks.mixite.core.api.Point
 import src.no.elg.hex.api.FrameUpdatable
 import src.no.elg.hex.hexagon.HexUtil.getData
-import src.no.elg.hex.input.InputHandler.cameraOffsetX
-import src.no.elg.hex.input.InputHandler.cameraOffsetY
 import java.util.HashSet
 
 /**
@@ -31,7 +29,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
     for (hex in grid.hexagons) {
       val points = hex.points
 
-      lineRenderer.color = getData(hex).color
+      lineRenderer.color = hex.getData().color
       for (i in points.indices) {
         val point = points[i]
         //get the next edge this edge is connected to
@@ -43,10 +41,10 @@ object OutlineRenderer : FrameUpdatable, Disposable {
         if (!connected.contains(nextPoint)) {
           connected.add(nextPoint)
           lineRenderer.line(
-            point.coordinateX.toFloat() + cameraOffsetX,
-            point.coordinateY.toFloat() + cameraOffsetY,
-            nextPoint.coordinateX.toFloat() + cameraOffsetX,
-            nextPoint.coordinateY.toFloat() + cameraOffsetY
+            point.coordinateX.toFloat(),
+            point.coordinateY.toFloat(),
+            nextPoint.coordinateX.toFloat(),
+            nextPoint.coordinateY.toFloat()
           )
         }
       }

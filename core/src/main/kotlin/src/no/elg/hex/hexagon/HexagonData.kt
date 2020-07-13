@@ -9,22 +9,21 @@ data class HexagonData(
   /**
    * Modifier of how bright the hex should be
    */
-  var brightness: Float = DIM,
+  val brightness: Float = DIM,
 
-  var color: Color = randomColor(),
+  val color: Color = randomColor(),
 
-  var type: HexType = HexType.values()[Random.nextInt(HexType.values().size)]
+  val type: HexType = HexType.values()[Random.nextInt(HexType.values().size)]
 ) : DefaultSatelliteData() {
-
-
+  
   companion object {
     /* Shade brightness modifier for hexagons */ //Cannot move to
-    var DIM = 0.75f
+    const val DIM = 0.75f
 
     //Can move to
-    var BRIGHT = 0.9f
+    const val BRIGHT = 0.9f
 
     //mouse hovering over, add this to the current hex under the mouse
-    var SELECTED = 0.1f
+    const val SELECTED = 0.1f
   }
 }

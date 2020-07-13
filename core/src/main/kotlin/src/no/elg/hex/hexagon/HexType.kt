@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.Point
 import src.no.elg.hex.hexagon.renderer.VerticesRenderer
-import src.no.elg.hex.input.InputHandler
 import src.no.elg.hex.util.dim
 
 
@@ -137,7 +136,7 @@ enum class HexType(private vararg val surfaces: Surface) {
     val points = hexagon.points.toMutableList().also {
       it.add(hexagon.center)
     }.map { (dx, dy) ->
-      Point.fromPosition(dx + InputHandler.cameraOffsetX, dy + InputHandler.cameraOffsetY)
+      Point.fromPosition(dx, dy)
     }
 
     for (surface in surfaces) {

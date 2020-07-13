@@ -11,15 +11,15 @@ import java.util.HashSet
 object HexUtil {
 
   /**
-   * @param hexagon
+   * @param this@getData
    * The hexagon to get the data from
    *
    * @return HexagonData of this hexagon
    */
-  fun getData(hexagon: Hexagon<HexagonData>): HexagonData {
-    return hexagon.satelliteData.orElseGet {
+  fun Hexagon<HexagonData>.getData(): HexagonData {
+    return satelliteData.orElseGet {
       HexagonData().also {
-        hexagon.setSatelliteData(it)
+        setSatelliteData(it)
       }
     }
   }
@@ -36,30 +36,23 @@ object HexUtil {
     return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent) it.get() else null }
   }
 
-  /**
-   * @param start
-   * The hexagon to start at
-   *
-   * @return All hexagons with the same color that are connected and their neighbors
-   */
-  fun connectedAdjacentHexagons(start: Hexagon<HexagonData>): Set<Hexagon<HexagonData>?> {
-    return adjacentHexagons(connectedHexagons(start))
-  }
 
   /**
-   * @param start
-   * The hexagon to start at
+   * @param initial The hexagon to start at
    *
    * @return All hexagons connected to the start hexagon that has the same color
    */
-  fun connectedHexagons(start: Hexagon<HexagonData>): Set<Hexagon<HexagonData>?> {
-    return connectedHexagons(start, getData(start).color, HashSet())
+  fun connectedHexagons(initial: Hexagon<HexagonData>): Set<Hexagon<HexagonData>?> {
+    return connectedHexagons(initial, initial.getData().color, HashSet())
   }
 
-  private fun connectedHexagons(center: Hexagon<HexagonData>, color: Color,
-                                visited: MutableSet<Hexagon<HexagonData>?>): Set<Hexagon<HexagonData>?> {
+  private fun connectedHexagons(
+    center: Hexagon<HexagonData>,
+    color: Color,
+    visited: MutableSet<Hexagon<HexagonData>?>
+  ): Set<Hexagon<HexagonData>?> {
     //only check a hexagon if they have the same color and haven't been visited
-    if (visited.contains(center) || getData(center).color != color) {
+    if (visited.contains(center) || center.getData().color != color) {
       return visited
     }
 
@@ -71,23 +64,5 @@ object HexUtil {
       connectedHexagons(neighbor, color, visited)
     }
     return visited
-  }
-
-  /**
-   * @param set
-   *
-   * @return
-   */
-  fun adjacentHexagons(set: Collection<Hexagon<HexagonData>?>): Set<Hexagon<HexagonData>?> {
-    val adjacent: MutableSet<Hexagon<HexagonData>?> = HashSet()
-    adjacent.addAll(set)
-    for (hex in set) {
-      for (neighbor in map.grid.getNeighborsOf(hex!!)) {
-        if (!adjacent.contains(neighbor)) {
-          adjacent.add(neighbor)
-        }
-      }
-    }
-    return adjacent
   }
 }

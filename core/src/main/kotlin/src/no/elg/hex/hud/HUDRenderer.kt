@@ -4,15 +4,13 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
 import src.no.elg.hex.api.FrameUpdatable
-import src.no.elg.hex.hexagon.HexUtil
+import src.no.elg.hex.hexagon.HexUtil.getData
 import src.no.elg.hex.hexagon.HexagonData
 import src.no.elg.hex.hud.HUDRenderer.HUDModus.DEBUG
 import src.no.elg.hex.hud.HUDRenderer.HUDModus.NONE
 import src.no.elg.hex.hud.ScreenRenderer.drawAll
 import src.no.elg.hex.input.InputHandler.MAX_ZOOM
 import src.no.elg.hex.input.InputHandler.MIN_ZOOM
-import src.no.elg.hex.input.InputHandler.cameraOffsetX
-import src.no.elg.hex.input.InputHandler.cameraOffsetY
 import src.no.elg.hex.input.InputHandler.cursorHex
 import src.no.elg.hex.input.InputHandler.mouseX
 import src.no.elg.hex.input.InputHandler.mouseY
@@ -29,14 +27,14 @@ object HUDRenderer : FrameUpdatable {
     if (modus == DEBUG) {
       val fps = String.format("FPS: %4d delta: %.5f zoom: ", Gdx.graphics.framesPerSecond,
         Gdx.graphics.deltaTime)
-      val screenPos = String.format("Screen pos (% 4d,% 4d)", mouseX, mouseY)
-      val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX + cameraOffsetX, mouseY + cameraOffsetY)
+      val screenPos = String.format("Screen pos (% 4d,% 4d)", Gdx.input.x, Gdx.input.y)
+      val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX, mouseY)
 
       drawAll(screenTexts = *arrayOf(
         ScreenText(fps, next = validatedText(Hex.camera.zoom, MIN_ZOOM, MAX_ZOOM)),
         ScreenText(screenPos),
         ScreenText(realPos),
-        ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex)
+        ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex?.prettyPrint())
         )))
     }
     //        else {
@@ -52,6 +50,6 @@ object HUDRenderer : FrameUpdatable {
   }
 
   private fun Hexagon<HexagonData>.prettyPrint(): String {
-    return "Hex (${this.center}) type ${HexUtil.getData(this).type.name}"
+    return "Hex (${this.center}) type ${this.getData().type.name}"
   }
 }

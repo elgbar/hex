@@ -2,8 +2,10 @@ package src.no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
+import src.no.elg.hex.api.FrameUpdatable
 import src.no.elg.hex.hexagon.HexUtil
 import src.no.elg.hex.hexagon.HexagonData
 import java.awt.Toolkit
@@ -13,7 +15,7 @@ import kotlin.math.sign
 /**
  * @author Elg
  */
-object InputHandler : InputAdapter() {
+object InputHandler : InputAdapter(), FrameUpdatable {
 
   private const val ZOOM_ENABLE = false
 
@@ -24,17 +26,27 @@ object InputHandler : InputAdapter() {
 
   private const val ZOOM_SPEED = 0.1f
 
-  var cameraOffsetX = 0f
-    private set
-  var cameraOffsetY = 0f
-    private set
-
   val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
 
-  val mouseX get() = Gdx.input.x
-  val mouseY get() = Gdx.input.y
+  private val unprojectVector = Vector3()
 
-  val cursorHex: Hexagon<HexagonData>? get() = HexUtil.getHexagon(mouseX.toDouble() - cameraOffsetX, mouseY.toDouble() - cameraOffsetY)
+  var mouseX: Float = 0f
+    private set
+  var mouseY: Float = 0f
+    private set
+
+  val cursorHex: Hexagon<HexagonData>? get() = HexUtil.getHexagon(mouseX.toDouble(), mouseY.toDouble())
+
+  override fun frameUpdate() {
+    unprojectVector.x = Gdx.input.x.toFloat()
+    unprojectVector.y = Gdx.input.y.toFloat()
+    unprojectVector.z = 0f
+
+    Hex.camera.unproject(unprojectVector)
+    mouseX = unprojectVector.x
+    mouseY = unprojectVector.y
+
+  }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     val zoom = Hex.camera.zoom
@@ -46,16 +58,17 @@ object InputHandler : InputAdapter() {
       return false
     }
 
-    cameraOffsetX += x
-    cameraOffsetY += y
-
+    Hex.camera.translate(-x, y)
     return true
   }
 
   fun resetCamera() {
     val data = Hex.map.grid.gridData
-    cameraOffsetX = -((data.gridWidth * data.hexagonWidth + data.gridWidth / 2f - Gdx.graphics.width) / 2f).toFloat()
-    cameraOffsetY = -((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
+
+    val x = -((data.gridWidth * data.hexagonWidth + data.gridWidth / 2f - Gdx.graphics.width) / 2f).toFloat()
+    val y = -((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
+
+    Hex.camera.direction.x
   }
 
   override fun scrolled(amount: Int): Boolean {
