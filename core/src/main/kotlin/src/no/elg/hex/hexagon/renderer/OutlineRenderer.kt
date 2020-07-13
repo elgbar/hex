@@ -4,12 +4,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex.camera
-import no.elg.hex.Hex.world
+import no.elg.hex.Hex.map
 import org.hexworks.mixite.core.api.Point
-import src.no.elg.hex.FrameUpdatable
-import src.no.elg.hex.InputHandler.cameraOffsetX
-import src.no.elg.hex.InputHandler.cameraOffsetY
+import src.no.elg.hex.api.FrameUpdatable
 import src.no.elg.hex.hexagon.HexUtil.getData
+import src.no.elg.hex.input.InputHandler.cameraOffsetX
+import src.no.elg.hex.input.InputHandler.cameraOffsetY
 import java.util.HashSet
 
 /**
@@ -21,7 +21,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
 
   override fun frameUpdate() {
 
-    val grid = world.grid
+    val grid = map.grid
 
     lineRenderer.begin(Line)
     lineRenderer.projectionMatrix = camera.combined

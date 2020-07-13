@@ -2,7 +2,7 @@ package src.no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
-import src.no.elg.hex.randomColor
+import src.no.elg.hex.util.randomColor
 import kotlin.random.Random
 
 data class HexagonData(

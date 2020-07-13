@@ -1,17 +1,14 @@
 package src.no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
-import no.elg.hex.Hex.world
+import no.elg.hex.Hex.map
 import org.hexworks.mixite.core.api.Hexagon
-import java.util.ArrayList
 import java.util.HashSet
 
 /**
  * @author kheba
  */
 object HexUtil {
-  private var hexes: List<Hexagon<HexagonData>> = ArrayList()
-  private var worldHash = 0
 
   /**
    * @param hexagon
@@ -36,7 +33,7 @@ object HexUtil {
    * @return Get the hexagon at a given screen location or `null` if nothing is found
    */
   fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-    return world.grid.getByPixelCoordinate(x, y).let { if (it.isPresent) it.get() else null }
+    return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent) it.get() else null }
   }
 
   /**
@@ -70,7 +67,7 @@ object HexUtil {
     visited.add(center)
 
     //check each neighbor
-    for (neighbor in world.grid.getNeighborsOf(center)) {
+    for (neighbor in map.grid.getNeighborsOf(center)) {
       connectedHexagons(neighbor, color, visited)
     }
     return visited
@@ -85,7 +82,7 @@ object HexUtil {
     val adjacent: MutableSet<Hexagon<HexagonData>?> = HashSet()
     adjacent.addAll(set)
     for (hex in set) {
-      for (neighbor in world.grid.getNeighborsOf(hex!!)) {
+      for (neighbor in map.grid.getNeighborsOf(hex!!)) {
         if (!adjacent.contains(neighbor)) {
           adjacent.add(neighbor)
         }

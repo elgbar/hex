@@ -1,4 +1,4 @@
-package src.no.elg.hex
+package src.no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
@@ -53,7 +53,7 @@ object InputHandler : InputAdapter() {
   }
 
   fun resetCamera() {
-    val data = Hex.world.grid.gridData
+    val data = Hex.map.grid.gridData
     cameraOffsetX = -((data.gridWidth * data.hexagonWidth + data.gridWidth / 2f - Gdx.graphics.width) / 2f).toFloat()
     cameraOffsetY = -((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
   }

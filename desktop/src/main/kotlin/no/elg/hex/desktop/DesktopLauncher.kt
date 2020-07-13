@@ -3,7 +3,7 @@ package no.elg.hex.desktop
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import no.elg.hex.Hex
-import src.no.elg.hex.InputHandler
+import src.no.elg.hex.input.InputHandler
 
 fun main() {
   val config = LwjglApplicationConfiguration()

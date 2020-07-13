@@ -8,17 +8,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
-import src.no.elg.hex.InputHandler
 import src.no.elg.hex.hexagon.renderer.OutlineRenderer
 import src.no.elg.hex.hexagon.renderer.VerticesRenderer
-import src.no.elg.hex.rendrer.HUDRenderer
-import src.no.elg.hex.rendrer.ScreenRenderer
-import src.no.elg.hex.world.World
+import src.no.elg.hex.hud.HUDRenderer
+import src.no.elg.hex.hud.ScreenRenderer
+import src.no.elg.hex.input.InputHandler
+import src.no.elg.hex.map.Map
 
 
 object Hex : ApplicationAdapter() {
 
-  val world = World(10, 10)
+  val map = Map(10, 10)
   val camera: OrthographicCamera = OrthographicCamera()
 
   override fun create() {

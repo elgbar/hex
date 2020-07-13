@@ -1,4 +1,4 @@
-package src.no.elg.hex.world
+package src.no.elg.hex.map
 
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
 import org.hexworks.mixite.core.api.HexagonalGrid
@@ -11,7 +11,7 @@ import src.no.elg.hex.hexagon.HexagonData
 /**
  * @author Elg
  */
-class World(width: Int, height: Int) {
+class Map(width: Int, height: Int) {
 
   val grid: HexagonalGrid<HexagonData>
   val calc: HexagonalGridCalculator<HexagonData>

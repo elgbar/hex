@@ -10,10 +10,10 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
-import src.no.elg.hex.FrameUpdatable
-import src.no.elg.hex.InputHandler
+import src.no.elg.hex.api.FrameUpdatable
 import src.no.elg.hex.hexagon.HexUtil
 import src.no.elg.hex.hexagon.HexagonData
+import src.no.elg.hex.input.InputHandler
 
 object VerticesRenderer : FrameUpdatable, Disposable {
 
@@ -84,7 +84,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     val currHex = InputHandler.cursorHex
 
     //Render the hexagons
-    for (hexagon in Hex.world.grid.hexagons) {
+    for (hexagon in Hex.map.grid.hexagons) {
       val data: HexagonData = HexUtil.getData(hexagon)
 //      data.brightness = if (highlighted.contains(hexagon)) HexagonData.BRIGHT else HexagonData.DIM
       val brightness = if (hexagon == currHex) data.brightness + HexagonData.SELECTED else data.brightness

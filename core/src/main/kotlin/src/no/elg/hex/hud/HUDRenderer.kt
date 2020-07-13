@@ -1,21 +1,21 @@
-package src.no.elg.hex.rendrer
+package src.no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
-import src.no.elg.hex.FrameUpdatable
-import src.no.elg.hex.InputHandler.MAX_ZOOM
-import src.no.elg.hex.InputHandler.MIN_ZOOM
-import src.no.elg.hex.InputHandler.cameraOffsetX
-import src.no.elg.hex.InputHandler.cameraOffsetY
-import src.no.elg.hex.InputHandler.cursorHex
-import src.no.elg.hex.InputHandler.mouseX
-import src.no.elg.hex.InputHandler.mouseY
+import src.no.elg.hex.api.FrameUpdatable
 import src.no.elg.hex.hexagon.HexUtil
 import src.no.elg.hex.hexagon.HexagonData
-import src.no.elg.hex.rendrer.HUDRenderer.HUDModus.DEBUG
-import src.no.elg.hex.rendrer.HUDRenderer.HUDModus.NONE
-import src.no.elg.hex.rendrer.ScreenRenderer.drawAll
+import src.no.elg.hex.hud.HUDRenderer.HUDModus.DEBUG
+import src.no.elg.hex.hud.HUDRenderer.HUDModus.NONE
+import src.no.elg.hex.hud.ScreenRenderer.drawAll
+import src.no.elg.hex.input.InputHandler.MAX_ZOOM
+import src.no.elg.hex.input.InputHandler.MIN_ZOOM
+import src.no.elg.hex.input.InputHandler.cameraOffsetX
+import src.no.elg.hex.input.InputHandler.cameraOffsetY
+import src.no.elg.hex.input.InputHandler.cursorHex
+import src.no.elg.hex.input.InputHandler.mouseX
+import src.no.elg.hex.input.InputHandler.mouseY
 
 /**
  * @author Elg

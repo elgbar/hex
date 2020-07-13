@@ -1,4 +1,4 @@
-package src.no.elg.hex
+package src.no.elg.hex.util
 
 import com.badlogic.gdx.graphics.Color
 import kotlin.random.Random
