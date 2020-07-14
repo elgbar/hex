@@ -73,8 +73,7 @@ object InputHandler : InputAdapter(), FrameUpdatable {
   }
 
   override fun scrolled(amount: Int): Boolean {
-    val dir = sign(amount.toFloat())
-    camera.zoom = (dir * ZOOM_SPEED + camera.zoom)//.coerceIn(MIN_ZOOM, MAX_ZOOM)
+    camera.zoom = (sign(amount.toFloat()) * ZOOM_SPEED + camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 }
