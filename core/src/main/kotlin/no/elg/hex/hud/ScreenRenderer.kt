@@ -1,4 +1,4 @@
-package src.no.elg.hex.hud
+package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -10,10 +10,10 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
-import src.no.elg.hex.api.Resizable
-import src.no.elg.hex.hud.ScreenDrawPosition.BOTTOM
-import src.no.elg.hex.hud.ScreenDrawPosition.TOP
-import src.no.elg.hex.input.InputHandler.scale
+import no.elg.hex.api.Resizable
+import no.elg.hex.hud.ScreenDrawPosition.BOTTOM
+import no.elg.hex.hud.ScreenDrawPosition.TOP
+import no.elg.hex.input.InputHandler.scale
 import java.io.File
 
 

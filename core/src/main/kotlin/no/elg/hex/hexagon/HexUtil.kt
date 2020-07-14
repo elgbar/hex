@@ -1,4 +1,4 @@
-package src.no.elg.hex.hexagon
+package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex.map
@@ -33,7 +33,7 @@ object HexUtil {
    * @return Get the hexagon at a given screen location or `null` if nothing is found
    */
   fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-    return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().invisible) it.get() else null }
+    return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().invalid) it.get() else null }
   }
 
 

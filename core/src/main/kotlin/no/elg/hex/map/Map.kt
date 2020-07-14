@@ -1,11 +1,11 @@
-package src.no.elg.hex.map
+package no.elg.hex.map
 
+import no.elg.hex.hexagon.HexagonData
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
 import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridCalculator
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
-import src.no.elg.hex.hexagon.HexagonData
 
 
 /**

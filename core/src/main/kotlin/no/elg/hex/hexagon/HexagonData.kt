@@ -1,10 +1,10 @@
-package src.no.elg.hex.hexagon
+package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
+import no.elg.hex.util.randomColor
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
-import src.no.elg.hex.util.randomColor
 import kotlin.random.Random
 
 data class HexagonData(
@@ -20,17 +20,21 @@ data class HexagonData(
   val callback: Hexagon<HexagonData>
 ) : DefaultSatelliteData() {
 
-  val invisible by lazy {
-
-    val adjacent = Hex.map.grid.getNeighborsOf(callback)
-    adjacent.size != EXPECTED_NEIGHBORS
-  }
+  /**
+   * Invalid hexagons are hexagons that the player should not know exists.
+   * They should not be rendered or be able to be queued
+   *
+   * @see no.elg.hex.input.InputHandler.cursorHex
+   * @see no.elg.hex.hexagon.renderer.OutlineRenderer
+   * @see no.elg.hex.hexagon.renderer.VerticesRenderer
+   */
+  val invalid = Hex.map.grid.getNeighborsOf(callback).size != EXPECTED_NEIGHBORS
 
   override var isOpaque: Boolean = false
-    get() = invisible or field
+    get() = invalid or field
 
   override var isPassable: Boolean = true
-    get() = invisible and field
+    get() = invalid and field
 
   companion object {
     /* Shade brightness modifier for hexagons */ //Cannot move to

@@ -1,10 +1,10 @@
-package src.no.elg.hex.hexagon
+package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
+import no.elg.hex.hexagon.renderer.VerticesRenderer
+import no.elg.hex.util.dim
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.Point
-import src.no.elg.hex.hexagon.renderer.VerticesRenderer
-import src.no.elg.hex.util.dim
 
 
 /**

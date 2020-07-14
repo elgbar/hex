@@ -1,4 +1,4 @@
-package src.no.elg.hex.api
+package no.elg.hex.api
 
 /**
  * Updated each frame

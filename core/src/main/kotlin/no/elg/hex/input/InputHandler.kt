@@ -1,14 +1,14 @@
-package src.no.elg.hex.input
+package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
+import no.elg.hex.api.FrameUpdatable
+import no.elg.hex.hexagon.HexUtil
+import no.elg.hex.hexagon.HexagonData
 import org.hexworks.mixite.core.api.Hexagon
-import src.no.elg.hex.api.FrameUpdatable
-import src.no.elg.hex.hexagon.HexUtil
-import src.no.elg.hex.hexagon.HexagonData
 import java.awt.Toolkit
 import kotlin.math.abs
 import kotlin.math.sign

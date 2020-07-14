@@ -1,13 +1,13 @@
-package src.no.elg.hex.hexagon.renderer
+package no.elg.hex.hexagon.renderer
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex.camera
 import no.elg.hex.Hex.map
+import no.elg.hex.api.FrameUpdatable
+import no.elg.hex.hexagon.HexUtil.getData
 import org.hexworks.mixite.core.api.Point
-import src.no.elg.hex.api.FrameUpdatable
-import src.no.elg.hex.hexagon.HexUtil.getData
 import java.util.HashSet
 
 /**
@@ -29,8 +29,8 @@ object OutlineRenderer : FrameUpdatable, Disposable {
     for (hex in grid.hexagons) {
       val points = hex.points
       val data = hex.getData()
-      if (data.invisible) continue
-      
+      if (data.invalid) continue
+
       lineRenderer.color = data.color
       for (i in points.indices) {
         val point = points[i]

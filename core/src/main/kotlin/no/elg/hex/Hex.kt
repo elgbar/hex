@@ -8,12 +8,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
-import src.no.elg.hex.hexagon.renderer.OutlineRenderer
-import src.no.elg.hex.hexagon.renderer.VerticesRenderer
-import src.no.elg.hex.hud.HUDRenderer
-import src.no.elg.hex.hud.ScreenRenderer
-import src.no.elg.hex.input.InputHandler
-import src.no.elg.hex.map.Map
+import no.elg.hex.hexagon.renderer.OutlineRenderer
+import no.elg.hex.hexagon.renderer.VerticesRenderer
+import no.elg.hex.hud.HUDRenderer
+import no.elg.hex.hud.ScreenRenderer
+import no.elg.hex.input.InputHandler
+import no.elg.hex.map.Map
 
 
 object Hex : ApplicationAdapter() {
