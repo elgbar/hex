@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hexagon.HexUtil
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import java.awt.Toolkit
 import kotlin.math.abs
@@ -36,7 +36,7 @@ object InputHandler : InputAdapter(), FrameUpdatable {
   var mouseY: Float = 0f
     private set
 
-  val cursorHex: Hexagon<HexagonData>? get() = HexUtil.getHexagon(mouseX.toDouble(), mouseY.toDouble())
+  val cursorHex: Hexagon<HexagonData>? get() = getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   override fun frameUpdate() {
     unprojectVector.x = Gdx.input.x.toFloat()

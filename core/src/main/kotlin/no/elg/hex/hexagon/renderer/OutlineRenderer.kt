@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex.camera
 import no.elg.hex.Hex.map
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hexagon.HexUtil.getData
+import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Point
 import java.util.HashSet
 

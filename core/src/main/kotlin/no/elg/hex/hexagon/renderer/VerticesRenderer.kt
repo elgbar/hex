@@ -11,9 +11,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hexagon.HexUtil.getData
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.InputHandler
+import no.elg.hex.util.getData
 
 object VerticesRenderer : FrameUpdatable, Disposable {
 

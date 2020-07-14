@@ -3,7 +3,6 @@ package no.elg.hex.hud
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hexagon.HexUtil.getData
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hud.HUDRenderer.HUDModus.DEBUG
 import no.elg.hex.hud.HUDRenderer.HUDModus.NONE
@@ -13,6 +12,7 @@ import no.elg.hex.input.InputHandler.MIN_ZOOM
 import no.elg.hex.input.InputHandler.cursorHex
 import no.elg.hex.input.InputHandler.mouseX
 import no.elg.hex.input.InputHandler.mouseY
+import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 
 /**
