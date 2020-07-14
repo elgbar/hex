@@ -18,7 +18,7 @@ import src.no.elg.hex.map.Map
 
 object Hex : ApplicationAdapter() {
 
-  val map = Map(10, 10)
+  val map = Map(25)
   val camera: OrthographicCamera = OrthographicCamera()
 
   private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
@@ -50,7 +50,7 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun resize(width: Int, height: Int) {
-    camera.setToOrtho(false, width.toFloat(), height.toFloat())
+    camera.setToOrtho(true, width.toFloat(), height.toFloat())
     ScreenRenderer.resize(width, height)
     InputHandler.resetCamera()
   }

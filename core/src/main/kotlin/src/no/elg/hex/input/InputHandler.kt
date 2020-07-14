@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
+import no.elg.hex.Hex.camera
 import org.hexworks.mixite.core.api.Hexagon
 import src.no.elg.hex.api.FrameUpdatable
 import src.no.elg.hex.hexagon.HexUtil
@@ -40,16 +41,15 @@ object InputHandler : InputAdapter(), FrameUpdatable {
   override fun frameUpdate() {
     unprojectVector.x = Gdx.input.x.toFloat()
     unprojectVector.y = Gdx.input.y.toFloat()
-    unprojectVector.z = 0f
 
-    Hex.camera.unproject(unprojectVector)
+    camera.unproject(unprojectVector)
     mouseX = unprojectVector.x
     mouseY = unprojectVector.y
 
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    val zoom = Hex.camera.zoom
+    val zoom = camera.zoom
     val x: Float = Gdx.input.deltaX * zoom
     val y: Float = Gdx.input.deltaY * zoom
 
@@ -58,22 +58,23 @@ object InputHandler : InputAdapter(), FrameUpdatable {
       return false
     }
 
-    Hex.camera.translate(-x, y)
+    camera.translate(-x, -y)
     return true
   }
 
   fun resetCamera() {
     val data = Hex.map.grid.gridData
 
-    val x = -((data.gridWidth * data.hexagonWidth + data.gridWidth / 2f - Gdx.graphics.width) / 2f).toFloat()
-    val y = -((data.gridHeight * data.hexagonHeight + data.gridHeight / 2f - Gdx.graphics.height) / 2f).toFloat()
+    val x = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat() / 2f
+    val y = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat() / 2f
 
-    Hex.camera.direction.x
+    camera.position.x = x
+    camera.position.y = y
   }
 
   override fun scrolled(amount: Int): Boolean {
     val dir = sign(amount.toFloat())
-    Hex.camera.zoom = (dir * ZOOM_SPEED + Hex.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    camera.zoom = (dir * ZOOM_SPEED + camera.zoom)//.coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 }
