@@ -86,6 +86,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     //Render the hexagons
     for (hexagon in Hex.map.grid.hexagons) {
       val data: HexagonData = hexagon.getData()
+      if (data.invisible) continue
 //      data.brightness = if (highlighted.contains(hexagon)) HexagonData.BRIGHT else HexagonData.DIM
       val brightness = if (hexagon == currHex) data.brightness + HexagonData.SELECTED else data.brightness
       data.type.render(this, data.color, brightness, hexagon)

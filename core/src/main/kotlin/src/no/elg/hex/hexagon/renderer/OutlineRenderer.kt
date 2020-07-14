@@ -28,15 +28,17 @@ object OutlineRenderer : FrameUpdatable, Disposable {
 
     for (hex in grid.hexagons) {
       val points = hex.points
-
-      lineRenderer.color = hex.getData().color
+      val data = hex.getData()
+      if (data.invisible) continue
+      
+      lineRenderer.color = data.color
       for (i in points.indices) {
         val point = points[i]
         //get the next edge this edge is connected to
         val nextPoint = points[if (i == points.size - 1) 0 else i + 1]
 
         drawnEdges.putIfAbsent(point, HashSet())
-        val connected: HashSet<Point> = drawnEdges[point] ?: throw IllegalStateException("No empty set provided!")
+        val connected: HashSet<Point> = drawnEdges[point] ?: error("No empty set provided!")
 
         if (!connected.contains(nextPoint)) {
           connected.add(nextPoint)
