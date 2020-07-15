@@ -3,6 +3,7 @@ package no.elg.hex.util
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex.map
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
 
@@ -18,7 +19,7 @@ import java.util.HashSet
  */
 fun Hexagon<HexagonData>.getData(): HexagonData {
   return satelliteData.orElseGet {
-    HexagonData(callback = this).also {
+    HexagonData(edge = isEdgeHexagon(this)).also {
       setSatelliteData(it)
     }
   }
@@ -33,7 +34,7 @@ fun Hexagon<HexagonData>.getData(): HexagonData {
  * @return Get the hexagon at a given screen location or `null` if nothing is found
  */
 fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-  return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().invalid) it.get() else null }
+  return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().isOpaque) it.get() else null }
 }
 
 

@@ -50,6 +50,6 @@ object HUDRenderer : FrameUpdatable {
   }
 
   private fun Hexagon<HexagonData>.prettyPrint(): String {
-    return "Hex (${this.center}) type ${this.getData().type.name}"
+    return "${getData().team.name} shape ${this.getData().type.name}"
   }
 }

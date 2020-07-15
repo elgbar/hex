@@ -18,8 +18,6 @@ import kotlin.math.sign
  */
 object InputHandler : InputAdapter(), FrameUpdatable {
 
-  private const val ZOOM_ENABLE = false
-
   private const val MIN_MOVE_AMOUNT = 0
 
   const val MIN_ZOOM = 0.15f

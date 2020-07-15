@@ -29,7 +29,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
     for (hex in grid.hexagons) {
       val points = hex.points
       val data = hex.getData()
-      if (data.invalid) continue
+      if (data.isOpaque) continue
 
       lineRenderer.color = data.color
       for (i in points.indices) {

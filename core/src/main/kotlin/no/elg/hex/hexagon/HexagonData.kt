@@ -2,39 +2,37 @@ package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
-import no.elg.hex.util.randomColor
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
-import kotlin.random.Random
 
 data class HexagonData(
   /**
    * Modifier of how bright the hex should be
    */
-  val brightness: Float = DIM,
+  val brightness: Float = BRIGHT,
 
-  val color: Color = randomColor(),
-
-  val type: HexType = HexType.values()[Random.nextInt(HexType.values().size)],
-
-  val callback: Hexagon<HexagonData>
-) : DefaultSatelliteData() {
+  val team: Team = Team.values().random(),
 
   /**
-   * Invalid hexagons are hexagons that the player should not know exists.
-   * They should not be rendered or be able to be queued
+   * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works these hexagon would be
+   * returned even when the mouse is not inside the hexagon In order to prevent that and gain pixel perfect hexagon
+   * accuracy the player should not know these exists.
    *
-   * @see no.elg.hex.input.InputHandler.cursorHex
+   * @see no.elg.hex.util.getHexagon
    * @see no.elg.hex.hexagon.renderer.OutlineRenderer
    * @see no.elg.hex.hexagon.renderer.VerticesRenderer
    */
-  val invalid = Hex.map.grid.getNeighborsOf(callback).size != EXPECTED_NEIGHBORS
+  val edge: Boolean
+) : DefaultSatelliteData() {
+
+  val color: Color = team.color//randomColor()//
+  val type: HexType = team.type
 
   override var isOpaque: Boolean = false
-    get() = invalid or field
+    get() = edge or field
 
   override var isPassable: Boolean = true
-    get() = invalid and field
+    get() = edge and field
 
   companion object {
     /* Shade brightness modifier for hexagons */ //Cannot move to
@@ -46,6 +44,8 @@ data class HexagonData(
     //mouse hovering over, add this to the current hex under the mouse
     const val SELECTED = 0.1f
 
-    const val EXPECTED_NEIGHBORS = 6
+    private const val EXPECTED_NEIGHBORS = 6
+
+    fun isEdgeHexagon(hex: Hexagon<HexagonData>) = Hex.map.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
   }
 }
