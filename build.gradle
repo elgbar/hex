@@ -50,7 +50,7 @@ tasks.named('wrapper') {
 
 subprojects {
   dependencies {
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
   }
 }
 
@@ -59,10 +59,10 @@ project(":desktop") {
 
   dependencies {
     implementation project(":core")
-    api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
   }
 }
 
@@ -70,11 +70,11 @@ project(":core") {
   apply plugin: "kotlin"
 
   dependencies {
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-    api "com.kotcrab.vis:vis-ui:$visVersion"
-    api "com.github.czyzby:gdx-kiwi:$kiwiVersion"
-    api 'com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0'
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+    implementation "com.kotcrab.vis:vis-ui:$visVersion"
+    implementation "com.github.czyzby:gdx-kiwi:$kiwiVersion"
+    implementation "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
   }
 }
