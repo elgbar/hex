@@ -23,8 +23,9 @@ object Hex : ApplicationAdapter() {
 
   private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
+  lateinit var args: ApplicationParser
   override fun create() {
-    Gdx.input.inputProcessor = InputHandler
+    require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
     if (InputHandler.scale > 1) {
       VisUI.load(X2)
     } else {
