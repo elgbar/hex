@@ -1,6 +1,7 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
@@ -28,6 +29,7 @@ object InputHandler : InputAdapter(), FrameUpdatable {
   val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
 
   private val unprojectVector = Vector3()
+  private var draggable = false
 
   var mouseX: Float = 0f
     private set
@@ -47,16 +49,32 @@ object InputHandler : InputAdapter(), FrameUpdatable {
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    val zoom = camera.zoom
-    val x: Float = Gdx.input.deltaX * zoom
-    val y: Float = Gdx.input.deltaY * zoom
+    if (draggable) {
+      val zoom = camera.zoom
+      val x: Float = Gdx.input.deltaX * zoom
+      val y: Float = Gdx.input.deltaY * zoom
 
-    //Make the little movements when clicking fast less noticeable
-    if (abs(x) < MIN_MOVE_AMOUNT * zoom && abs(y) < MIN_MOVE_AMOUNT * zoom) {
-      return false
+      //Make the little movements when clicking fast less noticeable
+      if (abs(x) < MIN_MOVE_AMOUNT * zoom && abs(y) < MIN_MOVE_AMOUNT * zoom) {
+        return false
+      }
+
+      camera.translate(-x, -y)
     }
+    return true
+  }
 
-    camera.translate(-x, -y)
+  override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    if (button == Buttons.RIGHT) {
+      draggable = true
+    }
+    return true
+  }
+
+  override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    if (button == Buttons.RIGHT) {
+      draggable = false
+    }
     return true
   }
 
