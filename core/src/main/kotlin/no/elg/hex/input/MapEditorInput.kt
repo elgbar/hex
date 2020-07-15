@@ -34,14 +34,14 @@ object MapEditorInput : InputAdapter() {
     if (button == Buttons.LEFT) {
       val cursorHex = BasicInputHandler.cursorHex ?: return true
       if (isShiftPressed()) {
-        for (radius in 0..brushRadius) {
+        for (radius in 1..brushRadius) {
           for (hexagon in cursorHex.findHexagonsInRadius(radius)) {
             hexagon.getData().isOpaque = editMode.newOpaqueness
           }
         }
-      } else {
-        cursorHex.getData().isOpaque = editMode.newOpaqueness
       }
+
+      cursorHex.getData().isOpaque = editMode.newOpaqueness
       return true
     }
     return false
