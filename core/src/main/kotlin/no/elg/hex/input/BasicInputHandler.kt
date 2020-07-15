@@ -6,9 +6,7 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
-import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.util.getData
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import java.awt.Toolkit
@@ -16,9 +14,11 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 /**
+ * Handles input event related to the camera and other basic functiuons such as what
+ *
  * @author Elg
  */
-object InputHandler : InputAdapter(), FrameUpdatable {
+object BasicInputHandler : InputAdapter() {
 
   private const val MIN_MOVE_AMOUNT = 0
 
@@ -27,26 +27,39 @@ object InputHandler : InputAdapter(), FrameUpdatable {
 
   private const val ZOOM_SPEED = 0.1f
 
-  val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
-
   private val unprojectVector = Vector3()
   private var draggable = false
+  private var lastMouseFrame: Long = -1
+
+  val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
 
   var mouseX: Float = 0f
     private set
+    get() {
+      updateMouse()
+      return field
+    }
   var mouseY: Float = 0f
     private set
+    get() {
+      updateMouse()
+      return field
+    }
 
   val cursorHex: Hexagon<HexagonData>? get() = getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
-  override fun frameUpdate() {
+  /**
+   * Update the world mouse position.
+   * Will only update if the frame has changed since last called
+   */
+  private fun updateMouse() {
+    if (lastMouseFrame == Gdx.graphics.frameId) return
     unprojectVector.x = Gdx.input.x.toFloat()
     unprojectVector.y = Gdx.input.y.toFloat()
 
     camera.unproject(unprojectVector)
     mouseX = unprojectVector.x
     mouseY = unprojectVector.y
-
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
@@ -61,24 +74,25 @@ object InputHandler : InputAdapter(), FrameUpdatable {
       }
 
       camera.translate(-x, -y)
+      return true
     }
-    return true
+    return false
   }
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (button == Buttons.LEFT) {
-      cursorHex?.getData()?.isOpaque = true
-    } else if (button == Buttons.RIGHT) {
+    if (button == Buttons.RIGHT) {
       draggable = true
+      return true
     }
-    return true
+    return false
   }
 
   override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.RIGHT) {
       draggable = false
+      return true
     }
-    return true
+    return false
   }
 
   fun resetCamera() {

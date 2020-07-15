@@ -13,13 +13,13 @@ import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.api.Resizable
 import no.elg.hex.hud.ScreenDrawPosition.BOTTOM
 import no.elg.hex.hud.ScreenDrawPosition.TOP
-import no.elg.hex.input.InputHandler.scale
+import no.elg.hex.input.BasicInputHandler.scale
 import java.io.File
 
 
-enum class ScreenDrawPosition {
-  TOP,
-  BOTTOM
+enum class ScreenDrawPosition(val reverseIteration: Boolean) {
+  TOP(false),
+  BOTTOM(true)
 }
 
 data class ScreenText(
@@ -46,11 +46,19 @@ fun nullCheckedText(value: Any?, next: ScreenText? = null) = if (value == null) 
  * @param min minimum allowed value of [value], exclusive
  * @param max maximum allowed value of [value], exclusive
  */
-fun <T : Comparable<T>> validatedText(value: T, min: T, max: T, next: ScreenText? = null): ScreenText {
+fun <T : Comparable<T>> validatedText(
+  value: T,
+  min: T,
+  max: T,
+  color: Color = Color.WHITE,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null
+): ScreenText {
   return if (value < min || value > max) {
-    ScreenText(value.toString(), RED, bold = true, next = next)
+    ScreenText(value.toString(), color = RED, bold = true, next = next)
   } else {
-    ScreenText(value.toString(), next = next)
+    ScreenText(value.toString(), color, bold, italic, next)
   }
 }
 
@@ -61,6 +69,8 @@ fun nullText(next: ScreenText? = null) = ScreenText(
   italic = false,
   next = next
 )
+
+fun emptyText() = ScreenText("")
 
 object ScreenRenderer : Disposable, Resizable {
 
@@ -88,7 +98,12 @@ object ScreenRenderer : Disposable, Resizable {
   /**
    * Draw all given text on different lines
    */
-  fun drawAll(position: ScreenDrawPosition = TOP, vararg screenTexts: ScreenText) {
+  fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP) {
+
+    if (position.reverseIteration) {
+      screenTexts.reverse()
+    }
+
     begin()
     for ((line, screenText) in screenTexts.withIndex()) {
       screenText.draw(line + 1, position)

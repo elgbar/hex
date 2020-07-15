@@ -12,7 +12,7 @@ import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.input.InputHandler
+import no.elg.hex.input.BasicInputHandler
 import no.elg.hex.util.getData
 
 object VerticesRenderer : FrameUpdatable, Disposable {
@@ -81,7 +81,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     Gdx.gl.glEnable(GL20.GL_BLEND)
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    val currHex = InputHandler.cursorHex
+    val currHex = BasicInputHandler.cursorHex
 
     //Render the hexagons
     for (hexagon in Hex.map.grid.hexagons) {

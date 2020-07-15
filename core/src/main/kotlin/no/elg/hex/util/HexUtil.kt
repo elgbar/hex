@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex.map
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
+import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
 
@@ -34,7 +35,7 @@ fun Hexagon<HexagonData>.getData(): HexagonData {
  * @return Get the hexagon at a given screen location or `null` if nothing is found
  */
 fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-  return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().isOpaque) it.get() else null }
+  return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().edge) it.get() else null }
 }
 
 
@@ -65,4 +66,41 @@ private fun connectedHexagons(
     connectedHexagons(neighbor, color, visited)
   }
   return visited
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Taken from https://github.com/Hexworks/mixite/pull/56 TODO remove when this is in the library                     //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const val NEIGHBOR_X_INDEX = 0
+const val NEIGHBOR_Z_INDEX = 1
+val NEIGHBORS = arrayOf(intArrayOf(+1, 0), intArrayOf(+1, -1), intArrayOf(0, -1), intArrayOf(-1, 0), intArrayOf(-1, +1), intArrayOf(0, +1))
+
+
+fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
+  CubeCoordinate.fromCoordinates(
+    coordinate.gridX + NEIGHBORS[index][NEIGHBOR_X_INDEX],
+    coordinate.gridZ + NEIGHBORS[index][NEIGHBOR_Z_INDEX]
+  )
+
+fun Hexagon<HexagonData>.findHexagonsInRadius(radius: Int): Set<Hexagon<HexagonData>> {
+  val result = HashSet<Hexagon<HexagonData>>()
+
+  var currentCoordinate = CubeCoordinate.fromCoordinates(
+    gridX - radius,
+    gridZ + radius
+  )
+
+
+  for (i in 0 until 6) {
+    for (j in 0 until radius) {
+      currentCoordinate = getNeighborCoordinateByIndex(currentCoordinate, i)
+      val hexagon = map.grid.getByCubeCoordinate(currentCoordinate)
+      if (hexagon.isPresent) {
+        result.add(hexagon.get())
+      }
+    }
+  }
+
+  return result
 }
