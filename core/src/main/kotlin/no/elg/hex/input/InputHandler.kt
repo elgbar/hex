@@ -8,6 +8,7 @@ import no.elg.hex.Hex
 import no.elg.hex.Hex.camera
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.util.getData
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import java.awt.Toolkit
@@ -65,7 +66,9 @@ object InputHandler : InputAdapter(), FrameUpdatable {
   }
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (button == Buttons.RIGHT) {
+    if (button == Buttons.LEFT) {
+      cursorHex?.getData()?.isOpaque = true
+    } else if (button == Buttons.RIGHT) {
       draggable = true
     }
     return true
