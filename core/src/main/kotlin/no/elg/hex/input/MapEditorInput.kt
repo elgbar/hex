@@ -6,7 +6,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.MapEditorInput.EditMode.DELETE
-import no.elg.hex.util.findHexagonsInRadius
+import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.getData
 import kotlin.math.max
 import kotlin.math.min
@@ -34,14 +34,12 @@ object MapEditorInput : InputAdapter() {
     if (button == Buttons.LEFT) {
       val cursorHex = BasicInputHandler.cursorHex ?: return true
       if (isShiftPressed()) {
-        for (radius in 1..brushRadius) {
-          for (hexagon in cursorHex.findHexagonsInRadius(radius)) {
-            hexagon.getData().isOpaque = editMode.newOpaqueness
-          }
+        for (hexagon in cursorHex.findHexagonsWithinRadius(brushRadius)) {
+          hexagon.getData().isOpaque = editMode.newOpaqueness
         }
+      } else {
+        cursorHex.getData().isOpaque = editMode.newOpaqueness
       }
-
-      cursorHex.getData().isOpaque = editMode.newOpaqueness
       return true
     }
     return false

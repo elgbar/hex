@@ -83,7 +83,19 @@ fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
     coordinate.gridZ + NEIGHBORS[index][NEIGHBOR_Z_INDEX]
   )
 
-fun Hexagon<HexagonData>.findHexagonsInRadius(radius: Int): Set<Hexagon<HexagonData>> {
+
+fun Hexagon<HexagonData>.findHexagonsWithinRadius(radius: Int, includeThis: Boolean = true): Set<Hexagon<HexagonData>> {
+  val result = HashSet<Hexagon<HexagonData>>()
+  if (includeThis) {
+    result += this
+  }
+  for (subRadius in 1..radius) {
+    result += calculateRing(subRadius)
+  }
+  return result
+}
+
+fun Hexagon<HexagonData>.calculateRing(radius: Int): Set<Hexagon<HexagonData>> {
   val result = HashSet<Hexagon<HexagonData>>()
 
   var currentCoordinate = CubeCoordinate.fromCoordinates(
