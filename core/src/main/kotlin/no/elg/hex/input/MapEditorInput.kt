@@ -4,8 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
+import com.fasterxml.jackson.module.kotlin.readValue
+import no.elg.hex.Hex
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.MapEditorInput.EditMode.DELETE
+import no.elg.hex.map.Map
 import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.getData
 import kotlin.math.max
@@ -19,6 +22,8 @@ object MapEditorInput : InputAdapter() {
   enum class EditMode(val newOpaqueness: Boolean) {
     ADD(false), DELETE(true)
   }
+
+  private var savedMap: String = ""
 
   const val MAX_BRUSH_SIZE = 10
   const val MIN_BRUSH_SIZE = 1
@@ -51,10 +56,22 @@ object MapEditorInput : InputAdapter() {
       return true
     } else if (keycode == Keys.W && isShiftPressed()) {
       brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
+      return true
     } else if (keycode == Keys.S && isShiftPressed()) {
       brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
-    } else if (keycode == Keys.E && isShiftPressed()) {
+      return true
+    } else if (keycode == Keys.E && isControlPressed()) {
       editMode = editMode.next(EditMode.values())
+      return true
+    } else if (keycode == Keys.F5) {
+
+      savedMap = Hex.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(Hex.map)
+      println("a = ${savedMap}")
+
+    } else if (keycode == Keys.F9) {
+      val new = Hex.mapper.readValue<Map>(savedMap)
+
+      require(new === Hex.map)
     }
     return false
   }

@@ -9,6 +9,7 @@ buildscript {
     aiVersion = '1.8.2'
     visVersion = '1.4.4'
     kiwiVersion = '1.9.1.9.6'
+    jackson_version = "2.11.1"
   }
 
   repositories {
@@ -77,5 +78,7 @@ project(":core") {
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.github.czyzby:gdx-kiwi:$kiwiVersion"
     implementation "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
+
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
   }
 }

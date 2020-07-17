@@ -31,10 +31,10 @@ object MapEditorRenderer : FrameUpdatable {
         emptyText(),
         ScreenText("SHIFT+W to increase radius of brush"),
         ScreenText("SHIFT+S to decrease radius of brush"),
-        ScreenText("SHIFT+E to iterate through edit modes"),
+        ScreenText("CTRL+E to iterate through edit modes"),
         emptyText(),
-        ScreenText("CTRL+S to save current map (TODO)", color = Color.LIGHT_GRAY),
-        ScreenText("CTRL+L to load a map (TODO)", color = Color.LIGHT_GRAY),
+        ScreenText("F5 to save current map (TODO)", color = Color.LIGHT_GRAY),
+        ScreenText("F9 to load a map (TODO)", color = Color.LIGHT_GRAY),
         position = BOTTOM
       )
     }

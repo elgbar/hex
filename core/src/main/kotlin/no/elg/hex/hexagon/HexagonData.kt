@@ -1,17 +1,19 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
+import com.fasterxml.jackson.annotation.JsonIgnore
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
 
 data class HexagonData(
+
   /**
    * Modifier of how bright the hex should be
    */
-  val brightness: Float = BRIGHT,
+  var brightness: Float = BRIGHT,
 
-  val team: Team = Team.values().random(),
+  var team: Team = Team.values().random(),
 
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works these hexagon would be
@@ -22,17 +24,19 @@ data class HexagonData(
    * @see no.elg.hex.hexagon.renderer.OutlineRenderer
    * @see no.elg.hex.hexagon.renderer.VerticesRenderer
    */
-  val edge: Boolean
+  val edge: Boolean,
+
+  override var isOpaque: Boolean = edge,
+
+  override var isPassable: Boolean = !edge
 ) : DefaultSatelliteData() {
 
-  val color: Color = team.color//randomColor()//
+  @JsonIgnore
+  val color: Color = team.color
+
+  @JsonIgnore
   val type: HexType = team.type
 
-  override var isOpaque: Boolean = false
-    get() = edge or field
-
-  override var isPassable: Boolean = true
-    get() = edge and field
 
   companion object {
     /* Shade brightness modifier for hexagons */ //Cannot move to

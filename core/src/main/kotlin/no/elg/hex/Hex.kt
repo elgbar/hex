@@ -6,6 +6,8 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
@@ -24,6 +26,16 @@ object Hex : ApplicationAdapter() {
 
   val island = Island(80, 50, RECTANGULAR)
   val camera: OrthographicCamera = OrthographicCamera()
+  val mapper = jacksonObjectMapper().also {
+    it.addMixIn(Hexagon::class.java, HexagonMixIn::class.java)
+    it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
+    it.addMixIn(Maybe::class.java, MaybeMixIn::class.java)
+    it.addMixIn(GridData::class.java, GridDataMixIn::class.java)
+
+    it.registerModule(SimpleModule().apply {
+      addDeserializer(Hexagon::class.java, HexagonDeserializer)
+    });
+  }
 
   private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
