@@ -96,7 +96,7 @@ fun Hexagon<HexagonData>.findHexagonsInRadius(radius: Int): Set<Hexagon<HexagonD
     for (j in 0 until radius) {
       currentCoordinate = getNeighborCoordinateByIndex(currentCoordinate, i)
       val hexagon = map.grid.getByCubeCoordinate(currentCoordinate)
-      if (hexagon.isPresent) {
+      if (hexagon.isPresent && !hexagon.get().getData().edge) {
         result.add(hexagon.get())
       }
     }
