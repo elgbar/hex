@@ -24,7 +24,7 @@ data class HexagonData(
    * @see no.elg.hex.hexagon.renderer.OutlineRenderer
    * @see no.elg.hex.hexagon.renderer.VerticesRenderer
    */
-  val edge: Boolean,
+  val edge: Boolean = false,
 
   override var isOpaque: Boolean = edge,
 
@@ -51,5 +51,7 @@ data class HexagonData(
     private const val EXPECTED_NEIGHBORS = 6
 
     fun isEdgeHexagon(hex: Hexagon<HexagonData>) = Hex.island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
+
+    val EDGE_DATA = HexagonData(edge = true)
   }
 }

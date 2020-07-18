@@ -3,6 +3,7 @@ package no.elg.hex.util
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex.island
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
@@ -20,9 +21,9 @@ import java.util.HashSet
  */
 fun Hexagon<HexagonData>.getData(): HexagonData {
   return satelliteData.orElseGet {
-    HexagonData(edge = isEdgeHexagon(this)).also {
-      setSatelliteData(it)
-    }
+    val data = if (isEdgeHexagon(this)) EDGE_DATA else HexagonData()
+    this.setSatelliteData(data)
+    return@orElseGet data
   }
 }
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.MapEditorInput.EditMode.DELETE
-import no.elg.hex.map.Map
+import no.elg.hex.island.Island
 import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.getData
 import kotlin.math.max
@@ -65,13 +65,14 @@ object MapEditorInput : InputAdapter() {
       return true
     } else if (keycode == Keys.F5) {
 
-      savedMap = Hex.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(Hex.map)
+      savedMap = Hex.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(Hex.island)
       println("a = ${savedMap}")
 
     } else if (keycode == Keys.F9) {
-      val new = Hex.mapper.readValue<Map>(savedMap)
+      val new = Hex.mapper.readValue<Island>(savedMap)
+      Hex.island = new
 
-      require(new === Hex.map)
+      require(new === Hex.island)
     }
     return false
   }
@@ -80,7 +81,6 @@ object MapEditorInput : InputAdapter() {
   private fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)
 
   private fun <E : Enum<E>> Enum<E>.next(values: Array<E>): E {
-//  val values: Array<E> = E::class::enumValues
     return if (ordinal + 1 == values.size) return values[0] else values[ordinal + 1]
   }
 }

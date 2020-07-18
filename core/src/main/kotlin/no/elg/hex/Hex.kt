@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
@@ -19,22 +18,18 @@ import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.input.BasicInputHandler
 import no.elg.hex.input.MapEditorInput
 import no.elg.hex.island.Island
+import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
+import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 
 
 object Hex : ApplicationAdapter() {
 
-  val island = Island(80, 50, RECTANGULAR)
+  var island = Island(80, 50, RECTANGULAR)
   val camera: OrthographicCamera = OrthographicCamera()
-  val mapper = jacksonObjectMapper().also {
-    it.addMixIn(Hexagon::class.java, HexagonMixIn::class.java)
-    it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
-    it.addMixIn(Maybe::class.java, MaybeMixIn::class.java)
-    it.addMixIn(GridData::class.java, GridDataMixIn::class.java)
 
-    it.registerModule(SimpleModule().apply {
-      addDeserializer(Hexagon::class.java, HexagonDeserializer)
-    });
+  val mapper = jacksonObjectMapper().also {
+    it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
   }
 
   private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
