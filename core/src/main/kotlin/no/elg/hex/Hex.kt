@@ -16,12 +16,13 @@ import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.input.BasicInputHandler
 import no.elg.hex.input.MapEditorInput
-import no.elg.hex.map.Map
+import no.elg.hex.island.Island
+import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 
 
 object Hex : ApplicationAdapter() {
 
-  val map = Map(99)
+  val island = Island(80, 50, RECTANGULAR)
   val camera: OrthographicCamera = OrthographicCamera()
 
   private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }

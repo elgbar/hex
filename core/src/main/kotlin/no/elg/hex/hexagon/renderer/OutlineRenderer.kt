@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex.camera
-import no.elg.hex.Hex.map
+import no.elg.hex.Hex.island
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Point
@@ -19,7 +19,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
 
   override fun frameUpdate() {
 
-    val grid = map.grid
+    val grid = island.grid
 
     lineRenderer.begin(Line)
     lineRenderer.projectionMatrix = camera.combined

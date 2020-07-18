@@ -75,7 +75,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     val currHex = BasicInputHandler.cursorHex
 
     //Render the hexagons
-    for (hexagon in Hex.map.grid.hexagons) {
+    for (hexagon in Hex.island.grid.hexagons) {
       val data: HexagonData = hexagon.getData()
       if (data.isOpaque) continue
 //      data.brightness = if (highlighted.contains(hexagon)) HexagonData.BRIGHT else HexagonData.DIM

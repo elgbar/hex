@@ -46,6 +46,6 @@ data class HexagonData(
 
     private const val EXPECTED_NEIGHBORS = 6
 
-    fun isEdgeHexagon(hex: Hexagon<HexagonData>) = Hex.map.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
+    fun isEdgeHexagon(hex: Hexagon<HexagonData>) = Hex.island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
   }
 }

@@ -96,7 +96,7 @@ object BasicInputHandler : InputAdapter() {
   }
 
   fun resetCamera() {
-    val data = Hex.map.grid.gridData
+    val data = Hex.island.grid.gridData
 
     val x = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat() / 2f
     val y = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat() / 2f

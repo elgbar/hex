@@ -1,7 +1,7 @@
 package no.elg.hex.util
 
 import com.badlogic.gdx.graphics.Color
-import no.elg.hex.Hex.map
+import no.elg.hex.Hex.island
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -35,7 +35,7 @@ fun Hexagon<HexagonData>.getData(): HexagonData {
  * @return Get the hexagon at a given screen location or `null` if nothing is found
  */
 fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-  return map.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().edge) it.get() else null }
+  return island.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().edge) it.get() else null }
 }
 
 
@@ -62,7 +62,7 @@ private fun connectedHexagons(
   visited.add(center)
 
   //check each neighbor
-  for (neighbor in map.grid.getNeighborsOf(center)) {
+  for (neighbor in island.grid.getNeighborsOf(center)) {
     connectedHexagons(neighbor, color, visited)
   }
   return visited
@@ -107,7 +107,7 @@ fun Hexagon<HexagonData>.calculateRing(radius: Int): Set<Hexagon<HexagonData>> {
   for (i in 0 until 6) {
     for (j in 0 until radius) {
       currentCoordinate = getNeighborCoordinateByIndex(currentCoordinate, i)
-      val hexagon = map.grid.getByCubeCoordinate(currentCoordinate)
+      val hexagon = island.grid.getByCubeCoordinate(currentCoordinate)
       if (hexagon.isPresent && !hexagon.get().getData().edge) {
         result.add(hexagon.get())
       }
