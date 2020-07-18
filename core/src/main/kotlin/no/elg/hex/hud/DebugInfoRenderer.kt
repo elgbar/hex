@@ -20,13 +20,14 @@ import org.hexworks.mixite.core.api.Hexagon
 object DebugInfoRenderer : FrameUpdatable {
 
   override fun frameUpdate() {
-    val fps = String.format("FPS: %4d delta: %.5f zoom: ", Gdx.graphics.framesPerSecond,
-      Gdx.graphics.deltaTime)
+
     val screenPos = String.format("Screen pos (% 4d,% 4d)", Gdx.input.x, Gdx.input.y)
     val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX, mouseY)
-
     drawAll(
-      ScreenText(fps, next = validatedText(Hex.camera.zoom, MIN_ZOOM, MAX_ZOOM) { "%.2f".format(it) }),
+      ScreenText("FPS: ",
+        next = validatedText(Gdx.graphics.framesPerSecond, 30, Int.MAX_VALUE, color = Color.YELLOW, format = { "%4d".format(it) },
+          next = ScreenText(" zoom: ",
+            next = validatedText(Hex.camera.zoom, MIN_ZOOM, MAX_ZOOM) { "%.2f".format(it) }))),
       ScreenText(screenPos),
       ScreenText(realPos),
       ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex?.prettyPrint(), color = Color.YELLOW))
