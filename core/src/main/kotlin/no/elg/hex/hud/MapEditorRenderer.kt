@@ -33,8 +33,10 @@ object MapEditorRenderer : FrameUpdatable {
         ScreenText("SHIFT+S to decrease radius of brush"),
         ScreenText("CTRL+E to iterate through edit modes"),
         emptyText(),
-        ScreenText("F5 to save current map (TODO)", color = Color.LIGHT_GRAY),
-        ScreenText("F9 to load a map (TODO)", color = Color.LIGHT_GRAY),
+        ScreenText("F5 to quick save island"),
+        ScreenText("F9 to quick load island"),
+        ScreenText("CTRL+S to save current island to disk (TODO)", color = Color.LIGHT_GRAY),
+        ScreenText("CTRL+L to load island from disk (TODO)", color = Color.LIGHT_GRAY),
         position = BOTTOM
       )
     }
