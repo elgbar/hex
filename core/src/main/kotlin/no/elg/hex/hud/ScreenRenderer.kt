@@ -11,15 +11,16 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.api.Resizable
-import no.elg.hex.hud.ScreenDrawPosition.BOTTOM
 import no.elg.hex.hud.ScreenDrawPosition.TOP
 import no.elg.hex.input.BasicInputHandler.scale
 import java.io.File
 
 
-enum class ScreenDrawPosition(val reverseIteration: Boolean) {
-  TOP(false),
-  BOTTOM(true)
+enum class ScreenDrawPosition(val bottom: Boolean, val right: Boolean) {
+  TOP(false, false),
+  BOTTOM(true, false),
+  TOP_RIGHT(false, true),
+  BOTTOM_RIGHT(true, true)
 }
 
 data class ScreenText(
@@ -53,17 +54,18 @@ fun <T : Comparable<T>> validatedText(
   color: Color = Color.WHITE,
   bold: Boolean = false,
   italic: Boolean = false,
-  next: ScreenText? = null
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
 ): ScreenText {
   return if (value < min || value > max) {
-    ScreenText(value.toString(), color = RED, bold = true, next = next)
+    ScreenText(format(value), color = RED, bold = true, next = next)
   } else {
-    ScreenText(value.toString(), color, bold, italic, next)
+    ScreenText(format(value), color, bold, italic, next)
   }
 }
 
 fun nullText(next: ScreenText? = null) = ScreenText(
-  "null",
+  "NULL",
   RED,
   bold = true,
   italic = false,
@@ -85,14 +87,27 @@ object ScreenRenderer : Disposable, Resizable {
 
 
   fun ScreenText.draw(line: Int, position: ScreenDrawPosition = TOP, offsetX: Float = spacing) {
-    val y = when (position) {
-      TOP -> Gdx.graphics.height - spacing * line * 2f
-      BOTTOM -> spacing * line * 2f + spacing
+    val y = if (position.bottom) {
+      spacing * line * 2f + spacing
+    } else {
+      Gdx.graphics.height - spacing * line * 2f
     }
 
+    val (x, nextOffsetX) = if (position.right) {
+      var ctr = 1f
+      var curr: ScreenText? = next
+      while (curr != null) {
+        ctr += curr.text.length
+        curr = curr.next
+      }
+      val totalLength = Gdx.graphics.width - spacing * ctr
+
+      totalLength - spacing * text.length to totalLength
+    } else offsetX to offsetX + spacing * text.length
+
     font.color = color
-    font.draw(batch, text, offsetX, y)
-    next?.draw(line, position, offsetX + spacing * text.length)
+    font.draw(batch, text, x, y)
+    next?.draw(line, position, nextOffsetX)
   }
 
   /**
@@ -100,7 +115,7 @@ object ScreenRenderer : Disposable, Resizable {
    */
   fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP) {
 
-    if (position.reverseIteration) {
+    if (position.bottom) {
       screenTexts.reverse()
     }
 

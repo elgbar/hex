@@ -67,7 +67,8 @@ object Hex : ApplicationAdapter() {
 
     if (args.debug) {
       DebugInfoRenderer.frameUpdate()
-    } else if (args.mapEditor) {
+    }
+    if (args.mapEditor) {
       MapEditorRenderer.frameUpdate()
     }
   }
