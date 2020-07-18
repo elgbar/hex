@@ -7,10 +7,9 @@ import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hud.MapEditorRenderer
-import no.elg.hex.input.MapEditorInput.EditMode.DELETE
+import no.elg.hex.input.EditMode.Delete
 import no.elg.hex.island.Island
 import no.elg.hex.util.findHexagonsWithinRadius
-import no.elg.hex.util.getData
 import kotlin.math.max
 import kotlin.math.min
 
@@ -18,10 +17,6 @@ import kotlin.math.min
  * @author Elg
  */
 object MapEditorInput : InputAdapter() {
-
-  enum class EditMode(val newOpaqueness: Boolean) {
-    ADD(false), DELETE(true)
-  }
 
   private var savedMap: String = writeIslandAsString(false)
 
@@ -31,7 +26,7 @@ object MapEditorInput : InputAdapter() {
   var brushRadius: Int = 1
     private set
 
-  var editMode: EditMode = DELETE
+  var editMode: EditMode = Delete
     private set
 
 
@@ -40,10 +35,10 @@ object MapEditorInput : InputAdapter() {
       val cursorHex = BasicInputHandler.cursorHex ?: return true
       if (isShiftPressed()) {
         for (hexagon in cursorHex.findHexagonsWithinRadius(brushRadius)) {
-          hexagon.getData().isOpaque = editMode.newOpaqueness
+          editMode.edit(hexagon)
         }
       } else {
-        cursorHex.getData().isOpaque = editMode.newOpaqueness
+        editMode.edit(cursorHex)
       }
       return true
     }
@@ -61,7 +56,7 @@ object MapEditorInput : InputAdapter() {
       brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
       return true
     } else if (keycode == Keys.E && isControlPressed()) {
-      editMode = editMode.next(EditMode.values())
+      editMode = EditMode.next()
       return true
     } else if (keycode == Keys.F5) {
       savedMap = writeIslandAsString(true)
