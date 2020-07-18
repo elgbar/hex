@@ -7,7 +7,7 @@ import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hud.MapEditorRenderer
-import no.elg.hex.input.EditMode.Delete
+import no.elg.hex.input.EditMode.Companion.editModeSubclasses
 import no.elg.hex.island.Island
 import no.elg.hex.util.findHexagonsWithinRadius
 import kotlin.math.max
@@ -26,8 +26,14 @@ object MapEditorInput : InputAdapter() {
   var brushRadius: Int = 1
     private set
 
-  var editMode: EditMode = Delete
+  var editMode: EditMode = editModeSubclasses.first()
     private set
+
+
+  internal fun nextEditMode() {
+    val nextIndex = (editModeSubclasses.indexOf(editMode) + 1) % editModeSubclasses.size
+    editMode = editModeSubclasses[nextIndex]
+  }
 
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -56,7 +62,7 @@ object MapEditorInput : InputAdapter() {
       brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
       return true
     } else if (keycode == Keys.E && isControlPressed()) {
-      editMode = EditMode.next()
+      nextEditMode()
       return true
     } else if (keycode == Keys.F5) {
       savedMap = writeIslandAsString(true)

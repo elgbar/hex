@@ -7,16 +7,10 @@ import org.hexworks.mixite.core.api.Hexagon
 sealed class EditMode {
 
   companion object {
-    private val subclasses: List<EditMode> by lazy {
+    val editModeSubclasses: List<EditMode> by lazy {
       EditMode::class.sealedSubclasses.map {
         requireNotNull(it.objectInstance) { "All subclasses of ${EditMode::class::simpleName} must be objects" }
       }
-    }
-    private var index = 0
-
-    fun next(): EditMode {
-      index = (index + 1) % subclasses.size
-      return subclasses[index]
     }
   }
 

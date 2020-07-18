@@ -9,7 +9,8 @@ buildscript {
     aiVersion = '1.8.2'
     visVersion = '1.4.4'
     kiwiVersion = '1.9.1.9.6'
-    jackson_version = "2.11.1"
+    jacksonVersion = "2.11.1"
+    junitVersion = "5.4.2"
   }
 
   repositories {
@@ -43,6 +44,10 @@ allprojects {
 
   [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "1.8"
   [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+  test {
+    useJUnitPlatform()
+  }
 }
 
 tasks.named('wrapper') {
@@ -79,6 +84,10 @@ project(":core") {
     implementation "com.github.czyzby:gdx-kiwi:$kiwiVersion"
     implementation "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
 
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+
+    testImplementation "org.jetbrains.kotlin:kotlin-junit5:$kotlinVersion"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
   }
 }
