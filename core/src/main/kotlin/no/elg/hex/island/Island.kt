@@ -41,6 +41,9 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
   }
 
 
+  val hexagons = grid.hexagons.toSet()
+
+
   @get:JsonValue
   private val dto
     get() =

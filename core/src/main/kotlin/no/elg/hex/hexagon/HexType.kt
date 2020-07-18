@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import no.elg.hex.hexagon.renderer.VerticesRenderer
 import no.elg.hex.util.dim
 import org.hexworks.mixite.core.api.Hexagon
-import org.hexworks.mixite.core.api.Point
 
 
 /**
@@ -133,15 +132,22 @@ enum class HexType(private vararg val surfaces: Surface) {
     brightness: Float,
     hexagon: Hexagon<HexagonData>
   ) {
-    val points = hexagon.points.toMutableList().also {
-      it.add(hexagon.center)
-    }.map { (dx, dy) ->
-      Point.fromPosition(dx, dy)
+
+    for ((i, element) in hexagon.vertices.withIndex()) {
+      points[i] = element.toFloat()
     }
+
+    val center = hexagon.center
+    points[12] = center.coordinateX.toFloat()
+    points[13] = center.coordinateY.toFloat()
 
     for (surface in surfaces) {
       surface.render(verticesRenderer, color, brightness, points)
     }
+  }
+
+  companion object {
+    val points = FloatArray(2 * 7)
   }
 
   private data class Surface(
@@ -171,17 +177,16 @@ enum class HexType(private vararg val surfaces: Surface) {
       verticesRenderer: VerticesRenderer,
       color: Color,
       brightness: Float,
-      points: List<Point>
+      points: FloatArray
     ) {
-      val (coordinateX, coordinateY) = points[v1]
-      vertices[0] = coordinateX.toFloat()
-      vertices[1] = coordinateY.toFloat()
-      val (coordinateX1, coordinateY1) = points[v2]
-      vertices[2] = coordinateX1.toFloat()
-      vertices[3] = coordinateY1.toFloat()
-      val (coordinateX2, coordinateY2) = points[v3]
-      vertices[4] = coordinateX2.toFloat()
-      vertices[5] = coordinateY2.toFloat()
+      vertices[0] = points[v1 * 2]
+      vertices[1] = points[v1 * 2 + 1]
+
+      vertices[2] = points[v2 * 2]
+      vertices[3] = points[v2 * 2 + 1]
+
+      vertices[4] = points[v3 * 2]
+      vertices[5] = points[v3 * 2 + 1]
       verticesRenderer.drawTriangle(color.cpy().dim(shade * brightness).toFloatBits(), vertices)
     }
 
