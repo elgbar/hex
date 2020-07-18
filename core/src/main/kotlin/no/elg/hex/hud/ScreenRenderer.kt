@@ -39,7 +39,13 @@ data class ScreenText(
   }
 }
 
-fun nullCheckedText(value: Any?, next: ScreenText? = null) = if (value == null) nullText(next) else ScreenText(value.toString())
+fun nullCheckedText(
+  value: Any?,
+  color: Color = Color.WHITE,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null
+) = if (value == null) nullText(next) else ScreenText(value.toString(), color, bold, italic, next)
 
 /**
  * Display the value if it is outside the given range

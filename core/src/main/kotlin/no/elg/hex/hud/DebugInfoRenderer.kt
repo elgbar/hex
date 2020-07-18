@@ -1,6 +1,7 @@
 package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
@@ -25,10 +26,10 @@ object DebugInfoRenderer : FrameUpdatable {
     val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX, mouseY)
 
     drawAll(
-      ScreenText(fps, next = validatedText(Hex.camera.zoom, MIN_ZOOM, MAX_ZOOM)),
+      ScreenText(fps, next = validatedText(Hex.camera.zoom, MIN_ZOOM, MAX_ZOOM) { "%.2f".format(it) }),
       ScreenText(screenPos),
       ScreenText(realPos),
-      ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex?.prettyPrint()))
+      ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex?.prettyPrint(), color = Color.YELLOW))
     )
   }
 
