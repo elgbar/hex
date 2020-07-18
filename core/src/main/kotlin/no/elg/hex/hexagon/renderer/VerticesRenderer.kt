@@ -17,23 +17,9 @@ import no.elg.hex.util.getData
 
 object VerticesRenderer : FrameUpdatable, Disposable {
 
-  //@formatter:off //TODO read this from file?
-  private const  val  VERT_SHADER = "attribute vec2 a_position;\n" +
-    "attribute vec4 a_color;\n" +
-    "uniform mat4 u_projTrans;\n" +
-    "varying vec4 vColor;\n" +
-    "void main() {\n" +
-    "	vColor = a_color;\n" +
-    "	gl_Position =  u_projTrans * vec4(a_position.xy, 0.0, 1.0);\n" +
-    "}"
-  private const  val  FRAG_SHADER = "#ifdef GL_ES\n" +
-    "precision mediump float;\n" +
-    "#endif\n" +
-    "varying vec4 vColor;\n" +
-    "void main() {\n" +
-    "	gl_FragColor = vColor;\n" +
-    "}"
-  //@formatter:on
+  private const val SHADERS_FOLDER = "shaders"
+  private const val FRAG_SHADER_PATH = "$SHADERS_FOLDER/hex.frag.glsl"
+  private const val VERT_SHADER_PATH = "$SHADERS_FOLDER/hex.vert.glsl"
 
   //Position attribute - (x, y)
   private const val POSITION_COMPONENTS = 2
@@ -45,7 +31,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
   private const val NUM_COMPONENTS = POSITION_COMPONENTS + COLOR_COMPONENTS
 
   //The maximum number of triangles our mesh will hold
-  private const val MAX_TRIS = 384 // each hexagon has 4 to 6 vertices, and there will be a least 64 hexagons
+  private const val MAX_TRIS = 6 * 64 // each hexagon has 4 to 6 vertices, and there will be a least 64 hexagons
 
   //The maximum number of vertices our mesh will hold
   private const val MAX_VERTS = MAX_TRIS * 3
@@ -54,15 +40,20 @@ object VerticesRenderer : FrameUpdatable, Disposable {
   private val mesh: Mesh = Mesh(true, MAX_VERTS, 0,
     VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
     VertexAttribute(Usage.ColorPacked, 4, "a_color"))
+
   private val shader: ShaderProgram = {
+
+    val fragShader: String = Gdx.files.internal(FRAG_SHADER_PATH).readString()
+    val vertShader: String = Gdx.files.internal(VERT_SHADER_PATH).readString()
+
     ShaderProgram.pedantic = false
-    val shader = ShaderProgram(VERT_SHADER, FRAG_SHADER)
+    val shader = ShaderProgram(vertShader, fragShader)
     val log = shader.log
     if (!shader.isCompiled) {
       throw GdxRuntimeException(log)
     }
-    if (log != null && log.length != 0) {
-      println("Shader Log: $log")
+    if (log != null && log.isNotEmpty()) {
+      Gdx.app.log("Shader Log", log)
     }
     shader
   }()
@@ -110,9 +101,6 @@ object VerticesRenderer : FrameUpdatable, Disposable {
 
     //number of vertices we need to render
     val vertexCount = idx / NUM_COMPONENTS
-
-    //update the camera with our Y-up coordiantes
-//        this.cam.setToOrtho(true, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
     //start the shader before setting any uniforms
     shader.begin()
