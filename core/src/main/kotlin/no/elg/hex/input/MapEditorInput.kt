@@ -23,7 +23,7 @@ object MapEditorInput : InputAdapter() {
     ADD(false), DELETE(true)
   }
 
-  private var savedMap: String = ""
+  private var savedMap: String = writeIslandAsString(false)
 
   const val MAX_BRUSH_SIZE = 10
   const val MIN_BRUSH_SIZE = 1
@@ -64,8 +64,7 @@ object MapEditorInput : InputAdapter() {
       editMode = editMode.next(EditMode.values())
       return true
     } else if (keycode == Keys.F5) {
-
-      savedMap = Hex.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(Hex.island)
+      savedMap = writeIslandAsString(true)
       println("a = ${savedMap}")
 
     } else if (keycode == Keys.F9) {
@@ -75,6 +74,12 @@ object MapEditorInput : InputAdapter() {
       require(new === Hex.island)
     }
     return false
+  }
+
+  private fun writeIslandAsString(pretty: Boolean = false): String {
+    return Hex.mapper.let {
+      if (pretty) it.writerWithDefaultPrettyPrinter() else it.writer()
+    }.writeValueAsString(Hex.island)
   }
 
   private fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)
