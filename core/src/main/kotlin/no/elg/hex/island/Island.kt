@@ -77,7 +77,6 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
 
   val hexagons = grid.hexagons.toSet()
 
-
   fun serialize(): String = Hex.mapper.writeValueAsString(Hex.island)
 
   fun saveIsland(): Boolean {

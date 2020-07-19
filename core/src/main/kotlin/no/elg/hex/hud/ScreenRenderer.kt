@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Color.GREEN
 import com.badlogic.gdx.graphics.Color.RED
+import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -69,6 +70,20 @@ fun <T : Comparable<T>> validatedText(
   } else {
     ScreenText(format(value), color, bold, italic, next)
   }
+}
+
+fun <T : Comparable<T>> variableText(
+  prefix: String,
+  value: T,
+  min: T,
+  max: T,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
+): ScreenText {
+  return ScreenText(prefix, color = WHITE, bold = bold, italic = italic,
+    next = validatedText(value, min, max, bold = bold, italic = italic, color = Color.YELLOW, format = format, next = next))
 }
 
 fun nullText(next: ScreenText? = null) = ScreenText(
