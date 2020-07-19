@@ -25,7 +25,7 @@ import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 
 object Hex : ApplicationAdapter() {
 
-  var island = Island(80, 50, RECTANGULAR)
+  lateinit var island: Island
   val camera: OrthographicCamera = OrthographicCamera()
 
   val mapper = jacksonObjectMapper().also {
@@ -36,9 +36,13 @@ object Hex : ApplicationAdapter() {
 
   lateinit var args: ApplicationArgumentsParser
 
-
   override fun create() {
     require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
+    
+    if (!Island.loadIsland()) {
+      island = Island(40, 25, RECTANGULAR)
+    }
+    MapEditorInput.quicksave()
 
     val inputMultiplexer = InputMultiplexer()
     Gdx.input.inputProcessor = inputMultiplexer
@@ -78,4 +82,6 @@ object Hex : ApplicationAdapter() {
     ScreenRenderer.resize(width, height)
     BasicInputHandler.resetCamera()
   }
+
+
 }

@@ -2,12 +2,14 @@ package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
+import com.badlogic.gdx.Input.Keys.C
 import com.badlogic.gdx.Input.Keys.CONTROL_LEFT
 import com.badlogic.gdx.Input.Keys.CONTROL_RIGHT
 import com.badlogic.gdx.Input.Keys.DOWN
 import com.badlogic.gdx.Input.Keys.F1
 import com.badlogic.gdx.Input.Keys.F5
 import com.badlogic.gdx.Input.Keys.F9
+import com.badlogic.gdx.Input.Keys.LEFT
 import com.badlogic.gdx.Input.Keys.NUMPAD_1
 import com.badlogic.gdx.Input.Keys.NUMPAD_2
 import com.badlogic.gdx.Input.Keys.NUM_1
@@ -15,10 +17,12 @@ import com.badlogic.gdx.Input.Keys.NUM_2
 import com.badlogic.gdx.Input.Keys.PAGE_DOWN
 import com.badlogic.gdx.Input.Keys.PAGE_UP
 import com.badlogic.gdx.Input.Keys.Q
+import com.badlogic.gdx.Input.Keys.RIGHT
 import com.badlogic.gdx.Input.Keys.S
 import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
 import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.Input.Keys.UP
+import com.badlogic.gdx.Input.Keys.V
 import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -30,6 +34,7 @@ import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.OpaquenessEditor.Companion.OPAQUENESS_EDITORS
 import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.input.editor.TeamEditor.Companion.TEAM_EDITORS
+import no.elg.hex.island.Island
 import no.elg.hex.util.findHexagonsWithinRadius
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
@@ -40,7 +45,7 @@ import kotlin.math.min
  */
 object MapEditorInput : InputAdapter() {
 
-  private var savedMap: String = writeIslandAsString(false)
+  private var quickSavedIsland: String = ""
 
   const val MAX_BRUSH_SIZE = 10
   const val MIN_BRUSH_SIZE = 1
@@ -49,6 +54,9 @@ object MapEditorInput : InputAdapter() {
     private set
 
   var selectedTeam: Team = Team.values().first()
+    private set
+
+  var saveSlot: Int = 0
     private set
 
   var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.`Set transparent`
@@ -88,8 +96,14 @@ object MapEditorInput : InputAdapter() {
       NUM_1, NUMPAD_1 -> opaquenessEditor = OPAQUENESS_EDITORS.next(opaquenessEditor)
       NUM_2, NUMPAD_2 -> teamEditor = TEAM_EDITORS.next(teamEditor)
 
-      F5 -> savedMap = writeIslandAsString(true).also { println(it) }
-      F9 -> Hex.island = Hex.mapper.readValue(savedMap)
+      F5 -> quickSavedIsland = writeIslandAsString(true)
+      F9 -> Hex.island = Hex.mapper.readValue(quickSavedIsland)
+
+      RIGHT -> saveSlot++
+      LEFT -> saveSlot = max(saveSlot - 1, 0)
+
+      C -> if (isControlPressed()) Hex.island.saveIsland() else return false
+      V -> if (isControlPressed()) Island.loadIsland() else return false
       else -> return false
     }
     return true
@@ -101,12 +115,18 @@ object MapEditorInput : InputAdapter() {
     }.writeValueAsString(Hex.island)
   }
 
+
+  fun quicksave() {
+    quickSavedIsland = Hex.island.serialize()
+  }
+
+  fun quickload() {
+    Hex.island = Island.deserialize(quickSavedIsland)
+  }
+
+
   private fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
   private fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
-
-  private fun <E : Enum<E>> Enum<E>.next(values: Array<E>): E {
-    return if (ordinal + 1 == values.size) return values[0] else values[ordinal + 1]
-  }
 
   private fun <E> List<E>.next(current: E): E {
     val nextIndex = (this.indexOf(current) + 1) % this.size
