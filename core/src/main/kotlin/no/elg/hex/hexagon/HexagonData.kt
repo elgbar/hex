@@ -39,11 +39,13 @@ data class HexagonData(
   override var isPassable: Boolean = !edge
 ) : DefaultSatelliteData() {
 
-  @JsonIgnore
-  val color: Color = team.color
+  @get:JsonIgnore
+  val color: Color
+    get() = team.color
 
-  @JsonIgnore
-  val type: HexType = team.type
+  @get:JsonIgnore
+  val type: HexType
+    get() = team.type
 
 
   companion object {
