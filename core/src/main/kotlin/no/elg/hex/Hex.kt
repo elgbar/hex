@@ -34,7 +34,7 @@ object Hex : ApplicationAdapter() {
 
   private val AA_BUFFER_CLEAR = lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
-  lateinit var args: ApplicationParser
+  lateinit var args: ApplicationArgumentsParser
 
 
   override fun create() {

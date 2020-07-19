@@ -3,7 +3,7 @@ package no.elg.hex.desktop
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.xenomachina.argparser.ArgParser
-import no.elg.hex.ApplicationParser
+import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.input.BasicInputHandler
 
@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
   config.samples = 16 //max out the samples as this isn't a very heavy game.
   config.useHDPI = true
 
-  Hex.args = ArgParser(args).parseInto(::ApplicationParser)
+  Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
 
   LwjglApplication(Hex, config)
 }
