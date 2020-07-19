@@ -1,11 +1,18 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
 
+@JsonInclude(NON_DEFAULT)
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
 data class HexagonData(
 
   /**
@@ -13,6 +20,7 @@ data class HexagonData(
    */
   var brightness: Float = BRIGHT,
 
+  @JsonInclude(ALWAYS)
   var team: Team = Team.values().random(),
 
   /**
