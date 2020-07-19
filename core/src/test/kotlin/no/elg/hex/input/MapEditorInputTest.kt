@@ -1,6 +1,6 @@
 package no.elg.hex.input
 
-import no.elg.hex.input.EditMode.Companion.editModeSubclasses
+import no.elg.hex.input.editor.OpaquenessEditor.Companion.OPAQUENESS_EDIT_SUBCLASSES
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -11,16 +11,16 @@ internal class MapEditorInputTest {
 
   @Test
   internal fun `First EditMode has index of 0`() {
-    assertEquals(0, editModeSubclasses.indexOf(MapEditorInput.editMode))
+    assertEquals(0, OPAQUENESS_EDIT_SUBCLASSES.indexOf(MapEditorInput.opaquenessEditor))
   }
 
   @Test
   internal fun `nextEditMode() is cyclic`() {
-    for (edit in editModeSubclasses) {
-      assertEquals(edit, MapEditorInput.editMode)
+    for (edit in OPAQUENESS_EDIT_SUBCLASSES) {
+      assertEquals(edit, MapEditorInput.opaquenessEditor)
       MapEditorInput.nextEditMode()
     }
 
-    assertEquals(editModeSubclasses[0], MapEditorInput.editMode)
+    assertEquals(OPAQUENESS_EDIT_SUBCLASSES[0], MapEditorInput.opaquenessEditor)
   }
 }

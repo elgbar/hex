@@ -7,7 +7,12 @@ import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.input.MapEditorInput.MAX_BRUSH_SIZE
 import no.elg.hex.input.MapEditorInput.MIN_BRUSH_SIZE
 import no.elg.hex.input.MapEditorInput.brushRadius
-import no.elg.hex.input.MapEditorInput.editMode
+import no.elg.hex.input.MapEditorInput.opaquenessEditor
+import no.elg.hex.input.MapEditorInput.selectedTeam
+import no.elg.hex.input.MapEditorInput.teamEditor
+import no.elg.hex.input.editor.Editor.Companion.editorText
+import no.elg.hex.input.editor.TeamEditor
+import no.elg.hex.input.editor.TeamEditor.Disabled
 
 /**
  * @author Elg
@@ -19,7 +24,16 @@ object MapEditorRenderer : FrameUpdatable {
   override fun frameUpdate() {
     ScreenRenderer.drawAll(
       ScreenText("Brush radius: ", next = validatedText(brushRadius, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, color = Color.YELLOW)),
-      ScreenText("Edit mode: ", next = ScreenText(editMode.name, color = Color.YELLOW)), position = TOP_RIGHT
+      when (teamEditor) {
+        TeamEditor.`Set team` -> ScreenText("Selected team: ", next = ScreenText(selectedTeam.name, color = Color.YELLOW))
+        TeamEditor.`Randomize team` -> ScreenText("Selected team: ", next = ScreenText("random", color = Color.PURPLE))
+        Disabled -> emptyText()
+      },
+      emptyText(),
+      ScreenText("Opaqueness editor: ", next = editorText(opaquenessEditor)),
+      ScreenText("Team editor: ", next = editorText(teamEditor)),
+//      ScreenText("Passable editor: ", next = editorText(passableEditor)),
+      position = TOP_RIGHT
     )
 
     if (showHelp) {
@@ -28,11 +42,15 @@ object MapEditorRenderer : FrameUpdatable {
         ScreenText("F1 to hide this help text"),
         emptyText(),
         ScreenText("Left click on a hexagon to remove it"),
-        ScreenText("SHIFT+Left-click to ${editMode.name.toLowerCase()} hexagons in a radius of $brushRadius", color = Color.LIGHT_GRAY),
+        ScreenText("Shift left click to edit hexagons in a radius of $brushRadius"),
         emptyText(),
-        ScreenText("SHIFT+W to increase radius of brush"),
-        ScreenText("SHIFT+S to decrease radius of brush"),
-        ScreenText("CTRL+E to iterate through edit modes"),
+        ScreenText("W/up/pgUp to increase radius of brush"),
+        ScreenText("S/down/pgDown to decrease radius of brush"),
+        ScreenText("Q to iterate through teams"),
+        emptyText(),
+        ScreenText("1 to iterate through opaqueness editors"),
+        ScreenText("2 to iterate through team editors"),
+        ScreenText("3 to iterate through passable editors"),
         emptyText(),
         ScreenText("F5 to quick save island"),
         ScreenText("F9 to quick load island"),

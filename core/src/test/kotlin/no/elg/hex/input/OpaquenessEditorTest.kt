@@ -1,6 +1,7 @@
 package no.elg.hex.input
 
 import no.elg.hex.Hex
+import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.util.getData
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Test
 /**
  * @author Elg
  */
-class EditModeTest {
+class OpaquenessEditorTest {
 
   val hexagons = Hex.island.grid.hexagons
 
@@ -19,10 +20,10 @@ class EditModeTest {
     val data = hex.getData()
 
     data.isOpaque = true
-    EditMode.Add.edit(hex)
+    OpaquenessEditor.`Set transparent`.edit(hex)
     assertFalse(data.isOpaque)
 
-    EditMode.Add.edit(hex)
+    OpaquenessEditor.`Set transparent`.edit(hex)
     assertFalse(data.isOpaque)
   }
 
@@ -32,10 +33,10 @@ class EditModeTest {
     val data = hex.getData()
 
     data.isOpaque = false
-    EditMode.Delete.edit(hex)
+    OpaquenessEditor.Delete.edit(hex)
     assertTrue(data.isOpaque)
 
-    EditMode.Delete.edit(hex)
+    OpaquenessEditor.Delete.edit(hex)
     assertTrue(data.isOpaque)
   }
 
@@ -45,10 +46,10 @@ class EditModeTest {
     val data = hex.getData()
 
     data.isOpaque = false
-    EditMode.Or.edit(hex)
+    OpaquenessEditor.`Disabled`.edit(hex)
     assertTrue(data.isOpaque)
 
-    EditMode.Or.edit(hex)
+    OpaquenessEditor.`Disabled`.edit(hex)
     assertFalse(data.isOpaque)
   }
 

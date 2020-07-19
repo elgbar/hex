@@ -2,14 +2,36 @@ package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
-import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.Input.Keys.CONTROL_LEFT
+import com.badlogic.gdx.Input.Keys.CONTROL_RIGHT
+import com.badlogic.gdx.Input.Keys.DOWN
+import com.badlogic.gdx.Input.Keys.F1
+import com.badlogic.gdx.Input.Keys.F5
+import com.badlogic.gdx.Input.Keys.F9
+import com.badlogic.gdx.Input.Keys.NUMPAD_1
+import com.badlogic.gdx.Input.Keys.NUMPAD_2
+import com.badlogic.gdx.Input.Keys.NUM_1
+import com.badlogic.gdx.Input.Keys.NUM_2
+import com.badlogic.gdx.Input.Keys.PAGE_DOWN
+import com.badlogic.gdx.Input.Keys.PAGE_UP
+import com.badlogic.gdx.Input.Keys.Q
+import com.badlogic.gdx.Input.Keys.S
+import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
+import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
+import com.badlogic.gdx.Input.Keys.UP
+import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
+import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.MapEditorRenderer
-import no.elg.hex.input.EditMode.Companion.editModeSubclasses
-import no.elg.hex.island.Island
+import no.elg.hex.input.editor.OpaquenessEditor
+import no.elg.hex.input.editor.OpaquenessEditor.Companion.OPAQUENESS_EDITORS
+import no.elg.hex.input.editor.TeamEditor
+import no.elg.hex.input.editor.TeamEditor.Companion.TEAM_EDITORS
 import no.elg.hex.util.findHexagonsWithinRadius
+import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
 
@@ -26,25 +48,32 @@ object MapEditorInput : InputAdapter() {
   var brushRadius: Int = 1
     private set
 
-  var editMode: EditMode = editModeSubclasses.first()
+  var selectedTeam: Team = Team.values().first()
     private set
 
-
-  internal fun nextEditMode() {
-    val nextIndex = (editModeSubclasses.indexOf(editMode) + 1) % editModeSubclasses.size
-    editMode = editModeSubclasses[nextIndex]
-  }
-
+  var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.`Set transparent`
+    private set
+  var teamEditor: TeamEditor = TeamEditor.Disabled
+    private set
+//  var passableEditor: PassableEditor = PassableEditor.Disabled
+//    private set
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
       val cursorHex = BasicInputHandler.cursorHex ?: return true
+
+      fun editHex(hexagon: Hexagon<HexagonData>) {
+        opaquenessEditor.edit(hexagon)
+        teamEditor.edit(hexagon)
+//        passableEditor.edit(hexagon)
+      }
+
       if (isShiftPressed()) {
         for (hexagon in cursorHex.findHexagonsWithinRadius(brushRadius)) {
-          editMode.edit(hexagon)
+          editHex(hexagon)
         }
       } else {
-        editMode.edit(cursorHex)
+        editHex(cursorHex)
       }
       return true
     }
@@ -52,29 +81,22 @@ object MapEditorInput : InputAdapter() {
   }
 
   override fun keyDown(keycode: Int): Boolean {
-    if (keycode == Keys.F1) {
-      MapEditorRenderer.showHelp = !MapEditorRenderer.showHelp
-      return true
-    } else if (keycode == Keys.W && isShiftPressed()) {
-      brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
-      return true
-    } else if (keycode == Keys.S && isShiftPressed()) {
-      brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
-      return true
-    } else if (keycode == Keys.E && isControlPressed()) {
-      nextEditMode()
-      return true
-    } else if (keycode == Keys.F5) {
-      savedMap = writeIslandAsString(true)
-      println("a = ${savedMap}")
+    when (keycode) {
+      F1 -> MapEditorRenderer.showHelp = !MapEditorRenderer.showHelp
 
-    } else if (keycode == Keys.F9) {
-      val new = Hex.mapper.readValue<Island>(savedMap)
-      Hex.island = new
+      W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
+      S, PAGE_DOWN, DOWN -> brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
+      Q -> selectedTeam = Team.values().next(selectedTeam)
 
-      require(new === Hex.island)
+      NUM_1, NUMPAD_1 -> opaquenessEditor = OPAQUENESS_EDITORS.next(opaquenessEditor)
+      NUM_2, NUMPAD_2 -> teamEditor = TEAM_EDITORS.next(teamEditor)
+//      NUM_3, NUMPAD_3 -> passableEditor = PASSABLE_EDITORS.next(passableEditor)
+
+      F5 -> savedMap = writeIslandAsString(true).also { println(it) }
+      F9 -> Hex.island = Hex.mapper.readValue(savedMap)
+      else -> return false
     }
-    return false
+    return true
   }
 
   private fun writeIslandAsString(pretty: Boolean = false): String {
@@ -83,10 +105,20 @@ object MapEditorInput : InputAdapter() {
     }.writeValueAsString(Hex.island)
   }
 
-  private fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)
-  private fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)
+  private fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
+  private fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
 
   private fun <E : Enum<E>> Enum<E>.next(values: Array<E>): E {
     return if (ordinal + 1 == values.size) return values[0] else values[ordinal + 1]
+  }
+
+  private fun <E> List<E>.next(current: E): E {
+    val nextIndex = (this.indexOf(current) + 1) % this.size
+    return this[nextIndex]
+  }
+
+  private fun <E> Array<E>.next(current: E): E {
+    val nextIndex = (this.indexOf(current) + 1) % this.size
+    return this[nextIndex]
   }
 }

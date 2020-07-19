@@ -2,6 +2,7 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color.GREEN
 import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -79,6 +80,19 @@ fun nullText(next: ScreenText? = null) = ScreenText(
 )
 
 fun emptyText() = ScreenText("")
+
+fun booleanText(
+  check: Boolean,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null
+) = ScreenText(
+  "%-5s".format(check),
+  bold = bold,
+  italic = italic,
+  color = if (check) GREEN else RED,
+  next = next
+)
 
 object ScreenRenderer : Disposable, Resizable {
 
