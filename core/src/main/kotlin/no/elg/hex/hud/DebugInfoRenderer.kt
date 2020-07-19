@@ -21,8 +21,8 @@ object DebugInfoRenderer : FrameUpdatable {
 
   override fun frameUpdate() {
 
-    val screenPos = String.format("Screen pos (% 4d,% 4d)", Gdx.input.x, Gdx.input.y)
-    val realPos = String.format("Real pos (% 8.2f,% 8.2f)", mouseX, mouseY)
+    val screenPos = "Screen pos (%4d,%4d)".format(Gdx.input.x, Gdx.input.y)
+    val realPos = "Real pos (% 5.0f,% 5.0f)".format(mouseX, mouseY)
     drawAll(
       ScreenText("FPS: ",
         next = validatedText(Gdx.graphics.framesPerSecond, 30, Int.MAX_VALUE, color = Color.YELLOW, format = { "%4d".format(it) },
