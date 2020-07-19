@@ -55,8 +55,6 @@ object MapEditorInput : InputAdapter() {
     private set
   var teamEditor: TeamEditor = TeamEditor.Disabled
     private set
-//  var passableEditor: PassableEditor = PassableEditor.Disabled
-//    private set
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
@@ -65,7 +63,6 @@ object MapEditorInput : InputAdapter() {
       fun editHex(hexagon: Hexagon<HexagonData>) {
         opaquenessEditor.edit(hexagon)
         teamEditor.edit(hexagon)
-//        passableEditor.edit(hexagon)
       }
 
       if (isShiftPressed()) {
@@ -90,7 +87,6 @@ object MapEditorInput : InputAdapter() {
 
       NUM_1, NUMPAD_1 -> opaquenessEditor = OPAQUENESS_EDITORS.next(opaquenessEditor)
       NUM_2, NUMPAD_2 -> teamEditor = TEAM_EDITORS.next(teamEditor)
-//      NUM_3, NUMPAD_3 -> passableEditor = PASSABLE_EDITORS.next(passableEditor)
 
       F5 -> savedMap = writeIslandAsString(true).also { println(it) }
       F9 -> Hex.island = Hex.mapper.readValue(savedMap)

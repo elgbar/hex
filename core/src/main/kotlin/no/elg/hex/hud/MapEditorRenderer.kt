@@ -32,7 +32,6 @@ object MapEditorRenderer : FrameUpdatable {
       emptyText(),
       ScreenText("Opaqueness editor: ", next = editorText(opaquenessEditor)),
       ScreenText("Team editor: ", next = editorText(teamEditor)),
-//      ScreenText("Passable editor: ", next = editorText(passableEditor)),
       position = TOP_RIGHT
     )
 
@@ -50,7 +49,6 @@ object MapEditorRenderer : FrameUpdatable {
         emptyText(),
         ScreenText("1 to iterate through opaqueness editors"),
         ScreenText("2 to iterate through team editors"),
-        ScreenText("3 to iterate through passable editors"),
         emptyText(),
         ScreenText("F5 to quick save island"),
         ScreenText("F9 to quick load island"),
