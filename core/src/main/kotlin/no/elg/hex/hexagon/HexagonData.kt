@@ -62,4 +62,8 @@ data class HexagonData(
 
     val EDGE_DATA = HexagonData(edge = true)
   }
+
+  override fun toString(): String {
+    return "opaque: %-5s, edge: %-5s, team: $team".format(isOpaque, edge)
+  }
 }

@@ -71,7 +71,7 @@ fun <T : Comparable<T>> validatedText(
 }
 
 fun nullText(next: ScreenText? = null) = ScreenText(
-  "NULL",
+  "null",
   RED,
   bold = true,
   italic = false,
