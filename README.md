@@ -2,40 +2,62 @@
 
 A simple turn based strategy game aiming to clone Slay.
 
+## Phrases
+
+| Prase | Meaning |
+|:---|:---|
+| Team | A player or computer |
+| Territory | Two or more hexes of the same team |
+| Piece | An piece on a hex (for example capitals, castles, or peasants) | 
+| Capital | The ruling piece of a territory, gives same protection as a peasant |
+| Castle | A stationary piece that gives more protection |
+| peasant | Least powerful movable piece, can only only take over unprotected land |
+| spearman | Slightly more powerful movable piece, can only take over unprotected land, capitals, and kill peasants |
+| knight | Even more powerful movable piece, can take over castles, and everything a spearman can |
+| baron | The most powerful piece in the game, can kill every piece (including othe barons) |
+| pine | A type of tree that grows everywhere |
+| palm | A type of tree that grows along the coast |
+| tree | Collective word for `pine` and `palm` |
+
 ## Development
 
 ### Phase 1
 
 Initial development, creating a solid framework to build the game further. 
 
-* Status: Partially complete
+* Status: Complete
 
 #### Goals
 
 * [x] Display a hexagon grid
 * [x] Allow player to drag the grid around
 * [x] Allow player to zoom
-* [ ] Allow player to highlight the hexagon currently under the mouse
+* [x] Allow player to highlight the hexagon currently under the mouse
 
-### Phase 2
-
-The second phase has been split into two halves that can be worked on in parallel.
-
-* Status: Pending
-
-#### Phase 2A - World 
+### Phase 2 - World 
 
 Use noise algorithms to create worlds
 
-* Status: Pending
+#### Goals
 
-#### Phase 2B-A - Gameplay
+* [X] Map editor
+* [ ] World generation
+    * Low priority as the map editor works for now
+
+* Status: Complete
+
+#### Phase 3 - Gameplay
 
 Implement the gamerules in the following subphase
 
+* Basic teams
+    * User is assigned a team (defaults to green/`LEAF`)
+    * Highlight `territory` (make every other hex darker)
+    * 
 * Economy
-  
 * Protection
+* Undoing
+    * Record each change to the map to allow undoing by "reloading" last state
 
 * Status: Pending
 
