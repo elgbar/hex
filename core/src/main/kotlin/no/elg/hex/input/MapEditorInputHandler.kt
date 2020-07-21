@@ -9,7 +9,6 @@ import com.badlogic.gdx.Input.Keys.DOWN
 import com.badlogic.gdx.Input.Keys.F1
 import com.badlogic.gdx.Input.Keys.F5
 import com.badlogic.gdx.Input.Keys.F9
-import com.badlogic.gdx.Input.Keys.LEFT
 import com.badlogic.gdx.Input.Keys.NUMPAD_1
 import com.badlogic.gdx.Input.Keys.NUMPAD_2
 import com.badlogic.gdx.Input.Keys.NUM_1
@@ -17,7 +16,6 @@ import com.badlogic.gdx.Input.Keys.NUM_2
 import com.badlogic.gdx.Input.Keys.PAGE_DOWN
 import com.badlogic.gdx.Input.Keys.PAGE_UP
 import com.badlogic.gdx.Input.Keys.Q
-import com.badlogic.gdx.Input.Keys.RIGHT
 import com.badlogic.gdx.Input.Keys.S
 import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
 import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
@@ -43,7 +41,7 @@ import kotlin.math.min
 /**
  * @author Elg
  */
-object MapEditorInput : InputAdapter() {
+object MapEditorInputHandler : InputAdapter() {
 
   private var quickSavedIsland: String = ""
 
@@ -54,9 +52,6 @@ object MapEditorInput : InputAdapter() {
     private set
 
   var selectedTeam: Team = Team.values().first()
-    private set
-
-  var saveSlot: Int = 0
     private set
 
   var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.`Set transparent`
@@ -98,9 +93,6 @@ object MapEditorInput : InputAdapter() {
 
       F5 -> quickSavedIsland = writeIslandAsString(true)
       F9 -> Hex.island = Hex.mapper.readValue(quickSavedIsland)
-
-      RIGHT -> saveSlot++
-      LEFT -> saveSlot = max(saveSlot - 1, 0)
 
       C -> if (isControlPressed()) Hex.island.saveIsland() else return false
       V -> if (isControlPressed()) Island.loadIsland() else return false

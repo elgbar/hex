@@ -7,20 +7,20 @@ import org.junit.jupiter.api.Test
 /**
  * @author Elg
  */
-internal class MapEditorInputTest {
+internal class MapEditorInputHandlerTest {
 
   @Test
   internal fun `First EditMode has index of 0`() {
-    assertEquals(0, OPAQUENESS_EDIT_SUBCLASSES.indexOf(MapEditorInput.opaquenessEditor))
+    assertEquals(0, OPAQUENESS_EDIT_SUBCLASSES.indexOf(MapEditorInputHandler.opaquenessEditor))
   }
 
   @Test
   internal fun `nextEditMode() is cyclic`() {
     for (edit in OPAQUENESS_EDIT_SUBCLASSES) {
-      assertEquals(edit, MapEditorInput.opaquenessEditor)
-      MapEditorInput.nextEditMode()
+      assertEquals(edit, MapEditorInputHandler.opaquenessEditor)
+      MapEditorInputHandler.nextEditMode()
     }
 
-    assertEquals(OPAQUENESS_EDIT_SUBCLASSES[0], MapEditorInput.opaquenessEditor)
+    assertEquals(OPAQUENESS_EDIT_SUBCLASSES[0], MapEditorInputHandler.opaquenessEditor)
   }
 }

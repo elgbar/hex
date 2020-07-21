@@ -1,10 +1,12 @@
 package no.elg.hex.util
 
-import com.badlogic.gdx.graphics.Color
+import no.elg.hex.ApplicationArgumentsParser
+import no.elg.hex.Hex
 import no.elg.hex.Hex.island
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
+import no.elg.hex.hexagon.Team
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
@@ -28,15 +30,20 @@ fun Hexagon<HexagonData>.getData(): HexagonData {
 }
 
 /**
- * @param x
- * screen x
- * @param y
- * screen y
+ * @param x screen x
+ * @param y screen y
  *
- * @return Get the hexagon at a given screen location or `null` if nothing is found
+ * Note that if the application is in map editor mode (via [ApplicationArgumentsParser.mapEditor]) this will return
+ * opaque hexagons. If not however these will be invisible to this method.
+ *
+ * @return Get the hexagon at a given screen location or `null` if nothing is found.
  */
 fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-  return island.grid.getByPixelCoordinate(x, y).let { if (it.isPresent && !it.get().getData().edge) it.get() else null }
+  return island.grid.getByPixelCoordinate(x, y).let {
+    if (it.isEmpty()) return@let null
+    val data = it.get().getData()
+    if (data.edge || (!Hex.args.mapEditor && data.isOpaque)) null else it.get()
+  }
 }
 
 
@@ -45,17 +52,18 @@ fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
  *
  * @return All hexagons connected to the start hexagon that has the same color
  */
-fun connectedHexagons(initial: Hexagon<HexagonData>): Set<Hexagon<HexagonData>?> {
-  return connectedHexagons(initial, initial.getData().color, HashSet())
+fun Hexagon<HexagonData>.connectedHexagons(): Set<Hexagon<HexagonData>> {
+  return connectedHexagons(this, this.getData().team, HashSet())
 }
 
 private fun connectedHexagons(
   center: Hexagon<HexagonData>,
-  color: Color,
-  visited: MutableSet<Hexagon<HexagonData>?>
-): Set<Hexagon<HexagonData>?> {
+  team: Team,
+  visited: MutableSet<Hexagon<HexagonData>>
+): Set<Hexagon<HexagonData>> {
+  val data = center.getData()
   //only check a hexagon if they have the same color and haven't been visited
-  if (visited.contains(center) || center.getData().color != color) {
+  if (visited.contains(center) || data.team != team || !data.visible) {
     return visited
   }
 
@@ -64,7 +72,7 @@ private fun connectedHexagons(
 
   //check each neighbor
   for (neighbor in island.grid.getNeighborsOf(center)) {
-    connectedHexagons(neighbor, color, visited)
+    connectedHexagons(neighbor, team, visited)
   }
   return visited
 }

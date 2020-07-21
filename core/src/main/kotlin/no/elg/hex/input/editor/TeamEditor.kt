@@ -2,7 +2,7 @@ package no.elg.hex.input.editor
 
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Team
-import no.elg.hex.input.MapEditorInput.selectedTeam
+import no.elg.hex.input.MapEditorInputHandler.selectedTeam
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 

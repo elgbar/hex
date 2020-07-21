@@ -10,13 +10,15 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
+import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.renderer.OutlineRenderer
 import no.elg.hex.hexagon.renderer.VerticesRenderer
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.input.BasicInputHandler
-import no.elg.hex.input.MapEditorInput
+import no.elg.hex.input.GameInputHandler
+import no.elg.hex.input.MapEditorInputHandler
 import no.elg.hex.island.Island
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -27,6 +29,7 @@ object Hex : ApplicationAdapter() {
 
   lateinit var island: Island
   val camera: OrthographicCamera = OrthographicCamera()
+  val playerTeam = Team.LEAF
 
   val mapper = jacksonObjectMapper().also {
     it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
@@ -38,17 +41,19 @@ object Hex : ApplicationAdapter() {
 
   override fun create() {
     require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
-    
+
     if (!Island.loadIsland()) {
       island = Island(40, 25, RECTANGULAR)
     }
-    MapEditorInput.quicksave()
+    MapEditorInputHandler.quicksave()
 
     val inputMultiplexer = InputMultiplexer()
     Gdx.input.inputProcessor = inputMultiplexer
     inputMultiplexer.addProcessor(BasicInputHandler)
     if (args.mapEditor) {
-      inputMultiplexer.addProcessor(MapEditorInput)
+      inputMultiplexer.addProcessor(MapEditorInputHandler)
+    } else {
+      inputMultiplexer.addProcessor(GameInputHandler)
     }
 
     if (BasicInputHandler.scale > 1) {

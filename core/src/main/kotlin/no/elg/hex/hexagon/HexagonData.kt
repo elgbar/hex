@@ -15,13 +15,10 @@ import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
 data class HexagonData(
 
-  /**
-   * Modifier of how bright the hex should be
-   */
-  var brightness: Float = BRIGHT,
-
   @JsonInclude(ALWAYS)
   var team: Team = Team.values().random(),
+
+  var piece: Piece = NoPiece,
 
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works these hexagon would be
@@ -47,13 +44,13 @@ data class HexagonData(
   val type: HexType
     get() = team.type
 
+  val visible: Boolean get() = !edge && !isOpaque
+
 
   companion object {
-    /* Shade brightness modifier for hexagons */ //Cannot move to
-    const val DIM = 0.75f
 
     //Can move to
-    const val BRIGHT = 0.9f
+    const val BRIGHTNESS = 0.9f
 
     //mouse hovering over, add this to the current hex under the mouse
     const val SELECTED = 0.1f
@@ -66,6 +63,6 @@ data class HexagonData(
   }
 
   override fun toString(): String {
-    return "opaque: %-5s, edge: %-5s, team: $team".format(isOpaque, edge)
+    return "team: $team piece: $piece"
   }
 }

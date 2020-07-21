@@ -2,6 +2,7 @@ package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
@@ -11,6 +12,7 @@ import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import java.awt.Toolkit
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.sign
 
 /**
@@ -46,6 +48,9 @@ object BasicInputHandler : InputAdapter() {
       return field
     }
 
+  var saveSlot: Int = 0
+    private set
+
   val cursorHex: Hexagon<HexagonData>? get() = getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   /**
@@ -79,20 +84,29 @@ object BasicInputHandler : InputAdapter() {
     return false
   }
 
-  override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (button == Buttons.RIGHT) {
-      draggable = true
-      return true
+  override fun keyDown(keycode: Int): Boolean {
+    when (keycode) {
+      Keys.RIGHT -> saveSlot++
+      Keys.LEFT -> saveSlot = max(saveSlot - 1, 0)
+      else -> return false
     }
-    return false
+    return true
+  }
+
+  override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    when (button) {
+      Buttons.RIGHT -> draggable = true
+      else -> return false
+    }
+    return true
   }
 
   override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (button == Buttons.RIGHT) {
-      draggable = false
-      return true
+    when (button) {
+      Buttons.RIGHT -> draggable = false
+      else -> return false
     }
-    return false
+    return true
   }
 
   fun resetCamera() {
