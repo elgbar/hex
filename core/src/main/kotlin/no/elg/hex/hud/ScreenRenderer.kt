@@ -27,7 +27,7 @@ enum class ScreenDrawPosition(val bottom: Boolean, val right: Boolean) {
 
 data class ScreenText(
   val text: String,
-  val color: Color = Color.WHITE,
+  val color: Color = WHITE,
   val bold: Boolean = false,
   val italic: Boolean = false,
   val next: ScreenText? = null
@@ -41,13 +41,14 @@ data class ScreenText(
   }
 }
 
-fun nullCheckedText(
-  value: Any?,
-  color: Color = Color.WHITE,
+fun <T> nullCheckedText(
+  value: T?,
+  color: Color = WHITE,
   bold: Boolean = false,
   italic: Boolean = false,
-  next: ScreenText? = null
-) = if (value == null) nullText(next) else ScreenText(value.toString(), color, bold, italic, next)
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
+) = if (value == null) nullText(next) else ScreenText(format(value), color, bold, italic, next)
 
 /**
  * Display the value if it is outside the given range
@@ -59,7 +60,7 @@ fun <T : Comparable<T>> validatedText(
   value: T,
   min: T,
   max: T,
-  color: Color = Color.WHITE,
+  color: Color = WHITE,
   bold: Boolean = false,
   italic: Boolean = false,
   next: ScreenText? = null,
