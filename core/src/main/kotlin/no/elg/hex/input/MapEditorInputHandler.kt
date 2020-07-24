@@ -54,7 +54,7 @@ object MapEditorInputHandler : InputAdapter() {
   var selectedTeam: Team = Team.values().first()
     private set
 
-  var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.`Set transparent`
+  var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.Disabled
     private set
   var teamEditor: TeamEditor = TeamEditor.Disabled
     private set
