@@ -44,7 +44,9 @@ data class HexagonData(
   val type: HexType
     get() = team.type
 
-  val visible: Boolean get() = !edge && !isOpaque
+  @get:JsonIgnore
+  val visible: Boolean
+    get() = !edge && !isOpaque
 
 
   companion object {
