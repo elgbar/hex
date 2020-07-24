@@ -2,7 +2,9 @@ package no.elg.hex.input
 
 import no.elg.hex.Hex
 import no.elg.hex.input.editor.OpaquenessEditor
+import no.elg.hex.island.Island
 import no.elg.hex.util.getData
+import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -12,10 +14,14 @@ import org.junit.jupiter.api.Test
  */
 class OpaquenessEditorTest {
 
+  init {
+    Hex.island = Island(5, 5, HEXAGONAL)
+  }
+
   val hexagons = Hex.island.grid.hexagons
 
   @Test
-  internal fun `Add EditMode makes hexagon not opaque`() {
+  internal fun `Set transparent EditMode makes hexagon not opaque`() {
     val hex = hexagons.first()
     val data = hex.getData()
 
@@ -28,28 +34,28 @@ class OpaquenessEditorTest {
   }
 
   @Test
-  internal fun `Delete EditMode makes hexagon opaque`() {
+  internal fun `Set opaque EditMode makes hexagon opaque`() {
     val hex = hexagons.first()
     val data = hex.getData()
 
     data.isOpaque = false
-    OpaquenessEditor.Delete.edit(hex)
+    OpaquenessEditor.`Set opaque`.edit(hex)
     assertTrue(data.isOpaque)
 
-    OpaquenessEditor.Delete.edit(hex)
+    OpaquenessEditor.`Set opaque`.edit(hex)
     assertTrue(data.isOpaque)
   }
 
   @Test
-  internal fun `Or EditMode makes hexagon opaqueness toggle`() {
+  internal fun `Toggle opaqueness EditMode makes hexagon opaqueness toggle`() {
     val hex = hexagons.first()
     val data = hex.getData()
 
     data.isOpaque = false
-    OpaquenessEditor.`Disabled`.edit(hex)
+    OpaquenessEditor.`Toggle opaqueness`.edit(hex)
     assertTrue(data.isOpaque)
 
-    OpaquenessEditor.`Disabled`.edit(hex)
+    OpaquenessEditor.`Toggle opaqueness`.edit(hex)
     assertFalse(data.isOpaque)
   }
 
