@@ -31,6 +31,7 @@ object Hex : ApplicationAdapter() {
   val camera: OrthographicCamera = OrthographicCamera()
   val playerTeam = Team.LEAF
 
+  @JvmStatic
   val mapper = jacksonObjectMapper().also {
     it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
   }
