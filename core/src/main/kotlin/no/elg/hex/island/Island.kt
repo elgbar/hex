@@ -23,7 +23,12 @@ import kotlin.math.max
 /**
  * @author Elg
  */
-class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: Set<Pair<CubeCoordinate, HexagonData>> = emptySet()) {
+class Island(
+  width: Int,
+  height: Int,
+  layout: HexagonalGridLayout,
+  hexagonData: Set<Pair<CubeCoordinate, HexagonData>> = emptySet()
+) {
 
   val grid: HexagonalGrid<HexagonData>
 
@@ -62,7 +67,7 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
   /**
    * Select the hex under the cursor
    */
-  fun select(): Unit {
+  fun select() {
     selected = null
     val hex = BasicInputHandler.cursorHex ?: return
     val data: HexagonData = hex.getData()
@@ -70,6 +75,7 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
     val territoryHexes = hex.getTerritoryHexagons() ?: return
 
     val capital = getCapital(territoryHexes) ?: Capital(data.team).also {
+      //this territory have no capital, create one!
       it.place(calculateBestCapitalPlacement(territoryHexes).getData())
     }
     selected = capital to territoryHexes
@@ -118,22 +124,31 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
     //The maximum distance between two hexagons for this grid
     val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
 
-    var currMinRadius = maxRadius
+    var greatestDistance = 1
 
-    for (hex in hexagons) {
-      for (r in 1 until currMinRadius) {
+
+    fun finDistanceToClosestHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
+      for (r in discardIfLessThan..maxRadius) {
         if (hex.calculateRing(r).any { it.getData().team != hexTeam }) {
-          if (r < currMinRadius) {
-            contenders.clear()
-            currMinRadius = r
-          }
-          contenders += hex
-          break
+          return r
         }
       }
+      return -1 //no hexes found we've won!
+    }
+
+    for (hex in hexagons) {
+      val dist = finDistanceToClosestHex(hex, greatestDistance)
+      if (dist > greatestDistance) {
+        //we have a new greatest distance
+        greatestDistance = dist
+        contenders.clear()
+      }
+      contenders += hex
     }
 
     require(contenders.isNotEmpty()) { "No capital contenders found!" }
+
+    Gdx.app.log("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
 
     if (contenders.size == 1) return contenders.first()
 
@@ -141,14 +156,16 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
     // invisible hexagons count to ours hexagons
 
     //number of hexagons expected to have around the given radius
-    val expectedHexagons = 6 * currMinRadius
+    val expectedHexagons = 6 * greatestDistance
 
-    contenders.map {
-      val ring = it.calculateRing(currMinRadius)
-      it to (expectedHexagons - ring.size) //non-existent hexes count as ours
-      +ring.map { it2 -> it2.getData().isOpaque || it2.getData().team == hexTeam }.count()
-    }
-    TODO()
+    return contenders.map { origin: Hexagon<HexagonData> ->
+      val ring = origin.calculateRing(greatestDistance)
+      origin to ((expectedHexagons - ring.size) //non-existent hexes count as ours
+        + ring.sumByDouble {
+        val data = it.getData()
+        (if (data.team == hexTeam) 1.0 else 0.0) + (if (data.visible) 0.0 else 0.5)
+      })
+    }.maxBy { it.second }!!.first
   }
 
   ///////////////////
@@ -185,23 +202,21 @@ class Island(width: Int, height: Int, layout: HexagonalGridLayout, hexagonData: 
     val fileName: String get() = "island-${BasicInputHandler.saveSlot}.is"
     val islandFile: FileHandle get() = Gdx.files.local("$ISLAND_SAVE_DIR/$fileName")
 
-    fun loadIsland(): Boolean {
-      val name = fileName
-      val file = islandFile
+    fun loadIsland(file: FileHandle = islandFile): Boolean {
       val json: String = try {
         requireNotNull(file.readString())
       } catch (e: Exception) {
-        Gdx.app.log("LOAD", "Failed to load island the name '$name'")
+        Gdx.app.log("LOAD", "Failed to load island the name '${file.name()}'")
         return false
       }
       Hex.island = try {
         deserialize(json)
       } catch (e: Exception) {
-        Gdx.app.log("LOAD", "Invalid island save data for island '$name'")
+        Gdx.app.log("LOAD", "Invalid island save data for island '${file.name()}'")
         return false
       }
 
-      Gdx.app.log("LOAD", "Successfully loaded island '$name'")
+      Gdx.app.log("LOAD", "Successfully loaded island '${file.name()}'")
       return true
     }
   }
