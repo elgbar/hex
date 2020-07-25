@@ -7,8 +7,15 @@ import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex.camera
 import no.elg.hex.Hex.island
 import no.elg.hex.api.FrameUpdatable
+import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.Knight
+import no.elg.hex.hexagon.PalmTree
+import no.elg.hex.hexagon.Peasant
+import no.elg.hex.hexagon.PineTree
+import no.elg.hex.hexagon.Spearman
 import no.elg.hex.input.BasicInputHandler
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
@@ -52,7 +59,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
         for (i in points.indices) {
           val point = points[i]
           //get the next edge this edge is connected to
-          val nextPoint = points[if (i == points.size - 1) 0 else i + 1]
+          val nextPoint = points[(i + 1) % points.size]
           lineRenderer.rectLine(
             point.coordinateX.toFloat(),
             point.coordinateY.toFloat(),
@@ -62,19 +69,29 @@ object OutlineRenderer : FrameUpdatable, Disposable {
       }
     }
 
-    draw(island.hexagons, 0.5f, false) { data ->
-      data.color to DEFAULT_RECT_LINE_WIDTH
-    }
 
-    island.selected?.also { (_, hexagons) ->
-      draw(hexagons, 1f, true) {
-        Color.WHITE to DEFAULT_RECT_LINE_WIDTH
+    draw(island.hexagons, 1f, false) { data ->
+      when (data.piece::class) {
+        Capital::class -> Color.BLUE to DEFAULT_RECT_LINE_WIDTH
+        PalmTree::class, PineTree::class -> Color.CHARTREUSE to DEFAULT_RECT_LINE_WIDTH
+        Castle::class -> Color.BLACK to DEFAULT_RECT_LINE_WIDTH
+        Peasant::class, Spearman::class, Knight::class, Baron::class -> Color.PURPLE to DEFAULT_RECT_LINE_WIDTH
+        else -> data.color to DEFAULT_RECT_LINE_WIDTH
       }
     }
 
-    draw(island.hexagons.filter { it.getData().piece is Capital }, 1f, true) {
-      Color.BLUE to DEFAULT_RECT_LINE_WIDTH * 3f
+    island.selected?.also {
+      draw(it.hexagons, 1f, false) { data ->
+        when (data.piece::class) {
+          Capital::class -> Color.BLUE to 3f
+          PalmTree::class, PineTree::class -> Color.CHARTREUSE to DEFAULT_RECT_LINE_WIDTH
+          Castle::class -> Color.BLACK to 2f
+          Peasant::class, Spearman::class, Knight::class, Baron::class -> Color.PURPLE to DEFAULT_RECT_LINE_WIDTH
+          else -> Color.WHITE to DEFAULT_RECT_LINE_WIDTH
+        }
+      }
     }
+
 
     lineRenderer.end()
   }

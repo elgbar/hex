@@ -29,7 +29,7 @@ object DebugInfoRenderer : FrameUpdatable {
       ScreenText(screenPos),
       ScreenText(realPos),
       ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex?.getData(), color = Color.YELLOW, format = {
-        "( %2d, % 2d, % 2d) $it".format(cursorHex?.gridX, cursorHex?.gridY, cursorHex?.gridZ)
+        "( %2d, % 2d) $it".format(cursorHex?.gridX, cursorHex?.gridZ)
       }))
     )
   }
