@@ -11,6 +11,7 @@ import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicInputHandler
 import no.elg.hex.util.getData
+import org.hexworks.mixite.core.api.Hexagon
 
 /**
  * @author kheba
@@ -19,7 +20,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
 
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
-  private const val defaultRectLineWidth = 0.75f
+  private const val DEFAULT_RECT_LINE_WIDTH = 0.75f
 
   override fun frameUpdate() {
 
@@ -29,35 +30,26 @@ object OutlineRenderer : FrameUpdatable, Disposable {
     val currHex = BasicInputHandler.cursorHex
     val selected = island.selected?.second
 
-    for (hexagon in island.hexagons) {
-      val points = hexagon.points
-      val data = hexagon.getData()
-      if (data.isOpaque || island.selected?.second?.contains(hexagon) == true) continue
 
-      val brightness = HexagonData.BRIGHTNESS + (if (hexagon == currHex) HexagonData.SELECTED else 0f)
+    fun draw(
+      hexes: Iterable<Hexagon<HexagonData>>,
+      alpha: Float,
+      dataIndependent: Boolean,
+      format: (data: HexagonData) -> Pair<Color, Float>
+    ) {
 
-      lineRenderer.color = data.color.cpy().mul(brightness, brightness, brightness, 0.5f)
-      for (i in points.indices) {
-        val point = points[i]
-        //get the next edge this edge is connected to
-        val nextPoint = points[if (i == points.size - 1) 0 else i + 1]
-        lineRenderer.line(
-          point.coordinateX.toFloat(),
-          point.coordinateY.toFloat(),
-          nextPoint.coordinateX.toFloat(),
-          nextPoint.coordinateY.toFloat())
-      }
-    }
+      val dataIndependentFormat = format(HexagonData.EDGE_DATA)
 
-    if (selected != null) {
-      //render the selected hexagons always on top of the other hexagons to display the white line
-      for (hexagon in selected) {
+      for (hexagon in hexes) {
         val points = hexagon.points
+        val data = hexagon.getData()
+        if (data.invisible) continue
 
-        val brightness = HexagonData.BRIGHTNESS + if (hexagon == currHex) HexagonData.SELECTED else 0f
+        val brightness = HexagonData.BRIGHTNESS + (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)
 
-        val isCap = hexagon.getData().piece is Capital
-        lineRenderer.color = (if (isCap) Color.BLUE else Color.WHITE).cpy().mul(brightness, brightness, brightness, 1f)
+        val (color, width) = if (dataIndependent) dataIndependentFormat else format(data)
+        lineRenderer.color = color.cpy().mul(brightness, brightness, brightness, alpha)
+
         for (i in points.indices) {
           val point = points[i]
           //get the next edge this edge is connected to
@@ -66,10 +58,25 @@ object OutlineRenderer : FrameUpdatable, Disposable {
             point.coordinateX.toFloat(),
             point.coordinateY.toFloat(),
             nextPoint.coordinateX.toFloat(),
-            nextPoint.coordinateY.toFloat(), if (isCap) 2f else defaultRectLineWidth, lineRenderer.color, lineRenderer.color)
+            nextPoint.coordinateY.toFloat(), width, lineRenderer.color, lineRenderer.color)
         }
       }
     }
+
+    draw(island.hexagons, 0.5f, false) { data ->
+      data.color to DEFAULT_RECT_LINE_WIDTH
+    }
+
+    if (selected != null) {
+      draw(selected, 1f, true) {
+        Color.WHITE to DEFAULT_RECT_LINE_WIDTH
+      }
+    }
+
+    draw(island.hexagons.filter { it.getData().piece is Capital }, 1f, true) {
+      Color.BLUE to DEFAULT_RECT_LINE_WIDTH * 3f
+    }
+
     lineRenderer.end()
   }
 
