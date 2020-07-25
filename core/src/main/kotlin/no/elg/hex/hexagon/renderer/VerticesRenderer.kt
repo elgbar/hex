@@ -77,7 +77,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     //Render the hexagons
     for (hexagon in Hex.island.hexagons) {
       val data: HexagonData = hexagon.getData()
-      if (data.isOpaque) continue
+      if (data.invisible) continue
       val brightness = HexagonData.BRIGHTNESS + if (hexagon == currHex) HexagonData.SELECTED else 0f
       data.type.render(this, data.color, brightness, hexagon)
     }

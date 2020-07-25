@@ -72,6 +72,7 @@ class Island(
   // Gameplay //
   //////////////
 
+
   /**
    * Select the hex under the cursor
    */
@@ -171,7 +172,7 @@ class Island(
       origin to ((expectedHexagons - ring.size) //non-existent hexes count as ours
         + ring.sumByDouble {
         val data = it.getData()
-        (if (data.team == hexTeam) 1.0 else 0.0) + (if (data.visible) 0.0 else 0.5)
+        (if (data.team == hexTeam) 1.0 else 0.0) + (if (data.invisible) 0.5 else 0.0)
       })
     }.maxBy { it.second }!!.first
   }

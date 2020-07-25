@@ -63,7 +63,7 @@ private fun connectedHexagons(
 ): Set<Hexagon<HexagonData>> {
   val data = center.getData()
   //only check a hexagon if they have the same color and haven't been visited
-  if (visited.contains(center) || data.team != team || !data.visible) {
+  if (visited.contains(center) || data.team != team || data.invisible) {
     return visited
   }
 
