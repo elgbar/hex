@@ -61,7 +61,6 @@ class Island(
         select(hexagon)
       }
     }
-
   }
 
   var selected: Territory? = null
@@ -78,8 +77,6 @@ class Island(
   fun select(hex: Hexagon<HexagonData>? = BasicInputHandler.cursorHex) {
     selected = null
     if (hex == null) return
-
-    val data: HexagonData = hex.getData()
 
     val territoryHexes = hex.getTerritoryHexagons() ?: return
 
@@ -185,12 +182,66 @@ class Island(
   // Serialization //
   ///////////////////
 
+  /**
+   *
+   * Validation rules:
+   *
+   * * All visible hexagons must be reachable from all other visible hexagons (ie there can only be one island)
+   * * No capital pieces in territories with size smaller than [MIN_HEX_IN_TERRITORY]
+   * * There must be exactly one capital per territory
+   *
+   * @return If this island is valid.
+   */
+  fun validate(): Boolean {
+    var valid = true
+
+    val checkedHexagons = HashSet<Hexagon<HexagonData>>()
+
+    for (hexagon in hexagons) {
+      if (checkedHexagons.contains(hexagon) || hexagon.getData().invisible) continue
+
+      val connectedHexes = hexagon.connectedHexagons()
+      checkedHexagons.addAll(connectedHexes)
+
+      if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
+        if (hexagon.getData().piece is Capital) {
+          Gdx.app.log("Island Validation", "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
+          valid = false
+        }
+        continue
+      }
+
+      val capitalCount = connectedHexes.count { it.getData().piece is Capital }
+      if (capitalCount < 1) {
+        Gdx.app.log(
+          "Island Validation",
+          "There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it."
+        )
+        valid = false
+      } else if (capitalCount > 1) {
+        Gdx.app.log(
+          "Island Validation",
+          "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it."
+        )
+        valid = false
+      }
+
+      //TODO check connectedness
+    }
+    return valid
+  }
+
   fun serialize(): String =
     Hex.mapper.writeValueAsString(Hex.island)
 
   fun saveIsland(): Boolean {
     val name = fileName
     val file = islandFile
+
+    if (!validate()) {
+      Gdx.app.log("SAVE", "Island failed validation")
+      return false
+    }
 
     if (file.isDirectory) {
       Gdx.app.log("SAVE", "Failed to save island the name '$name' as the resulting file will be a directory.")
