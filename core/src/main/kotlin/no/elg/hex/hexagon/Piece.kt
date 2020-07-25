@@ -188,20 +188,20 @@ class PalmTree(team: Team) : StationaryPiece(team) {
 
 class Peasant(team: Team) : DynamicPiece(team) {
   override val strength = PEASANT_STRENGTH
-  override val cost: Int = -2
+  override val cost: Int = -1
 }
 
 class Spearman(team: Team) : DynamicPiece(team) {
   override val strength = SPEARMAN_STRENGTH
-  override val cost: Int = -6
+  override val cost: Int = -5
 }
 
 class Knight(team: Team) : DynamicPiece(team) {
   override val strength = KNIGHT_STRENGTH
-  override val cost: Int = -18
+  override val cost: Int = -17
 }
 
 class Baron(team: Team) : DynamicPiece(team) {
   override val strength = BARON_STRENGTH
-  override val cost: Int = -54
+  override val cost: Int = -53
 }
