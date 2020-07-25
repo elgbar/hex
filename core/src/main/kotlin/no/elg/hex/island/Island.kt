@@ -83,9 +83,13 @@ class Island(
 
     val territoryHexes = hex.getTerritoryHexagons() ?: return
 
-    val capital = getCapital(territoryHexes) ?: Capital(data.team).also {
-      //this territory have no capital, create one!
-      it.place(calculateBestCapitalPlacement(territoryHexes).getData())
+    val capital = getCapital(territoryHexes).let {
+      if (it != null) it
+      else {
+        val capHex = calculateBestCapitalPlacement(territoryHexes).getData()
+        capHex.setPiece(Capital::class)
+        capHex.piece as Capital
+      }
     }
     selected = Territory(capital, territoryHexes)
   }
