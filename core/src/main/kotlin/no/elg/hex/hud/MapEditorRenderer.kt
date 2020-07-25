@@ -22,7 +22,7 @@ import no.elg.hex.input.editor.TeamEditor
  */
 object MapEditorRenderer : FrameUpdatable {
 
-  var showHelp = true
+  var showHelp = false
 
   override fun frameUpdate() {
     ScreenRenderer.drawAll(
@@ -34,9 +34,9 @@ object MapEditorRenderer : FrameUpdatable {
         TeamEditor.Disabled -> ScreenText(selectedTeam.name, color = Color.LIGHT_GRAY)
       }),
       ScreenText("Selected piece: ", next = when (pieceEditor) {
-        PieceEditor.`Set piece` -> ScreenText(selectedPiece.toString(), color = Color.YELLOW)
+        PieceEditor.`Set piece` -> nullCheckedText(selectedPiece.simpleName, color = Color.YELLOW)
         PieceEditor.`Randomize piece` -> ScreenText("random", color = Color.PURPLE)
-        PieceEditor.Disabled -> ScreenText(selectedPiece.toString(), color = Color.LIGHT_GRAY)
+        PieceEditor.Disabled -> nullCheckedText(selectedPiece.simpleName, color = Color.LIGHT_GRAY)
       }),
       emptyText(),
       ScreenText("Opaqueness editor: ", next = editorText(opaquenessEditor)),
@@ -45,9 +45,10 @@ object MapEditorRenderer : FrameUpdatable {
       position = TOP_RIGHT
     )
 
+    val title = ScreenText("=== Map editor keys ===", color = Color.SALMON)
     if (showHelp) {
       ScreenRenderer.drawAll(
-        ScreenText("=== Map editor keys ===", color = Color.SALMON),
+        title,
         ScreenText("F1 to hide this help text"),
         ScreenText("Holding SHIFT will reverse iteration order, unless otherwise stated"),
         emptyText(),
@@ -69,6 +70,12 @@ object MapEditorRenderer : FrameUpdatable {
         ScreenText("LEFT to decrease save slot"),
         ScreenText("CTRL+C to save current island to disk"),
         ScreenText("CTRL+V to load island from disk"),
+        position = BOTTOM
+      )
+    } else {
+      ScreenRenderer.drawAll(
+        title,
+        ScreenText("F1 to show help text"),
         position = BOTTOM
       )
     }
