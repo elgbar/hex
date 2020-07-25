@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Color.GREEN
 import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.Color.WHITE
+import com.badlogic.gdx.graphics.Color.YELLOW
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -16,6 +17,7 @@ import no.elg.hex.api.Resizable
 import no.elg.hex.hud.ScreenDrawPosition.TOP
 import no.elg.hex.input.BasicInputHandler.scale
 import java.io.File
+import kotlin.math.sign
 
 
 enum class ScreenDrawPosition(val bottom: Boolean, val right: Boolean) {
@@ -49,6 +51,20 @@ fun <T> nullCheckedText(
   next: ScreenText? = null,
   format: (T) -> String = { it.toString() }
 ) = if (value == null) nullText(next) else ScreenText(format(value), color, bold, italic, next)
+
+fun <T : Number> signColoredText(value: T,
+                                 bold: Boolean = false,
+                                 italic: Boolean = false,
+                                 next: ScreenText? = null,
+                                 format: (T) -> String = { it.toString() }): ScreenText {
+  val signColor = when (sign(value.toFloat())) {
+    1f -> GREEN
+    -1f -> RED
+    else -> YELLOW
+  }
+
+  return ScreenText(format(value), signColor, bold, italic, next)
+}
 
 /**
  * Display the value if it is outside the given range
@@ -84,7 +100,7 @@ fun <T : Comparable<T>> variableText(
   format: (T) -> String = { it.toString() }
 ): ScreenText {
   return ScreenText(prefix, color = WHITE, bold = bold, italic = italic,
-    next = validatedText(value, min, max, bold = bold, italic = italic, color = Color.YELLOW, format = format, next = next))
+    next = validatedText(value, min, max, bold = bold, italic = italic, color = YELLOW, format = format, next = next))
 }
 
 fun nullText(next: ScreenText? = null) = ScreenText(
