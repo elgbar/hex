@@ -12,20 +12,13 @@ import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
 
 /**
- * @author kheba
- */
-
-/**
- * @param this@getData
- * The hexagon to get the data from
- *
  * @return HexagonData of this hexagon
  */
 fun Hexagon<HexagonData>.getData(): HexagonData {
   return satelliteData.orElseGet {
-    val data = if (isEdgeHexagon(this)) EDGE_DATA else HexagonData()
-    this.setSatelliteData(data)
-    return@orElseGet data
+    (if (isEdgeHexagon(this)) EDGE_DATA else HexagonData()).also {
+      this.setSatelliteData(it)
+    }
   }
 }
 
@@ -46,11 +39,8 @@ fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
   }
 }
 
-
 /**
- * @param initial The hexagon to start at
- *
- * @return All hexagons connected to the start hexagon that has the same color
+ * @return All hexagons connected to the start hexagon of the same team
  */
 fun Hexagon<HexagonData>.connectedHexagons(): Set<Hexagon<HexagonData>> {
   return connectedHexagons(this, this.getData().team, HashSet())

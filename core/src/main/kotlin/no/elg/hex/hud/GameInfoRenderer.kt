@@ -11,19 +11,17 @@ import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 object GameInfoRenderer : FrameUpdatable {
 
   override fun frameUpdate() {
-    Hex.island.selected?.also { (capital, hexagons) ->
-
-      val income = capital.income(hexagons)
+    Hex.island.selected?.also { selected ->
 
       val incomeColor = when {
-        income > 0 -> Color.GREEN
-        income < 0 -> Color.RED
+        selected.income > 0 -> Color.GREEN
+        selected.income < 0 -> Color.RED
         else -> Color.BLACK
       }
 
       ScreenRenderer.drawAll(
-        ScreenText("Treasury: ${capital.balance}"),
-        ScreenText("Income: ", next = ScreenText("%+d".format(income), color = incomeColor))
+        ScreenText("Treasury: ${selected.capital.balance}"),
+        ScreenText("Income: ", next = ScreenText("%+d".format(selected.income), color = incomeColor))
         , position = TOP_RIGHT)
     }
   }

@@ -28,7 +28,6 @@ object OutlineRenderer : FrameUpdatable, Disposable {
     lineRenderer.projectionMatrix = camera.combined
 
     val currHex = BasicInputHandler.cursorHex
-    val selected = island.selected?.second
 
 
     fun draw(
@@ -67,8 +66,8 @@ object OutlineRenderer : FrameUpdatable, Disposable {
       data.color to DEFAULT_RECT_LINE_WIDTH
     }
 
-    if (selected != null) {
-      draw(selected, 1f, true) {
+    island.selected?.also { (_, hexagons) ->
+      draw(hexagons, 1f, true) {
         Color.WHITE to DEFAULT_RECT_LINE_WIDTH
       }
     }

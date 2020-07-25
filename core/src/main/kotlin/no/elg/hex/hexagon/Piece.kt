@@ -78,7 +78,7 @@ sealed class Piece {
 //  }
 
   override fun toString(): String = this::class.simpleName!!
-  
+
 }
 
 val PIECES: List<KClass<out Piece>> by lazy {
@@ -162,7 +162,7 @@ class Capital(team: Team) : StationaryPiece(team) {
     balance = 0
   }
 
-  fun income(hexagons: Collection<Hexagon<HexagonData>>): Int {
+  fun calculateIncome(hexagons: Collection<Hexagon<HexagonData>>): Int {
     return hexagons.sumBy { it.getData().piece.cost }
   }
 

@@ -64,10 +64,8 @@ class Island(
 
   }
 
-  //TODO Refactor to Territory data class (with lazy income evaluator)
-  var selected: Pair<Capital, Set<Hexagon<HexagonData>>>? = null
+  var selected: Territory? = null
     private set
-
 
   //////////////
   // Gameplay //
@@ -89,7 +87,7 @@ class Island(
       //this territory have no capital, create one!
       it.place(calculateBestCapitalPlacement(territoryHexes).getData())
     }
-    selected = capital to territoryHexes
+    selected = Territory(capital, territoryHexes)
   }
 
   fun Hexagon<HexagonData>.getCapital(): Capital? {
