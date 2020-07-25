@@ -2,6 +2,7 @@ package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
+import com.badlogic.gdx.Input.Keys.A
 import com.badlogic.gdx.Input.Keys.C
 import com.badlogic.gdx.Input.Keys.CONTROL_LEFT
 import com.badlogic.gdx.Input.Keys.CONTROL_RIGHT
@@ -11,8 +12,10 @@ import com.badlogic.gdx.Input.Keys.F5
 import com.badlogic.gdx.Input.Keys.F9
 import com.badlogic.gdx.Input.Keys.NUMPAD_1
 import com.badlogic.gdx.Input.Keys.NUMPAD_2
+import com.badlogic.gdx.Input.Keys.NUMPAD_3
 import com.badlogic.gdx.Input.Keys.NUM_1
 import com.badlogic.gdx.Input.Keys.NUM_2
+import com.badlogic.gdx.Input.Keys.NUM_3
 import com.badlogic.gdx.Input.Keys.PAGE_DOWN
 import com.badlogic.gdx.Input.Keys.PAGE_UP
 import com.badlogic.gdx.Input.Keys.Q
@@ -26,10 +29,14 @@ import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.PIECES
+import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.OpaquenessEditor.Companion.OPAQUENESS_EDITORS
+import no.elg.hex.input.editor.PieceEditor
+import no.elg.hex.input.editor.PieceEditor.Companion.PIECE_EDITORS
 import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.input.editor.TeamEditor.Companion.TEAM_EDITORS
 import no.elg.hex.island.Island
@@ -37,6 +44,7 @@ import no.elg.hex.util.findHexagonsWithinRadius
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.reflect.KClass
 
 /**
  * @author Elg
@@ -54,9 +62,14 @@ object MapEditorInputHandler : InputAdapter() {
   var selectedTeam: Team = Team.values().first()
     private set
 
+  var selectedPiece: KClass<out Piece> = PIECES.first()
+    private set
+
   var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.Disabled
     private set
   var teamEditor: TeamEditor = TeamEditor.Disabled
+    private set
+  var pieceEditor: PieceEditor = PieceEditor.Disabled
     private set
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -66,6 +79,7 @@ object MapEditorInputHandler : InputAdapter() {
       fun editHex(hexagon: Hexagon<HexagonData>) {
         opaquenessEditor.edit(hexagon)
         teamEditor.edit(hexagon)
+        pieceEditor.edit(hexagon)
       }
 
       if (isShiftPressed()) {
@@ -86,10 +100,16 @@ object MapEditorInputHandler : InputAdapter() {
 
       W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
       S, PAGE_DOWN, DOWN -> brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
-      Q -> selectedTeam = Team.values().next(selectedTeam)
 
-      NUM_1, NUMPAD_1 -> opaquenessEditor = OPAQUENESS_EDITORS.next(opaquenessEditor)
-      NUM_2, NUMPAD_2 -> teamEditor = TEAM_EDITORS.next(teamEditor)
+      Q -> selectedTeam = Team.values().let { if (isShiftPressed()) it.previous(selectedTeam) else it.next(selectedTeam) }
+      A -> selectedPiece = PIECES.let { if (isShiftPressed()) it.previous(selectedPiece) else it.next(selectedPiece) }
+
+      NUM_1, NUMPAD_1 ->
+        opaquenessEditor = OPAQUENESS_EDITORS.let { if (isShiftPressed()) it.previous(opaquenessEditor) else it.next(opaquenessEditor) }
+      NUM_2, NUMPAD_2 ->
+        teamEditor = TEAM_EDITORS.let { if (isShiftPressed()) it.previous(teamEditor) else it.next(teamEditor) }
+      NUM_3, NUMPAD_3 ->
+        pieceEditor = PIECE_EDITORS.let { if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor) }
 
       F5 -> quickSavedIsland = writeIslandAsString(true)
       F9 -> Hex.island = Hex.mapper.readValue(quickSavedIsland)
@@ -127,6 +147,18 @@ object MapEditorInputHandler : InputAdapter() {
 
   private fun <E> Array<E>.next(current: E): E {
     val nextIndex = (this.indexOf(current) + 1) % this.size
+    return this[nextIndex]
+  }
+
+  private fun <E> List<E>.previous(current: E): E {
+    val currentIndex = this.indexOf(current)
+    val nextIndex = if (currentIndex == 0) size - 1 else (currentIndex - 1) % this.size
+    return this[nextIndex]
+  }
+
+  private fun <E> Array<E>.previous(current: E): E {
+    val currentIndex = this.indexOf(current)
+    val nextIndex = if (currentIndex == 0) size - 1 else (currentIndex - 1) % this.size
     return this[nextIndex]
   }
 }

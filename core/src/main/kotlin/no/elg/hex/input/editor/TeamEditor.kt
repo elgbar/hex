@@ -23,13 +23,13 @@ sealed class TeamEditor : Editor() {
 
   object `Set team` : TeamEditor() {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData().team = selectedTeam
+      hexagon.getData().setTeam(selectedTeam, null)
     }
   }
 
   object `Randomize team` : TeamEditor() {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData().team = Team.values().random()
+      hexagon.getData().setTeam(Team.values().random(), null)
     }
   }
 

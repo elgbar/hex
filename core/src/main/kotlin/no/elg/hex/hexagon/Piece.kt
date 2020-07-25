@@ -1,6 +1,9 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.util.getData
+import org.hexworks.mixite.core.api.Hexagon
+import kotlin.reflect.KClass
 
 
 const val NO_STRENGTH = 0
@@ -64,11 +67,27 @@ sealed class Piece {
    */
   abstract fun place(onto: HexagonData): Boolean
 
-  init {
-    require(strength >= NO_STRENGTH)
-  }
+  //TODO move to tests
+//  init {
+//    require(strength >= NO_STRENGTH)
+//  }
 
   override fun toString(): String = this::class.simpleName!!
+  
+}
+
+val PIECES: List<KClass<out Piece>> by lazy {
+  val subclasses = ArrayList<KClass<out Piece>>()
+
+  Piece::class.sealedSubclasses.forEach {
+    if (it.isSealed) {
+      subclasses.addAll(it.sealedSubclasses)
+    } else {
+      subclasses += it
+    }
+  }
+
+  return@lazy subclasses
 }
 
 object NoPiece : Piece() {
@@ -77,11 +96,10 @@ object NoPiece : Piece() {
   override val team: Team get() = error("Empty Piece is not confined to a team")
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
   override fun place(onto: HexagonData): Boolean {
-    error("Cannot place a 'Nothing' piece, it is meant to represent an empty hexagon!")
-  }
+  override fun place(onto: HexagonData): Boolean = true
 }
 
-abstract class StationaryPiece(override val team: Team) : Piece() {
+sealed class StationaryPiece(override val team: Team) : Piece() {
 
   private var placed: Boolean = false
 
@@ -96,13 +114,12 @@ abstract class StationaryPiece(override val team: Team) : Piece() {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Pieces can only be placed on an empty hex")
       return false
     }
-    onto.piece = this
     placed = true
     return true
   }
 }
 
-abstract class DynamicPiece(override val team: Team) : Piece() {
+sealed class DynamicPiece(override val team: Team) : Piece() {
 
   final override val movable: Boolean = true
 

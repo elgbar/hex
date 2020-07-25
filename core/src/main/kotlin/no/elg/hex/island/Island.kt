@@ -64,6 +64,7 @@ class Island(
 
   }
 
+  //TODO Refactor to Territory data class (with lazy income evaluator)
   var selected: Pair<Capital, Set<Hexagon<HexagonData>>>? = null
     private set
 
@@ -182,7 +183,8 @@ class Island(
   // Serialization //
   ///////////////////
 
-  fun serialize(): String = Hex.mapper.writeValueAsString(Hex.island)
+  fun serialize(): String =
+    Hex.mapper.writeValueAsString(Hex.island)
 
   fun saveIsland(): Boolean {
     val name = fileName
@@ -223,6 +225,7 @@ class Island(
         deserialize(json)
       } catch (e: Exception) {
         Gdx.app.log("LOAD", "Invalid island save data for island '${file.name()}'")
+        Gdx.app.log("LOAD", e.message)
         return false
       }
 

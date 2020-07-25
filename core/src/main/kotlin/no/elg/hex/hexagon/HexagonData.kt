@@ -1,25 +1,23 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
+import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
+import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
+import kotlin.reflect.KClass
+import kotlin.reflect.full.primaryConstructor
 
 @JsonInclude(NON_DEFAULT)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
 data class HexagonData(
-
-  @JsonInclude(ALWAYS)
-  var team: Team = Team.values().random(),
-
-  var piece: Piece = NoPiece,
-
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works these hexagon would be
    * returned even when the mouse is not inside the hexagon In order to prevent that and gain pixel perfect hexagon
@@ -36,6 +34,42 @@ data class HexagonData(
   override var isPassable: Boolean = !edge
 ) : DefaultSatelliteData() {
 
+  @JsonInclude(ALWAYS)
+  var team: Team = Team.values().random()
+    private set
+
+  @JsonIgnore
+  var piece: Piece = NoPiece
+    private set
+
+  /**
+   * @param pieceType The new type of piece to place onto this hex, if `null` the piece will not change type
+   */
+  fun setTeam(team: Team, pieceType: KClass<out Piece>?) {
+    require(pieceType?.isAbstract != true) { "Cannot set the piece to an abstract piece" }
+    this.team = team
+    if (pieceType == null) {
+      setPiece(piece::class)
+    } else {
+      setPiece(pieceType)
+    }
+  }
+
+  @JsonSetter("pieceType")
+  fun setPiece(pieceType: KClass<out Piece>) {
+    require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
+
+    val pieceToPlace = if (pieceType.objectInstance != null) {
+      pieceType.objectInstance
+    } else {
+      pieceType.primaryConstructor?.call(team)
+    } ?: error("No constructor found with a single ${Team::class.simpleName} argument")
+
+    if (pieceToPlace.place(this)) {
+      piece = pieceToPlace
+    }
+  }
+
   @get:JsonIgnore
   val color: Color
     get() = team.color
@@ -47,6 +81,23 @@ data class HexagonData(
   @get:JsonIgnore
   val invisible: Boolean
     get() = edge || isOpaque
+
+
+  ///////////////////
+  // serialization //
+  ///////////////////
+
+  @JsonGetter("pieceType")
+  fun getPieceTypeName() = piece::class.qualifiedName
+
+  @JsonSetter("pieceType")
+  fun setPieceFromTypeName(typeName: String?) {
+    setPiece(PIECES.first { it.qualifiedName == typeName })
+  }
+
+  override fun toString(): String {
+    return "team: $team piece: $piece"
+  }
 
   companion object {
 
@@ -61,9 +112,5 @@ data class HexagonData(
     fun isEdgeHexagon(hex: Hexagon<HexagonData>) = Hex.island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
 
     val EDGE_DATA = HexagonData(edge = true)
-  }
-
-  override fun toString(): String {
-    return "team: $team piece: $piece"
   }
 }
