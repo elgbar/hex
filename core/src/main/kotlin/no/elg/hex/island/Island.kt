@@ -32,6 +32,11 @@ class Island(
 
   val grid: HexagonalGrid<HexagonData>
 
+  /**
+   * Prefer this over calling [grid.hexagons] as this has better performance
+   */
+  val hexagons: Set<Hexagon<HexagonData>>
+
   init {
     val builder = HexagonalGridBuilder<HexagonData>()
       .setGridWidth(width)
@@ -49,12 +54,15 @@ class Island(
         }
       }
     }
-  }
+    hexagons = grid.hexagons.toSet()
 
-  /**
-   * Prefer this over calling [grid.hexagons] as this has better performance
-   */
-  val hexagons = grid.hexagons.toSet()
+    Gdx.app.postRunnable {
+      for (hexagon in hexagons) {
+        select(hexagon)
+      }
+    }
+
+  }
 
   var selected: Pair<Capital, Set<Hexagon<HexagonData>>>? = null
     private set
