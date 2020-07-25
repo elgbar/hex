@@ -56,6 +56,11 @@ sealed class Piece {
    */
   abstract val movable: Boolean
 
+  /**
+   * How much the territory gain/lose by maintaining this piece
+   */
+  abstract val cost: Int
+
   open val capitalPlacement: CapitalPlacementPreference = CapitalPlacementPreference.LAST_RESORT
 
   /**
@@ -95,7 +100,7 @@ object NoPiece : Piece() {
   override val movable: Boolean = false
   override val team: Team get() = error("Empty Piece is not confined to a team")
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
-  override fun place(onto: HexagonData): Boolean {
+  override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
 }
 
@@ -147,6 +152,7 @@ class Capital(team: Team) : StationaryPiece(team) {
    * How much money this territory currently has
    */
   var balance: Int = 0
+  override val cost: Int = 1
 
   /**
    * Transfer everything to the given capital
@@ -156,36 +162,46 @@ class Capital(team: Team) : StationaryPiece(team) {
     balance = 0
   }
 
+  fun income(hexagons: Collection<Hexagon<HexagonData>>): Int {
+    return hexagons.sumBy { it.getData().piece.cost }
+  }
 
   override val strength = PEASANT_STRENGTH
 }
 
 class Castle(team: Team) : StationaryPiece(team) {
   override val strength = SPEARMAN_STRENGTH
+  override val cost: Int = 1
 }
 
 class PineTree(team: Team) : StationaryPiece(team) {
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = SPEARMAN_STRENGTH
+  override val cost: Int = 0
 }
 
 class PalmTree(team: Team) : StationaryPiece(team) {
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = SPEARMAN_STRENGTH
+  override val cost: Int = 0
 }
 
 class Peasant(team: Team) : DynamicPiece(team) {
   override val strength = PEASANT_STRENGTH
+  override val cost: Int = -2
 }
 
 class Spearman(team: Team) : DynamicPiece(team) {
   override val strength = SPEARMAN_STRENGTH
+  override val cost: Int = -6
 }
 
 class Knight(team: Team) : DynamicPiece(team) {
   override val strength = KNIGHT_STRENGTH
+  override val cost: Int = -18
 }
 
 class Baron(team: Team) : DynamicPiece(team) {
   override val strength = BARON_STRENGTH
+  override val cost: Int = -54
 }

@@ -14,6 +14,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.renderer.OutlineRenderer
 import no.elg.hex.hexagon.renderer.VerticesRenderer
 import no.elg.hex.hud.DebugInfoRenderer
+import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.input.BasicInputHandler
@@ -80,6 +81,8 @@ object Hex : ApplicationAdapter() {
     }
     if (args.mapEditor) {
       MapEditorRenderer.frameUpdate()
+    } else {
+      GameInfoRenderer.frameUpdate()
     }
   }
 
