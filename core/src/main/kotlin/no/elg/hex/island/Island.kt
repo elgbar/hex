@@ -76,9 +76,10 @@ class Island(
   /**
    * Select the hex under the cursor
    */
-  fun select() {
+  fun select(hex: Hexagon<HexagonData>? = BasicInputHandler.cursorHex) {
     selected = null
-    val hex = BasicInputHandler.cursorHex ?: return
+    if (hex == null) return
+
     val data: HexagonData = hex.getData()
 
     val territoryHexes = hex.getTerritoryHexagons() ?: return
@@ -157,7 +158,7 @@ class Island(
 
     require(contenders.isNotEmpty()) { "No capital contenders found!" }
 
-    Gdx.app.log("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
+    Gdx.app.debug("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
 
     if (contenders.size == 1) return contenders.first()
 
