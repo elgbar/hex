@@ -56,8 +56,8 @@ tasks.named('wrapper') {
 
 subprojects {
   dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "com.xenomachina:kotlin-argparser:2.0.7"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    api "com.xenomachina:kotlin-argparser:2.0.7"
   }
 }
 
@@ -65,11 +65,11 @@ project(":desktop") {
   apply plugin: "kotlin"
 
   dependencies {
-    implementation project(":core")
-    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    api project(":core")
+    api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
   }
 }
 
@@ -77,17 +77,17 @@ project(":core") {
   apply plugin: "kotlin"
 
   dependencies {
-    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-    implementation "com.kotcrab.vis:vis-ui:$visVersion"
-    implementation "com.github.czyzby:gdx-kiwi:$kiwiVersion"
-    implementation "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+    api "com.kotcrab.vis:vis-ui:$visVersion"
+    api "com.github.czyzby:gdx-kiwi:$kiwiVersion"
+    api "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
 
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    api "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 
-    testImplementation "org.jetbrains.kotlin:kotlin-junit5:$kotlinVersion"
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testApi "org.jetbrains.kotlin:kotlin-junit5:$kotlinVersion"
+    testApi("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
   }
 }
