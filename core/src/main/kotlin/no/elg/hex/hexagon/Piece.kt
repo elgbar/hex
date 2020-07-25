@@ -138,8 +138,8 @@ sealed class DynamicPiece(override val team: Team) : Piece() {
     if (onto.piece != NoPiece) {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Pieces can only be placed on an empty hex")
       return false
-    } else if (onto.team == team) {
-      Gdx.app.log("${this::class.simpleName}-${this::place.name}", "Dynamic pieces can only be placed on a tile with the same team")
+    } else if (onto.team != team) {
+      Gdx.app.log("${this::class.simpleName}-${this::place.name}", "Dynamic pieces can only be placed on a tile with the same team. This team = $team, onto team = ${onto.team}")
       return false
     }
     return true
