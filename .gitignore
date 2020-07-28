@@ -129,3 +129,5 @@ Thumbs.db
 core/out/
 
 islands/
+
+core/src/main/resources/sprites/slay/

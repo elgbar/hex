@@ -1,0 +1,55 @@
+
+sprites.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+capital
+  rotate: false
+  xy: 4, 4
+  size: 505, 531
+  orig: 505, 531
+  offset: 0, 0
+  index: -1
+capital_flag
+  rotate: false
+  xy: 513, 4
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+castle
+  rotate: false
+  xy: 1022, 4
+  size: 318, 528
+  orig: 318, 528
+  offset: 0, 0
+  index: -1
+flag
+  rotate: false
+  xy: 1531, 4
+  size: 217, 574
+  orig: 217, 574
+  offset: 0, 0
+  index: -1
+grave
+  rotate: false
+  xy: 4, 648
+  size: 383, 500
+  orig: 383, 500
+  offset: 0, 0
+  index: -1
+palm
+  rotate: false
+  xy: 513, 648
+  size: 379, 522
+  orig: 379, 522
+  offset: 0, 0
+  index: -1
+pine
+  rotate: false
+  xy: 1022, 648
+  size: 443, 640
+  orig: 443, 640
+  offset: 0, 0
+  index: -1
