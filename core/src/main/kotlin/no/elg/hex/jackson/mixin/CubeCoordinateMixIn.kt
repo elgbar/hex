@@ -1,19 +1,32 @@
 package no.elg.hex.jackson.mixin
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonValue
+import org.hexworks.mixite.core.api.CubeCoordinate
 
 /**
  * @author Elg
  */
-interface CubeCoordinateMixIn {
+abstract class CubeCoordinateMixIn {
 
-  @get:JsonProperty("x", required = true, index = 0)
-  var gridX: Int
-
-  @get:JsonProperty("z", required = true, index = 1)
-  var gridZ: Int
+  @JsonValue
+  abstract fun toAxialKey(): String
 
   @get:JsonIgnore
-  var gridY: Int
+  abstract var gridX: Int
+
+  @get:JsonIgnore
+  abstract var gridZ: Int
+
+  @get:JsonIgnore
+  abstract var gridY: Int
+
+  companion object {
+    @JsonCreator
+    @JvmStatic
+    fun fromAxialKey(axialKey: String): CubeCoordinate {
+      TODO()
+    }
+  }
 }

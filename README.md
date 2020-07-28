@@ -88,3 +88,8 @@ Implement the gamerules in the following subphase
         * A new `pine tree` grows on a hex if
             1. It is empty
             2. It is adjacent to at least two other trees
+
+## Set of pair to map
+
+* `\{\"first\":\{"x":([0-9-]+),\"z\":([0-9-]+)\},"second":([0-9]+|\{.+?\})\}(,|\])`
+* `\"$1,$2\":$3$4`

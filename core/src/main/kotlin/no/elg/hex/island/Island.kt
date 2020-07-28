@@ -27,7 +27,7 @@ class Island(
   width: Int,
   height: Int,
   layout: HexagonalGridLayout,
-  hexagonData: Set<Pair<CubeCoordinate, HexagonData>> = emptySet()
+  hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap()
 ) {
 
   val grid: HexagonalGrid<HexagonData>
@@ -298,8 +298,13 @@ class Island(
         grid.gridData.gridWidth,
         grid.gridData.gridHeight,
         grid.gridData.gridLayout,
-        grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to it.getData() }
+        grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to it.getData() }.toMap()
       )
 
-  private data class IslandDTO(val width: Int, val height: Int, val layout: HexagonalGridLayout, val hexagonData: Set<Pair<CubeCoordinate, HexagonData>>)
+  private data class IslandDTO(
+    val width: Int,
+    val height: Int,
+    val layout: HexagonalGridLayout,
+    val hexagonData: Map<CubeCoordinate, HexagonData>
+  )
 }
