@@ -1,7 +1,7 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
-import no.elg.hex.hexagon.renderer.VerticesRenderer
+import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.dim
 import org.hexworks.mixite.core.api.Hexagon
 

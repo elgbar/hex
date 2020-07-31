@@ -1,4 +1,4 @@
-package no.elg.hex.hexagon.renderer
+package no.elg.hex.renderer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20

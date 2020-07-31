@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hexagon.renderer.OutlineRenderer
-import no.elg.hex.hexagon.renderer.VerticesRenderer
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.BasicInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
+import no.elg.hex.renderer.OutlineRenderer
+import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.LevelSelectScreen.getIslandFile
 import no.elg.island.Island
 
