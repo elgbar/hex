@@ -42,8 +42,8 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
 /**
  * @return All hexagons connected to the start hexagon of the same team
  */
-fun Hexagon<HexagonData>.connectedHexagons(island: Island): Set<Hexagon<HexagonData>> {
-  return connectedHexagons(this, this.getData(island).team, HashSet(), island)
+fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>> {
+  return connectedHexagons(hexagon, hexagon.getData(this).team, HashSet(), this)
 }
 
 private fun connectedHexagons(

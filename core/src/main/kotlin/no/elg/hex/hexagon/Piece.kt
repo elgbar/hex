@@ -1,6 +1,9 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.util.getData
+import no.elg.island.Island
+import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
 
 
@@ -160,6 +163,7 @@ class Capital(team: Team) : StationaryPiece(team) {
     balance = 0
   }
 
+  fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) = hexagons.sumBy { it.getData(island).piece.cost }
 
   override val strength = PEASANT_STRENGTH
 }

@@ -76,9 +76,9 @@ class Island(
     selected = null
     if (hex == null) return
 
-    val territoryHexes = hex.getTerritoryHexagons() ?: return
+    val territoryHexes = getTerritoryHexagons(hex) ?: return
 
-    val capital = getCapital(territoryHexes).let {
+    val capital = getCapitalOf(territoryHexes).let {
       if (it != null) it
       else {
         val capHex = calculateBestCapitalPlacement(territoryHexes).getData(this)
@@ -89,20 +89,20 @@ class Island(
     selected = Territory(this, capital, territoryHexes)
   }
 
-  fun Hexagon<HexagonData>.getCapital(): Capital? {
-    val territoryHexagons = this.getTerritoryHexagons() ?: return null
-    return getCapital(territoryHexagons)
+  fun getCapitalOf(hexagon: Hexagon<HexagonData>): Capital? {
+    val territoryHexagons = getTerritoryHexagons(hexagon) ?: return null
+    return getCapitalOf(territoryHexagons)
   }
 
-  private fun getCapital(hexagons: Set<Hexagon<HexagonData>>): Capital? {
+  private fun getCapitalOf(hexagons: Set<Hexagon<HexagonData>>): Capital? {
     return hexagons.firstOrNull { it.getData(this).piece is Capital }?.getData(this)?.piece as? Capital?
   }
 
   /**
    * Get all hexagons that is in tha same territory as the given [this@getTerritoryHexagons]. or null if hexagon is not a part of a territory
    */
-  fun Hexagon<HexagonData>.getTerritoryHexagons(): Set<Hexagon<HexagonData>>? {
-    val territoryHexes = connectedHexagons(this@Island)
+  fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
+    val territoryHexes = connectedHexagons(hexagon)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) return null
     return territoryHexes
   }
@@ -198,7 +198,7 @@ class Island(
     for (hexagon in hexagons) {
       if (checkedHexagons.contains(hexagon) || hexagon.getData(this).invisible) continue
 
-      val connectedHexes = hexagon.connectedHexagons(this)
+      val connectedHexes = this.connectedHexagons(hexagon)
       checkedHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
