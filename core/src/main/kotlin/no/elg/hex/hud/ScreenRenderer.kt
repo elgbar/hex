@@ -6,17 +6,14 @@ import com.badlogic.gdx.graphics.Color.GREEN
 import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Color.YELLOW
-import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
+import no.elg.hex.Assets.Companion.FONT_SIZE
+import no.elg.hex.Hex
 import no.elg.hex.api.Resizable
 import no.elg.hex.hud.ScreenDrawPosition.TOP
-import no.elg.hex.input.BasicInputHandler.scale
-import java.io.File
 import kotlin.math.sign
 
 
@@ -35,10 +32,10 @@ data class ScreenText(
   val next: ScreenText? = null
 ) {
   val font: BitmapFont = when {
-    !bold && !italic -> ScreenRenderer.regularFont
-    !bold && italic -> ScreenRenderer.regularItalicFont
-    bold && !italic -> ScreenRenderer.boldFont
-    bold && italic -> ScreenRenderer.boldItalicFont
+    !bold && !italic -> Hex.assets.regularFont
+    !bold && italic -> Hex.assets.regularItalicFont
+    bold && !italic -> Hex.assets.boldFont
+    bold && italic -> Hex.assets.boldItalicFont
     else -> error("This should really not happen!")
   }
 }
@@ -128,15 +125,12 @@ fun booleanText(
 
 object ScreenRenderer : Disposable, Resizable {
 
-  val spacing: Float
-  val batch: SpriteBatch
+  val spacing: Float = FONT_SIZE * Hex.scale / 2f
+  val batch: SpriteBatch = SpriteBatch()
 
-
-  val regularFont: BitmapFont
-  val regularItalicFont: BitmapFont
-  val boldFont: BitmapFont
-  val boldItalicFont: BitmapFont
-
+  init {
+    resize(Gdx.graphics.width, Gdx.graphics.height)
+  }
 
   fun ScreenText.draw(line: Int, position: ScreenDrawPosition = TOP, offsetX: Float = spacing) {
     val y = if (position.bottom) {
@@ -188,35 +182,10 @@ object ScreenRenderer : Disposable, Resizable {
 
   override fun dispose() {
     batch.dispose()
-    regularFont.dispose()
   }
 
   override fun resize(width: Int, height: Int) {
     batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, width.toFloat(), height.toFloat())
   }
 
-  val FONTS_FOLDER = "fonts" + File.separatorChar
-  const val FONT_SIZE = 20
-
-  init {
-    fun font(bold: Boolean, italic: Boolean): FreeTypeFontGenerator {
-      val boldness = if (bold) "B" else "R"
-      val italicness = if (italic) "I" else ""
-      return FreeTypeFontGenerator(Gdx.files.internal("${FONTS_FOLDER}UbuntuMono-$boldness$italicness.ttf"))
-    }
-
-    val parameter = FreeTypeFontParameter()
-    parameter.size = FONT_SIZE * scale
-    parameter.minFilter = Linear
-
-    regularFont = font(bold = false, italic = false).generateFont(parameter)
-    regularItalicFont = font(bold = false, italic = true).generateFont(parameter)
-    boldFont = font(bold = true, italic = false).generateFont(parameter)
-    boldItalicFont = font(bold = true, italic = true).generateFont(parameter)
-
-    spacing = FONT_SIZE * scale / 2f
-
-    batch = SpriteBatch()
-    resize(Gdx.graphics.width, Gdx.graphics.height)
-  }
 }

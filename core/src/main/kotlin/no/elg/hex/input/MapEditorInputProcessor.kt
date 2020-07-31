@@ -32,15 +32,13 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
-import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.editor.OpaquenessEditor
-import no.elg.hex.input.editor.OpaquenessEditor.Companion.OPAQUENESS_EDITORS
 import no.elg.hex.input.editor.PieceEditor
-import no.elg.hex.input.editor.PieceEditor.Companion.PIECE_EDITORS
 import no.elg.hex.input.editor.TeamEditor
-import no.elg.hex.input.editor.TeamEditor.Companion.TEAM_EDITORS
-import no.elg.hex.island.Island
+import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.findHexagonsWithinRadius
+import no.elg.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
@@ -49,12 +47,22 @@ import kotlin.reflect.KClass
 /**
  * @author Elg
  */
-object MapEditorInputHandler : InputAdapter() {
+class MapEditorInputProcessor(
+  private val islandScreen: IslandScreen
+) : InputAdapter() {
+
+
+  private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(islandScreen)
+  private val teamEditors = TeamEditor.generateTeamEditors(islandScreen)
+  private val pieceEditors = PieceEditor.generatePieceEditors(islandScreen)
+
+  init {
+    quicksave()
+  }
 
   private var quickSavedIsland: String = ""
 
-  const val MAX_BRUSH_SIZE = 10
-  const val MIN_BRUSH_SIZE = 1
+  var showHelp = false
 
   var brushRadius: Int = 1
     private set
@@ -65,16 +73,17 @@ object MapEditorInputHandler : InputAdapter() {
   var selectedPiece: KClass<out Piece> = PIECES.first()
     private set
 
-  var opaquenessEditor: OpaquenessEditor = OpaquenessEditor.Disabled
+  var opaquenessEditor: OpaquenessEditor = opaquenessEditors.last()
     private set
-  var teamEditor: TeamEditor = TeamEditor.Disabled
+  var teamEditor: TeamEditor = teamEditors.last()
     private set
-  var pieceEditor: PieceEditor = PieceEditor.Disabled
+  var pieceEditor: PieceEditor = pieceEditors.last()
     private set
+
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
-      val cursorHex = BasicInputHandler.cursorHex ?: return true
+      val cursorHex = islandScreen.basicInputProcessor.cursorHex ?: return true
 
       fun editHex(hexagon: Hexagon<HexagonData>) {
         opaquenessEditor.edit(hexagon)
@@ -83,7 +92,7 @@ object MapEditorInputHandler : InputAdapter() {
       }
 
       if (isShiftPressed()) {
-        for (hexagon in cursorHex.findHexagonsWithinRadius(brushRadius)) {
+        for (hexagon in cursorHex.findHexagonsWithinRadius(islandScreen.island, brushRadius)) {
           editHex(hexagon)
         }
       } else {
@@ -96,7 +105,7 @@ object MapEditorInputHandler : InputAdapter() {
 
   override fun keyDown(keycode: Int): Boolean {
     when (keycode) {
-      F1 -> MapEditorRenderer.showHelp = !MapEditorRenderer.showHelp
+      F1 -> showHelp = !showHelp
 
       W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
       S, PAGE_DOWN, DOWN -> brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
@@ -105,35 +114,30 @@ object MapEditorInputHandler : InputAdapter() {
       A -> selectedPiece = PIECES.let { if (isShiftPressed()) it.previous(selectedPiece) else it.next(selectedPiece) }
 
       NUM_1, NUMPAD_1 ->
-        opaquenessEditor = OPAQUENESS_EDITORS.let { if (isShiftPressed()) it.previous(opaquenessEditor) else it.next(opaquenessEditor) }
+        opaquenessEditor = opaquenessEditors.let { if (isShiftPressed()) it.previous(opaquenessEditor) else it.next(opaquenessEditor) }
       NUM_2, NUMPAD_2 ->
-        teamEditor = TEAM_EDITORS.let { if (isShiftPressed()) it.previous(teamEditor) else it.next(teamEditor) }
+        teamEditor = teamEditors.let { if (isShiftPressed()) it.previous(teamEditor) else it.next(teamEditor) }
       NUM_3, NUMPAD_3 ->
-        pieceEditor = PIECE_EDITORS.let { if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor) }
+        pieceEditor = pieceEditors.let { if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor) }
 
-      F5 -> quickSavedIsland = writeIslandAsString(true)
-      F9 -> Hex.island = Hex.mapper.readValue(quickSavedIsland)
+      F5 -> quicksave()
+      F9 -> quickload()
 
-      C -> if (isControlPressed()) Hex.island.saveIsland() else return false
-      V -> if (isControlPressed()) Island.loadIsland() else return false
+      C -> if (isControlPressed()) islandScreen.saveIsland() else return false
+      V -> if (isControlPressed()) {
+        LevelSelectScreen.play(islandScreen.basicInputProcessor.saveSlot)
+      } else return false
       else -> return false
     }
     return true
   }
 
-  private fun writeIslandAsString(pretty: Boolean = false): String {
-    return Hex.mapper.let {
-      if (pretty) it.writerWithDefaultPrettyPrinter() else it.writer()
-    }.writeValueAsString(Hex.island)
-  }
-
-
   fun quicksave() {
-    quickSavedIsland = Hex.island.serialize()
+    quickSavedIsland = islandScreen.island.serialize()
   }
 
   fun quickload() {
-    Hex.island = Island.deserialize(quickSavedIsland)
+    LevelSelectScreen.play(Hex.mapper.readValue<Island>(quickSavedIsland))
   }
 
 
@@ -160,5 +164,10 @@ object MapEditorInputHandler : InputAdapter() {
     val currentIndex = this.indexOf(current)
     val nextIndex = if (currentIndex == 0) size - 1 else (currentIndex - 1) % this.size
     return this[nextIndex]
+  }
+
+  companion object {
+    const val MAX_BRUSH_SIZE = 10
+    const val MIN_BRUSH_SIZE = 1
   }
 }

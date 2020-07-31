@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled
 import com.badlogic.gdx.utils.Disposable
-import no.elg.hex.Hex.camera
-import no.elg.hex.Hex.island
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -16,26 +14,23 @@ import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
-import no.elg.hex.input.BasicInputHandler
+import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 
 /**
  * @author kheba
  */
-object OutlineRenderer : FrameUpdatable, Disposable {
+class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, Disposable {
 
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
-
-  private const val DEFAULT_RECT_LINE_WIDTH = 0.75f
 
   override fun frameUpdate() {
 
     lineRenderer.begin(Filled)
-    lineRenderer.projectionMatrix = camera.combined
+    lineRenderer.projectionMatrix = islandScreen.camera.combined
 
-    val currHex = BasicInputHandler.cursorHex
-
+    val currHex = islandScreen.basicInputProcessor.cursorHex
 
     fun draw(
       hexes: Iterable<Hexagon<HexagonData>>,
@@ -48,7 +43,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
 
       for (hexagon in hexes) {
         val points = hexagon.points
-        val data = hexagon.getData()
+        val data = hexagon.getData(islandScreen.island)
         if (data.invisible) continue
 
         val brightness = HexagonData.BRIGHTNESS + (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)
@@ -70,7 +65,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
     }
 
 
-    draw(island.hexagons, 1f, false) { data ->
+    draw(islandScreen.island.hexagons, 1f, false) { data ->
       when (data.piece::class) {
         Capital::class -> Color.BLUE to DEFAULT_RECT_LINE_WIDTH
         PalmTree::class, PineTree::class -> Color.CHARTREUSE to DEFAULT_RECT_LINE_WIDTH
@@ -80,7 +75,7 @@ object OutlineRenderer : FrameUpdatable, Disposable {
       }
     }
 
-    island.selected?.also {
+    islandScreen.island.selected?.also {
       draw(it.hexagons, 1f, false) { data ->
         when (data.piece::class) {
           Capital::class -> Color.BLUE to 3f
@@ -98,6 +93,10 @@ object OutlineRenderer : FrameUpdatable, Disposable {
 
   override fun dispose() {
     lineRenderer.dispose()
+  }
+
+  companion object {
+    private const val DEFAULT_RECT_LINE_WIDTH = 0.75f
   }
 
 }

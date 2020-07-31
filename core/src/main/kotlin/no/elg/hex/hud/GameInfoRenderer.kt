@@ -1,16 +1,17 @@
 package no.elg.hex.hud
 
-import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
+import no.elg.hex.input.GameInputProcessor
+import no.elg.hex.screens.IslandScreen
 
 /**
  * @author Elg
  */
-object GameInfoRenderer : FrameUpdatable {
+class GameInfoRenderer(private val islandScreen: IslandScreen, gameInputProcessor: GameInputProcessor) : FrameUpdatable {
 
   override fun frameUpdate() {
-    Hex.island.selected?.also { selected ->
+    islandScreen.island.selected?.also { selected ->
       ScreenRenderer.drawAll(
         ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%+d".format(it) }),
         ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),

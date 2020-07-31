@@ -2,11 +2,11 @@ package no.elg.hex.util
 
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
-import no.elg.hex.Hex.island
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import no.elg.hex.hexagon.Team
+import no.elg.island.Island
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
@@ -14,9 +14,9 @@ import java.util.HashSet
 /**
  * @return HexagonData of this hexagon
  */
-fun Hexagon<HexagonData>.getData(): HexagonData {
+fun Hexagon<HexagonData>.getData(island: Island): HexagonData {
   return satelliteData.orElseGet {
-    (if (isEdgeHexagon(this)) EDGE_DATA else HexagonData()).also {
+    (if (isEdgeHexagon(this, island)) EDGE_DATA else HexagonData()).also {
       this.setSatelliteData(it)
     }
   }
@@ -31,10 +31,10 @@ fun Hexagon<HexagonData>.getData(): HexagonData {
  *
  * @return Get the hexagon at a given screen location or `null` if nothing is found.
  */
-fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
-  return island.grid.getByPixelCoordinate(x, y).let {
+fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
+  return this.grid.getByPixelCoordinate(x, y).let {
     if (it.isEmpty()) return@let null
-    val data = it.get().getData()
+    val data = it.get().getData(this)
     if (data.edge || (!Hex.args.mapEditor && data.isOpaque)) null else it.get()
   }
 }
@@ -42,16 +42,17 @@ fun getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
 /**
  * @return All hexagons connected to the start hexagon of the same team
  */
-fun Hexagon<HexagonData>.connectedHexagons(): Set<Hexagon<HexagonData>> {
-  return connectedHexagons(this, this.getData().team, HashSet())
+fun Hexagon<HexagonData>.connectedHexagons(island: Island): Set<Hexagon<HexagonData>> {
+  return connectedHexagons(this, this.getData(island).team, HashSet(), island)
 }
 
 private fun connectedHexagons(
   center: Hexagon<HexagonData>,
   team: Team,
-  visited: MutableSet<Hexagon<HexagonData>>
+  visited: MutableSet<Hexagon<HexagonData>>,
+  island: Island
 ): Set<Hexagon<HexagonData>> {
-  val data = center.getData()
+  val data = center.getData(island)
   //only check a hexagon if they have the same color and haven't been visited
   if (visited.contains(center) || data.team != team || data.invisible) {
     return visited
@@ -62,7 +63,7 @@ private fun connectedHexagons(
 
   //check each neighbor
   for (neighbor in island.grid.getNeighborsOf(center)) {
-    connectedHexagons(neighbor, team, visited)
+    connectedHexagons(neighbor, team, visited, island)
   }
   return visited
 }
@@ -83,18 +84,18 @@ fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
   )
 
 
-fun Hexagon<HexagonData>.findHexagonsWithinRadius(radius: Int, includeThis: Boolean = true): Set<Hexagon<HexagonData>> {
+fun Hexagon<HexagonData>.findHexagonsWithinRadius(island: Island, radius: Int, includeThis: Boolean = true): Set<Hexagon<HexagonData>> {
   val result = HashSet<Hexagon<HexagonData>>()
   if (includeThis) {
     result += this
   }
   for (subRadius in 1..radius) {
-    result += calculateRing(subRadius)
+    result += calculateRing(island, subRadius)
   }
   return result
 }
 
-fun Hexagon<HexagonData>.calculateRing(radius: Int): Set<Hexagon<HexagonData>> {
+fun Hexagon<HexagonData>.calculateRing(island: Island, radius: Int): Set<Hexagon<HexagonData>> {
   val result = HashSet<Hexagon<HexagonData>>()
 
   var currentCoordinate = CubeCoordinate.fromCoordinates(
@@ -102,12 +103,11 @@ fun Hexagon<HexagonData>.calculateRing(radius: Int): Set<Hexagon<HexagonData>> {
     gridZ + radius
   )
 
-
   for (i in 0 until 6) {
     for (j in 0 until radius) {
       currentCoordinate = getNeighborCoordinateByIndex(currentCoordinate, i)
       val hexagon = island.grid.getByCubeCoordinate(currentCoordinate)
-      if (hexagon.isPresent && !hexagon.get().getData().edge) {
+      if (hexagon.isPresent && !hexagon.get().getData(island).edge) {
         result.add(hexagon.get())
       }
     }

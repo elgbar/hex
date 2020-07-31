@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
-import no.elg.hex.Hex
+import no.elg.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
 import kotlin.reflect.KClass
@@ -109,7 +109,7 @@ data class HexagonData(
 
     private const val EXPECTED_NEIGHBORS = 6
 
-    fun isEdgeHexagon(hex: Hexagon<HexagonData>) = Hex.island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
+    fun isEdgeHexagon(hex: Hexagon<HexagonData>, island: Island) = island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
 
     val EDGE_DATA = HexagonData(edge = true)
   }

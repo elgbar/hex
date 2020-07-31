@@ -1,4 +1,4 @@
-package no.elg.hex.island
+package no.elg.island
 
 import com.badlogic.gdx.files.FileHandle
 import org.junit.jupiter.api.Assertions.assertTrue

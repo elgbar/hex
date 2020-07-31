@@ -1,8 +1,6 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
-import no.elg.hex.util.getData
-import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
 
 
@@ -35,7 +33,7 @@ enum class CapitalPlacementPreference {
 // * Only return the pices of the strongest preferences. F.eks if any [STRONGLY] they are always returned. If no [STRONGLY] are presenent but one [LAST_RESORT] and one [WEAKLY] are present only [WEAKLY] will be returned
 // */
 //fun filterToCapitalPreference(hexagons: Iterable<Hexagon<HexagonData>>): Set<Hexagon<HexagonData>> {
-//  val highestPref = hexagons.mapTo(HashSet()) { it.getData().piece.capitalPlacement }
+//  val highestPref = hexagons.mapTo(HashSet()) { it.getData(island).piece.capitalPlacement }
 //  if(h)
 //}
 
@@ -162,9 +160,6 @@ class Capital(team: Team) : StationaryPiece(team) {
     balance = 0
   }
 
-  fun calculateIncome(hexagons: Collection<Hexagon<HexagonData>>): Int {
-    return hexagons.sumBy { it.getData().piece.cost }
-  }
 
   override val strength = PEASANT_STRENGTH
 }

@@ -8,34 +8,12 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
-import no.elg.hex.Hex
-import no.elg.hex.Hex.camera
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.input.BasicInputHandler
+import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 
-object VerticesRenderer : FrameUpdatable, Disposable {
-
-  private const val SHADERS_FOLDER = "shaders"
-  private const val FRAG_SHADER_PATH = "$SHADERS_FOLDER/hex.frag.glsl"
-  private const val VERT_SHADER_PATH = "$SHADERS_FOLDER/hex.vert.glsl"
-
-  //Position attribute - (x, y)
-  private const val POSITION_COMPONENTS = 2
-
-  //Color attribute - (r, g, b, a)
-  private const val COLOR_COMPONENTS = 1
-
-  //Total number of components for all attributes
-  private const val NUM_COMPONENTS = POSITION_COMPONENTS + COLOR_COMPONENTS
-
-  //The maximum number of triangles our mesh will hold
-  private const val MAX_TRIS = 6 * 64 // each hexagon has 4 to 6 vertices, and there will be a least 64 hexagons
-
-  //The maximum number of vertices our mesh will hold
-  private const val MAX_VERTS = MAX_TRIS * 3
-
+class VerticesRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, Disposable {
 
   private val mesh: Mesh = Mesh(true, MAX_VERTS, 0,
     VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
@@ -72,11 +50,11 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     Gdx.gl.glEnable(GL20.GL_BLEND)
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    val currHex = BasicInputHandler.cursorHex
+    val currHex = islandScreen.basicInputProcessor.cursorHex
 
     //Render the hexagons
-    for (hexagon in Hex.island.hexagons) {
-      val data: HexagonData = hexagon.getData()
+    for (hexagon in islandScreen.island.hexagons) {
+      val data: HexagonData = hexagon.getData(islandScreen.island)
       if (data.invisible) continue
       val brightness = HexagonData.BRIGHTNESS + if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f
       data.type.render(this, data.color, brightness, hexagon)
@@ -105,7 +83,7 @@ object VerticesRenderer : FrameUpdatable, Disposable {
     shader.begin()
 
     //update the projection matrix so our triangles are rendered in 2D
-    shader.setUniformMatrix("u_projTrans", camera.combined)
+    shader.setUniformMatrix("u_projTrans", islandScreen.camera.combined)
 
     //render the mesh
     mesh.render(shader, GL20.GL_TRIANGLES, 0, vertexCount)
@@ -153,5 +131,27 @@ object VerticesRenderer : FrameUpdatable, Disposable {
   override fun dispose() {
     mesh.dispose()
     shader.dispose()
+  }
+
+  companion object {
+    private const val SHADERS_FOLDER = "shaders"
+
+    private const val FRAG_SHADER_PATH = "${SHADERS_FOLDER}/hex.frag.glsl"
+    private const val VERT_SHADER_PATH = "${SHADERS_FOLDER}/hex.vert.glsl"
+
+    //Position attribute - (x, y)
+    private const val POSITION_COMPONENTS = 2
+
+    //Color attribute - (r, g, b, a)
+    private const val COLOR_COMPONENTS = 1
+
+    //Total number of components for all attributes
+    private const val NUM_COMPONENTS = POSITION_COMPONENTS + COLOR_COMPONENTS
+
+    //The maximum number of triangles our mesh will hold
+    private const val MAX_TRIS = 6 * 64 // each hexagon has 4 to 6 vertices, and there will be a least 64 hexagons
+
+    //The maximum number of vertices our mesh will hold
+    private const val MAX_VERTS = MAX_TRIS * 3
   }
 }

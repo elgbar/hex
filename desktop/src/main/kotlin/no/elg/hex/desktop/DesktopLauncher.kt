@@ -5,12 +5,11 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
-import no.elg.hex.input.BasicInputHandler
 
 fun main(args: Array<String>) {
   val config = LwjglApplicationConfiguration()
 
-  if (BasicInputHandler.scale > 1) {
+  if (Hex.scale > 1) {
     config.width = 1920
     config.height = 1080
   } else {

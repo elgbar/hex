@@ -5,12 +5,10 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
-import no.elg.hex.Hex
-import no.elg.hex.Hex.camera
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
-import java.awt.Toolkit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sign
@@ -20,20 +18,7 @@ import kotlin.math.sign
  *
  * @author Elg
  */
-object BasicInputHandler : InputAdapter() {
-
-  private const val MIN_MOVE_AMOUNT = 0
-
-  const val MIN_ZOOM = 0.15f
-  const val MAX_ZOOM = 3.0f
-
-  private const val ZOOM_SPEED = 0.1f
-
-  private val unprojectVector = Vector3()
-  private var draggable = false
-  private var lastMouseFrame: Long = -1
-
-  val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
+class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
 
   var mouseX: Float = 0f
     private set
@@ -51,7 +36,7 @@ object BasicInputHandler : InputAdapter() {
   var saveSlot: Int = 0
     private set
 
-  val cursorHex: Hexagon<HexagonData>? get() = getHexagon(mouseX.toDouble(), mouseY.toDouble())
+  val cursorHex: Hexagon<HexagonData>? get() = islandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   /**
    * Update the world mouse position.
@@ -62,14 +47,14 @@ object BasicInputHandler : InputAdapter() {
     unprojectVector.x = Gdx.input.x.toFloat()
     unprojectVector.y = Gdx.input.y.toFloat()
 
-    camera.unproject(unprojectVector)
+    islandScreen.camera.unproject(unprojectVector)
     mouseX = unprojectVector.x
     mouseY = unprojectVector.y
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable) {
-      val zoom = camera.zoom
+      val zoom = islandScreen.camera.zoom
       val x: Float = Gdx.input.deltaX * zoom
       val y: Float = Gdx.input.deltaY * zoom
 
@@ -78,7 +63,7 @@ object BasicInputHandler : InputAdapter() {
         return false
       }
 
-      camera.translate(-x, -y)
+      islandScreen.camera.translate(-x, -y)
       return true
     }
     return false
@@ -110,17 +95,31 @@ object BasicInputHandler : InputAdapter() {
   }
 
   fun resetCamera() {
-    val data = Hex.island.grid.gridData
+    val data = islandScreen.island.grid.gridData
 
     val x = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat() / 2f
     val y = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat() / 2f
 
-    camera.position.x = x
-    camera.position.y = y
+    islandScreen.camera.position.x = x
+    islandScreen.camera.position.y = y
   }
 
   override fun scrolled(amount: Int): Boolean {
-    camera.zoom = (sign(amount.toFloat()) * ZOOM_SPEED + camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    islandScreen.camera.zoom = (sign(amount.toFloat()) * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
+  }
+
+  companion object {
+    private const val MIN_MOVE_AMOUNT = 0
+
+    const val MIN_ZOOM = 0.15f
+    const val MAX_ZOOM = 3.0f
+
+    private const val ZOOM_SPEED = 0.1f
+
+    private val unprojectVector = Vector3()
+    private var draggable = false
+    private var lastMouseFrame: Long = -1
+
   }
 }

@@ -1,13 +1,11 @@
-package no.elg.hex.island
+package no.elg.island
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.input.BasicInputHandler
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
@@ -74,7 +72,7 @@ class Island(
   /**
    * Select the hex under the cursor
    */
-  fun select(hex: Hexagon<HexagonData>? = BasicInputHandler.cursorHex) {
+  fun select(hex: Hexagon<HexagonData>?) {
     selected = null
     if (hex == null) return
 
@@ -83,12 +81,12 @@ class Island(
     val capital = getCapital(territoryHexes).let {
       if (it != null) it
       else {
-        val capHex = calculateBestCapitalPlacement(territoryHexes).getData()
+        val capHex = calculateBestCapitalPlacement(territoryHexes).getData(this)
         capHex.setPiece(Capital::class)
         capHex.piece as Capital
       }
     }
-    selected = Territory(capital, territoryHexes)
+    selected = Territory(this, capital, territoryHexes)
   }
 
   fun Hexagon<HexagonData>.getCapital(): Capital? {
@@ -97,14 +95,14 @@ class Island(
   }
 
   private fun getCapital(hexagons: Set<Hexagon<HexagonData>>): Capital? {
-    return hexagons.firstOrNull { it.getData().piece is Capital }?.getData()?.piece as? Capital?
+    return hexagons.firstOrNull { it.getData(this).piece is Capital }?.getData(this)?.piece as? Capital?
   }
 
   /**
    * Get all hexagons that is in tha same territory as the given [this@getTerritoryHexagons]. or null if hexagon is not a part of a territory
    */
   fun Hexagon<HexagonData>.getTerritoryHexagons(): Set<Hexagon<HexagonData>>? {
-    val territoryHexes = connectedHexagons()
+    val territoryHexes = connectedHexagons(this@Island)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) return null
     return territoryHexes
   }
@@ -123,11 +121,11 @@ class Island(
    */
   fun calculateBestCapitalPlacement(hexagons: Set<Hexagon<HexagonData>>): Hexagon<HexagonData> {
     require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "There must be at least $MIN_HEX_IN_TERRITORY hexagons in the given set!" }
-    val hexTeam = hexagons.first().getData().team
-    require(hexagons.all { it.getData().team == hexTeam }) { "All hexagons given must be on the same team" }
+    val hexTeam = hexagons.first().getData(this).team
+    require(hexagons.all { it.getData(this).team == hexTeam }) { "All hexagons given must be on the same team" }
 
     //TODO make sure to take into account if there are already any pieces there
-//    hexagons.map { it.getData().piece.capitalPlacement to }
+//    hexagons.map { it.getData(this).piece.capitalPlacement to }
 
     val contenders = HashSet<Hexagon<HexagonData>>(hexagons.size)
 
@@ -139,7 +137,7 @@ class Island(
 
     fun finDistanceToClosestHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
       for (r in discardIfLessThan..maxRadius) {
-        if (hex.calculateRing(r).any { it.getData().team != hexTeam }) {
+        if (hex.calculateRing(this, r).any { it.getData(this).team != hexTeam }) {
           return r
         }
       }
@@ -169,10 +167,10 @@ class Island(
     val expectedHexagons = 6 * greatestDistance
 
     return contenders.map { origin: Hexagon<HexagonData> ->
-      val ring = origin.calculateRing(greatestDistance)
+      val ring = origin.calculateRing(this, greatestDistance)
       origin to ((expectedHexagons - ring.size) //non-existent hexes count as ours
         + ring.sumByDouble {
-        val data = it.getData()
+        val data = it.getData(this)
         (if (data.team == hexTeam) 1.0 else 0.0) + (if (data.invisible) 0.5 else 0.0)
       })
     }.maxBy { it.second }!!.first
@@ -198,20 +196,20 @@ class Island(
     val checkedHexagons = HashSet<Hexagon<HexagonData>>()
 
     for (hexagon in hexagons) {
-      if (checkedHexagons.contains(hexagon) || hexagon.getData().invisible) continue
+      if (checkedHexagons.contains(hexagon) || hexagon.getData(this).invisible) continue
 
-      val connectedHexes = hexagon.connectedHexagons()
+      val connectedHexes = hexagon.connectedHexagons(this)
       checkedHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
-        if (hexagon.getData().piece is Capital) {
+        if (hexagon.getData(this).piece is Capital) {
           Gdx.app.log("Island Validation", "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
           valid = false
         }
         continue
       }
 
-      val capitalCount = connectedHexes.count { it.getData().piece is Capital }
+      val capitalCount = connectedHexes.count { it.getData(this).piece is Capital }
       if (capitalCount < 1) {
         Gdx.app.log(
           "Island Validation",
@@ -231,27 +229,7 @@ class Island(
     return valid
   }
 
-  fun serialize(): String =
-    Hex.mapper.writeValueAsString(Hex.island)
-
-  fun saveIsland(): Boolean {
-    val name = fileName
-    val file = islandFile
-
-    if (!validate()) {
-      Gdx.app.log("SAVE", "Island failed validation")
-      return false
-    }
-
-    if (file.isDirectory) {
-      Gdx.app.log("SAVE", "Failed to save island the name '$name' as the resulting file will be a directory.")
-      return false
-    }
-    file.writeString(serialize(), false)
-    Gdx.app.log("SAVE", "Successfully saved island '$name'")
-    return true
-  }
-
+  fun serialize(): String = Hex.mapper.writeValueAsString(this)
 
   companion object {
     const val GRID_RADIUS = 20.0
@@ -260,30 +238,6 @@ class Island(
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)
-    }
-
-    const val ISLAND_SAVE_DIR = "islands"
-
-    val fileName: String get() = "island-${BasicInputHandler.saveSlot}.is"
-    val islandFile: FileHandle get() = Gdx.files.local("$ISLAND_SAVE_DIR/$fileName")
-
-    fun loadIsland(file: FileHandle = islandFile): Boolean {
-      val json: String = try {
-        requireNotNull(file.readString())
-      } catch (e: Exception) {
-        Gdx.app.log("LOAD", "Failed to load island the name '${file.name()}'")
-        return false
-      }
-      Hex.island = try {
-        deserialize(json)
-      } catch (e: Exception) {
-        Gdx.app.log("LOAD", "Invalid island save data for island '${file.name()}'")
-        Gdx.app.log("LOAD", e.message)
-        return false
-      }
-
-      Gdx.app.log("LOAD", "Successfully loaded island '${file.name()}'")
-      return true
     }
   }
 
@@ -298,7 +252,7 @@ class Island(
         grid.gridData.gridWidth,
         grid.gridData.gridHeight,
         grid.gridData.gridLayout,
-        grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to it.getData() }.toMap()
+        grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to it.getData(this) }.toMap()
       )
 
   private data class IslandDTO(

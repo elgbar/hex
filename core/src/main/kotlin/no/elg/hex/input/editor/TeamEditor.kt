@@ -2,38 +2,44 @@ package no.elg.hex.input.editor
 
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Team
-import no.elg.hex.input.MapEditorInputHandler.selectedTeam
+import no.elg.hex.input.MapEditorInputProcessor
+import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.reflect.full.primaryConstructor
 
-sealed class TeamEditor : Editor() {
+sealed class TeamEditor(val islandScreen: IslandScreen) : Editor() {
 
   companion object {
-    val TEAM_EDITORS: List<TeamEditor> by lazy {
+
+    fun generateTeamEditors(islandScreen: IslandScreen): List<TeamEditor> =
       TeamEditor::class.sealedSubclasses.map {
-        requireNotNull(it.objectInstance) { "All subclasses of ${TeamEditor::class::simpleName} must be objects" }
+        it.primaryConstructor?.call(islandScreen) ?: error("Failed to create new instance of ${it.simpleName}")
       }.also {
         val disabledSubclasses = it.filter { sub -> sub.isNOP }.size
         require(disabledSubclasses == 1) {
           "There must be one and exactly one disabled subclass of ${TeamEditor::class::simpleName}. Found $disabledSubclasses disabled classes."
         }
       }
-    }
+
   }
 
-  object `Set team` : TeamEditor() {
+  class `Set team`(islandScreen: IslandScreen) : TeamEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData().setTeam(selectedTeam, null)
+      require(islandScreen.inputProcessor is MapEditorInputProcessor) {
+        "Tried change editor while the input processor is not ${MapEditorInputProcessor::class.simpleName}"
+      }
+      hexagon.getData(islandScreen.island).setTeam((islandScreen.inputProcessor as MapEditorInputProcessor).selectedTeam, null)
     }
   }
 
-  object `Randomize team` : TeamEditor() {
+  class `Randomize team`(islandScreen: IslandScreen) : TeamEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData().setTeam(Team.values().random(), null)
+      hexagon.getData(islandScreen.island).setTeam(Team.values().random(), null)
     }
   }
 
-  object Disabled : TeamEditor() {
+  class Disabled(islandScreen: IslandScreen) : TeamEditor(islandScreen) {
     override val isNOP = true
   }
 }
