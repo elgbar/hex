@@ -11,6 +11,7 @@ import no.elg.hex.input.BasicInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.renderer.OutlineRenderer
+import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.LevelSelectScreen.getIslandFile
 import no.elg.island.Island
@@ -41,6 +42,7 @@ class IslandScreen(val island: Island) : AbstractScreen() {
 
   private val verticesRenderer = VerticesRenderer(this)
   private val outlineRenderer = OutlineRenderer(this)
+  private val spriteRenderer = SpriteRenderer(this)
 
   override fun onLoad() {
     Hex.inputMultiplexer.addProcessor(basicInputProcessor)
@@ -52,6 +54,7 @@ class IslandScreen(val island: Island) : AbstractScreen() {
 
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
+    spriteRenderer.frameUpdate()
 
     if (Hex.args.debug) {
       debugRenderer.frameUpdate()
