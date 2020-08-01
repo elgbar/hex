@@ -3,7 +3,7 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap.Format.RGBA4444
+import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -29,12 +29,12 @@ import com.badlogic.gdx.utils.Array as GdxArray
  */
 object LevelSelectScreen : AbstractScreen() {
 
-  private const val FRAME_BUFFER_SIZE = 512
+  private const val FRAME_BUFFER_SIZE = 1024
 
   private const val PREVIEWS_PER_ROW = 3
   private const val PREVIEW_PADDING_PERCENT = 0.025f
 
-  private val NOT_SELECTED_COLOR = Color.WHITE
+  private val NOT_SELECTED_COLOR = Color.LIGHT_GRAY
   private val SELECT_COLOR = Color.GREEN
 
   private val islandPreviews = GdxArray<FrameBuffer>()
@@ -48,8 +48,12 @@ object LevelSelectScreen : AbstractScreen() {
   val mouseX get() = unprojectVector.x
   val mouseY get() = unprojectVector.y
 
-  override fun show() {
-    Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
+  fun renderPreviews() {
+    for (buffer in islandPreviews) {
+      buffer.dispose()
+    }
+    islandPreviews.clear()
+
     val islandDir = Gdx.files.local(ISLAND_SAVES_DIR)
     if (!islandDir.isDirectory) {
       play(0)
@@ -57,13 +61,20 @@ object LevelSelectScreen : AbstractScreen() {
     for ((i, saveFile: FileHandle) in islandDir.list(ISLAND_FILE_ENDING).withIndex()) {
       val island = loadIsland(saveFile) ?: continue
       val islandScreen = IslandScreen(i, island, false)
-      val buffer = FrameBuffer(RGBA4444, FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, false)
+      islandScreen.resize(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE)
+
+      val buffer = FrameBuffer(RGBA8888, FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, false)
       buffer.begin()
       islandScreen.render(0f)
       buffer.end()
       islandPreviews.add(buffer)
       islandScreen.dispose()
     }
+  }
+
+  override fun show() {
+    Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
+    renderPreviews()
   }
 
   override fun hide() {
@@ -79,15 +90,13 @@ object LevelSelectScreen : AbstractScreen() {
     val gridY = index / PREVIEWS_PER_ROW
 
     val padding: Float = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
-    val paddingH: Float = Gdx.graphics.height * PREVIEW_PADDING_PERCENT
-    val width: Float = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
-    val height: Float = (Gdx.graphics.height - (1 + PREVIEWS_PER_ROW) * paddingH) / PREVIEWS_PER_ROW
+    val size: Float = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
 
     return Rectangle(
-      padding + (padding + width) * gridX,
-      padding + (padding + height) * gridY,
-      width,
-      height
+      padding + (padding + size) * gridX,
+      padding + (padding + size) * gridY,
+      size,
+      size
     )
   }
 
@@ -145,6 +154,11 @@ object LevelSelectScreen : AbstractScreen() {
       Gdx.app.debug("LOAD", e.message)
       null
     }
+  }
+
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    renderPreviews()
   }
 
 }
