@@ -3,7 +3,6 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys.A
-import com.badlogic.gdx.Input.Keys.C
 import com.badlogic.gdx.Input.Keys.CONTROL_LEFT
 import com.badlogic.gdx.Input.Keys.CONTROL_RIGHT
 import com.badlogic.gdx.Input.Keys.DOWN
@@ -16,14 +15,15 @@ import com.badlogic.gdx.Input.Keys.NUMPAD_3
 import com.badlogic.gdx.Input.Keys.NUM_1
 import com.badlogic.gdx.Input.Keys.NUM_2
 import com.badlogic.gdx.Input.Keys.NUM_3
+import com.badlogic.gdx.Input.Keys.O
 import com.badlogic.gdx.Input.Keys.PAGE_DOWN
 import com.badlogic.gdx.Input.Keys.PAGE_UP
 import com.badlogic.gdx.Input.Keys.Q
+import com.badlogic.gdx.Input.Keys.R
 import com.badlogic.gdx.Input.Keys.S
 import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
 import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.Input.Keys.UP
-import com.badlogic.gdx.Input.Keys.V
 import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -121,10 +121,8 @@ class MapEditorInputProcessor(
       F5 -> quicksave()
       F9 -> quickload()
 
-      C -> if (isControlPressed()) islandScreen.saveIsland() else return false
-      V -> if (isControlPressed()) {
-        LevelSelectScreen.play(islandScreen.id)
-      } else return false
+      O -> if (isControlPressed()) islandScreen.saveIsland() else return false
+      R -> if (isControlPressed()) LevelSelectScreen.play(islandScreen.id) else return false
       else -> return false
     }
     return true
