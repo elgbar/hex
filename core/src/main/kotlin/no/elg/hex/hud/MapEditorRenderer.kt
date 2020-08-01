@@ -19,6 +19,7 @@ class MapEditorRenderer(private val islandScreen: IslandScreen, private val mapE
 
   companion object {
     private val title = ScreenText("=== Map editor keys ===", color = Color.SALMON)
+
     val shownHelp = arrayOf(title,
       ScreenText("F1 to hide this help text"),
       ScreenText("Holding SHIFT will reverse iteration order, unless otherwise stated"),
@@ -35,10 +36,12 @@ class MapEditorRenderer(private val islandScreen: IslandScreen, private val mapE
       ScreenText("2 to iterate through team editors"),
       ScreenText("3 to iterate through piece editors"),
       emptyText(),
+      ScreenText("Ctrl+C recalculate capitals"),
+      emptyText(),
       ScreenText("F5 to quick save island"),
       ScreenText("F9 to quick load island"),
-      ScreenText("CTRL+O to output current island to disk"),
-      ScreenText("CTRL+R to read island from disk"))
+      ScreenText("Ctrl+O to output current island to disk"),
+      ScreenText("Ctrl+R to read island from disk"))
 
     val hiddenHelp = arrayOf(title,
       ScreenText("F1 to show help text"))

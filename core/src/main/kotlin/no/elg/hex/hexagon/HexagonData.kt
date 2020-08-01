@@ -56,7 +56,7 @@ data class HexagonData(
   }
 
   @JsonSetter("pieceType")
-  fun setPiece(pieceType: KClass<out Piece>) {
+  fun setPiece(pieceType: KClass<out Piece>): Piece {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
 
     val pieceToPlace = if (pieceType.objectInstance != null) {
@@ -68,6 +68,7 @@ data class HexagonData(
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace
     }
+    return piece
   }
 
   @get:JsonIgnore

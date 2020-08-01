@@ -73,11 +73,6 @@ sealed class Piece {
    */
   abstract fun place(onto: HexagonData): Boolean
 
-  //TODO move to tests
-//  init {
-//    require(strength >= NO_STRENGTH)
-//  }
-
   override fun toString(): String = this::class.simpleName!!
 
 }

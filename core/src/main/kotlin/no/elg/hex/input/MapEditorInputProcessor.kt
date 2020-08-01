@@ -3,6 +3,7 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys.A
+import com.badlogic.gdx.Input.Keys.C
 import com.badlogic.gdx.Input.Keys.CONTROL_LEFT
 import com.badlogic.gdx.Input.Keys.CONTROL_RIGHT
 import com.badlogic.gdx.Input.Keys.DOWN
@@ -28,7 +29,9 @@ import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
+import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.NoPiece
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
@@ -38,6 +41,7 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.findHexagonsWithinRadius
+import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
@@ -123,6 +127,20 @@ class MapEditorInputProcessor(
 
       O -> if (isControlPressed()) islandScreen.saveIsland() else return false
       R -> if (isControlPressed()) LevelSelectScreen.play(islandScreen.id) else return false
+      C -> if (isControlPressed()) {
+        val island = islandScreen.island
+        for (hexagon in island.hexagons) {
+          val data = hexagon.getData(island)
+          if (data.piece is Capital) {
+            data.setPiece(NoPiece::class)
+          }
+        }
+        for (hexagon in island.hexagons) {
+          island.select(hexagon)
+        }
+
+      } else return false
+
       else -> return false
     }
     return true

@@ -79,14 +79,16 @@ class Island(
     val territoryHexes = getTerritoryHexagons(hex) ?: return
 
     val capital = getCapitalOf(territoryHexes).let {
-      if (it != null) it
+      if (it != null) return@let it
       else {
         val capHex = calculateBestCapitalPlacement(territoryHexes).getData(this)
-        capHex.setPiece(Capital::class)
-        capHex.piece as Capital
+        val piece = capHex.setPiece(Capital::class)
+        return@let if (piece is Capital) capHex.piece as Capital else null
       }
     }
-    selected = Territory(this, capital, territoryHexes)
+    if (capital != null) {
+      selected = Territory(this, capital, territoryHexes)
+    }
   }
 
   fun getCapitalOf(hexagon: Hexagon<HexagonData>): Capital? {
