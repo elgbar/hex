@@ -35,7 +35,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
 
     batch.begin()
 
-    for (hexagon in islandScreen.island.hexagons) {
+    loop@ for (hexagon in islandScreen.island.hexagons) {
       val data = hexagon.getData(islandScreen.island)
       if (data.invisible) continue
 
@@ -48,14 +48,14 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
       val drawable = when (data.piece::class) {
         Capital::class -> {
           val piece = (data.piece as Capital)
-          val territoryHexes = islandScreen.island.getTerritoryHexagons(hexagon)!!
+          val territoryHexes = islandScreen.island.getTerritoryHexagons(hexagon) ?: continue@loop
           if (piece.calculateIncome(territoryHexes, islandScreen.island) < 10) capital else capitalFlag
         }
         PalmTree::class -> palm
         PineTree::class -> pine
         Castle::class -> castle
-        else -> null
-      } ?: continue
+        else -> continue@loop
+      }
 
       val ratio = drawable.packedWidth.toFloat() / drawable.packedHeight.toFloat()
 
