@@ -135,7 +135,7 @@ class MapEditorInputProcessor(
   }
 
   fun quickload() {
-    LevelSelectScreen.play(-1, Hex.mapper.readValue(quickSavedIsland))
+    LevelSelectScreen.play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))
   }
 
 
