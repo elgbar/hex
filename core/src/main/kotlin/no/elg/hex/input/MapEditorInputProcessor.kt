@@ -38,7 +38,6 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.findHexagonsWithinRadius
-import no.elg.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
@@ -50,7 +49,6 @@ import kotlin.reflect.KClass
 class MapEditorInputProcessor(
   private val islandScreen: IslandScreen
 ) : InputAdapter() {
-
 
   private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(islandScreen)
   private val teamEditors = TeamEditor.generateTeamEditors(islandScreen)
@@ -125,7 +123,7 @@ class MapEditorInputProcessor(
 
       C -> if (isControlPressed()) islandScreen.saveIsland() else return false
       V -> if (isControlPressed()) {
-        LevelSelectScreen.play(islandScreen.basicInputProcessor.saveSlot)
+        LevelSelectScreen.play(islandScreen.id)
       } else return false
       else -> return false
     }
@@ -137,7 +135,7 @@ class MapEditorInputProcessor(
   }
 
   fun quickload() {
-    LevelSelectScreen.play(Hex.mapper.readValue<Island>(quickSavedIsland))
+    LevelSelectScreen.play(-1, Hex.mapper.readValue(quickSavedIsland))
   }
 
 

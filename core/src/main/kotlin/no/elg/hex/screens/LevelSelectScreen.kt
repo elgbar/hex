@@ -43,7 +43,6 @@ object LevelSelectScreen : AbstractScreen() {
 
   val previews get() = islandPreviews.size
 
-
   val mouseX get() = unprojectVector.x
   val mouseY get() = unprojectVector.y
 
@@ -53,13 +52,15 @@ object LevelSelectScreen : AbstractScreen() {
     if (!islandDir.isDirectory) {
       play(0)
     }
-    for (saveFile: FileHandle in islandDir.list(ISLAND_FILE_ENDING)) {
+    for ((i, saveFile: FileHandle) in islandDir.list(ISLAND_FILE_ENDING).withIndex()) {
       val island = loadIsland(saveFile) ?: continue
+      val islandScreen = IslandScreen(i, island, false)
       val buffer = FrameBuffer(RGBA4444, FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, false)
       buffer.begin()
-      IslandScreen(island, false).render(0f)
+      islandScreen.render(0f)
       buffer.end()
       islandPreviews.add(buffer)
+      islandScreen.dispose()
     }
   }
 
@@ -115,17 +116,13 @@ object LevelSelectScreen : AbstractScreen() {
 
   fun getIslandFile(slot: Int): FileHandle = Gdx.files.local("$ISLAND_SAVES_DIR/island-$slot.$ISLAND_FILE_ENDING")
 
-  fun play(slot: Int) {
-    play(getIslandFile(slot))
+  fun play(id: Int) {
+    val island = loadIsland(getIslandFile(id)) ?: Island(40, 25, RECTANGULAR)
+    play(id, island)
   }
 
-  fun play(file: FileHandle) {
-    val island = loadIsland(file) ?: Island(40, 25, RECTANGULAR)
-    play(island)
-  }
-
-  fun play(island: Island) {
-    Gdx.app.postRunnable { Hex.screen = IslandScreen(island) }
+  fun play(id: Int, island: Island) {
+    Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
   }
 
   fun loadIsland(file: FileHandle): Island? {

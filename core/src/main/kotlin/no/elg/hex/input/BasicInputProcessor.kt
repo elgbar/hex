@@ -12,8 +12,6 @@ import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.sign
 
 /**
  * Handles input event related to the camera and other basic functiuons such as what
@@ -34,10 +32,6 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
       updateMouse()
       return field
     }
-
-  var saveSlot: Int = 0
-    private set
-
 
   private val unprojectVector = Vector3()
   private var draggable = false
@@ -78,8 +72,6 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
 
   override fun keyDown(keycode: Int): Boolean {
     when (keycode) {
-      Keys.RIGHT -> saveSlot++
-      Keys.LEFT -> saveSlot = max(saveSlot - 1, 0)
       Keys.ESCAPE -> Hex.screen = LevelSelectScreen
       else -> return false
     }
@@ -103,7 +95,7 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
   }
 
   override fun scrolled(amount: Int): Boolean {
-    islandScreen.camera.zoom = (sign(amount.toFloat()) * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    islandScreen.camera.zoom = (amount * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 

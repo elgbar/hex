@@ -19,7 +19,11 @@ import no.elg.island.Island
 /**
  * @author Elg
  */
-class IslandScreen(val island: Island, val debugRender: Boolean = Hex.args.debug) : AbstractScreen() {
+class IslandScreen(
+  val id: Int,
+  val island: Island,
+  private val renderHud: Boolean = true
+) : AbstractScreen() {
 
   val inputProcessor: InputProcessor by lazy {
     if (Hex.args.mapEditor) {
@@ -56,15 +60,17 @@ class IslandScreen(val island: Island, val debugRender: Boolean = Hex.args.debug
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
 
-    if (debugRender) {
-      debugRenderer.frameUpdate()
+    if (renderHud) {
+      if (renderHud) {
+        debugRenderer.frameUpdate()
+      }
+      frameUpdatable.frameUpdate()
     }
-    frameUpdatable.frameUpdate()
   }
 
 
   fun saveIsland(): Boolean {
-    val file = getIslandFile(basicInputProcessor.saveSlot)
+    val file = getIslandFile(id)
     val name = file.name()
 
     if (!island.validate()) {

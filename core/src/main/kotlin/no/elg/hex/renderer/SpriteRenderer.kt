@@ -20,6 +20,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
 
 
   private val batch: SpriteBatch = SpriteBatch()
+
   private val pine: AtlasRegion by lazy { Hex.assets.sprites.findRegion("pine") }
   private val palm: AtlasRegion by lazy { Hex.assets.sprites.findRegion("palm") }
   private val capital: AtlasRegion by lazy { Hex.assets.sprites.findRegion("capital") }
@@ -82,6 +83,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
   }
 
   override fun dispose() {
+    batch.dispose()
   }
 
 }

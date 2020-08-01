@@ -21,7 +21,7 @@ class MapEditorRenderer(private val islandScreen: IslandScreen, private val mapE
     with(mapEditorInputProcessor) {
       ScreenRenderer.drawAll(
         ScreenText("Brush radius: ", next = validatedText(brushRadius, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, color = Color.YELLOW)),
-        ScreenText("Save slot: ", next = validatedText(islandScreen.basicInputProcessor.saveSlot, 0, Int.MAX_VALUE, color = Color.YELLOW)),
+        ScreenText("Island id: ", next = validatedText(islandScreen.id, 0, Int.MAX_VALUE, color = Color.YELLOW)),
         ScreenText("Selected team: ", next = when (teamEditor::class) {
           TeamEditor.`Set team`::class -> ScreenText(selectedTeam.name, color = Color.YELLOW)
           TeamEditor.`Randomize team`::class -> ScreenText("random", color = Color.PURPLE)
