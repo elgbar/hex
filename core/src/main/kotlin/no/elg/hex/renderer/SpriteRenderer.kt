@@ -5,11 +5,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
+import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.PalmTree
+import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
+import no.elg.hex.hexagon.Spearman
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 
@@ -21,12 +25,23 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
 
   private val batch: SpriteBatch = SpriteBatch()
 
-  private val pine: AtlasRegion by lazy { Hex.assets.sprites.findRegion("pine") }
-  private val palm: AtlasRegion by lazy { Hex.assets.sprites.findRegion("palm") }
-  private val capital: AtlasRegion by lazy { Hex.assets.sprites.findRegion("capital") }
-  private val capitalFlag: AtlasRegion by lazy { Hex.assets.sprites.findRegion("capital_flag") }
-  private val castle: AtlasRegion by lazy { Hex.assets.sprites.findRegion("castle") }
-  private val grave: AtlasRegion by lazy { Hex.assets.sprites.findRegion("grave") }
+  private fun findSprite(regionName: String): AtlasRegion {
+    if (Hex.args.retro) {
+      return Hex.assets.originalSprites.findRegion(regionName)
+    }
+    return Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
+  }
+
+  private val pine: AtlasRegion by lazy { findSprite("pine") }
+  private val palm: AtlasRegion by lazy { findSprite("palm") }
+  private val capital: AtlasRegion by lazy { findSprite("village") }
+  private val capitalFlag: AtlasRegion by lazy { findSprite("village0") }
+  private val castle: AtlasRegion by lazy { findSprite("castle") }
+  private val grave: AtlasRegion by lazy { findSprite("grave") }
+  private val peasant: AtlasRegion by lazy { findSprite("man00") }
+  private val spearman: AtlasRegion by lazy { findSprite("man10") }
+  private val knight: AtlasRegion by lazy { findSprite("man20") }
+  private val baron: AtlasRegion by lazy { findSprite("man30") }
 
   override fun frameUpdate() {
 
@@ -55,6 +70,10 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
         PalmTree::class -> palm
         PineTree::class -> pine
         Castle::class -> castle
+        Peasant::class -> peasant
+        Spearman::class -> spearman
+        Knight::class -> knight
+        Baron::class -> baron
         else -> continue@loop
       }
 

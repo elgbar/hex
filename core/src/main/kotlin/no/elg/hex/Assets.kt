@@ -1,5 +1,6 @@
 package no.elg.hex
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
@@ -33,6 +34,7 @@ class Assets : AssetManager() {
     const val ISLAND_FILE_ENDING = "is"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
+    const val ORIGINAL_SPRITES_ATLAS = "sprites/original_sprites.atlas"
 
     const val BOLD_FONT = "fonts/UbuntuMono-B.ttf"
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
@@ -48,6 +50,7 @@ class Assets : AssetManager() {
   val regularItalicFont: BitmapFont by lazy { get<BitmapFont>(REGULAR_ITALIC_FONT) }
 
   val sprites: TextureAtlas by lazy { get<TextureAtlas>(SPRITE_ATLAS) }
+  val originalSprites: TextureAtlas by lazy { get<TextureAtlas>(ORIGINAL_SPRITES_ATLAS) }
 
   init {
     super.setErrorListener { _, throwable -> throwable.printStackTrace() }
@@ -63,6 +66,9 @@ class Assets : AssetManager() {
       val parameter = FreeTypeFontLoaderParameter()
       parameter.fontParameters.size = FONT_SIZE * Hex.scale
       parameter.fontParameters.minFilter = Linear
+
+      println("Gdx.files.internal(ISLAND_SAVES_DIR).exists() = ${Gdx.files.internal(ISLAND_SAVES_DIR).list().map { it.name() }}")
+
       parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
       load(parameter.fontFileName, BITMAP_FONT, parameter)
     }
@@ -80,6 +86,7 @@ class Assets : AssetManager() {
     font(bold = true, italic = true)
 
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
+    load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
 
   }
 

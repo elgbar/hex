@@ -1,0 +1,286 @@
+
+original_sprites.png
+size: 276,276
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+castle
+  rotate: false
+  xy: 90, 58
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+grave
+  rotate: false
+  xy: 2, 190
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+help
+  rotate: false
+  xy: 134, 74
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+help_selected
+  rotate: false
+  xy: 134, 18
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+man00
+  rotate: false
+  xy: 134, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man01
+  rotate: false
+  xy: 2, 58
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man02
+  rotate: false
+  xy: 46, 102
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man03
+  rotate: false
+  xy: 90, 146
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man04
+  rotate: false
+  xy: 134, 190
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man10
+  rotate: false
+  xy: 134, 102
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man11
+  rotate: false
+  xy: 46, 14
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man12
+  rotate: false
+  xy: 178, 146
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man13
+  rotate: false
+  xy: 222, 190
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man14
+  rotate: false
+  xy: 90, 14
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man20
+  rotate: false
+  xy: 46, 146
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man21
+  rotate: false
+  xy: 90, 190
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man22
+  rotate: false
+  xy: 134, 146
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man23
+  rotate: false
+  xy: 178, 190
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man24
+  rotate: false
+  xy: 178, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man31
+  rotate: false
+  xy: 2, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man33
+  rotate: false
+  xy: 2, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man32
+  rotate: false
+  xy: 2, 14
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man34
+  rotate: false
+  xy: 46, 58
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man30
+  rotate: false
+  xy: 46, 58
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+palm
+  rotate: false
+  xy: 222, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+pine
+  rotate: false
+  xy: 2, 102
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+settings
+  rotate: false
+  xy: 250, 162
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+settings_selected
+  rotate: false
+  xy: 222, 162
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+surrender
+  rotate: false
+  xy: 162, 74
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+undo
+  rotate: false
+  xy: 134, 46
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+undo_all
+  rotate: false
+  xy: 178, 118
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+village
+  rotate: false
+  xy: 90, 102
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village3
+  rotate: false
+  xy: 46, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village1
+  rotate: false
+  xy: 46, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village6
+  rotate: false
+  xy: 46, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village4
+  rotate: false
+  xy: 2, 146
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village0
+  rotate: false
+  xy: 2, 146
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village5
+  rotate: false
+  xy: 46, 190
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village7
+  rotate: false
+  xy: 90, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village2
+  rotate: false
+  xy: 90, 234
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
