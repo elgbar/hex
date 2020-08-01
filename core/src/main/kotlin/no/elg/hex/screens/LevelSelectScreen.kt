@@ -31,7 +31,7 @@ object LevelSelectScreen : AbstractScreen() {
 
   private const val FRAME_BUFFER_SIZE = 512
 
-  private const val PREVIEWS_PER_ROW = 2
+  private const val PREVIEWS_PER_ROW = 3
   private const val PREVIEW_PADDING_PERCENT = 0.025f
 
   private val NOT_SELECTED_COLOR = Color.WHITE

@@ -11,6 +11,7 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import java.lang.Float.max
 
 /**
  * @author Elg
@@ -38,10 +39,9 @@ object LevelSelectInputProcessor : InputAdapter() {
     val (_, y, _, height) = LevelSelectScreen.rect(previews)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = LevelSelectScreen.camera.position.y
-    LevelSelectScreen.camera.position.y = (oldY + amount * SCROLL_SPEED).coerceIn(screenHeight / 2..y + height - screenHeight)
+    val min = screenHeight / 2
 
-    println("LevelSelectScreen.camera.position.y = ${LevelSelectScreen.camera.position.y}")
-
+    LevelSelectScreen.camera.position.y = (oldY + amount * SCROLL_SPEED).coerceIn(min..max(min, y + height - screenHeight))
     return true
   }
 }
