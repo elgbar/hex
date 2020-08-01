@@ -5,8 +5,10 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
+import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.abs
@@ -35,6 +37,11 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
 
   var saveSlot: Int = 0
     private set
+
+
+  private val unprojectVector = Vector3()
+  private var draggable = false
+  private var lastMouseFrame: Long = -1
 
   val cursorHex: Hexagon<HexagonData>? get() = islandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
@@ -73,6 +80,7 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
     when (keycode) {
       Keys.RIGHT -> saveSlot++
       Keys.LEFT -> saveSlot = max(saveSlot - 1, 0)
+      Keys.ESCAPE -> Hex.screen = LevelSelectScreen
       else -> return false
     }
     return true
@@ -94,16 +102,6 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
     return true
   }
 
-  fun resetCamera() {
-    val data = islandScreen.island.grid.gridData
-
-    val x = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat() / 2f
-    val y = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat() / 2f
-
-    islandScreen.camera.position.x = x
-    islandScreen.camera.position.y = y
-  }
-
   override fun scrolled(amount: Int): Boolean {
     islandScreen.camera.zoom = (sign(amount.toFloat()) * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
@@ -116,10 +114,5 @@ class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter
     const val MAX_ZOOM = 3.0f
 
     private const val ZOOM_SPEED = 0.1f
-
-    private val unprojectVector = Vector3()
-    private var draggable = false
-    private var lastMouseFrame: Long = -1
-
   }
 }

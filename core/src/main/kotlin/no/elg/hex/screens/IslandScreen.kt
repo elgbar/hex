@@ -19,7 +19,7 @@ import no.elg.island.Island
 /**
  * @author Elg
  */
-class IslandScreen(val island: Island) : AbstractScreen() {
+class IslandScreen(val island: Island, val debugRender: Boolean = Hex.args.debug) : AbstractScreen() {
 
   val inputProcessor: InputProcessor by lazy {
     if (Hex.args.mapEditor) {
@@ -56,7 +56,7 @@ class IslandScreen(val island: Island) : AbstractScreen() {
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
 
-    if (Hex.args.debug) {
+    if (debugRender) {
       debugRenderer.frameUpdate()
     }
     frameUpdatable.frameUpdate()
@@ -85,6 +85,17 @@ class IslandScreen(val island: Island) : AbstractScreen() {
     super.dispose()
     Hex.inputMultiplexer.removeProcessor(basicInputProcessor)
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
+  }
+
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    val data = island.grid.gridData
+
+    val x = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat() / 2f
+    val y = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat() / 2f
+
+    camera.position.x = x
+    camera.position.y = y
   }
 
   override fun hide() {

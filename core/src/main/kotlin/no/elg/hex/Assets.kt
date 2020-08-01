@@ -29,6 +29,8 @@ class Assets : AssetManager() {
     private val BITMAP_FONT = BitmapFont::class.java
     private val FREE_TYPE_FONT_GEN = FreeTypeFontGenerator::class.java
 
+    const val ISLAND_SAVES_DIR = "islands"
+    const val ISLAND_FILE_ENDING = "is"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
 
