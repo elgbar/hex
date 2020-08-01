@@ -2,11 +2,14 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
+import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.BasicInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
@@ -74,16 +77,22 @@ class IslandScreen(
     val name = file.name()
 
     if (!island.validate()) {
-      Gdx.app.log("SAVE", "Island failed validation")
+      val msg = "Island failed validation"
+      Gdx.app.log("SAVE", msg)
+      publishMessage(ScreenText(msg, color = Color.RED))
       return false
     }
 
     if (file.isDirectory) {
-      Gdx.app.log("SAVE", "Failed to save island the name '$name' as the resulting file will be a directory.")
+      val msg = "Failed to save island the name '$name' as the resulting file will be a directory."
+      Gdx.app.log("SAVE", msg)
+      publishMessage(ScreenText(msg, color = Color.RED))
       return false
     }
     file.writeString(island.serialize(), false)
-    Gdx.app.log("SAVE", "Successfully saved island '$name'")
+    val msg = "Successfully saved island '$name'"
+    Gdx.app.log("SAVE", msg)
+    publishMessage(ScreenText(msg, color = Color.GREEN))
     return true
   }
 

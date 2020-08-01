@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
 import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
+import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
@@ -122,6 +124,11 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   fun play(id: Int, island: Island) {
+
+    val msg = "Successfully loaded island $id"
+    Gdx.app.debug("SAVE", msg)
+    publishMessage(msg)
+    
     Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
   }
 
@@ -129,13 +136,14 @@ object LevelSelectScreen : AbstractScreen() {
     val json: String = try {
       requireNotNull(file.readString())
     } catch (e: Exception) {
-      Gdx.app.log("LOAD", "Failed to load island the name '${file.name()}'")
+      val msg = "Failed to load island the name '${file.name()}'"
+      Gdx.app.debug("SAVE", msg)
+      publishMessage(ScreenText(msg, color = Color.RED))
       return null
     }
 
     return try {
       val island = Island.deserialize(json)
-      Gdx.app.log("LOAD", "Successfully loaded island '${file.name()}'")
       island
     } catch (e: Exception) {
       Gdx.app.log("LOAD", "Invalid island save data for island '${file.name()}'")

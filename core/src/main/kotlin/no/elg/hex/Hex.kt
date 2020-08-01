@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.screens.AbstractScreen
@@ -77,6 +78,7 @@ object Hex : ApplicationAdapter() {
   override fun render() {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
     screen.render(Gdx.graphics.deltaTime)
+    MessagesRenderer.frameUpdate()
   }
 
   override fun resize(width: Int, height: Int) {
