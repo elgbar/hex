@@ -1,6 +1,5 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
@@ -77,22 +76,16 @@ class IslandScreen(
     val name = file.name()
 
     if (!island.validate()) {
-      val msg = "Island failed validation"
-      Gdx.app.log("SAVE", msg)
-      publishMessage(ScreenText(msg, color = Color.RED))
+      publishMessage(ScreenText("Island failed validation", color = Color.RED))
       return false
     }
 
     if (file.isDirectory) {
-      val msg = "Failed to save island the name '$name' as the resulting file will be a directory."
-      Gdx.app.log("SAVE", msg)
-      publishMessage(ScreenText(msg, color = Color.RED))
+      publishMessage(ScreenText("Failed to save island the name '$name' as the resulting file will be a directory.", color = Color.RED))
       return false
     }
     file.writeString(island.serialize(), false)
-    val msg = "Successfully saved island '$name'"
-    Gdx.app.log("SAVE", msg)
-    publishMessage(ScreenText(msg, color = Color.GREEN))
+    publishMessage(ScreenText("Successfully saved island '$name'", color = Color.GREEN))
     return true
   }
 

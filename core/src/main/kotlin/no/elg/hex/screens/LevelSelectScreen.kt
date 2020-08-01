@@ -125,10 +125,8 @@ object LevelSelectScreen : AbstractScreen() {
 
   fun play(id: Int, island: Island) {
 
-    val msg = "Successfully loaded island $id"
-    Gdx.app.debug("SAVE", msg)
-    publishMessage(msg)
-    
+    publishMessage("Successfully loaded island $id")
+
     Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
   }
 
@@ -136,18 +134,15 @@ object LevelSelectScreen : AbstractScreen() {
     val json: String = try {
       requireNotNull(file.readString())
     } catch (e: Exception) {
-      val msg = "Failed to load island the name '${file.name()}'"
-      Gdx.app.debug("SAVE", msg)
-      publishMessage(ScreenText(msg, color = Color.RED))
+      publishMessage(ScreenText("Failed to load island the name '${file.name()}'", color = Color.RED))
       return null
     }
 
     return try {
-      val island = Island.deserialize(json)
-      island
+      Island.deserialize(json)
     } catch (e: Exception) {
-      Gdx.app.log("LOAD", "Invalid island save data for island '${file.name()}'")
-      Gdx.app.log("LOAD", e.message)
+      publishMessage(ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED))
+      Gdx.app.debug("LOAD", e.message)
       null
     }
   }

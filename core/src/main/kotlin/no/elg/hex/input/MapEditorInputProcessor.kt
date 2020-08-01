@@ -27,6 +27,7 @@ import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.Input.Keys.UP
 import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
@@ -35,6 +36,8 @@ import no.elg.hex.hexagon.NoPiece
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
@@ -58,11 +61,11 @@ class MapEditorInputProcessor(
   private val teamEditors = TeamEditor.generateTeamEditors(islandScreen)
   private val pieceEditors = PieceEditor.generatePieceEditors(islandScreen)
 
+  private var quickSavedIsland: String = ""
+
   init {
     quicksave()
   }
-
-  private var quickSavedIsland: String = ""
 
   var showHelp = false
 
@@ -122,7 +125,10 @@ class MapEditorInputProcessor(
       NUM_3, NUMPAD_3 ->
         pieceEditor = pieceEditors.let { if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor) }
 
-      F5 -> quicksave()
+      F5 -> {
+        quicksave()
+        publishMessage("Quicksaved")
+      }
       F9 -> quickload()
 
       O -> if (isControlPressed()) islandScreen.saveIsland() else return false
@@ -151,6 +157,10 @@ class MapEditorInputProcessor(
   }
 
   fun quickload() {
+    if (quickSavedIsland.isEmpty()) {
+      publishMessage(ScreenText("No quick save found", Color.RED))
+      return
+    }
     LevelSelectScreen.play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))
   }
 

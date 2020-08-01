@@ -10,7 +10,7 @@ import no.elg.hex.hud.ScreenRenderer.draw
  */
 object MessagesRenderer : FrameUpdatable {
 
-  const val DURATION_SECONDS = 3f
+  const val DURATION_SECONDS = 10f
   const val FADE_START = 0.5f
 
   private val messages = ArrayList<Pair<ScreenText, Float>>()
@@ -20,6 +20,7 @@ object MessagesRenderer : FrameUpdatable {
   }
 
   fun publishMessage(message: ScreenText) {
+    Gdx.app.debug("HUD MSGS", message.text)
     messages.add(0, message to DURATION_SECONDS)
   }
 
