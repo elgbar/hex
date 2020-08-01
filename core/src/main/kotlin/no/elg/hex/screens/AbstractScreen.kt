@@ -16,13 +16,6 @@ abstract class AbstractScreen : ScreenAdapter() {
 
   abstract override fun render(delta: Float)
 
-  /**
-   * Called on the main thread when this screen is set as the current screen
-   */
-  open fun onLoad() {}
-
-  open fun onUnload() {}
-
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(true, width.toFloat(), height.toFloat())
   }

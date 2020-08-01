@@ -40,11 +40,11 @@ object Hex : ApplicationAdapter() {
       val old = field
       Gdx.app.log("SCREEN", "Unloading old screen ${old::class.simpleName}")
       if (old is AbstractScreen) {
-        old.onUnload()
+        old.hide()
       }
       Gdx.app.log("SCREEN", "Loading new screen ${value::class.simpleName}")
       if (value is AbstractScreen) {
-        value.onLoad()
+        value.show()
       }
       field = value
     }

@@ -44,7 +44,7 @@ class IslandScreen(val island: Island) : AbstractScreen() {
   private val outlineRenderer = OutlineRenderer(this)
   private val spriteRenderer = SpriteRenderer(this)
 
-  override fun onLoad() {
+  override fun show() {
     Hex.inputMultiplexer.addProcessor(basicInputProcessor)
     Hex.inputMultiplexer.addProcessor(inputProcessor)
   }
@@ -87,7 +87,7 @@ class IslandScreen(val island: Island) : AbstractScreen() {
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
   }
 
-  override fun onUnload() {
+  override fun hide() {
     dispose()
   }
 }
