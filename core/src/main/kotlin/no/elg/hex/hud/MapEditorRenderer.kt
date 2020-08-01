@@ -17,6 +17,33 @@ import no.elg.hex.screens.IslandScreen
  */
 class MapEditorRenderer(private val islandScreen: IslandScreen, private val mapEditorInputProcessor: MapEditorInputProcessor) : FrameUpdatable {
 
+  companion object {
+    private val title = ScreenText("=== Map editor keys ===", color = Color.SALMON)
+    val shownHelp = arrayOf(title,
+      ScreenText("F1 to hide this help text"),
+      ScreenText("Holding SHIFT will reverse iteration order, unless otherwise stated"),
+      emptyText(),
+      ScreenText("Left click on a hexagon to remove it"),
+      ScreenText("Shift left click to edit hexagons in a radius of \$brushRadius"),
+      emptyText(),
+      ScreenText("W/up/pgUp to increase radius of brush"),
+      ScreenText("S/down/pgDown to decrease radius of brush"),
+      ScreenText("Q to iterate through teams"),
+      ScreenText("A to iterate through pieces"),
+      emptyText(),
+      ScreenText("1 to iterate through opaqueness editors"),
+      ScreenText("2 to iterate through team editors"),
+      ScreenText("3 to iterate through piece editors"),
+      emptyText(),
+      ScreenText("F5 to quick save island"),
+      ScreenText("F9 to quick load island"),
+      ScreenText("CTRL+O to output current island to disk"),
+      ScreenText("CTRL+R to read island from disk"))
+
+    val hiddenHelp = arrayOf(title,
+      ScreenText("F1 to show help text"))
+  }
+
   override fun frameUpdate() {
     with(mapEditorInputProcessor) {
       ScreenRenderer.drawAll(
@@ -41,39 +68,10 @@ class MapEditorRenderer(private val islandScreen: IslandScreen, private val mapE
         position = TOP_RIGHT
       )
 
-      val title = ScreenText("=== Map editor keys ===", color = Color.SALMON)
       if (showHelp) {
-        ScreenRenderer.drawAll(
-          title,
-          ScreenText("F1 to hide this help text"),
-          ScreenText("Holding SHIFT will reverse iteration order, unless otherwise stated"),
-          emptyText(),
-          ScreenText("Left click on a hexagon to remove it"),
-          ScreenText("Shift left click to edit hexagons in a radius of $brushRadius"),
-          emptyText(),
-          ScreenText("W/up/pgUp to increase radius of brush"),
-          ScreenText("S/down/pgDown to decrease radius of brush"),
-          ScreenText("Q to iterate through teams"),
-          ScreenText("A to iterate through pieces"),
-          emptyText(),
-          ScreenText("1 to iterate through opaqueness editors"),
-          ScreenText("2 to iterate through team editors"),
-          ScreenText("3 to iterate through piece editors"),
-          emptyText(),
-          ScreenText("F5 to quick save island"),
-          ScreenText("F9 to quick load island"),
-          ScreenText("RIGHT to increase save slot"),
-          ScreenText("LEFT to decrease save slot"),
-          ScreenText("CTRL+C to save current island to disk"),
-          ScreenText("CTRL+V to load island from disk"),
-          position = BOTTOM
-        )
+        ScreenRenderer.drawAll(*shownHelp, position = BOTTOM)
       } else {
-        ScreenRenderer.drawAll(
-          title,
-          ScreenText("F1 to show help text"),
-          position = BOTTOM
-        )
+        ScreenRenderer.drawAll(*hiddenHelp, position = BOTTOM)
       }
     }
   }
