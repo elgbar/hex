@@ -57,14 +57,20 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
         else -> null
       } ?: continue
 
+      val ratio = drawable.packedWidth.toFloat() / drawable.packedHeight.toFloat()
+
+      val height = boundingBox.height.toFloat()
+      val width = boundingBox.width.toFloat()
+
+      //"- width * (1f - ratio) / 2f" because we need to compensate for the removed width
       batch.draw(
         drawable,
         boundingBox.x.toFloat(),
         boundingBox.y.toFloat(),
-        boundingBox.width.toFloat() / 2,
-        boundingBox.height.toFloat() / 2,
-        boundingBox.width.toFloat(),
-        boundingBox.height.toFloat(),
+        (width - width * (1f - ratio) / 2f) / 2f,
+        height / 2f,
+        width * ratio,
+        height,
         1f,
         1f,
         180f
