@@ -58,6 +58,12 @@ class Island(
       for (hexagon in hexagons) {
         select(hexagon)
       }
+      for (hexagon in hexagons) {
+        val piece = hexagon.getData(this).piece
+        if (piece is Capital) {
+          piece.balance = START_CAPITAL
+        }
+      }
     }
   }
 
@@ -237,6 +243,8 @@ class Island(
     const val GRID_RADIUS = 20.0
 
     const val MIN_HEX_IN_TERRITORY = 2
+
+    const val START_CAPITAL = 10
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)

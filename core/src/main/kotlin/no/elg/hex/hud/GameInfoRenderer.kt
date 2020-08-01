@@ -13,7 +13,7 @@ class GameInfoRenderer(private val islandScreen: IslandScreen, gameInputProcesso
   override fun frameUpdate() {
     islandScreen.island.selected?.also { selected ->
       ScreenRenderer.drawAll(
-        ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%+d".format(it) }),
+        ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) }),
         ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),
         position = TOP_RIGHT)
     }
