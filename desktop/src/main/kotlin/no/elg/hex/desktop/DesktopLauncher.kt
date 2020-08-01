@@ -8,6 +8,8 @@ import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 
 fun main(args: Array<String>) {
+  Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
+
   val config = LwjglApplicationConfiguration()
 
   if (Hex.scale > 1) {
@@ -26,7 +28,13 @@ fun main(args: Array<String>) {
   config.addIcon("icons/icon32.png", Internal)
   config.addIcon("icons/icon128.png", Internal)
 
-  Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
+  config.title = "Hex"
+  if (Hex.args.mapEditor) {
+    config.title += " - Map Editor"
+  }
+  if (Hex.args.debug) {
+    config.title += " (debug)"
+  }
 
   LwjglApplication(Hex, config)
 }
