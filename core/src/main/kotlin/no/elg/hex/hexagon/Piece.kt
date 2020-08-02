@@ -103,7 +103,6 @@ val PIECES: List<KClass<out Piece>> by lazy {
   }
 
   addAllSubclasses(Piece::class)
-  println("subclasses.size = ${subclasses.size}")
   return@lazy subclasses
 }
 
@@ -122,14 +121,15 @@ sealed class StationaryPiece(override val team: Team) : Piece() {
   private var placed: Boolean = false
 
   final override val movable: Boolean = false
+  open val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class)
 
   override fun place(onto: HexagonData): Boolean {
     require(!placed) { "Stationary pieces can only be placed once" }
     if (onto.team != team) {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Stationary pieces can only be placed on a tile with the same team")
       return false
-    } else if (onto.piece != Empty) {
-      Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Pieces can only be placed on an empty hex")
+    } else if (!canBePlacedOn.any { it.isInstance(onto.piece) }) {
+      Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Piece ${this::class.simpleName} can only be placed on ${canBePlacedOn.map { it::simpleName }} pieces")
       return false
     }
     placed = true
@@ -240,6 +240,7 @@ class Grave(team: Team) : StationaryPiece(team) {
   override val strength = NO_STRENGTH
   override val cost: Int = 1
 
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     pieceHex.getData(island).setPiece(pieceHex.treeType(island))
   }
@@ -252,6 +253,7 @@ sealed class TreePiece(team: Team) : StationaryPiece(team) {
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = NO_STRENGTH
   override val cost: Int = 0
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, Capital::class, Grave::class)
 
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     hasGrown = false
