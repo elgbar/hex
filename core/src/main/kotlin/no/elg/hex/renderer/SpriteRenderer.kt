@@ -26,27 +26,30 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
   private val batch: SpriteBatch = SpriteBatch()
 
   private fun findSprite(regionName: String): AtlasRegion {
-    if (Hex.args.retro) {
-      return Hex.assets.originalSprites.findRegion(regionName)
+    val region = if (Hex.args.retro) {
+      Hex.assets.originalSprites.findRegion(regionName)
+    } else {
+      Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
     }
-    return Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
+    region.flip(true, true)
+    return region
   }
 
-  private val pine: AtlasRegion by lazy { findSprite("pine") }
-  private val palm: AtlasRegion by lazy { findSprite("palm") }
-  private val capital: AtlasRegion by lazy { findSprite("village") }
-  private val capitalFlag: AtlasRegion by lazy { findSprite("village0") }
-  private val castle: AtlasRegion by lazy { findSprite("castle") }
-  private val grave: AtlasRegion by lazy { findSprite("grave") }
-  private val peasant: AtlasRegion by lazy { findSprite("man00") }
-  private val spearman: AtlasRegion by lazy { findSprite("man10") }
-  private val knight: AtlasRegion by lazy { findSprite("man20") }
-  private val baron: AtlasRegion by lazy { findSprite("man30") }
+  private val pine by lazy { findSprite("pine") }
+  private val palm by lazy { findSprite("palm") }
+  private val capital by lazy { findSprite("village") }
+  private val capitalFlag by lazy { findSprite("village0") }
+  private val castle by lazy { findSprite("castle") }
+  private val grave by lazy { findSprite("grave") }
+  private val peasant by lazy { findSprite("man00") }
+  private val spearman by lazy { findSprite("man10") }
+  private val knight by lazy { findSprite("man20") }
+  private val baron by lazy { findSprite("man30") }
 
   override fun frameUpdate() {
 
     val currHex = islandScreen.basicInputProcessor.cursorHex
-
+    
     batch.projectionMatrix = islandScreen.camera.combined
 
     batch.begin()
@@ -82,20 +85,14 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
       val height = boundingBox.height.toFloat()
       val width = boundingBox.width.toFloat()
 
-      //"- width * (1f - ratio) / 2f" because we need to compensate for the removed width
+      //"+ width * (1f - ratio) / 2f" because we need to compensate for the removed width
       batch.draw(
         drawable,
-        boundingBox.x.toFloat(),
+        boundingBox.x.toFloat() + width * (1f - ratio) / 2f,
         boundingBox.y.toFloat(),
-        (width - width * (1f - ratio) / 2f) / 2f,
-        height / 2f,
         width * ratio,
-        height,
-        1f,
-        1f,
-        180f
+        height
       )
-
     }
 
     batch.end()
