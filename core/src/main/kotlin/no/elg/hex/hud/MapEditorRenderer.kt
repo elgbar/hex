@@ -52,17 +52,15 @@ class MapEditorRenderer(private val islandScreen: IslandScreen, private val mapE
       ScreenRenderer.drawAll(
         ScreenText("Brush radius: ", next = validatedText(brushRadius, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, color = Color.YELLOW)),
         ScreenText("Island id: ", next = validatedText(islandScreen.id, 0, Int.MAX_VALUE, color = Color.YELLOW)),
-        ScreenText("Selected team: ", next = when (teamEditor::class) {
-          TeamEditor.`Set team`::class -> ScreenText(selectedTeam.name, color = Color.YELLOW)
-          TeamEditor.`Randomize team`::class -> ScreenText("random", color = Color.PURPLE)
-          TeamEditor.Disabled::class -> ScreenText(selectedTeam.name, color = Color.LIGHT_GRAY)
-          else -> error("???")
+        ScreenText("Selected team: ", next = when (teamEditor) {
+          is TeamEditor.`Set team` -> ScreenText(selectedTeam.name, color = Color.YELLOW)
+          is TeamEditor.`Randomize team` -> ScreenText("random", color = Color.PURPLE)
+          is TeamEditor.Disabled -> ScreenText(selectedTeam.name, color = Color.LIGHT_GRAY)
         }),
-        ScreenText("Selected piece: ", next = when (pieceEditor::class) {
-          PieceEditor.`Set piece`::class -> nullCheckedText(selectedPiece.simpleName, color = Color.YELLOW)
-          PieceEditor.`Randomize piece`::class -> ScreenText("random", color = Color.PURPLE)
-          PieceEditor.Disabled::class -> nullCheckedText(selectedPiece.simpleName, color = Color.LIGHT_GRAY)
-          else -> error("???")
+        ScreenText("Selected piece: ", next = when (pieceEditor) {
+          is PieceEditor.`Set piece` -> nullCheckedText(selectedPiece.simpleName, color = Color.YELLOW)
+          is PieceEditor.`Randomize piece` -> ScreenText("random", color = Color.PURPLE)
+          is PieceEditor.Disabled -> nullCheckedText(selectedPiece.simpleName, color = Color.LIGHT_GRAY)
         }),
         emptyText(),
         ScreenText("Opaqueness editor: ", next = editorText(opaquenessEditor)),
