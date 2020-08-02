@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.Team
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
@@ -247,6 +248,8 @@ class Island(
     const val MIN_HEX_IN_TERRITORY = 2
 
     const val START_CAPITAL = 10
+
+    val PLAYER_TEAM = Team.LEAF
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)
