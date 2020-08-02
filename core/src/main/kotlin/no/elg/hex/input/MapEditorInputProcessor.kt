@@ -45,6 +45,8 @@ import no.elg.hex.screens.IslandScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.getData
+import no.elg.hex.util.next
+import no.elg.hex.util.previous
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
@@ -171,27 +173,6 @@ class MapEditorInputProcessor(
   private fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
   private fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
 
-  private fun <E> List<E>.next(current: E): E {
-    val nextIndex = (this.indexOf(current) + 1) % this.size
-    return this[nextIndex]
-  }
-
-  private fun <E> Array<E>.next(current: E): E {
-    val nextIndex = (this.indexOf(current) + 1) % this.size
-    return this[nextIndex]
-  }
-
-  private fun <E> List<E>.previous(current: E): E {
-    val currentIndex = this.indexOf(current)
-    val nextIndex = if (currentIndex == 0) size - 1 else (currentIndex - 1) % this.size
-    return this[nextIndex]
-  }
-
-  private fun <E> Array<E>.previous(current: E): E {
-    val currentIndex = this.indexOf(current)
-    val nextIndex = if (currentIndex == 0) size - 1 else (currentIndex - 1) % this.size
-    return this[nextIndex]
-  }
 
   companion object {
     const val MAX_BRUSH_SIZE = 10
