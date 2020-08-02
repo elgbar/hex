@@ -63,7 +63,7 @@ class IslandScreen(
     spriteRenderer.frameUpdate()
 
     if (renderHud) {
-      if (renderHud) {
+      if (Hex.args.debug || Hex.args.trace) {
         debugRenderer.frameUpdate()
       }
       frameUpdatable.frameUpdate()

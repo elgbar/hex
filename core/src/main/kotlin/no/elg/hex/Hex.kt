@@ -2,6 +2,7 @@ package no.elg.hex
 
 import com.badlogic.gdx.Application.LOG_DEBUG
 import com.badlogic.gdx.Application.LOG_INFO
+import com.badlogic.gdx.Application.LOG_NONE
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -17,6 +18,7 @@ import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.SplashScreen
+import no.elg.hex.util.LOG_TRACE
 import org.hexworks.mixite.core.api.CubeCoordinate
 import java.awt.Toolkit
 
@@ -56,7 +58,7 @@ object Hex : ApplicationAdapter() {
   override fun create() {
     require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
 
-    Gdx.app.logLevel = if (args.debug) LOG_DEBUG else LOG_INFO
+    Gdx.app.logLevel = if (args.silent) LOG_NONE else if (args.trace) LOG_TRACE else if (args.debug) LOG_DEBUG else LOG_INFO
 
     val backgroundColor = Color.valueOf("#172D62")
     Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f)

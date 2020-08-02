@@ -9,6 +9,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
+import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
@@ -164,7 +165,7 @@ class Island(
 
     require(contenders.isNotEmpty()) { "No capital contenders found!" }
 
-    Gdx.app.debug("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
+    Gdx.app.trace("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
 
     if (contenders.size == 1) return contenders.first()
 

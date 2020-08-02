@@ -32,7 +32,9 @@ fun main(args: Array<String>) {
   if (Hex.args.mapEditor) {
     config.title += " - Map Editor"
   }
-  if (Hex.args.debug) {
+  if (Hex.args.trace) {
+    config.title += " (trace)"
+  } else if (Hex.args.debug) {
     config.title += " (debug)"
   }
 
