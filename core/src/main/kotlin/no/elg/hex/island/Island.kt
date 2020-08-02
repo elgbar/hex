@@ -11,6 +11,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
+import no.elg.hex.util.next
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
@@ -75,6 +76,7 @@ class Island(
 
   var pieceInHand: Piece? = null
 
+  private var currentTeam: Team = PLAYER_TEAM
 
   //////////////
   // Gameplay //
@@ -82,9 +84,16 @@ class Island(
 
   fun endTurn() {
     select(null)
-    for (hexagon in hexagons) {
-      hexagon.getData(this).piece.endTurn(this, hexagon)
-    }
+    do {
+      Gdx.app.debug("TURN", "Ending turn of $currentTeam")
+      for (hexagon in hexagons) {
+        val data = hexagon.getData(this)
+        if (data.team != currentTeam) continue
+        data.piece.endTurn(this, hexagon, data, currentTeam)
+      }
+      currentTeam = Team.values().next(currentTeam)
+    } while (currentTeam != PLAYER_TEAM)
+
     for (hexagon in hexagons) {
       hexagon.getData(this).piece.newTurn(this, hexagon)
     }

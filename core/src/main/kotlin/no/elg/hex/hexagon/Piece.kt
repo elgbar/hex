@@ -80,10 +80,17 @@ sealed class Piece {
 
   var elapsedAnimationTime = 0f
 
-  open fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  /**
+   * Called when each team ends it's turn. The [pieceHex], [data], and [team] are guaranteed to be synced.
+   * Only hexagons who's turn it is will be called.
+   */
+  open fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     //NO-OP
   }
 
+  /**
+   * Called when all visible hexagons's [endTurn] has been called
+   */
   open fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     //NO-OP
   }
@@ -113,7 +120,6 @@ object Empty : Piece() {
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
   override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
-  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {}
 }
 
 sealed class StationaryPiece(override val team: Team) : Piece() {
@@ -209,7 +215,7 @@ class Capital(team: Team) : StationaryPiece(team) {
     }
   }
 
-  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     val hexagons = island.getTerritoryHexagons(pieceHex)
 
     if (hexagons == null) {
@@ -262,13 +268,13 @@ sealed class TreePiece(team: Team) : StationaryPiece(team) {
   override val cost: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, Capital::class, Grave::class)
 
-  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     hasGrown = false
   }
 }
 
 class PineTree(team: Team) : TreePiece(team) {
-  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
 
     //Find all empty neighbor hexes that are empty
@@ -301,7 +307,7 @@ class PineTree(team: Team) : TreePiece(team) {
 
 class PalmTree(team: Team) : TreePiece(team) {
   @ExperimentalStdlibApi
-  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
     //Find all empty neighbor hexes that are empty along the cost
     val piece = pieceHex.getNeighbors(island).filter {
