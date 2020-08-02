@@ -240,8 +240,15 @@ class Grave(team: Team) : StationaryPiece(team) {
   override val strength = NO_STRENGTH
   override val cost: Int = 1
 
+  private var timeToTree = 1f
+
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
+
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    if (timeToTree > 0) {
+      timeToTree--
+      return
+    }
     pieceHex.getData(island).setPiece(pieceHex.treeType(island))
   }
 }
