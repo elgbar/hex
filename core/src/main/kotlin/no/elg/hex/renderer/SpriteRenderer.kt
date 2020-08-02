@@ -12,6 +12,7 @@ import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
+import no.elg.hex.hexagon.Grave
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.LivingPiece
@@ -93,18 +94,16 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
         is PalmTree -> palm
         is PineTree -> pine
         is Castle -> castle
+        is Grave -> grave
         is LivingPiece -> {
-          if (data.team == PLAYER_TEAM && piece.alive) {
-            piece.updateAnimationTime()
-            when (piece) {
-              is Peasant -> peasant
-              is Spearman -> spearman
-              is Knight -> knight
-              is Baron -> baron
-            }.getKeyFrame(piece.elapsedAnimationTime)
-          } else {
-            grave
-          }
+
+          val time = if (data.team == PLAYER_TEAM) piece.updateAnimationTime() else 0f
+          when (piece) {
+            is Peasant -> peasant
+            is Spearman -> spearman
+            is Knight -> knight
+            is Baron -> baron
+          }.getKeyFrame(time)
         }
         is Empty -> continue@loop
       }

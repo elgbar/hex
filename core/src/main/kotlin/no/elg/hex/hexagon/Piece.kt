@@ -2,7 +2,10 @@ package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.island.Island
+import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
+import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
 
@@ -77,19 +80,30 @@ sealed class Piece {
 
   var elapsedAnimationTime = 0f
 
+  open fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    //NO-OP
+  }
+
+  open fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    //NO-OP
+  }
 }
 
 val PIECES: List<KClass<out Piece>> by lazy {
   val subclasses = ArrayList<KClass<out Piece>>()
 
-  Piece::class.sealedSubclasses.forEach {
+  fun addAllSubclasses(it: KClass<out Piece>) {
     if (it.isSealed) {
-      subclasses.addAll(it.sealedSubclasses)
+      for (subclass in it.sealedSubclasses) {
+        addAllSubclasses(subclass)
+      }
     } else {
       subclasses += it
     }
   }
 
+  addAllSubclasses(Piece::class)
+  println("subclasses.size = ${subclasses.size}")
   return@lazy subclasses
 }
 
@@ -100,6 +114,7 @@ object Empty : Piece() {
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
   override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
+  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {}
 }
 
 sealed class StationaryPiece(override val team: Team) : Piece() {
@@ -132,15 +147,16 @@ sealed class LivingPiece(override val team: Team) : Piece() {
 
   var moved: Boolean = false
 
-  var alive: Boolean = true
-    private set
-
-  fun kill() {
-    alive = false
+  fun kill(island: Island, hex: Hexagon<HexagonData>) {
+    hex.getData(island).setPiece(Grave::class)
   }
 
-  fun move(to: HexagonData) {
-    TODO()
+  fun move(island: Island, from: Hexagon<HexagonData>, to: Hexagon<HexagonData>) {
+    moved = true
+  }
+
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    moved = false
   }
 
   override fun place(onto: HexagonData): Boolean {
@@ -154,12 +170,13 @@ sealed class LivingPiece(override val team: Team) : Piece() {
     return true
   }
 
-  fun updateAnimationTime() {
+  fun updateAnimationTime(): Float {
     if (moved) {
       elapsedAnimationTime = 0f
     } else {
       elapsedAnimationTime += Gdx.graphics.deltaTime
     }
+    return elapsedAnimationTime
   }
 
   override fun toString(): String {
@@ -183,6 +200,32 @@ class Capital(team: Team) : StationaryPiece(team) {
     balance = 0
   }
 
+  private fun killall(island: Island, iterable: Iterable<Hexagon<HexagonData>>) {
+    for (hex in iterable) {
+      val piece = hex.getData(island).piece
+      if (piece is LivingPiece) {
+        piece.kill(island, hex)
+      }
+    }
+  }
+
+  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    val hexagons = island.getTerritoryHexagons(pieceHex)
+
+    if (hexagons == null) {
+      killall(island, island.connectedHexagons(pieceHex))
+      pieceHex.getData(island).setPiece(pieceHex.treeType(island))
+      return
+    }
+
+    require(island.getCapitalOf(hexagons) === this) { "Mismatch between this piece and the capital of the territory!" }
+
+    balance += calculateIncome(hexagons, island)
+    if (balance < 0) {
+      killall(island, hexagons)
+    }
+  }
+
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) = hexagons.sumBy { it.getData(island).piece.cost }
 
   override val strength = PEASANT_STRENGTH
@@ -193,16 +236,74 @@ class Castle(team: Team) : StationaryPiece(team) {
   override val cost: Int = 1
 }
 
-class PineTree(team: Team) : StationaryPiece(team) {
-  override val capitalPlacement = CapitalPlacementPreference.WEAKLY
-  override val strength = SPEARMAN_STRENGTH
-  override val cost: Int = 0
+class Grave(team: Team) : StationaryPiece(team) {
+  override val strength = NO_STRENGTH
+  override val cost: Int = 1
+
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    pieceHex.getData(island).setPiece(pieceHex.treeType(island))
+  }
 }
 
-class PalmTree(team: Team) : StationaryPiece(team) {
+sealed class TreePiece(team: Team) : StationaryPiece(team) {
+
+  protected var hasGrown: Boolean = true
+
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
-  override val strength = SPEARMAN_STRENGTH
+  override val strength = NO_STRENGTH
   override val cost: Int = 0
+
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    hasGrown = false
+  }
+}
+
+class PineTree(team: Team) : TreePiece(team) {
+  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    if (hasGrown) return
+
+    //Find all empty neighbor hexes that are empty
+    val list = pieceHex.getNeighbors(island).filter {
+      val piece = it.getData(island).piece
+      piece is Empty && it.treeType(island) == PineTree::class
+    }.shuffled()
+
+    for (hexagon in list) {
+      //Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
+      val otherPines = hexagon.getNeighbors(island).filter {
+        if (it == pieceHex) return@filter false
+        val piece = it.getData(island).piece
+        return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
+      }
+      if (otherPines.isNotEmpty()) {
+        //Grow a tree between this pine and another pine
+        val otherPine = otherPines.random().getData(island).piece as PineTree
+        val newPine = hexagon.getData(island).setPiece(PineTree::class)
+        if (newPine is PineTree) {
+          hasGrown = true
+          otherPine.hasGrown = true
+          newPine.hasGrown = true
+          break
+        }
+      }
+    }
+  }
+}
+
+class PalmTree(team: Team) : TreePiece(team) {
+  @ExperimentalStdlibApi
+  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    if (hasGrown) return
+    //Find all empty neighbor hexes that are empty along the cost
+    val piece = pieceHex.getNeighbors(island).filter {
+      val piece = it.getData(island).piece
+      piece is Empty && it.treeType(island) == PalmTree::class
+    }.randomOrNull()?.getData(island)?.setPiece(PalmTree::class)
+    if (piece is PalmTree) {
+      piece.hasGrown = true
+      hasGrown = true
+    }
+  }
 }
 
 class Peasant(team: Team) : LivingPiece(team) {

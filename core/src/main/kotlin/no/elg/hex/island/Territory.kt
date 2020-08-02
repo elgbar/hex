@@ -1,8 +1,7 @@
-package no.elg.island
+package no.elg.hex.island
 
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 
 /**

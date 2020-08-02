@@ -6,12 +6,12 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
 import no.elg.hex.util.trace
-import no.elg.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
@@ -73,10 +73,22 @@ class Island(
   var selected: Territory? = null
     private set
 
+  var pieceInHand: Piece? = null
+
+
   //////////////
   // Gameplay //
   //////////////
 
+  fun endTurn() {
+    select(null)
+    for (hexagon in hexagons) {
+      hexagon.getData(this).piece.endTurn(this, hexagon)
+    }
+    for (hexagon in hexagons) {
+      hexagon.getData(this).piece.newTurn(this, hexagon)
+    }
+  }
 
   /**
    * Select the hex under the cursor
@@ -105,7 +117,7 @@ class Island(
     return getCapitalOf(territoryHexagons)
   }
 
-  private fun getCapitalOf(hexagons: Set<Hexagon<HexagonData>>): Capital? {
+  fun getCapitalOf(hexagons: Set<Hexagon<HexagonData>>): Capital? {
     return hexagons.firstOrNull { it.getData(this).piece is Capital }?.getData(this)?.piece as? Capital?
   }
 

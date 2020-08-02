@@ -1,6 +1,7 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Input.Buttons
+import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.InputAdapter
 import no.elg.hex.island.Island
 import no.elg.hex.screens.IslandScreen
@@ -19,6 +20,14 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         if (hex.getData(islandScreen.island).team != Island.PLAYER_TEAM) return false
         islandScreen.island.select(hex)
       }
+      else -> return false
+    }
+    return true
+  }
+
+  override fun keyDown(keycode: Int): Boolean {
+    when (keycode) {
+      ENTER -> islandScreen.island.endTurn()
       else -> return false
     }
     return true

@@ -5,11 +5,15 @@ import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
+import no.elg.hex.hexagon.PalmTree
+import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
+import kotlin.reflect.KClass
 
 /**
  * @return HexagonData of this hexagon
@@ -40,7 +44,7 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
 }
 
 /**
- * @return All hexagons connected to the start hexagon of the same team
+ * @return All visible hexagons connected to the start hexagon of the same team
  */
 fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>> {
   return connectedHexagons(hexagon, hexagon.getData(this).team, HashSet(), this)
@@ -66,6 +70,20 @@ private fun connectedHexagons(
     connectedHexagons(neighbor, team, visited, island)
   }
   return visited
+}
+
+fun Hexagon<HexagonData>.getNeighbors(island: Island, onlyVisible: Boolean = true) =
+  island.grid.getNeighborsOf(this).let {
+    if (onlyVisible) {
+      it.filter { hex -> !hex.getData(island).invisible }
+    } else {
+      it
+    }
+  }
+
+fun Hexagon<HexagonData>.treeType(island: Island): KClass<out TreePiece> {
+  val neighbors: Collection<Hexagon<HexagonData>> = getNeighbors(island, false)
+  return if (neighbors.any { it.getData(island).invisible }) PalmTree::class else PineTree::class
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
