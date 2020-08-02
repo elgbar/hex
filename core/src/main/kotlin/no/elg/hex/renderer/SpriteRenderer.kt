@@ -19,6 +19,7 @@ import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
+import no.elg.hex.island.Island.Companion.PLAYER_TEAM
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 import com.badlogic.gdx.utils.Array as GdxArray
@@ -82,7 +83,9 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
       val piece = data.piece
       val drawable = when (piece) {
         is Capital -> {
-          if (piece.balance < 10) capital else {
+          if (data.team != PLAYER_TEAM || piece.balance < 10) {
+            capital
+          } else {
             piece.elapsedAnimationTime += Gdx.graphics.deltaTime
             capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
           }
@@ -91,7 +94,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
         is PineTree -> pine
         is Castle -> castle
         is LivingPiece -> {
-          if (piece.alive) {
+          if (data.team == PLAYER_TEAM && piece.alive) {
             piece.updateAnimationTime()
             when (piece) {
               is Peasant -> peasant
