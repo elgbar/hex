@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
-import no.elg.island.Island
+import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
 import kotlin.reflect.KClass
@@ -39,7 +39,7 @@ data class HexagonData(
     private set
 
   @JsonIgnore
-  var piece: Piece = NoPiece
+  var piece: Piece = Empty
     private set
 
   /**

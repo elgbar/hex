@@ -6,7 +6,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import no.elg.hex.hexagon.Team
-import no.elg.island.Island
+import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet

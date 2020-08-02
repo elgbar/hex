@@ -31,8 +31,8 @@ import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.hexagon.NoPiece
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
@@ -132,13 +132,16 @@ class MapEditorInputProcessor(
       F9 -> quickload()
 
       O -> if (isControlPressed()) islandScreen.saveIsland() else return false
-      R -> if (isControlPressed()) LevelSelectScreen.play(islandScreen.id) else return false
+      R -> if (isControlPressed()) {
+        LevelSelectScreen.play(islandScreen.id)
+        publishMessage("Successfully reloaded island ${islandScreen.id}")
+      } else return false
       C -> if (isControlPressed()) {
         val island = islandScreen.island
         for (hexagon in island.hexagons) {
           val data = hexagon.getData(island)
           if (data.piece is Capital) {
-            data.setPiece(NoPiece::class)
+            data.setPiece(Empty::class)
           }
         }
         for (hexagon in island.hexagons) {

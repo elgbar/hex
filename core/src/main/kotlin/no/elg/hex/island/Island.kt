@@ -1,4 +1,4 @@
-package no.elg.island
+package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
 import com.fasterxml.jackson.annotation.JsonValue
@@ -10,6 +10,7 @@ import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
 import no.elg.hex.util.trace
+import no.elg.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP

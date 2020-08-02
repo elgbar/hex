@@ -16,11 +16,12 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.LevelSelectInputProcessor
+import no.elg.hex.island.Island
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import no.elg.island.Island
+import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -48,17 +49,37 @@ object LevelSelectScreen : AbstractScreen() {
   val mouseX get() = unprojectVector.x
   val mouseY get() = unprojectVector.y
 
+  private fun islandFiles(): GdxArray<FileHandle> {
+    val dir = Gdx.files.internal(ISLAND_SAVES_DIR)
+    val files = GdxArray<FileHandle>()
+
+    if (dir.isDirectory) {
+      for (slot in 0..Int.MAX_VALUE) {
+        val file = getIslandFile(slot)
+        if (file.exists()) {
+          if (file.isDirectory) continue
+          files.add(file)
+        } else {
+          break
+        }
+      }
+    }
+    return files
+  }
+
   fun renderPreviews() {
     for (buffer in islandPreviews) {
       buffer.dispose()
     }
     islandPreviews.clear()
 
-    val islandDir = Gdx.files.local(ISLAND_SAVES_DIR)
-    if (!islandDir.isDirectory) {
-      play(0)
+    val islands = islandFiles()
+    if (islands.isEmpty) {
+      play(-1, Island(40, 25, HEXAGONAL))
+      return
     }
-    for ((i, saveFile: FileHandle) in islandDir.list(ISLAND_FILE_ENDING).withIndex()) {
+
+    for ((i, saveFile: FileHandle) in islands.withIndex()) {
       val island = loadIsland(saveFile) ?: continue
       val islandScreen = IslandScreen(i, island, false)
       islandScreen.resize(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE)
@@ -124,18 +145,15 @@ object LevelSelectScreen : AbstractScreen() {
     lineRenderer.end()
   }
 
-
-  fun getIslandFile(slot: Int): FileHandle = Gdx.files.local("$ISLAND_SAVES_DIR/island-$slot.$ISLAND_FILE_ENDING")
+  fun getIslandFile(slot: Int): FileHandle = Gdx.files.internal("$ISLAND_SAVES_DIR/island-$slot.$ISLAND_FILE_ENDING")
 
   fun play(id: Int) {
-    val island = loadIsland(getIslandFile(id)) ?: Island(40, 25, RECTANGULAR)
+    val islandFile = getIslandFile(id)
+    val island = loadIsland(islandFile) ?: Island(40, 25, RECTANGULAR)
     play(id, island)
   }
 
   fun play(id: Int, island: Island) {
-
-    publishMessage("Successfully loaded island $id")
-
     Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
   }
 

@@ -1,6 +1,5 @@
 package no.elg.hex
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
@@ -66,9 +65,6 @@ class Assets : AssetManager() {
       val parameter = FreeTypeFontLoaderParameter()
       parameter.fontParameters.size = FONT_SIZE * Hex.scale
       parameter.fontParameters.minFilter = Linear
-
-      println("Gdx.files.internal(ISLAND_SAVES_DIR).exists() = ${Gdx.files.internal(ISLAND_SAVES_DIR).list().map { it.name() }}")
-
       parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
       load(parameter.fontFileName, BITMAP_FONT, parameter)
     }

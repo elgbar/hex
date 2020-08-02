@@ -1,8 +1,8 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.island.Island
 import no.elg.hex.util.getData
-import no.elg.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
 
@@ -17,7 +17,7 @@ enum class CapitalPlacementPreference {
   /**
    * Will be preferred over any other choice
    *
-   * @see NoPiece
+   * @see Empty
    */
   STRONGLY,
 
@@ -75,6 +75,8 @@ sealed class Piece {
 
   override fun toString(): String = this::class.simpleName!!
 
+  var elapsedAnimationTime = 0f
+
 }
 
 val PIECES: List<KClass<out Piece>> by lazy {
@@ -91,7 +93,7 @@ val PIECES: List<KClass<out Piece>> by lazy {
   return@lazy subclasses
 }
 
-object NoPiece : Piece() {
+object Empty : Piece() {
   override val strength: Int = NO_STRENGTH
   override val movable: Boolean = false
   override val team: Team get() = error("Empty Piece is not confined to a team")
@@ -111,27 +113,38 @@ sealed class StationaryPiece(override val team: Team) : Piece() {
     if (onto.team != team) {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Stationary pieces can only be placed on a tile with the same team")
       return false
-    } else if (onto.piece != NoPiece) {
+    } else if (onto.piece != Empty) {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Pieces can only be placed on an empty hex")
       return false
     }
     placed = true
     return true
   }
+
+  override fun toString(): String {
+    return super.toString() + ": placed? $placed"
+  }
 }
 
-sealed class DynamicPiece(override val team: Team) : Piece() {
+sealed class LivingPiece(override val team: Team) : Piece() {
 
   final override val movable: Boolean = true
 
   var moved: Boolean = false
+
+  var alive: Boolean = true
+    private set
+
+  fun kill() {
+    alive = false
+  }
 
   fun move(to: HexagonData) {
     TODO()
   }
 
   override fun place(onto: HexagonData): Boolean {
-    if (onto.piece != NoPiece) {
+    if (onto.piece != Empty) {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Pieces can only be placed on an empty hex")
       return false
     } else if (onto.team != team) {
@@ -139,6 +152,18 @@ sealed class DynamicPiece(override val team: Team) : Piece() {
       return false
     }
     return true
+  }
+
+  fun updateAnimationTime() {
+    if (moved) {
+      elapsedAnimationTime = 0f
+    } else {
+      elapsedAnimationTime += Gdx.graphics.deltaTime
+    }
+  }
+
+  override fun toString(): String {
+    return super.toString() + ": moved? $moved"
   }
 }
 
@@ -180,22 +205,22 @@ class PalmTree(team: Team) : StationaryPiece(team) {
   override val cost: Int = 0
 }
 
-class Peasant(team: Team) : DynamicPiece(team) {
+class Peasant(team: Team) : LivingPiece(team) {
   override val strength = PEASANT_STRENGTH
   override val cost: Int = -1
 }
 
-class Spearman(team: Team) : DynamicPiece(team) {
+class Spearman(team: Team) : LivingPiece(team) {
   override val strength = SPEARMAN_STRENGTH
   override val cost: Int = -5
 }
 
-class Knight(team: Team) : DynamicPiece(team) {
+class Knight(team: Team) : LivingPiece(team) {
   override val strength = KNIGHT_STRENGTH
   override val cost: Int = -17
 }
 
-class Baron(team: Team) : DynamicPiece(team) {
+class Baron(team: Team) : LivingPiece(team) {
   override val strength = BARON_STRENGTH
   override val cost: Int = -53
 }

@@ -1,7 +1,7 @@
 package no.elg.hex.input
 
 import no.elg.hex.input.editor.OpaquenessEditor
-import no.elg.island.Island
+import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
