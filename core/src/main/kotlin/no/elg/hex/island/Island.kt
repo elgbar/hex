@@ -6,8 +6,9 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.hexagon.Piece
+import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
@@ -64,8 +65,13 @@ class Island(
       }
       for (hexagon in hexagons) {
         val piece = hexagon.getData(this).piece
-        if (piece is Capital) {
-          piece.balance = START_CAPITAL
+        when (piece) {
+          is Capital -> piece.balance = START_CAPITAL
+          is LivingPiece -> piece.moved = false
+          is TreePiece -> piece.hasGrown = false
+          else -> {
+            /* NOP */
+          }
         }
       }
     }
@@ -74,7 +80,7 @@ class Island(
   var selected: Territory? = null
     private set
 
-  var pieceInHand: Piece? = null
+  var inHand: Hand? = null
 
   private var currentTeam: Team = PLAYER_TEAM
 
@@ -103,6 +109,15 @@ class Island(
    * Select the hex under the cursor
    */
   fun select(hex: Hexagon<HexagonData>?) {
+
+    inHand?.also { (_, piece, originalHex) ->
+      val newPiece = originalHex.getData(this).setPiece(piece::class)
+      if (newPiece is LivingPiece) {
+        newPiece.moved = false
+      }
+      inHand = null
+    }
+
     selected = null
     if (hex == null) return
 

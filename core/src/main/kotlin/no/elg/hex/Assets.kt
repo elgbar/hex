@@ -5,12 +5,16 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
+import com.badlogic.gdx.graphics.g2d.Animation
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP_PINGPONG
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
+import com.badlogic.gdx.utils.Array
 
 
 /**
@@ -50,6 +54,36 @@ class Assets : AssetManager() {
 
   val sprites: TextureAtlas by lazy { get<TextureAtlas>(SPRITE_ATLAS) }
   val originalSprites: TextureAtlas by lazy { get<TextureAtlas>(ORIGINAL_SPRITES_ATLAS) }
+
+  private fun findSprite(regionName: String): AtlasRegion {
+    val region = if (Hex.args.retro) {
+      Hex.assets.originalSprites.findRegion(regionName)
+    } else {
+      Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
+    }
+    region.flip(false, true)
+    return region
+  }
+
+  private fun findAnimation(regionPrefix: String, totalFrames: Int, frameDuration: Float): Animation<AtlasRegion> {
+    val array = Array<AtlasRegion>()
+    for (frame in 0 until totalFrames) {
+      array.add(findSprite(regionPrefix + frame))
+    }
+
+    return Animation(frameDuration, array, LOOP_PINGPONG)
+  }
+
+  val pine by lazy { findSprite("pine") }
+  val palm by lazy { findSprite("palm") }
+  val capital by lazy { findSprite("village") }
+  val capitalFlag by lazy { findAnimation("village", 8, 1 / 10f) }
+  val castle by lazy { findSprite("castle") }
+  val grave by lazy { findSprite("grave") }
+  val peasant by lazy { findAnimation("man0", 5, 1 / 17f) }
+  val spearman by lazy { findAnimation("man1", 5, 1 / 15f) }
+  val knight by lazy { findAnimation("man2", 5, 1 / 17f) }
+  val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
 
   init {
     super.setErrorListener { _, throwable -> throwable.printStackTrace() }

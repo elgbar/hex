@@ -1,6 +1,7 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
@@ -15,6 +16,16 @@ const val PEASANT_STRENGTH = 1
 const val SPEARMAN_STRENGTH = 2
 const val KNIGHT_STRENGTH = 3
 const val BARON_STRENGTH = 4
+
+fun strengthToType(str: Int): KClass<out LivingPiece> {
+  return when (str) {
+    PEASANT_STRENGTH -> Peasant::class
+    SPEARMAN_STRENGTH -> Spearman::class
+    KNIGHT_STRENGTH -> Knight::class
+    BARON_STRENGTH -> Baron::class
+    else -> error("Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)")
+  }
+}
 
 enum class CapitalPlacementPreference {
   /**
@@ -67,6 +78,8 @@ sealed class Piece {
 
   open val capitalPlacement: CapitalPlacementPreference = CapitalPlacementPreference.LAST_RESORT
 
+  open val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class)
+
   /**
    * Action called when this is placed on an hexagon
    *
@@ -74,7 +87,15 @@ sealed class Piece {
    *
    * @return If the placement was successful
    */
-  abstract fun place(onto: HexagonData): Boolean
+  open fun place(onto: HexagonData): Boolean {
+    return if (!Hex.args.mapEditor && !canBePlacedOn.any { it.isInstance(onto.piece) }) {
+      Gdx.app.debug("${this::class.simpleName}-${this::place.name}",
+        "Piece ${this::class.simpleName} can only be placed on ${canBePlacedOn.map { it::simpleName }} pieces")
+      false
+    } else {
+      true
+    }
+  }
 
   override fun toString(): String = this::class.simpleName!!
 
@@ -127,15 +148,13 @@ sealed class StationaryPiece(override val team: Team) : Piece() {
   private var placed: Boolean = false
 
   final override val movable: Boolean = false
-  open val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class)
 
   override fun place(onto: HexagonData): Boolean {
     require(!placed) { "Stationary pieces can only be placed once" }
+    if (!super.place(onto)) return false
     if (onto.team != team) {
-      Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Stationary pieces can only be placed on a tile with the same team")
-      return false
-    } else if (!canBePlacedOn.any { it.isInstance(onto.piece) }) {
-      Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Piece ${this::class.simpleName} can only be placed on ${canBePlacedOn.map { it::simpleName }} pieces")
+      Gdx.app.debug("${this::class.simpleName}-${this::place.name}",
+        "Stationary pieces can only be placed on a tile with the same team")
       return false
     }
     placed = true
@@ -153,12 +172,10 @@ sealed class LivingPiece(override val team: Team) : Piece() {
 
   var moved: Boolean = false
 
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, LivingPiece::class, StationaryPiece::class)
+
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
     hex.getData(island).setPiece(Grave::class)
-  }
-
-  fun move(island: Island, from: Hexagon<HexagonData>, to: Hexagon<HexagonData>) {
-    moved = true
   }
 
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
@@ -166,13 +183,19 @@ sealed class LivingPiece(override val team: Team) : Piece() {
   }
 
   override fun place(onto: HexagonData): Boolean {
-    if (onto.piece != Empty) {
-      Gdx.app.debug("${this::class.simpleName}-${this::place.name}", "Pieces can only be placed on an empty hex")
+    if (!super.place(onto)) return false
+    val ontoPiece = onto.piece
+    if ((ontoPiece is Capital || ontoPiece is Castle) && onto.team == team) {
+      Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
       return false
-    } else if (onto.team != team) {
-      Gdx.app.log("${this::class.simpleName}-${this::place.name}", "Dynamic pieces can only be placed on a tile with the same team. This team = $team, onto team = ${onto.team}")
-      return false
+    } else if (ontoPiece is LivingPiece && onto.team == team) {
+      val newStr = this.strength + ontoPiece.strength
+      if (newStr <= BARON_STRENGTH) {
+        strengthToType(newStr)
+        return true
+      }
     }
+    moved = true
     return true
   }
 
@@ -261,7 +284,7 @@ class Grave(team: Team) : StationaryPiece(team) {
 
 sealed class TreePiece(team: Team) : StationaryPiece(team) {
 
-  protected var hasGrown: Boolean = true
+  var hasGrown: Boolean = true
 
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = NO_STRENGTH
