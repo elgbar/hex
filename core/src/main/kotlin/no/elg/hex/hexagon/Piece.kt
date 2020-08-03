@@ -8,6 +8,7 @@ import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
+import java.lang.Integer.min
 import kotlin.reflect.KClass
 
 
@@ -134,6 +135,12 @@ val PIECES: List<KClass<out Piece>> by lazy {
   return@lazy subclasses
 }
 
+
+///////////
+// Empty //
+///////////
+
+
 object Empty : Piece() {
   override val strength: Int = NO_STRENGTH
   override val movable: Boolean = false
@@ -142,6 +149,12 @@ object Empty : Piece() {
   override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
 }
+
+
+////////////////
+// Stationary //
+////////////////
+
 
 sealed class StationaryPiece(override val team: Team) : Piece() {
 
@@ -166,52 +179,6 @@ sealed class StationaryPiece(override val team: Team) : Piece() {
   }
 }
 
-sealed class LivingPiece(override val team: Team) : Piece() {
-
-  final override val movable: Boolean = true
-
-  var moved: Boolean = false
-
-  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, LivingPiece::class, StationaryPiece::class)
-
-  fun kill(island: Island, hex: Hexagon<HexagonData>) {
-    hex.getData(island).setPiece(Grave::class)
-  }
-
-  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
-    moved = false
-  }
-
-  override fun place(onto: HexagonData): Boolean {
-    if (!super.place(onto)) return false
-    val ontoPiece = onto.piece
-    if ((ontoPiece is Capital || ontoPiece is Castle) && onto.team == team) {
-      Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
-      return false
-    } else if (ontoPiece is LivingPiece && onto.team == team) {
-      val newStr = this.strength + ontoPiece.strength
-      if (newStr <= BARON_STRENGTH) {
-        strengthToType(newStr)
-        return true
-      }
-    }
-    moved = true
-    return true
-  }
-
-  fun updateAnimationTime(): Float {
-    if (moved) {
-      elapsedAnimationTime = 0f
-    } else {
-      elapsedAnimationTime += Gdx.graphics.deltaTime
-    }
-    return elapsedAnimationTime
-  }
-
-  override fun toString(): String {
-    return super.toString() + ": moved? $moved"
-  }
-}
 
 class Capital(team: Team) : StationaryPiece(team) {
 
@@ -282,6 +249,12 @@ class Grave(team: Team) : StationaryPiece(team) {
   }
 }
 
+
+//////////
+// TREE //
+//////////
+
+
 sealed class TreePiece(team: Team) : StationaryPiece(team) {
 
   var hasGrown: Boolean = true
@@ -341,6 +314,55 @@ class PalmTree(team: Team) : TreePiece(team) {
       piece.hasGrown = true
       hasGrown = true
     }
+  }
+}
+
+
+////////////
+// LIVING //
+////////////
+
+
+sealed class LivingPiece(override val team: Team) : Piece() {
+
+  final override val movable: Boolean = true
+
+  var moved: Boolean = true
+
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, LivingPiece::class, StationaryPiece::class)
+
+  fun kill(island: Island, hex: Hexagon<HexagonData>) {
+    hex.getData(island).setPiece(Grave::class)
+  }
+
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+    moved = false
+  }
+
+  override fun place(onto: HexagonData): Boolean {
+    if (!super.place(onto)) return false
+    val ontoPiece = onto.piece
+    if ((ontoPiece is Capital || ontoPiece is Castle) && onto.team == team) {
+      Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
+      return false
+    } else if (onto.team != team && (onto.piece.strength >= min(strength, KNIGHT_STRENGTH))) {
+      Gdx.app.debug("PLACE", "Cannot attack ${onto.piece::class.simpleName} with a ${this::class.simpleName}")
+      return false
+    }
+    return true
+  }
+
+  fun updateAnimationTime(): Float {
+    if (moved) {
+      elapsedAnimationTime = 0f
+    } else {
+      elapsedAnimationTime += Gdx.graphics.deltaTime
+    }
+    return elapsedAnimationTime
+  }
+
+  override fun toString(): String {
+    return super.toString() + ": moved? $moved"
   }
 }
 
