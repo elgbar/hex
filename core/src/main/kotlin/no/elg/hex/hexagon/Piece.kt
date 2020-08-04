@@ -79,7 +79,7 @@ sealed class Piece {
 
   open val capitalPlacement: CapitalPlacementPreference = CapitalPlacementPreference.LAST_RESORT
 
-  open val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class)
+  open val canBePlacedOn: Array<KClass<out Piece>> = emptyArray()
 
   /**
    * Action called when this is placed on an hexagon
@@ -89,9 +89,9 @@ sealed class Piece {
    * @return If the placement was successful
    */
   open fun place(onto: HexagonData): Boolean {
-    return if (!Hex.args.mapEditor && !canBePlacedOn.any { it.isInstance(onto.piece) }) {
+    return if (!Hex.args.mapEditor && (!(onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }))) {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}",
-        "Piece ${this::class.simpleName} can only be placed on ${canBePlacedOn.map { it::simpleName }} pieces")
+        "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}")
       false
     } else {
       true
@@ -262,7 +262,7 @@ sealed class TreePiece(team: Team) : StationaryPiece(team) {
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = NO_STRENGTH
   override val cost: Int = 0
-  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, Capital::class, Grave::class)
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
   override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     hasGrown = false
@@ -329,7 +329,7 @@ sealed class LivingPiece(override val team: Team) : Piece() {
 
   var moved: Boolean = true
 
-  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Empty::class, LivingPiece::class, StationaryPiece::class)
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class, StationaryPiece::class)
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
     hex.getData(island).setPiece(Grave::class)
