@@ -24,18 +24,18 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         Buttons.LEFT -> {
           val cursorHex = basicInputProcessor.cursorHex ?: return false
           val cursorHexData = cursorHex.getData(island)
-          if (cursorHexData.team != PLAYER_TEAM) return false
           val territory = island.selected
 
-          if (territory == null || !territory.hexagons.contains(cursorHex)) {
+          if ((territory == null || !territory.hexagons.contains(cursorHex)) && cursorHexData.team == PLAYER_TEAM) {
             island.select(cursorHex)
           }
 
           val cursorPiece = cursorHexData.piece
+          val oldTeam = cursorHexData.team
 
           val hand = island.inHand
           if (hand == null) {
-            if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved) {
+            if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
               //We currently don't hold anything in our hand, so pick it up!
               island.inHand = Hand(PLAYER_TEAM, cursorPiece, cursorHex)
               cursorHexData.setPiece(Empty::class)
@@ -43,20 +43,22 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             return true
           }
 
-          val piece = if (cursorPiece is LivingPiece && hand.piece is LivingPiece && cursorHexData.team == hand.team) {
+          val (piece, moved) = if (cursorPiece is LivingPiece && hand.piece is LivingPiece && cursorHexData.team == hand.team) {
             //merge cursor piece with held piece
             val newStr = hand.piece.strength + cursorPiece.strength
             if (newStr > BARON_STRENGTH) return true //cannot merge
-            strengthToType(newStr)
+            //The piece can only move when both the piece in hand and the hex pointed at has not moved
+            strengthToType(newStr) to (!hand.piece.moved || !cursorPiece.moved)
           } else {
-            hand.piece::class
+            hand.piece::class to (oldTeam != PLAYER_TEAM)
           }
 
           val new = cursorHexData.setPiece(piece)
           if (new !== cursorPiece) {
+            cursorHexData.team = hand.team
             island.inHand = null
-            if (cursorPiece is Empty && new is LivingPiece) {
-              new.moved = false
+            if (new is LivingPiece) {
+              new.moved = moved
             }
           }
         }
