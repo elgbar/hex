@@ -60,7 +60,7 @@ enum class CapitalPlacementPreference {
  */
 sealed class Piece {
 
-  protected abstract val team: Team
+  abstract val data: HexagonData
 
   /**
    * How powerful an object is. Must be Strictly positive
@@ -144,7 +144,9 @@ val PIECES: List<KClass<out Piece>> by lazy {
 object Empty : Piece() {
   override val strength: Int = NO_STRENGTH
   override val movable: Boolean = false
-  override val team: Team get() = error("Empty Piece is not confined to a team")
+  override val data: HexagonData
+    get() =
+      error("Empty Piece is not confined to a Hexagon")
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
   override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
@@ -156,7 +158,7 @@ object Empty : Piece() {
 ////////////////
 
 
-sealed class StationaryPiece(override val team: Team) : Piece() {
+sealed class StationaryPiece(final override val data: HexagonData) : Piece() {
 
   private var placed: Boolean = false
 
@@ -165,11 +167,6 @@ sealed class StationaryPiece(override val team: Team) : Piece() {
   override fun place(onto: HexagonData): Boolean {
     require(!placed) { "Stationary pieces can only be placed once" }
     if (!super.place(onto)) return false
-    if (onto.team != team) {
-      Gdx.app.debug("${this::class.simpleName}-${this::place.name}",
-        "Stationary pieces can only be placed on a tile with the same team")
-      return false
-    }
     placed = true
     return true
   }
@@ -180,7 +177,8 @@ sealed class StationaryPiece(override val team: Team) : Piece() {
 }
 
 
-class Capital(team: Team) : StationaryPiece(team) {
+class Capital(data: HexagonData) : StationaryPiece(data) {
+
 
   /**
    * How much money this territory currently has
@@ -227,12 +225,12 @@ class Capital(team: Team) : StationaryPiece(team) {
   override val strength = PEASANT_STRENGTH
 }
 
-class Castle(team: Team) : StationaryPiece(team) {
+class Castle(data: HexagonData) : StationaryPiece(data) {
   override val strength = SPEARMAN_STRENGTH
   override val cost: Int = 1
 }
 
-class Grave(team: Team) : StationaryPiece(team) {
+class Grave(data: HexagonData) : StationaryPiece(data) {
   override val strength = NO_STRENGTH
   override val cost: Int = 1
 
@@ -255,7 +253,7 @@ class Grave(team: Team) : StationaryPiece(team) {
 //////////
 
 
-sealed class TreePiece(team: Team) : StationaryPiece(team) {
+sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
 
   var hasGrown: Boolean = true
 
@@ -269,7 +267,7 @@ sealed class TreePiece(team: Team) : StationaryPiece(team) {
   }
 }
 
-class PineTree(team: Team) : TreePiece(team) {
+class PineTree(data: HexagonData) : TreePiece(data) {
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
 
@@ -301,7 +299,7 @@ class PineTree(team: Team) : TreePiece(team) {
   }
 }
 
-class PalmTree(team: Team) : TreePiece(team) {
+class PalmTree(data: HexagonData) : TreePiece(data) {
   @ExperimentalStdlibApi
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
@@ -323,7 +321,7 @@ class PalmTree(team: Team) : TreePiece(team) {
 ////////////
 
 
-sealed class LivingPiece(override val team: Team) : Piece() {
+sealed class LivingPiece(final override val data: HexagonData) : Piece() {
 
   final override val movable: Boolean = true
 
@@ -342,10 +340,10 @@ sealed class LivingPiece(override val team: Team) : Piece() {
   override fun place(onto: HexagonData): Boolean {
     if (!super.place(onto)) return false
     val ontoPiece = onto.piece
-    if ((ontoPiece is Capital || ontoPiece is Castle) && onto.team == team) {
+    if ((ontoPiece is Capital || ontoPiece is Castle) && onto.team == data.team) {
       Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
       return false
-    } else if (onto.team != team && (onto.piece.strength >= min(strength, KNIGHT_STRENGTH))) {
+    } else if (onto.team != data.team && (onto.piece.strength >= min(strength, KNIGHT_STRENGTH))) {
       Gdx.app.debug("PLACE", "Cannot attack ${onto.piece::class.simpleName} with a ${this::class.simpleName}")
       return false
     }
@@ -366,22 +364,22 @@ sealed class LivingPiece(override val team: Team) : Piece() {
   }
 }
 
-class Peasant(team: Team) : LivingPiece(team) {
+class Peasant(data: HexagonData) : LivingPiece(data) {
   override val strength = PEASANT_STRENGTH
   override val cost: Int = -1
 }
 
-class Spearman(team: Team) : LivingPiece(team) {
+class Spearman(data: HexagonData) : LivingPiece(data) {
   override val strength = SPEARMAN_STRENGTH
   override val cost: Int = -5
 }
 
-class Knight(team: Team) : LivingPiece(team) {
+class Knight(data: HexagonData) : LivingPiece(data) {
   override val strength = KNIGHT_STRENGTH
   override val cost: Int = -17
 }
 
-class Baron(team: Team) : LivingPiece(team) {
+class Baron(data: HexagonData) : LivingPiece(data) {
   override val strength = BARON_STRENGTH
   override val cost: Int = -53
 }
