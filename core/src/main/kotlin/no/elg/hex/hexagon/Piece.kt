@@ -339,19 +339,6 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
     moved = false
   }
 
-  override fun place(onto: HexagonData): Boolean {
-    if (!super.place(onto)) return false
-    val ontoPiece = onto.piece
-    if ((ontoPiece is Capital || ontoPiece is Castle) && onto.team == data.team) {
-      Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
-      return false
-    } else if (onto.team != data.team && (onto.piece.strength >= min(strength, KNIGHT_STRENGTH))) {
-      Gdx.app.debug("PLACE", "Cannot attack ${onto.piece::class.simpleName} with a ${this::class.simpleName}")
-      return false
-    }
-    return true
-  }
-
   fun updateAnimationTime(): Float {
     if (moved) {
       elapsedAnimationTime = 0f

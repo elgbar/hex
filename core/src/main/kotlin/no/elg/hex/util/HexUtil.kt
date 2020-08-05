@@ -86,6 +86,11 @@ fun Hexagon<HexagonData>.treeType(island: Island): KClass<out TreePiece> {
   return if (neighbors.any { it.getData(island).invisible }) PalmTree::class else PineTree::class
 }
 
+fun Hexagon<HexagonData>.calculateStrength(island: Island): Int {
+  return getNeighbors(island).map { it.getData(island).piece.strength }.max()
+    ?: error("No elements in list, not even this hexagon!")
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Taken from https://github.com/Hexworks/mixite/pull/56 TODO remove when this is in the library                     //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

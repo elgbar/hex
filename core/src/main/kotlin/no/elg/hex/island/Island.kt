@@ -104,7 +104,7 @@ class Island(
     } while (currentTeam != PLAYER_TEAM)
 
     for (hexagon in hexagons) {
-      hexagon.getData(this).piece.newTurn(this, hexagon)
+      hexagon.getData(this).piece.newRound(this, hexagon)
     }
   }
 
@@ -113,14 +113,8 @@ class Island(
    */
   fun select(hex: Hexagon<HexagonData>?) {
 
-    inHand?.also { (_, piece, originalHex) ->
-      val data = originalHex.getData(this)
-      if (data.setPiece(piece::class)) {
-        val newPiece = data.piece
-        if (newPiece is LivingPiece) {
-          newPiece.moved = false
-        }
-      }
+    inHand?.also { hand ->
+      hand.undoPickup()
       inHand = null
     }
 

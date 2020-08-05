@@ -1,16 +1,30 @@
 package no.elg.hex.input
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.InputAdapter
 import no.elg.hex.hexagon.BARON_STRENGTH
+import no.elg.hex.hexagon.Baron
+import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
+import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.KNIGHT_STRENGTH
+import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.LivingPiece
+import no.elg.hex.hexagon.Peasant
+import no.elg.hex.hexagon.Piece
+import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.island.Hand
 import no.elg.hex.island.Island.Companion.PLAYER_TEAM
 import no.elg.hex.screens.IslandScreen
+import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
+import kotlin.math.min
+import kotlin.reflect.full.isSubclassOf
 
 /**
  * @author Elg
@@ -31,7 +45,6 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
           }
 
           val cursorPiece = cursorHexData.piece
-          val oldTeam = cursorHexData.team
 
           val hand = island.inHand
           if (hand == null) {
@@ -56,6 +69,19 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             handPiece::class to (cursorHexData.team != PLAYER_TEAM || cursorPiece !is Empty)
           }
 
+          if (newPieceType.isSubclassOf(LivingPiece::class)) {
+            val cursorStrength = cursorHex.calculateStrength(island)
+            if (cursorHexData.team == hand.territory.team && (cursorPiece is Capital || cursorPiece is Castle)) {
+              Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
+              return true
+            } else if (cursorHexData.team != hand.territory.team && handPiece.strength <= min(cursorStrength, KNIGHT_STRENGTH)) {
+              Gdx.app.debug("PLACE", "Cannot attack ${cursorPiece::class.simpleName} with a ${this::class.simpleName}")
+              return true
+            }
+          } else if (Castle::class != newPieceType) {
+            throw IllegalStateException("Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
+          }
+
           if (cursorHexData.setPiece(newPieceType)) {
             cursorHexData.team = hand.territory.team
             island.inHand = null
@@ -63,9 +89,9 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             if (newPiece is LivingPiece) {
               newPiece.moved = moved
             }
+            //reselect territory to update it's values
+            island.select(cursorHex)
           }
-          //reselect territory to update it's values
-          island.select(cursorHex)
         }
         else -> return false
       }
