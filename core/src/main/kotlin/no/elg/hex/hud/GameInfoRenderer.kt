@@ -29,11 +29,11 @@ class GameInfoRenderer(private val islandScreen: IslandScreen, gameInputProcesso
       ScreenRenderer.drawAll(
         ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) }),
         ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),
-        ScreenText("Holding: ", next = nullCheckedText(islandScreen.island.inHand?.piece)),
+        ScreenText("Holding: ", next = nullCheckedText(islandScreen.island.inHand)),
         position = TOP_RIGHT)
     }
 
-    islandScreen.island.inHand?.also { (_, piece, _) ->
+    islandScreen.island.inHand?.also { (_, piece) ->
       batch.begin()
       val region = when (piece) {
         is Capital -> Hex.assets.capital

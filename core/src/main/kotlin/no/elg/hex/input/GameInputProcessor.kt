@@ -36,25 +36,28 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
           val hand = island.inHand
           if (hand == null) {
             if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
+              val territory = island.selected ?: return true
               //We currently don't hold anything in our hand, so pick it up!
-              island.inHand = Hand(PLAYER_TEAM, cursorPiece, cursorHex)
+              island.inHand = Hand(territory, cursorPiece)
               cursorHexData.setPiece(Empty::class)
             }
             return true
           }
 
-          val (piece, moved) = if (cursorPiece is LivingPiece && hand.piece is LivingPiece && cursorHexData.team == hand.team) {
+          val handPiece = hand.piece
+
+          val (newPieceType, moved) = if (cursorPiece is LivingPiece && handPiece is LivingPiece && cursorHexData.team == hand.territory.team) {
             //merge cursor piece with held piece
-            val newStr = hand.piece.strength + cursorPiece.strength
+            val newStr = handPiece.strength + cursorPiece.strength
             if (newStr > BARON_STRENGTH) return true //cannot merge
             //The piece can only move when both the piece in hand and the hex pointed at has not moved
-            strengthToType(newStr) to (hand.piece.moved || cursorPiece.moved)
+            strengthToType(newStr) to (handPiece.moved || cursorPiece.moved)
           } else {
-            hand.piece::class to (oldTeam != PLAYER_TEAM || cursorHexData.piece !is Empty)
+            handPiece::class to (cursorHexData.team != PLAYER_TEAM || cursorPiece !is Empty)
           }
 
-          if (cursorHexData.setPiece(piece)) {
-            cursorHexData.team = hand.team
+          if (cursorHexData.setPiece(newPieceType)) {
+            cursorHexData.team = hand.territory.team
             island.inHand = null
             val newPiece = cursorHexData.piece
             if (newPiece is LivingPiece) {
@@ -71,8 +74,20 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   override fun keyDown(keycode: Int): Boolean {
+    fun setIfTerritorySelected(piece: Piece) {
+      islandScreen.island.selected?.also {
+        it.capital.balance -= piece.price
+        islandScreen.island.inHand = Hand(it, piece)
+      }
+    }
+
     when (keycode) {
       ENTER -> islandScreen.island.endTurn()
+      Keys.F1 -> setIfTerritorySelected(Castle(HexagonData.EDGE_DATA))
+      Keys.F2 -> setIfTerritorySelected(Peasant(HexagonData.EDGE_DATA))
+      Keys.F3 -> setIfTerritorySelected(Spearman(HexagonData.EDGE_DATA))
+      Keys.F4 -> setIfTerritorySelected(Knight(HexagonData.EDGE_DATA))
+      Keys.F5 -> setIfTerritorySelected(Baron(HexagonData.EDGE_DATA))
       else -> return false
     }
     return true

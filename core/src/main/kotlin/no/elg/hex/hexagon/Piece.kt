@@ -8,7 +8,6 @@ import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
-import java.lang.Integer.min
 import kotlin.reflect.KClass
 
 
@@ -77,6 +76,8 @@ sealed class Piece {
    */
   abstract val cost: Int
 
+  open val price: Int get() = error("This piece cannot be bought!")
+
   open val capitalPlacement: CapitalPlacementPreference = CapitalPlacementPreference.LAST_RESORT
 
   open val canBePlacedOn: Array<KClass<out Piece>> = emptyArray()
@@ -113,7 +114,7 @@ sealed class Piece {
   /**
    * Called when all visible hexagons's [endTurn] has been called
    */
-  open fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  open fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     //NO-OP
   }
 }
@@ -144,9 +145,7 @@ val PIECES: List<KClass<out Piece>> by lazy {
 object Empty : Piece() {
   override val strength: Int = NO_STRENGTH
   override val movable: Boolean = false
-  override val data: HexagonData
-    get() =
-      error("Empty Piece is not confined to a Hexagon")
+  override val data: HexagonData get() = error("Empty Piece is not confined to a Hexagon")
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
   override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
@@ -228,6 +227,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
 class Castle(data: HexagonData) : StationaryPiece(data) {
   override val strength = SPEARMAN_STRENGTH
   override val cost: Int = 1
+  override val price: Int = 15
 }
 
 class Grave(data: HexagonData) : StationaryPiece(data) {
@@ -238,7 +238,7 @@ class Grave(data: HexagonData) : StationaryPiece(data) {
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
-  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (timeToTree > 0) {
       timeToTree--
       return
@@ -268,7 +268,7 @@ sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
 }
 
 class PineTree(data: HexagonData) : TreePiece(data) {
-  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
 
     //Find all empty neighbor hexes that are empty
@@ -301,14 +301,14 @@ class PineTree(data: HexagonData) : TreePiece(data) {
 
 class PalmTree(data: HexagonData) : TreePiece(data) {
   @ExperimentalStdlibApi
-  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
     //Find all empty neighbor hexes that are empty along the cost
     val loopData = pieceHex.getNeighbors(island).filter {
       val piece = it.getData(island).piece
       piece is Empty && it.treeType(island) == PalmTree::class
     }.randomOrNull()?.getData(island) ?: return
-    
+
     if (loopData.setPiece(PalmTree::class)) {
       (loopData.piece as PineTree).hasGrown = true
       hasGrown = true
@@ -325,6 +325,7 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
 sealed class LivingPiece(final override val data: HexagonData) : Piece() {
 
   final override val movable: Boolean = true
+  final override val price: Int = 10
 
   var moved: Boolean = true
 
@@ -334,7 +335,7 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
     hex.getData(island).setPiece(Grave::class)
   }
 
-  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     moved = false
   }
 
