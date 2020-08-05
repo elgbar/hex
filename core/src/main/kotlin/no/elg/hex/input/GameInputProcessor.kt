@@ -61,6 +61,8 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
               newPiece.moved = moved
             }
           }
+          //reselect territory to update it's values
+          island.select(cursorHex)
         }
         else -> return false
       }
