@@ -95,7 +95,6 @@ object LevelSelectScreen : AbstractScreen() {
 
   override fun show() {
     Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
-    renderPreviews()
   }
 
   override fun hide() {
