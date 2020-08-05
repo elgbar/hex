@@ -50,7 +50,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             //The piece can only move when both the piece in hand and the hex pointed at has not moved
             strengthToType(newStr) to (!hand.piece.moved || !cursorPiece.moved)
           } else {
-            hand.piece::class to (oldTeam != PLAYER_TEAM)
+            hand.piece::class to (oldTeam != PLAYER_TEAM || cursorHexData.piece !is Empty)
           }
 
           if (cursorHexData.setPiece(piece)) {
