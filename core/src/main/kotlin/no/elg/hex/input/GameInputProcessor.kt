@@ -103,6 +103,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     fun setIfTerritorySelected(piece: Piece) {
       islandScreen.island.selected?.also {
         it.capital.balance -= piece.price
+        if (piece is LivingPiece) piece.moved = false
         islandScreen.island.inHand = Hand(it, piece)
       }
     }
