@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Team
@@ -59,22 +60,25 @@ class Island(
     }
     hexagons = grid.hexagons.toSet()
 
-    Gdx.app.postRunnable {
-      for (hexagon in hexagons) {
-        select(hexagon)
+    for (hexagon in hexagons) {
+      val data = hexagon.getData(this)
+      require(data.piece == Empty || data == data.piece.data) {
+        "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
       }
-      for (hexagon in hexagons) {
-        val piece = hexagon.getData(this).piece
-        when (piece) {
-          is Capital -> piece.balance = START_CAPITAL
-          is LivingPiece -> piece.moved = false
-          is TreePiece -> piece.hasGrown = false
-          else -> {
-            /* NOP */
-          }
+      select(hexagon)
+    }
+    for (hexagon in hexagons) {
+      val piece = hexagon.getData(this).piece
+      when (piece) {
+        is Capital -> piece.balance = START_CAPITAL
+        is LivingPiece -> piece.moved = false
+        is TreePiece -> piece.hasGrown = false
+        else -> {
+          /* NOP */
         }
       }
     }
+
   }
 
   var selected: Territory? = null
@@ -122,15 +126,19 @@ class Island(
     if (hex == null) return
 
     val territoryHexes = getTerritoryHexagons(hex) ?: return
+    val team = territoryHexes.first().getData(this).team
+    require(territoryHexes.all { it.getData(this).team == team }) { "Wrong team!" }
 
     val capital = getCapitalOf(territoryHexes).let {
       if (it != null) return@let it
       else {
         val capHex = calculateBestCapitalPlacement(territoryHexes).getData(this)
+        require(capHex.team == team) { "Cap wrong team when creating" }
         val piece = capHex.setPiece(Capital::class)
         return@let if (piece is Capital) capHex.piece as Capital else null
       }
     }
+
     if (capital != null) {
       selected = Territory(this, capital, territoryHexes)
     }
@@ -142,7 +150,12 @@ class Island(
   }
 
   fun getCapitalOf(hexagons: Set<Hexagon<HexagonData>>): Capital? {
-    return hexagons.firstOrNull { it.getData(this).piece is Capital }?.getData(this)?.piece as? Capital?
+    val hex = hexagons.firstOrNull { it.getData(this).piece is Capital } ?: return null
+    val data = hex.getData(this)
+    val piece = data.piece
+    require(piece.data === data) { "Piece data and hex data mismatch" }
+    require(piece is Capital) { "Piece is not capital" }
+    return piece
   }
 
   /**
