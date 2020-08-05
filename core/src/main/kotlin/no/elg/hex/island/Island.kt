@@ -84,6 +84,19 @@ class Island(
     private set
 
   var inHand: Hand? = null
+    set(value) {
+      field?.apply {
+        if (piece.data === HexagonData.EDGE_DATA) {
+          territory.capital.balance += piece.price
+        } else if (piece.data.setPiece(piece::class)) {
+          val newPiece = piece.data.piece
+          if (newPiece is LivingPiece) {
+            newPiece.moved = false
+          }
+        }
+      }
+      field = value
+    }
 
   private var currentTeam: Team = PLAYER_TEAM
 
@@ -113,10 +126,7 @@ class Island(
    */
   fun select(hex: Hexagon<HexagonData>?) {
 
-    inHand?.also { hand ->
-      hand.undoPickup()
-      inHand = null
-    }
+    inHand = null
 
     selected = null
     if (hex == null) return
