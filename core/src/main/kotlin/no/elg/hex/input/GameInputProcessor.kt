@@ -53,12 +53,12 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             hand.piece::class to (oldTeam != PLAYER_TEAM)
           }
 
-          val new = cursorHexData.setPiece(piece)
-          if (new !== cursorPiece) {
+          if (cursorHexData.setPiece(piece)) {
             cursorHexData.team = hand.team
             island.inHand = null
-            if (new is LivingPiece) {
-              new.moved = moved
+            val newPiece = cursorHexData.piece
+            if (newPiece is LivingPiece) {
+              newPiece.moved = moved
             }
           }
         }

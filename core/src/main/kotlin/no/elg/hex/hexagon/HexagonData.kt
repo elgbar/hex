@@ -41,8 +41,11 @@ data class HexagonData(
   var piece: Piece = Empty
     private set
 
+  /**
+   * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type [pieceType].
+   */
   @JsonSetter("pieceType")
-  fun setPiece(pieceType: KClass<out Piece>): Piece {
+  fun setPiece(pieceType: KClass<out Piece>): Boolean {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
 
     val pieceToPlace = if (pieceType.objectInstance != null) {
@@ -51,12 +54,12 @@ data class HexagonData(
       pieceType.primaryConstructor?.call(this)
     } ?: error("No constructor found with a single ${Team::class.simpleName} argument")
 
-
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace
       require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) { "Piece's data does not point to this!" }
+      return true
     }
-    return piece
+    return false
   }
 
   @get:JsonIgnore

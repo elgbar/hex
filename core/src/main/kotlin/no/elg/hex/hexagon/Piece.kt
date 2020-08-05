@@ -287,11 +287,11 @@ class PineTree(data: HexagonData) : TreePiece(data) {
       if (otherPines.isNotEmpty()) {
         //Grow a tree between this pine and another pine
         val otherPine = otherPines.random().getData(island).piece as PineTree
-        val newPine = hexagon.getData(island).setPiece(PineTree::class)
-        if (newPine is PineTree) {
+        val loopData = hexagon.getData(island)
+        if (loopData.setPiece(PineTree::class)) {
           hasGrown = true
           otherPine.hasGrown = true
-          newPine.hasGrown = true
+          (loopData.piece as PineTree).hasGrown = true
           break
         }
       }
@@ -304,12 +304,13 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
   override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
     //Find all empty neighbor hexes that are empty along the cost
-    val piece = pieceHex.getNeighbors(island).filter {
+    val loopData = pieceHex.getNeighbors(island).filter {
       val piece = it.getData(island).piece
       piece is Empty && it.treeType(island) == PalmTree::class
-    }.randomOrNull()?.getData(island)?.setPiece(PalmTree::class)
-    if (piece is PalmTree) {
-      piece.hasGrown = true
+    }.randomOrNull()?.getData(island) ?: return
+    
+    if (loopData.setPiece(PalmTree::class)) {
+      (loopData.piece as PineTree).hasGrown = true
       hasGrown = true
     }
   }

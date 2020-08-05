@@ -115,9 +115,12 @@ class Island(
   fun select(hex: Hexagon<HexagonData>?) {
 
     inHand?.also { (_, piece, originalHex) ->
-      val newPiece = originalHex.getData(this).setPiece(piece::class)
-      if (newPiece is LivingPiece) {
-        newPiece.moved = false
+      val data = originalHex.getData(this)
+      if (data.setPiece(piece::class)) {
+        val newPiece = data.piece
+        if (newPiece is LivingPiece) {
+          newPiece.moved = false
+        }
       }
       inHand = null
     }
@@ -132,10 +135,9 @@ class Island(
     val capital = getCapitalOf(territoryHexes).let {
       if (it != null) return@let it
       else {
-        val capHex = calculateBestCapitalPlacement(territoryHexes).getData(this)
-        require(capHex.team == team) { "Cap wrong team when creating" }
-        val piece = capHex.setPiece(Capital::class)
-        return@let if (piece is Capital) capHex.piece as Capital else null
+        val capHexData = calculateBestCapitalPlacement(territoryHexes).getData(this)
+        require(capHexData.team == team) { "Cap wrong team when creating" }
+        return@let if (capHexData.setPiece(Capital::class)) capHexData.piece as Capital else null
       }
     }
 
