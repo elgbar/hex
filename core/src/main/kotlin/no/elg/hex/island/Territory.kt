@@ -44,6 +44,8 @@ data class Territory(val island: Island, val capital: Capital, val hexagons: Col
         }
       }
     }
-    require(foundCapital) { "Failed to find the capital among the hexagons in t" }
+    require(foundCapital) {
+      "Failed to find the capital among the hexagons in the given hexagons"
+    }
   }
 }

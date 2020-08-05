@@ -65,7 +65,6 @@ class Island(
       require(data.piece == Empty || data == data.piece.data) {
         "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
       }
-      select(hexagon)
     }
     for (hexagon in hexagons) {
       val piece = hexagon.getData(this).piece
@@ -146,18 +145,24 @@ class Island(
     }
   }
 
-  fun getCapitalOf(hexagon: Hexagon<HexagonData>): Capital? {
-    val territoryHexagons = getTerritoryHexagons(hexagon) ?: return null
-    return getCapitalOf(territoryHexagons)
-  }
+  fun getCapitalOf(hexagons: Collection<Hexagon<HexagonData>>): Capital? {
+    val capitals = hexagons.filter { it.getData(this).piece is Capital }
+    if (capitals.isEmpty()) return null
+    else if (capitals.size == 1) return capitals.first().getData(this).piece as Capital
 
-  fun getCapitalOf(hexagons: Set<Hexagon<HexagonData>>): Capital? {
-    val hex = hexagons.firstOrNull { it.getData(this).piece is Capital } ?: return null
-    val data = hex.getData(this)
-    val piece = data.piece
-    require(piece.data === data) { "Piece data and hex data mismatch" }
-    require(piece is Capital) { "Piece is not capital" }
-    return piece
+    //there might be multiple capitals in the set of hexagons. Find the best one, transfer all assets and delete the others
+
+    val bestCapitalHex = calculateBestCapitalPlacement(capitals)
+    val bestData = bestCapitalHex.getData(this).piece as Capital
+    for (capital in capitals) {
+      if (capital === bestCapitalHex) continue
+
+      val data = capital.getData(this)
+      val otherCapital = data.piece as Capital
+      otherCapital.transfer(bestData)
+      data.setPiece(Empty::class)
+    }
+    return bestData
   }
 
   /**
@@ -181,7 +186,7 @@ class Island(
    *
    * @param hexagons All hexagons in a territory, must have a size equal to or greater than [MIN_HEX_IN_TERRITORY]
    */
-  fun calculateBestCapitalPlacement(hexagons: Set<Hexagon<HexagonData>>): Hexagon<HexagonData> {
+  fun calculateBestCapitalPlacement(hexagons: Collection<Hexagon<HexagonData>>): Hexagon<HexagonData> {
     require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "There must be at least $MIN_HEX_IN_TERRITORY hexagons in the given set!" }
     val hexTeam = hexagons.first().getData(this).team
     require(hexagons.all { it.getData(this).team == hexTeam }) { "All hexagons given must be on the same team" }
