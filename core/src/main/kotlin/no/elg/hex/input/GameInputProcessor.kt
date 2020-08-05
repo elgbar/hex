@@ -48,7 +48,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             val newStr = hand.piece.strength + cursorPiece.strength
             if (newStr > BARON_STRENGTH) return true //cannot merge
             //The piece can only move when both the piece in hand and the hex pointed at has not moved
-            strengthToType(newStr) to (!hand.piece.moved || !cursorPiece.moved)
+            strengthToType(newStr) to (hand.piece.moved || cursorPiece.moved)
           } else {
             hand.piece::class to (oldTeam != PLAYER_TEAM || cursorHexData.piece !is Empty)
           }
