@@ -184,6 +184,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
    */
   var balance: Int = 0
   override val cost: Int = 1
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Piece::class)
 
   /**
    * Transfer everything to the given capital
