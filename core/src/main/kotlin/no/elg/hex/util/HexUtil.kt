@@ -7,6 +7,7 @@ import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
+import no.elg.hex.hexagon.KNIGHT_STRENGTH
 import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.PineTree
@@ -18,6 +19,7 @@ import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.reflect.KClass
 
 /**
@@ -108,6 +110,10 @@ fun Island.regenerateCapitals() {
     select(hexagon)
   }
   forEachPieceType<Capital>() { _, _, piece -> piece.balance = START_CAPITAL }
+}
+
+fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean {
+  return with.strength > min(calculateStrength(hexagon), KNIGHT_STRENGTH)
 }
 
 inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {

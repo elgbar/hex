@@ -8,6 +8,7 @@ import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.screens.IslandScreen
+import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 
@@ -62,7 +63,10 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
 
       val hand = islandScreen.island.inHand
       if (hand != null && hand.piece is LivingPiece) {
-        draw(it.enemyBorderHexes, Color.RED, 1f, 2f)
+        val hexes = it.enemyBorderHexes.filter { hex ->
+          islandScreen.island.canAttack(hex, hand.piece)
+        }
+        draw(hexes, Color.RED, 1f, 2f)
       }
     }
 
