@@ -12,7 +12,6 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
-import no.elg.hex.util.forEachPieceType
 import no.elg.hex.util.getData
 import no.elg.hex.util.next
 import no.elg.hex.util.trace
@@ -102,7 +101,8 @@ class Island(
       field = value
     }
 
-  private var currentTeam: Team = PLAYER_TEAM
+  var currentTeam: Team = STARTING_TEAM
+    private set
 
   //////////////
   // Gameplay //
@@ -110,23 +110,19 @@ class Island(
 
   fun endTurn() {
     select(null)
-    do {
-      Gdx.app.debug("TURN", "Ending turn of $currentTeam")
-      for (hexagon in hexagons) {
-        val data = this.getData(hexagon)
-        if (data.team != currentTeam) continue
-        data.piece.endTurn(this, hexagon, data, currentTeam)
-      }
-      currentTeam = Team.values().next(currentTeam)
-    } while (currentTeam != PLAYER_TEAM)
+    currentTeam = Team.values().next(currentTeam)
+    Gdx.app.debug("TURN", "Starting turn of $currentTeam")
 
     for (hexagon in hexagons) {
-      this.getData(hexagon).piece.newRound(this, hexagon)
+      val data = this.getData(hexagon)
+      if (data.team != currentTeam) continue
+      data.piece.beginTurn(this, hexagon, data, currentTeam)
     }
 
-    forEachPieceType<LivingPiece> { hex, data, piece ->
-      if (getTerritoryHexagons(hex) == null) {
-        piece.kill(this, hex)
+    if (currentTeam == STARTING_TEAM) {
+      Gdx.app.debug("TURN", "New round!")
+      for (hexagon in hexagons) {
+        this.getData(hexagon).piece.newRound(this, hexagon)
       }
     }
   }
@@ -338,7 +334,7 @@ class Island(
 
     const val START_CAPITAL = 10
 
-    val PLAYER_TEAM = Team.LEAF
+    val STARTING_TEAM = Team.LEAF
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)

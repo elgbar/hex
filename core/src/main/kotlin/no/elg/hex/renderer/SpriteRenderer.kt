@@ -17,7 +17,6 @@ import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
-import no.elg.hex.island.Island.Companion.PLAYER_TEAM
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 
@@ -45,7 +44,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
       val piece = data.piece
       val drawable = when (piece) {
         is Capital -> {
-          if (data.team != PLAYER_TEAM || piece.balance < 10) {
+          if (data.team != islandScreen.island.currentTeam || piece.balance < 10) {
             Hex.assets.capital
           } else {
             piece.elapsedAnimationTime += Gdx.graphics.deltaTime
@@ -58,7 +57,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
         is Grave -> Hex.assets.grave
         is LivingPiece -> {
 
-          val time = if (data.team == PLAYER_TEAM) piece.updateAnimationTime() else 0f
+          val time = if (data.team == islandScreen.island.currentTeam) piece.updateAnimationTime() else 0f
           when (piece) {
             is Peasant -> Hex.assets.peasant
             is Spearman -> Hex.assets.spearman

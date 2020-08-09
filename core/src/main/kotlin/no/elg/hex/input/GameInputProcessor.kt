@@ -19,7 +19,6 @@ import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.island.Hand
-import no.elg.hex.island.Island.Companion.PLAYER_TEAM
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
@@ -41,7 +40,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
           val cursorHexData = island.getData(cursorHex)
 
           val oldTerritory = island.selected
-          if ((oldTerritory == null || !oldTerritory.hexagons.contains(cursorHex)) && cursorHexData.team == PLAYER_TEAM) {
+          if ((oldTerritory == null || !oldTerritory.hexagons.contains(cursorHex)) && cursorHexData.team == island.currentTeam) {
             island.select(cursorHex)
           }
           val territory = island.selected
@@ -53,7 +52,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
           val hand = island.inHand
           if (hand == null) {
-            if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
+            if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == island.currentTeam) {
               //We currently don't hold anything in our hand, so pick it up!
               island.inHand = Hand(territory, cursorPiece)
               cursorHexData.setPiece(Empty::class)
@@ -62,7 +61,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             return true
           }
 
-          if (cursorHexData.team != PLAYER_TEAM && !territory.enemyBorderHexes.contains(cursorHex)) {
+          if (cursorHexData.team != island.currentTeam && !territory.enemyBorderHexes.contains(cursorHex)) {
             Gdx.app.debug("PLACE", "Tried to place piece on enemy hex outside border hexes")
             return true
           }
@@ -76,7 +75,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             //The piece can only move when both the piece in hand and the hex pointed at has not moved
             strengthToType(newStr) to (handPiece.moved || cursorPiece.moved)
           } else {
-            handPiece::class to (cursorHexData.team != PLAYER_TEAM || cursorPiece !is Empty)
+            handPiece::class to (cursorHexData.team != island.currentTeam || cursorPiece !is Empty)
           }
 
           if (newPieceType.isSubclassOf(LivingPiece::class)) {

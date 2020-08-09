@@ -26,6 +26,7 @@ class DebugInfoRenderer(private val islandScreen: IslandScreen) : FrameUpdatable
       variableText("FPS: ", Gdx.graphics.framesPerSecond, 30, Int.MAX_VALUE, format = { "%4d".format(it) },
         next = variableText(" zoom: ", islandScreen.camera.zoom, MIN_ZOOM, MAX_ZOOM, format = { "%.2f".format(it) })),
       ScreenText("Island is ${islandScreen.island.grid.gridData.gridWidth} x ${islandScreen.island.grid.gridData.gridHeight} ${islandScreen.island.grid.gridData.gridLayout}"),
+      ScreenText("Current team is ${islandScreen.island.currentTeam}"),
       ScreenText(screenPos),
       ScreenText(realPos),
       ScreenText("Pointing at hex ", next = nullCheckedText(cursorData, color = Color.YELLOW, format = {

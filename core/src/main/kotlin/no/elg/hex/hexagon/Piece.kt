@@ -107,12 +107,12 @@ sealed class Piece {
    * Called when each team ends it's turn. The [pieceHex], [data], and [team] are guaranteed to be synced.
    * Only hexagons who's turn it is will be called.
    */
-  open fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
+  open fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     //NO-OP
   }
 
   /**
-   * Called when all visible hexagons's [endTurn] has been called
+   * Called when all visible hexagons's [beginTurn] has been called
    */
   open fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     //NO-OP
@@ -203,7 +203,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
     }
   }
 
-  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
+  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     val hexagons = island.getTerritoryHexagons(pieceHex)
 
     if (hexagons == null) {
@@ -263,7 +263,7 @@ sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
   override val cost: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
-  override fun endTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
+  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     hasGrown = false
   }
 }
@@ -328,7 +328,6 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
 sealed class LivingPiece(final override val data: HexagonData) : Piece() {
 
   final override val movable: Boolean = true
-  final override val price: Int = 10
 
   var moved: Boolean = true
 
@@ -339,7 +338,11 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
   }
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    moved = false
+    if (island.getTerritoryHexagons(pieceHex) == null) {
+      kill(island, pieceHex)
+    } else {
+      moved = false
+    }
   }
 
   fun updateAnimationTime(): Float {
@@ -359,19 +362,23 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
 class Peasant(data: HexagonData) : LivingPiece(data) {
   override val strength = PEASANT_STRENGTH
   override val cost: Int = -1
+  override val price: Int = 10
 }
 
 class Spearman(data: HexagonData) : LivingPiece(data) {
   override val strength = SPEARMAN_STRENGTH
   override val cost: Int = -5
+  override val price: Int = 20
 }
 
 class Knight(data: HexagonData) : LivingPiece(data) {
   override val strength = KNIGHT_STRENGTH
   override val cost: Int = -17
+  override val price: Int = 30
 }
 
 class Baron(data: HexagonData) : LivingPiece(data) {
   override val strength = BARON_STRENGTH
   override val cost: Int = -53
+  override val price: Int = 40
 }
