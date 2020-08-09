@@ -51,10 +51,6 @@ class IslandScreen(
   private val outlineRenderer = OutlineRenderer(this)
   private val spriteRenderer = SpriteRenderer(this)
 
-  override fun show() {
-    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
-    Hex.inputMultiplexer.addProcessor(inputProcessor)
-  }
 
   override fun render(delta: Float) {
     camera.update()
@@ -95,11 +91,6 @@ class IslandScreen(
     }
   }
 
-  override fun dispose() {
-    super.dispose()
-    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
-    Hex.inputMultiplexer.removeProcessor(inputProcessor)
-  }
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
@@ -112,7 +103,19 @@ class IslandScreen(
     camera.position.y = y
   }
 
+  override fun show() {
+    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
+    Hex.inputMultiplexer.addProcessor(inputProcessor)
+  }
+
   override fun hide() {
     dispose()
+    island.select(null)
+  }
+
+  override fun dispose() {
+    super.dispose()
+    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
+    Hex.inputMultiplexer.removeProcessor(inputProcessor)
   }
 }

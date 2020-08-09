@@ -15,6 +15,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.START_CAPITAL
+import no.elg.hex.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
@@ -124,6 +125,26 @@ inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<Hex
   }
 }
 
+data class HexagonWithData<out T>(val hexagon: Hexagon<HexagonData>, val data: HexagonData)
+
+fun Iterable<Hexagon<HexagonData>>.withData(island: Island, action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit) {
+  for (hexagon in this) {
+    action(hexagon, island.getData(hexagon))
+  }
+}
+
+fun Island.getTerritories(team: Team): Collection<Territory> {
+  val territories = HashSet<Territory>()
+  hexagons.withData(this) { hexagon, data ->
+    if (data.team == team) {
+      select(hexagon)
+      selected?.also {
+        territories.add(it)
+      }
+    }
+  }
+  return territories
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Taken from https://github.com/Hexworks/mixite/pull/56 TODO remove when this is in the library                     //

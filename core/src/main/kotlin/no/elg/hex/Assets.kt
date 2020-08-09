@@ -15,6 +15,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
 import com.badlogic.gdx.utils.Array
+import no.elg.hex.assets.IslandAsynchronousAssetLoader
+import no.elg.hex.island.Island
+import no.elg.hex.screens.LevelSelectScreen
 
 
 /**
@@ -85,6 +88,7 @@ class Assets : AssetManager() {
   val knight by lazy { findAnimation("man2", 5, 1 / 17f) }
   val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
 
+
   init {
     super.setErrorListener { _, throwable -> throwable.printStackTrace() }
     val resolver = InternalFileHandleResolver()
@@ -110,6 +114,8 @@ class Assets : AssetManager() {
     // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
     finishLoading()
 
+    setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
+
     //rest of the fonts
     font(bold = false, italic = true)
     font(bold = true, italic = false)
@@ -118,6 +124,15 @@ class Assets : AssetManager() {
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
     load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
 
+    for (slot in 0..Int.MAX_VALUE) {
+      val file = LevelSelectScreen.getIslandFile(slot)
+      if (file.exists()) {
+        if (file.isDirectory) continue
+        load(LevelSelectScreen.getIslandFileName(slot), Island::class.java)
+      } else {
+        break
+      }
+    }
   }
 
   fun finishMain() {

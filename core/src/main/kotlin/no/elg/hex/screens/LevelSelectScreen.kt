@@ -13,16 +13,12 @@ import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
 import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
-import no.elg.hex.hud.MessagesRenderer.publishMessage
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import no.elg.hex.util.regenerateCapitals
-import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /**
@@ -49,20 +45,6 @@ object LevelSelectScreen : AbstractScreen() {
   val mouseX get() = unprojectVector.x
   val mouseY get() = unprojectVector.y
 
-  private fun islandFiles(): GdxArray<FileHandle> {
-    val files = GdxArray<FileHandle>()
-
-    for (slot in 0..Int.MAX_VALUE) {
-      val file = getIslandFile(slot)
-      if (file.exists()) {
-        if (file.isDirectory) continue
-        files.add(file)
-      } else {
-        break
-      }
-    }
-    return files
-  }
 
   fun renderPreviews() {
     for (buffer in islandPreviews) {
@@ -70,23 +52,29 @@ object LevelSelectScreen : AbstractScreen() {
     }
     islandPreviews.clear()
 
-    val islands = islandFiles()
-    if (islands.isEmpty) {
+    if (!Hex.assets.isLoaded(getIslandFileName(0))) {
       play(0)
       return
     }
 
-    for ((i, saveFile: FileHandle) in islands.withIndex()) {
-      val island = loadIsland(saveFile) ?: continue
-      val islandScreen = IslandScreen(i, island, false)
-      islandScreen.resize(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE)
+    for (slot in 0..Int.MAX_VALUE) {
+      val file = LevelSelectScreen.getIslandFile(slot)
+      if (file.exists()) {
+        if (file.isDirectory) continue
 
-      val buffer = FrameBuffer(RGBA8888, FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, false)
-      buffer.begin()
-      islandScreen.render(0f)
-      buffer.end()
-      islandPreviews.add(buffer)
-      islandScreen.dispose()
+        val islandScreen = IslandScreen(slot, Hex.assets.get(getIslandFileName(slot)), false)
+        islandScreen.resize(FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE)
+
+        val buffer = FrameBuffer(RGBA8888, FRAME_BUFFER_SIZE, FRAME_BUFFER_SIZE, false)
+        buffer.begin()
+        islandScreen.render(0f)
+        buffer.end()
+        islandPreviews.add(buffer)
+        islandScreen.dispose()
+
+      } else {
+        break
+      }
     }
   }
 
@@ -150,30 +138,11 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   fun play(id: Int) {
-    val islandFile = getIslandFile(id)
-    val island = loadIsland(islandFile)
-    play(id, island)
+    play(id, Hex.assets.get(getIslandFileName(id)))
   }
 
   fun play(id: Int, island: Island) {
     Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
-  }
-
-  fun loadIsland(file: FileHandle): Island {
-    val json: String = try {
-      requireNotNull(file.readString())
-    } catch (e: Exception) {
-      publishMessage(ScreenText("Failed to load island the name '${file.name()}'", color = Color.RED))
-      "invalid island json"
-    }
-
-    return try {
-      Island.deserialize(json)
-    } catch (e: Exception) {
-      publishMessage(ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED))
-      Gdx.app.debug("LOAD", e.message)
-      Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
-    }
   }
 
   override fun resize(width: Int, height: Int) {
