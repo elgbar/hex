@@ -1,8 +1,6 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlin.math.max
@@ -36,14 +34,12 @@ class Island(
     height: Int,
     layout: HexagonalGridLayout,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap()
-) : Disposable {
+) {
 
   val grid: HexagonalGrid<HexagonData>
 
   /** Prefer this over calling [grid.hexagons] as this has better performance */
   val hexagons: Set<Hexagon<HexagonData>>
-
-  lateinit var preview: Texture
 
   init {
     val builder =
@@ -395,12 +391,4 @@ class Island(
       val height: Int,
       val layout: HexagonalGridLayout,
       val hexagonData: Map<CubeCoordinate, HexagonData>)
-
-  ////////////////
-  // Disposable //
-  ////////////////
-
-  override fun dispose() {
-    preview.dispose()
-  }
 }
