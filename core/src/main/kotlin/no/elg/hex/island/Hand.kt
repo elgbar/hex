@@ -14,6 +14,8 @@ data class Hand(val territory: Territory, val piece: Piece) {
     require(piece !is LivingPiece || !piece.moved) { "Holding a piece that has already moved!" }
   }
 
+  var holding = true
+
   override fun toString(): String {
     return "team: $territory, piece: ${piece::class.simpleName}"
   }

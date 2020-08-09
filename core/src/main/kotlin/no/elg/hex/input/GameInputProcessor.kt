@@ -48,8 +48,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
           val hand = island.inHand
           if (hand == null) {
-            if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
-              val territory = island.selected ?: return true
+            if (territory != null && cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
               //We currently don't hold anything in our hand, so pick it up!
               island.inHand = Hand(territory, cursorPiece)
               cursorHexData.setPiece(Empty::class)
@@ -84,7 +83,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
           if (cursorHexData.setPiece(newPieceType)) {
             cursorHexData.team = hand.territory.team
-            island.inHand = null
+            island.inHand?.holding = false
             val newPiece = cursorHexData.piece
             if (newPiece is LivingPiece) {
               newPiece.moved = moved

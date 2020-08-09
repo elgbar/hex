@@ -86,12 +86,14 @@ class Island(
   var inHand: Hand? = null
     set(value) {
       field?.apply {
-        if (piece.data === HexagonData.EDGE_DATA) {
-          territory.capital.balance += piece.price
-        } else if (piece.data.setPiece(piece::class)) {
-          val newPiece = piece.data.piece
-          if (newPiece is LivingPiece) {
-            newPiece.moved = false
+        if (holding) {
+          if (piece.data === HexagonData.EDGE_DATA) {
+            territory.capital.balance += piece.price
+          } else if (piece.data.setPiece(piece::class)) {
+            val newPiece = piece.data.piece
+            if (newPiece is LivingPiece) {
+              newPiece.moved = false
+            }
           }
         }
       }
