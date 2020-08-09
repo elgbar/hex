@@ -11,7 +11,6 @@ import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.hexagon.KNIGHT_STRENGTH
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Peasant
@@ -21,10 +20,9 @@ import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.island.Hand
 import no.elg.hex.island.Island.Companion.PLAYER_TEAM
 import no.elg.hex.screens.IslandScreen
-import no.elg.hex.util.calculateStrength
+import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
-import kotlin.math.min
 import kotlin.reflect.full.isSubclassOf
 
 /**
@@ -39,21 +37,31 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         Buttons.LEFT -> {
           val cursorHex = basicIslandInputProcessor.cursorHex ?: return false
           val cursorHexData = island.getData(cursorHex)
-          val territory = island.selected
 
-          if ((territory == null || !territory.hexagons.contains(cursorHex)) && cursorHexData.team == PLAYER_TEAM) {
+          val oldTerritory = island.selected
+          if ((oldTerritory == null || !oldTerritory.hexagons.contains(cursorHex)) && cursorHexData.team == PLAYER_TEAM) {
             island.select(cursorHex)
           }
-
+          val territory = island.selected
+          if (territory == null) {
+            Gdx.app.debug("PLACE", "Territory is still null after selecting it")
+            return true
+          }
           val cursorPiece = cursorHexData.piece
 
           val hand = island.inHand
           if (hand == null) {
-            if (territory != null && cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
+            if (cursorPiece.movable && cursorPiece is LivingPiece && !cursorPiece.moved && cursorHexData.team == PLAYER_TEAM) {
               //We currently don't hold anything in our hand, so pick it up!
               island.inHand = Hand(territory, cursorPiece)
               cursorHexData.setPiece(Empty::class)
             }
+            Gdx.app.debug("PLACE", "Hand was null, now it is ${island.inHand}")
+            return true
+          }
+
+          if (cursorHexData.team != PLAYER_TEAM && !territory.enemyBorderHexes.contains(cursorHex)) {
+            Gdx.app.debug("PLACE", "Tried to place piece on enemy hex outside border hexes")
             return true
           }
 
@@ -70,12 +78,11 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
           }
 
           if (newPieceType.isSubclassOf(LivingPiece::class)) {
-            val cursorStrength = island.calculateStrength(cursorHex)
             if (cursorHexData.team == hand.territory.team && (cursorPiece is Capital || cursorPiece is Castle)) {
               Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
               return true
-            } else if (cursorHexData.team != hand.territory.team && handPiece.strength <= min(cursorStrength, KNIGHT_STRENGTH)) {
-              Gdx.app.debug("PLACE", "Cannot attack ${cursorPiece::class.simpleName} with a ${this::class.simpleName}")
+            } else if (cursorHexData.team != hand.territory.team && !island.canAttack(cursorHex, handPiece)) {
+              Gdx.app.debug("PLACE", "Cannot attack ${cursorPiece::class.simpleName} with a ${handPiece::class.simpleName}")
               return true
             }
           } else if (Castle::class != newPieceType) {
@@ -84,7 +91,8 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
           if (cursorHexData.setPiece(newPieceType)) {
             cursorHexData.team = hand.territory.team
-            island.inHand?.holding = false
+
+            island.inHand?.holding = oldTerritory != territory
             val newPiece = cursorHexData.piece
             if (newPiece is LivingPiece) {
               newPiece.moved = moved

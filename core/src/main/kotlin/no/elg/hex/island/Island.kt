@@ -127,12 +127,16 @@ class Island(
   /**
    * Select the hex under the cursor
    */
-  fun select(hexagon: Hexagon<HexagonData>?) {
-
+  fun select(hexagon: Hexagon<HexagonData>?): Boolean {
+    val oldSelected = selected
     inHand = null
-
     selected = null
-    if (hexagon == null) return
+
+
+    if (hexagon == null) {
+      Gdx.app.debug("SELECT", "Unselecting currently selected territory")
+      return true
+    }
 
     val territoryHexes = getTerritoryHexagons(hexagon)
     if (territoryHexes == null) {
@@ -140,7 +144,9 @@ class Island(
       if (data.piece is Capital) {
         data.setPiece(treeType(hexagon))
       }
-      return
+      selected = oldSelected
+      Gdx.app.debug("SELECT", "Hex to select does not connect with enough hexagons to be a territory")
+      return false
     }
     val team = this.getData(territoryHexes.first()).team
     require(territoryHexes.all { this.getData(it).team == team }) { "Wrong team!" }
@@ -154,8 +160,13 @@ class Island(
       }
     }
 
-    if (capital != null) {
+    return if (capital != null) {
       selected = Territory(this, capital, territoryHexes)
+      true
+    } else {
+      Gdx.app.debug("SELECT", "No capital for the selected territory (this is a bug)")
+      selected = oldSelected
+      false
     }
   }
 

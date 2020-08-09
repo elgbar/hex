@@ -48,4 +48,8 @@ data class Territory(val island: Island, val capital: Capital, val hexagons: Col
       "Failed to find the capital among the hexagons in the given hexagons"
     }
   }
+
+  override fun toString(): String {
+    return "Territory of team ${capital.data.team}"
+  }
 }
