@@ -81,6 +81,11 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
                 "Cannot place a living entity of the same team onto a capital or castle piece")
         return
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
+        Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
+        return
+      }
+    } else if (Castle::class == newPieceType) {
+      if (hexData.team != territory.team) {
         Gdx.app
             .debug(
                 "PLACE",
