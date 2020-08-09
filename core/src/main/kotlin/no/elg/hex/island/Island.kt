@@ -111,6 +111,11 @@ class Island(
   var currentTeam: Team = STARTING_TEAM
     private set
 
+  private val teamToPlayer = HashMap<Team, AI?>().apply {
+    this.putAll(Team.values().map { it to RandomAI() })
+    put(STARTING_TEAM, null) //player
+  }
+
   //////////////
   // Gameplay //
   //////////////
@@ -126,12 +131,15 @@ class Island(
       data.piece.beginTurn(this, hexagon, data, currentTeam)
     }
 
+    teamToPlayer[currentTeam]?.actionOnAll(this, currentTeam)
+
     if (currentTeam == STARTING_TEAM) {
       Gdx.app.debug("TURN", "New round!")
       for (hexagon in hexagons) {
         this.getData(hexagon).piece.newRound(this, hexagon)
       }
     }
+    select(null)
   }
 
   /**
@@ -369,7 +377,7 @@ class Island(
     val layout: HexagonalGridLayout,
     val hexagonData: Map<CubeCoordinate, HexagonData>
   )
-  
+
 
   ////////////////
   // Disposable //
@@ -380,4 +388,3 @@ class Island(
     preview.dispose()
   }
 }
-
