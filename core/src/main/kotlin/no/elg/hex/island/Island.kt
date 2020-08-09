@@ -12,6 +12,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.forEachPieceType
 import no.elg.hex.util.getData
 import no.elg.hex.util.next
 import no.elg.hex.util.trace
@@ -121,6 +122,12 @@ class Island(
 
     for (hexagon in hexagons) {
       this.getData(hexagon).piece.newRound(this, hexagon)
+    }
+
+    forEachPieceType<LivingPiece> { hex, data, piece ->
+      if (getTerritoryHexagons(hex) == null) {
+        piece.kill(this, hex)
+      }
     }
   }
 
