@@ -99,7 +99,7 @@ class MapEditorInputProcessor(
       }
 
       if (isShiftPressed()) {
-        for (hexagon in cursorHex.findHexagonsWithinRadius(islandScreen.island, brushRadius)) {
+        for (hexagon in islandScreen.island.findHexagonsWithinRadius(cursorHex, brushRadius)) {
           editHex(hexagon)
         }
       } else {
@@ -141,7 +141,7 @@ class MapEditorInputProcessor(
       C -> if (isControlPressed()) {
         val island = islandScreen.island
         for (hexagon in island.hexagons) {
-          val data = hexagon.getData(island)
+          val data = island.getData(hexagon)
           if (data.piece is Capital) {
             data.setPiece(Empty::class)
           }

@@ -29,13 +29,13 @@ sealed class TeamEditor(val islandScreen: IslandScreen) : Editor() {
       require(islandScreen.inputProcessor is MapEditorInputProcessor) {
         "Tried change editor while the input processor is not ${MapEditorInputProcessor::class.simpleName}"
       }
-      hexagon.getData(islandScreen.island).team = (islandScreen.inputProcessor as MapEditorInputProcessor).selectedTeam
+      islandScreen.island.getData(hexagon).team = (islandScreen.inputProcessor as MapEditorInputProcessor).selectedTeam
     }
   }
 
   class `Randomize team`(islandScreen: IslandScreen) : TeamEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData(islandScreen.island).team = Team.values().random()
+      islandScreen.island.getData(hexagon).team = Team.values().random()
     }
   }
 

@@ -195,7 +195,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
 
   private fun killall(island: Island, iterable: Iterable<Hexagon<HexagonData>>) {
     for (hex in iterable) {
-      val piece = hex.getData(island).piece
+      val piece = island.getData(hex).piece
       if (piece is LivingPiece) {
         piece.kill(island, hex)
       }
@@ -207,7 +207,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
 
     if (hexagons == null) {
       killall(island, island.connectedHexagons(pieceHex))
-      pieceHex.getData(island).setPiece(pieceHex.treeType(island))
+      island.getData(pieceHex).setPiece(island.treeType(pieceHex))
       return
     }
 
@@ -219,7 +219,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
     }
   }
 
-  fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) = hexagons.sumBy { it.getData(island).piece.cost }
+  fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) = hexagons.sumBy { island.getData(it).piece.cost }
 
   override val strength = PEASANT_STRENGTH
 }
@@ -243,7 +243,7 @@ class Grave(data: HexagonData) : StationaryPiece(data) {
       timeToTree--
       return
     }
-    pieceHex.getData(island).setPiece(pieceHex.treeType(island))
+    island.getData(pieceHex).setPiece(island.treeType(pieceHex))
   }
 }
 
@@ -272,22 +272,22 @@ class PineTree(data: HexagonData) : TreePiece(data) {
     if (hasGrown) return
 
     //Find all empty neighbor hexes that are empty
-    val list = pieceHex.getNeighbors(island).filter {
-      val piece = it.getData(island).piece
-      piece is Empty && it.treeType(island) == PineTree::class
+    val list = island.getNeighbors(pieceHex).filter {
+      val piece = island.getData(it).piece
+      piece is Empty && island.treeType(it) == PineTree::class
     }.shuffled()
 
     for (hexagon in list) {
       //Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
-      val otherPines = hexagon.getNeighbors(island).filter {
+      val otherPines = island.getNeighbors(hexagon).filter {
         if (it == pieceHex) return@filter false
-        val piece = it.getData(island).piece
+        val piece = island.getData(it).piece
         return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
       }
       if (otherPines.isNotEmpty()) {
         //Grow a tree between this pine and another pine
-        val otherPine = otherPines.random().getData(island).piece as PineTree
-        val loopData = hexagon.getData(island)
+        val otherPine = island.getData(otherPines.random()).piece as PineTree
+        val loopData = island.getData(hexagon)
         if (loopData.setPiece(PineTree::class)) {
           hasGrown = true
           otherPine.hasGrown = true
@@ -304,13 +304,15 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
     //Find all empty neighbor hexes that are empty along the cost
-    val loopData = pieceHex.getNeighbors(island).filter {
-      val piece = it.getData(island).piece
-      piece is Empty && it.treeType(island) == PalmTree::class
-    }.randomOrNull()?.getData(island) ?: return
+    val hex = island.getNeighbors(pieceHex).filter {
+      val piece = island.getData(it).piece
+      piece is Empty && island.treeType(it) == PalmTree::class
+    }.randomOrNull() ?: return
 
-    if (loopData.setPiece(PalmTree::class)) {
-      (loopData.piece as PineTree).hasGrown = true
+    val randomNeighborData = island.getData(hex)
+
+    if (randomNeighborData.setPiece(PalmTree::class)) {
+      (randomNeighborData.piece as PineTree).hasGrown = true
       hasGrown = true
     }
   }
@@ -332,7 +334,7 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class, StationaryPiece::class)
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
-    hex.getData(island).setPiece(Grave::class)
+    island.getData(hex).setPiece(Grave::class)
   }
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {

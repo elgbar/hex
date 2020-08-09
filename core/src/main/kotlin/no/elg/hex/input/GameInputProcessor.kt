@@ -37,7 +37,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
       when (button) {
         Buttons.LEFT -> {
           val cursorHex = basicInputProcessor.cursorHex ?: return false
-          val cursorHexData = cursorHex.getData(island)
+          val cursorHexData = island.getData(cursorHex)
           val territory = island.selected
 
           if ((territory == null || !territory.hexagons.contains(cursorHex)) && cursorHexData.team == PLAYER_TEAM) {
@@ -70,7 +70,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
           }
 
           if (newPieceType.isSubclassOf(LivingPiece::class)) {
-            val cursorStrength = cursorHex.calculateStrength(island)
+            val cursorStrength = island.calculateStrength(cursorHex)
             if (cursorHexData.team == hand.territory.team && (cursorPiece is Capital || cursorPiece is Castle)) {
               Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
               return true

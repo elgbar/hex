@@ -23,19 +23,19 @@ sealed class OpaquenessEditor(val islandScreen: IslandScreen) : Editor() {
 
   class `Set opaque`(islandScreen: IslandScreen) : OpaquenessEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData(islandScreen.island).isOpaque = false
+      islandScreen.island.getData(hexagon).isOpaque = false
     }
   }
 
   class `Set transparent`(islandScreen: IslandScreen) : OpaquenessEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData(islandScreen.island).isOpaque = true
+      islandScreen.island.getData(hexagon).isOpaque = true
     }
   }
 
   class `Toggle opaqueness`(islandScreen: IslandScreen) : OpaquenessEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      val data = hexagon.getData(islandScreen.island)
+      val data = islandScreen.island.getData(hexagon)
       data.isOpaque = !data.isOpaque
     }
   }

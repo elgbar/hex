@@ -54,7 +54,7 @@ class VerticesRenderer(private val islandScreen: IslandScreen) : FrameUpdatable,
 
     //Render the hexagons
     for (hexagon in islandScreen.island.hexagons) {
-      val data: HexagonData = hexagon.getData(islandScreen.island)
+      val data: HexagonData = islandScreen.island.getData(hexagon)
       if (data.invisible) continue
       val brightness = HexagonData.BRIGHTNESS + if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f
       data.type.render(this, data.color, brightness, hexagon)

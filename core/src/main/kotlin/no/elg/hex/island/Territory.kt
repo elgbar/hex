@@ -23,7 +23,7 @@ data class Territory(val island: Island, val capital: Capital, val hexagons: Col
   val enemyBorderHexes: Collection<Hexagon<HexagonData>> by lazy {
     val enemyHexes = HashSet<Hexagon<HexagonData>>()
     for (hexagon in hexagons) {
-      enemyHexes.addAll(hexagon.getNeighbors(island).filter { it.getData(island).team != PLAYER_TEAM })
+      enemyHexes.addAll(island.getNeighbors(hexagon).filter { island.getData(it).team != PLAYER_TEAM })
     }
     return@lazy enemyHexes
   }
@@ -33,10 +33,10 @@ data class Territory(val island: Island, val capital: Capital, val hexagons: Col
   init {
     require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "Too few hexagons in territory must be at least $MIN_HEX_IN_TERRITORY" }
     var foundCapital = false
-    team = hexagons.first().getData(island).team
+    team = island.getData(hexagons.first()).team
     for (hexagon in hexagons) {
       for (it in hexagons) {
-        val data = it.getData(island)
+        val data = island.getData(it)
         if (data.piece === capital) foundCapital = true
         require(data.team == team) {
           "Found a hex that does not have the same team as the rest of the hexagons. " +

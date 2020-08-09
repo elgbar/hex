@@ -18,10 +18,10 @@ import kotlin.reflect.KClass
 /**
  * @return HexagonData of this hexagon
  */
-fun Hexagon<HexagonData>.getData(island: Island): HexagonData {
-  return satelliteData.orElseGet {
-    (if (isEdgeHexagon(this, island)) EDGE_DATA else HexagonData()).also {
-      this.setSatelliteData(it)
+fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
+  return hexagon.satelliteData.orElseGet {
+    (if (isEdgeHexagon(hexagon, this)) EDGE_DATA else HexagonData()).also {
+      hexagon.setSatelliteData(it)
     }
   }
 }
@@ -38,7 +38,7 @@ fun Hexagon<HexagonData>.getData(island: Island): HexagonData {
 fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
   return this.grid.getByPixelCoordinate(x, y).let {
     if (it.isEmpty()) return@let null
-    val data = it.get().getData(this)
+    val data = this.getData(it.get())
     if (data.edge || (!Hex.args.mapEditor && data.isOpaque)) null else it.get()
   }
 }
@@ -47,7 +47,7 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
  * @return All visible hexagons connected to the start hexagon of the same team
  */
 fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>> {
-  return connectedHexagons(hexagon, hexagon.getData(this).team, HashSet(), this)
+  return connectedHexagons(hexagon, this.getData(hexagon).team, HashSet(), this)
 }
 
 private fun connectedHexagons(
@@ -56,7 +56,7 @@ private fun connectedHexagons(
   visited: MutableSet<Hexagon<HexagonData>>,
   island: Island
 ): Set<Hexagon<HexagonData>> {
-  val data = center.getData(island)
+  val data = island.getData(center)
   //only check a hexagon if they have the same color and haven't been visited
   if (visited.contains(center) || data.team != team || data.invisible) {
     return visited
@@ -72,22 +72,23 @@ private fun connectedHexagons(
   return visited
 }
 
-fun Hexagon<HexagonData>.getNeighbors(island: Island, onlyVisible: Boolean = true) =
-  island.grid.getNeighborsOf(this).let {
+fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = true) =
+  grid.getNeighborsOf(hexagon).let {
     if (onlyVisible) {
-      it.filter { hex -> !hex.getData(island).invisible }
+      it.filter { hex -> !getData(hex).invisible }
     } else {
       it
     }
   }
 
-fun Hexagon<HexagonData>.treeType(island: Island): KClass<out TreePiece> {
-  val neighbors: Collection<Hexagon<HexagonData>> = getNeighbors(island, false)
-  return if (neighbors.any { it.getData(island).invisible }) PalmTree::class else PineTree::class
+fun Island.treeType(hexagon: Hexagon<HexagonData>): KClass<out TreePiece> {
+  val neighbors: Collection<Hexagon<HexagonData>> = getNeighbors(hexagon, false)
+  return if (neighbors.any { getData(it).invisible }) PalmTree::class else PineTree::class
 }
 
-fun Hexagon<HexagonData>.calculateStrength(island: Island): Int {
-  return getNeighbors(island).map { it.getData(island).piece.strength }.max()
+fun Island.calculateStrength(hexagon: Hexagon<HexagonData>): Int {
+  val team = getData(hexagon).team
+  return getNeighbors(hexagon).map { getData(it) }.filter { it.team == team }.map { it.piece.strength }.max()
     ?: error("No elements in list, not even this hexagon!")
 }
 
@@ -107,30 +108,30 @@ fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
   )
 
 
-fun Hexagon<HexagonData>.findHexagonsWithinRadius(island: Island, radius: Int, includeThis: Boolean = true): Set<Hexagon<HexagonData>> {
+fun Island.findHexagonsWithinRadius(hexagon: Hexagon<HexagonData>, radius: Int, includeThis: Boolean = true): Set<Hexagon<HexagonData>> {
   val result = HashSet<Hexagon<HexagonData>>()
   if (includeThis) {
-    result += this
+    result += hexagon
   }
   for (subRadius in 1..radius) {
-    result += calculateRing(island, subRadius)
+    result += this.calculateRing(hexagon, subRadius)
   }
   return result
 }
 
-fun Hexagon<HexagonData>.calculateRing(island: Island, radius: Int): Set<Hexagon<HexagonData>> {
+fun Island.calculateRing(hexagon: Hexagon<HexagonData>, radius: Int): Set<Hexagon<HexagonData>> {
   val result = HashSet<Hexagon<HexagonData>>()
 
   var currentCoordinate = CubeCoordinate.fromCoordinates(
-    gridX - radius,
-    gridZ + radius
+    hexagon.gridX - radius,
+    hexagon.gridZ + radius
   )
 
   for (i in 0 until 6) {
     for (j in 0 until radius) {
       currentCoordinate = getNeighborCoordinateByIndex(currentCoordinate, i)
-      val hexagon = island.grid.getByCubeCoordinate(currentCoordinate)
-      if (hexagon.isPresent && !hexagon.get().getData(island).edge) {
+      val hexagon = grid.getByCubeCoordinate(currentCoordinate)
+      if (hexagon.isPresent && !getData(hexagon.get()).edge) {
         result.add(hexagon.get())
       }
     }

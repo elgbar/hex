@@ -35,7 +35,7 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
     batch.begin()
 
     loop@ for (hexagon in islandScreen.island.hexagons) {
-      val data = hexagon.getData(islandScreen.island)
+      val data = islandScreen.island.getData(hexagon)
       if (data.invisible) continue
 
       val brightness = HexagonData.BRIGHTNESS + (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)

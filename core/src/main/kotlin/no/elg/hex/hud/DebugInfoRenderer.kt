@@ -21,13 +21,14 @@ class DebugInfoRenderer(private val islandScreen: IslandScreen) : FrameUpdatable
     val screenPos = "Screen pos (%4d,%4d)".format(Gdx.input.x, Gdx.input.y)
     val realPos = "Real pos (% 5.0f,% 5.0f)".format(basicInputHandler.mouseX, basicInputHandler.mouseY)
     val cursorHex = basicInputHandler.cursorHex
+    val cursorData = if (cursorHex != null) islandScreen.island.getData(cursorHex) else null
     drawAll(
       variableText("FPS: ", Gdx.graphics.framesPerSecond, 30, Int.MAX_VALUE, format = { "%4d".format(it) },
         next = variableText(" zoom: ", islandScreen.camera.zoom, MIN_ZOOM, MAX_ZOOM, format = { "%.2f".format(it) })),
       ScreenText("Island is ${islandScreen.island.grid.gridData.gridWidth} x ${islandScreen.island.grid.gridData.gridHeight} ${islandScreen.island.grid.gridData.gridLayout}"),
       ScreenText(screenPos),
       ScreenText(realPos),
-      ScreenText("Pointing at hex ", next = nullCheckedText(cursorHex?.getData(islandScreen.island), color = Color.YELLOW, format = {
+      ScreenText("Pointing at hex ", next = nullCheckedText(cursorData, color = Color.YELLOW, format = {
         "( %2d, % 2d) $it".format(cursorHex?.gridX, cursorHex?.gridZ)
       }))
     )

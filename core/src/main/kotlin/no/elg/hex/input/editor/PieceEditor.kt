@@ -28,13 +28,13 @@ sealed class PieceEditor(val islandScreen: IslandScreen) : Editor() {
       require(islandScreen.inputProcessor is MapEditorInputProcessor) {
         "Tried change editor while the input processor is not ${MapEditorInputProcessor::class.simpleName}"
       }
-      hexagon.getData(islandScreen.island).setPiece((islandScreen.inputProcessor as MapEditorInputProcessor).selectedPiece)
+      islandScreen.island.getData(hexagon).setPiece((islandScreen.inputProcessor as MapEditorInputProcessor).selectedPiece)
     }
   }
 
   class `Randomize piece`(islandScreen: IslandScreen) : PieceEditor(islandScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      hexagon.getData(islandScreen.island).setPiece(PIECES.random())
+      islandScreen.island.getData(hexagon).setPiece(PIECES.random())
     }
   }
 
