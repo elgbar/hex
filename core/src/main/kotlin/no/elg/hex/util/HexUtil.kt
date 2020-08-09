@@ -17,6 +17,7 @@ import no.elg.hex.island.Island.Companion.START_CAPITAL
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
+import kotlin.math.max
 import kotlin.reflect.KClass
 
 /**
@@ -76,6 +77,9 @@ private fun connectedHexagons(
   return visited
 }
 
+/**
+ * Get all neighbors of the given [hexagon], not including [hexagon]
+ */
 fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = true) =
   grid.getNeighborsOf(hexagon).let {
     if (onlyVisible) {
@@ -91,9 +95,11 @@ fun Island.treeType(hexagon: Hexagon<HexagonData>): KClass<out TreePiece> {
 }
 
 fun Island.calculateStrength(hexagon: Hexagon<HexagonData>): Int {
-  val team = getData(hexagon).team
-  return getNeighbors(hexagon).map { getData(it) }.filter { it.team == team }.map { it.piece.strength }.max()
-    ?: error("No elements in list, not even this hexagon!")
+  val data = getData(hexagon)
+  val team = data.team
+  val neighborStrength = getNeighbors(hexagon).map { getData(it) }.filter { it.team == team }.map { it.piece.strength }.max()
+    ?: 0
+  return max(data.piece.strength, neighborStrength)
 }
 
 fun Island.regenerateCapitals() {
