@@ -29,6 +29,9 @@ import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.reflect.KClass
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
@@ -46,16 +49,9 @@ import no.elg.hex.util.next
 import no.elg.hex.util.previous
 import no.elg.hex.util.regenerateCapitals
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.reflect.KClass
 
-/**
- * @author Elg
- */
-class MapEditorInputProcessor(
-  private val islandScreen: IslandScreen
-) : InputAdapter() {
+/** @author Elg */
+class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
 
   private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(islandScreen)
   private val teamEditors = TeamEditor.generateTeamEditors(islandScreen)
@@ -85,7 +81,6 @@ class MapEditorInputProcessor(
   var pieceEditor: PieceEditor = pieceEditors.last()
     private set
 
-
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
       val cursorHex = islandScreen.basicIslandInputProcessor.cursorHex ?: return true
@@ -111,33 +106,45 @@ class MapEditorInputProcessor(
   override fun keyDown(keycode: Int): Boolean {
     when (keycode) {
       F1 -> showHelp = !showHelp
-
       W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
       S, PAGE_DOWN, DOWN -> brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
-
-      Q -> selectedTeam = Team.values().let { if (isShiftPressed()) it.previous(selectedTeam) else it.next(selectedTeam) }
-      A -> selectedPiece = PIECES.let { if (isShiftPressed()) it.previous(selectedPiece) else it.next(selectedPiece) }
-
+      Q ->
+          selectedTeam =
+              Team.values().let {
+                if (isShiftPressed()) it.previous(selectedTeam) else it.next(selectedTeam)
+              }
+      A ->
+          selectedPiece =
+              PIECES.let {
+                if (isShiftPressed()) it.previous(selectedPiece) else it.next(selectedPiece)
+              }
       NUM_1, NUMPAD_1 ->
-        opaquenessEditor = opaquenessEditors.let { if (isShiftPressed()) it.previous(opaquenessEditor) else it.next(opaquenessEditor) }
+          opaquenessEditor =
+              opaquenessEditors.let {
+                if (isShiftPressed()) it.previous(opaquenessEditor) else it.next(opaquenessEditor)
+              }
       NUM_2, NUMPAD_2 ->
-        teamEditor = teamEditors.let { if (isShiftPressed()) it.previous(teamEditor) else it.next(teamEditor) }
+          teamEditor =
+              teamEditors.let {
+                if (isShiftPressed()) it.previous(teamEditor) else it.next(teamEditor)
+              }
       NUM_3, NUMPAD_3 ->
-        pieceEditor = pieceEditors.let { if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor) }
-
+          pieceEditor =
+              pieceEditors.let {
+                if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor)
+              }
       F5 -> {
         quicksave()
         publishMessage("Quicksaved")
       }
       F9 -> quickload()
-
       O -> if (isControlPressed()) islandScreen.saveIsland() else return false
-      R -> if (isControlPressed()) {
-        LevelSelectScreen.play(islandScreen.id)
-        publishMessage("Successfully reloaded island ${islandScreen.id}")
-      } else return false
+      R ->
+          if (isControlPressed()) {
+            LevelSelectScreen.play(islandScreen.id)
+            publishMessage("Successfully reloaded island ${islandScreen.id}")
+          } else return false
       C -> if (isControlPressed()) islandScreen.island.regenerateCapitals() else return false
-
       else -> return false
     }
     return true
@@ -155,10 +162,10 @@ class MapEditorInputProcessor(
     LevelSelectScreen.play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))
   }
 
-
-  private fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
-  private fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
-
+  private fun isShiftPressed(): Boolean =
+      Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
+  private fun isControlPressed(): Boolean =
+      Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
 
   companion object {
     const val MAX_BRUSH_SIZE = 10

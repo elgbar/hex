@@ -5,9 +5,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.util.getTerritories
 
-/**
- * @author Elg
- */
+/** @author Elg */
 interface AI {
 
   fun action(territory: Territory)

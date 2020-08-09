@@ -5,9 +5,7 @@ import no.elg.hex.Hex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-/**
- * @author Elg
- */
+/** @author Elg */
 internal class HexagonDataTest {
   @Test
   internal fun `Can serialize hexagon data with capital piece`() {

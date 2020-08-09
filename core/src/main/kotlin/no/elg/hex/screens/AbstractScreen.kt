@@ -4,14 +4,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 
-/**
- * @author Elg
- */
+/** @author Elg */
 abstract class AbstractScreen : ScreenAdapter() {
 
-
   val camera: OrthographicCamera by lazy {
-    OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).also { it.setToOrtho(true) }
+    OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).also {
+      it.setToOrtho(true)
+    }
   }
 
   abstract override fun render(delta: Float)

@@ -1,9 +1,6 @@
 package no.elg.hex.util
 
-/**
- * @author Elg
- */
-
+/** @author Elg */
 fun <E> List<E>.next(current: E): E {
   val nextIndex = (this.indexOf(current) + 1) % this.size
   return this[nextIndex]

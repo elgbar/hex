@@ -20,11 +20,8 @@ import no.elg.hex.hexagon.Spearman
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 
-/**
- * @author Elg
- */
+/** @author Elg */
 class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, Disposable {
-
 
   private val batch: SpriteBatch = SpriteBatch()
 
@@ -37,36 +34,41 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
       val data = islandScreen.island.getData(hexagon)
       if (data.invisible) continue
 
-      val brightness = HexagonData.BRIGHTNESS + (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)
+      val brightness =
+          HexagonData.BRIGHTNESS +
+              (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)
 
       batch.setColor(brightness, brightness, brightness, 1f)
 
       val piece = data.piece
-      val drawable = when (piece) {
-        is Capital -> {
-          if (data.team != islandScreen.island.currentTeam || piece.balance < 10) {
-            Hex.assets.capital
-          } else {
-            piece.elapsedAnimationTime += Gdx.graphics.deltaTime
-            Hex.assets.capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
-          }
-        }
-        is PalmTree -> Hex.assets.palm
-        is PineTree -> Hex.assets.pine
-        is Castle -> Hex.assets.castle
-        is Grave -> Hex.assets.grave
-        is LivingPiece -> {
-
-          val time = if (data.team == islandScreen.island.currentTeam) piece.updateAnimationTime() else 0f
+      val drawable =
           when (piece) {
-            is Peasant -> Hex.assets.peasant
-            is Spearman -> Hex.assets.spearman
-            is Knight -> Hex.assets.knight
-            is Baron -> Hex.assets.baron
-          }.getKeyFrame(time)
-        }
-        is Empty -> continue@loop
-      }
+            is Capital -> {
+              if (data.team != islandScreen.island.currentTeam || piece.balance < 10) {
+                Hex.assets.capital
+              } else {
+                piece.elapsedAnimationTime += Gdx.graphics.deltaTime
+                Hex.assets.capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
+              }
+            }
+            is PalmTree -> Hex.assets.palm
+            is PineTree -> Hex.assets.pine
+            is Castle -> Hex.assets.castle
+            is Grave -> Hex.assets.grave
+            is LivingPiece -> {
+
+              val time =
+                  if (data.team == islandScreen.island.currentTeam) piece.updateAnimationTime()
+                  else 0f
+              when (piece) {
+                is Peasant -> Hex.assets.peasant
+                is Spearman -> Hex.assets.spearman
+                is Knight -> Hex.assets.knight
+                is Baron -> Hex.assets.baron
+              }.getKeyFrame(time)
+            }
+            is Empty -> continue@loop
+          }
 
       val ratio = drawable.packedWidth.toFloat() / drawable.packedHeight.toFloat()
 
@@ -74,14 +76,13 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
       val height = boundingBox.height.toFloat()
       val width = boundingBox.width.toFloat()
 
-      //"+ width * (1f - ratio) / 2f" because we need to compensate for the removed width
+      // "+ width * (1f - ratio) / 2f" because we need to compensate for the removed width
       batch.draw(
-        drawable,
-        boundingBox.x.toFloat() + width * (1f - ratio) / 2f,
-        boundingBox.y.toFloat(),
-        width * ratio,
-        height
-      )
+          drawable,
+          boundingBox.x.toFloat() + width * (1f - ratio) / 2f,
+          boundingBox.y.toFloat(),
+          width * ratio,
+          height)
     }
 
     batch.end()
@@ -90,5 +91,4 @@ class SpriteRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, D
   override fun dispose() {
     batch.dispose()
   }
-
 }

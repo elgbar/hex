@@ -7,8 +7,6 @@ package no.elg.hex.api
  */
 interface FrameUpdatable {
 
-  /**
-   * Method to be called each frame
-   */
+  /** Method to be called each frame */
   fun frameUpdate()
 }

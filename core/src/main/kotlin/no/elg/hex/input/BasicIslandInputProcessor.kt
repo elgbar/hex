@@ -5,13 +5,13 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
+import kotlin.math.abs
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.math.abs
 
 /**
  * Handles input event related to the camera and other basic functiuons such as what
@@ -37,11 +37,11 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
   private var draggable = false
   private var lastMouseFrame: Long = -1
 
-  val cursorHex: Hexagon<HexagonData>? get() = islandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
+  val cursorHex: Hexagon<HexagonData>?
+    get() = islandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   /**
-   * Update the world mouse position.
-   * Will only update if the frame has changed since last called
+   * Update the world mouse position. Will only update if the frame has changed since last called
    */
   private fun updateMouse() {
     if (lastMouseFrame == Gdx.graphics.frameId) return
@@ -59,7 +59,7 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
       val x: Float = Gdx.input.deltaX * zoom
       val y: Float = Gdx.input.deltaY * zoom
 
-      //Make the little movements when clicking fast less noticeable
+      // Make the little movements when clicking fast less noticeable
       if (abs(x) < MIN_MOVE_AMOUNT * zoom && abs(y) < MIN_MOVE_AMOUNT * zoom) {
         return false
       }
@@ -95,7 +95,8 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
   }
 
   override fun scrolled(amount: Int): Boolean {
-    islandScreen.camera.zoom = (amount * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    islandScreen.camera.zoom =
+        (amount * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 

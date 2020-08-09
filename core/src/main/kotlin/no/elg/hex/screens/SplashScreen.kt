@@ -9,9 +9,7 @@ import com.badlogic.gdx.utils.Align
 import no.elg.hex.Assets
 import no.elg.hex.Hex
 
-/**
- * @author Elg
- */
+/** @author Elg */
 object SplashScreen : AbstractScreen() {
 
   private val startTime: Long = System.currentTimeMillis()
@@ -19,7 +17,6 @@ object SplashScreen : AbstractScreen() {
   private val font: BitmapFont by lazy { Hex.assets.get<BitmapFont>(Assets.REGULAR_FONT) }
   private val layout by lazy { GlyphLayout(font, "") }
   private val batch: SpriteBatch by lazy { SpriteBatch() }
-
 
   override fun render(delta: Float) {
 
@@ -30,11 +27,12 @@ object SplashScreen : AbstractScreen() {
       camera.update()
       batch.begin()
 
-      val txt = "LOADING %2.0f%% %n%n${System.currentTimeMillis() - startTime} ms".format(Hex.assets.progress * 100)
+      val txt =
+          "LOADING %2.0f%% %n%n${System.currentTimeMillis() - startTime} ms".format(
+              Hex.assets.progress * 100)
       layout.setText(font, txt, Color.WHITE, Gdx.graphics.width.toFloat(), Align.center, true)
       font.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
       batch.end()
     }
   }
 }
-

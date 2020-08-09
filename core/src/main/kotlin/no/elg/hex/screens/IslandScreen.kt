@@ -19,14 +19,9 @@ import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.LevelSelectScreen.getIslandFileName
 
-/**
- * @author Elg
- */
-class IslandScreen(
-  val id: Int,
-  val island: Island,
-  private val renderHud: Boolean = true
-) : AbstractScreen() {
+/** @author Elg */
+class IslandScreen(val id: Int, val island: Island, private val renderHud: Boolean = true) :
+    AbstractScreen() {
 
   val inputProcessor: InputProcessor by lazy {
     if (Hex.args.mapEditor) {
@@ -44,13 +39,14 @@ class IslandScreen(
     }
   }
 
-  val basicIslandInputProcessor: BasicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
+  val basicIslandInputProcessor: BasicIslandInputProcessor by lazy {
+    BasicIslandInputProcessor(this)
+  }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
 
   private val verticesRenderer = VerticesRenderer(this)
   private val outlineRenderer = OutlineRenderer(this)
   private val spriteRenderer = SpriteRenderer(this)
-
 
   override fun render(delta: Float) {
     camera.update()
@@ -67,7 +63,6 @@ class IslandScreen(
     }
   }
 
-
   fun saveIsland(): Boolean {
     val file = Gdx.files.local(getIslandFileName(id))
 
@@ -77,7 +72,10 @@ class IslandScreen(
     }
 
     if (file.isDirectory) {
-      publishMessage(ScreenText("Failed to save island the name '${file.name()}' as the resulting file will be a directory.", color = Color.RED))
+      publishMessage(
+          ScreenText(
+              "Failed to save island the name '${file.name()}' as the resulting file will be a directory.",
+              color = Color.RED))
       return false
     }
     return try {
@@ -90,7 +88,6 @@ class IslandScreen(
       false
     }
   }
-
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)

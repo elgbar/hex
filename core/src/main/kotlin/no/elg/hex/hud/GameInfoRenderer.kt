@@ -20,58 +20,59 @@ import no.elg.hex.hud.ScreenRenderer.batch
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.screens.IslandScreen
 
-/**
- * @author Elg
- */
-class GameInfoRenderer(private val islandScreen: IslandScreen, gameInputProcessor: GameInputProcessor) : FrameUpdatable {
-
+/** @author Elg */
+class GameInfoRenderer(
+    private val islandScreen: IslandScreen, gameInputProcessor: GameInputProcessor
+) : FrameUpdatable {
 
   override fun frameUpdate() {
     islandScreen.island.selected?.also { selected ->
       ScreenRenderer.drawAll(
-        ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) }),
-        ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),
-        ScreenText("Holding: ", next = nullCheckedText(islandScreen.island.inHand)),
-        position = TOP_RIGHT)
+          ScreenText(
+              "Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) }),
+          ScreenText(
+              "Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),
+          ScreenText("Holding: ", next = nullCheckedText(islandScreen.island.inHand)),
+          position = TOP_RIGHT)
     }
 
-    if (islandScreen.inputProcessor is GameInputProcessor && (islandScreen.inputProcessor as GameInputProcessor).infiniteMoney) {
+    if (islandScreen.inputProcessor is GameInputProcessor &&
+        (islandScreen.inputProcessor as GameInputProcessor).infiniteMoney) {
       ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM)
     }
 
     islandScreen.island.inHand?.also { (_, piece) ->
       batch.begin()
-      val region = when (piece) {
-        is Capital -> Hex.assets.capital
-        is PalmTree -> Hex.assets.palm
-        is PineTree -> Hex.assets.pine
-        is Castle -> Hex.assets.castle
-        is Grave -> Hex.assets.grave
-        is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
-        is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
-        is Knight -> Hex.assets.knight.getKeyFrame(0f)
-        is Baron -> Hex.assets.baron.getKeyFrame(0f)
-        is Empty -> return@also
-      }
+      val region =
+          when (piece) {
+            is Capital -> Hex.assets.capital
+            is PalmTree -> Hex.assets.palm
+            is PineTree -> Hex.assets.pine
+            is Castle -> Hex.assets.castle
+            is Grave -> Hex.assets.grave
+            is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
+            is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
+            is Knight -> Hex.assets.knight.getKeyFrame(0f)
+            is Baron -> Hex.assets.baron.getKeyFrame(0f)
+            is Empty -> return@also
+          }
 
       region.flip(false, true)
 
       batch.draw(
-        region,
-        Gdx.graphics.width / 2f,
-        Gdx.graphics.height - region.packedHeight * 2.5f,
-        0f,
-        0f,
-        region.packedWidth.toFloat(),
-        region.packedHeight.toFloat(),
-        2f,
-        2f,
-        0f
-      )
+          region,
+          Gdx.graphics.width / 2f,
+          Gdx.graphics.height - region.packedHeight * 2.5f,
+          0f,
+          0f,
+          region.packedWidth.toFloat(),
+          region.packedHeight.toFloat(),
+          2f,
+          2f,
+          0f)
 
       region.flip(false, true)
       batch.end()
-
     }
   }
 

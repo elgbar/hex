@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.draw
 
-/**
- * @author Elg
- */
+/** @author Elg */
 object MessagesRenderer : FrameUpdatable {
 
   const val DURATION_SECONDS = 10f
@@ -31,14 +29,12 @@ object MessagesRenderer : FrameUpdatable {
     for ((index, pair) in messages.withIndex()) {
       val (message, timeLeft) = pair
 
-
       if (timeLeft < FADE_START) {
-        val alpha = timeLeft / FADE_START
-        message.copy(color = message.color.cpy().also { it.a = alpha })
-      } else {
-        message
-      }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
-
+            val alpha = timeLeft / FADE_START
+            message.copy(color = message.color.cpy().also { it.a = alpha })
+          } else {
+            message
+          }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
 
       val newTime = timeLeft - Gdx.graphics.rawDeltaTime
       if (newTime > 0f) {

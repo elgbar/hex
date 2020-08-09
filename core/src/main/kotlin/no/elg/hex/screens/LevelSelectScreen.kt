@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.Array as GdxArray
 import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
 import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
@@ -19,11 +20,8 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import com.badlogic.gdx.utils.Array as GdxArray
 
-/**
- * @author Elg
- */
+/** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
 
   private const val FRAME_BUFFER_SIZE = 1024
@@ -40,11 +38,13 @@ object LevelSelectScreen : AbstractScreen() {
 
   private val unprojectVector = Vector3()
 
-  val previews get() = islandPreviews.size
+  val previews
+    get() = islandPreviews.size
 
-  val mouseX get() = unprojectVector.x
-  val mouseY get() = unprojectVector.y
-
+  val mouseX
+    get() = unprojectVector.x
+  val mouseY
+    get() = unprojectVector.y
 
   fun renderPreviews() {
     for (buffer in islandPreviews) {
@@ -71,7 +71,6 @@ object LevelSelectScreen : AbstractScreen() {
         buffer.end()
         islandPreviews.add(buffer)
         islandScreen.dispose()
-
       } else {
         break
       }
@@ -98,11 +97,7 @@ object LevelSelectScreen : AbstractScreen() {
     val size: Float = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
 
     return Rectangle(
-      padding + (padding + size) * gridX,
-      padding + (padding + size) * gridY,
-      size,
-      size
-    )
+        padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size)
   }
 
   override fun render(delta: Float) {
@@ -122,7 +117,9 @@ object LevelSelectScreen : AbstractScreen() {
       val (x, y, width, height) = rect(i)
       batch.draw(preview.colorBufferTexture, x, y, width, height)
 
-      lineRenderer.color = (if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR)
+      lineRenderer.color =
+          (if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR
+          else NOT_SELECTED_COLOR)
       lineRenderer.rect(x, y, width, height)
     }
     batch.end()
@@ -149,5 +146,4 @@ object LevelSelectScreen : AbstractScreen() {
     super.resize(width, height)
     renderPreviews()
   }
-
 }

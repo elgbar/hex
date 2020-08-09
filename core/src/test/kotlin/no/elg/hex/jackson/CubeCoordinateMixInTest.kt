@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-/**
- * @author Elg
- */
+/** @author Elg */
 class CubeCoordinateMixInTest {
 
   @Test
@@ -38,5 +36,4 @@ class CubeCoordinateMixInTest {
     val json = Hex.mapper.writeValueAsString(map)
     assertEquals(map, Hex.mapper.readValue<Map<CubeCoordinate, Int>>(json))
   }
-
 }

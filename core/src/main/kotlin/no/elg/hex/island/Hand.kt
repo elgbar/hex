@@ -20,4 +20,3 @@ data class Hand(val territory: Territory, val piece: Piece) {
     return "team: $territory, piece: ${piece::class.simpleName}"
   }
 }
-

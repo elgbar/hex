@@ -7,9 +7,7 @@ import no.elg.hex.hexagon.HexType.HALF
 import no.elg.hex.hexagon.HexType.HOURGLASS
 import no.elg.hex.hexagon.HexType.TRIANGULAR
 
-/**
- * @author Elg
- */
+/** @author Elg */
 enum class Team(val color: Color, val type: HexType) {
   SUN(Color.valueOf("#FFE049"), DIAMOND),
   LEAF(Color.valueOf("#67CE6E"), HOURGLASS),

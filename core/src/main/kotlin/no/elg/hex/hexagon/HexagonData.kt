@@ -9,29 +9,27 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
+import kotlin.reflect.KClass
+import kotlin.reflect.full.primaryConstructor
 import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
-import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
 
 @JsonInclude(NON_DEFAULT)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
 data class HexagonData(
-  /**
-   * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works these hexagon would be
-   * returned even when the mouse is not inside the hexagon In order to prevent that and gain pixel perfect hexagon
-   * accuracy the player should not know these exists.
-   *
-   * @see no.elg.hex.util.getHexagon
-   * @see no.elg.hex.hexagon.renderer.OutlineRenderer
-   * @see no.elg.hex.hexagon.renderer.VerticesRenderer
-   */
-  val edge: Boolean = false,
-
-  override var isOpaque: Boolean = edge,
-
-  override var isPassable: Boolean = !edge
+    /**
+     * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works
+     * these hexagon would be returned even when the mouse is not inside the hexagon In order to
+     * prevent that and gain pixel perfect hexagon accuracy the player should not know these exists.
+     *
+     * @see no.elg.hex.util.getHexagon
+     * @see no.elg.hex.hexagon.renderer.OutlineRenderer
+     * @see no.elg.hex.hexagon.renderer.VerticesRenderer
+     */
+    val edge: Boolean = false,
+    override var isOpaque: Boolean = edge,
+    override var isPassable: Boolean = !edge
 ) : DefaultSatelliteData() {
 
   @JsonInclude(ALWAYS)
@@ -42,21 +40,26 @@ data class HexagonData(
     private set
 
   /**
-   * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type [pieceType].
+   * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type
+   * [pieceType].
    */
   @JsonSetter("pieceType")
   fun setPiece(pieceType: KClass<out Piece>): Boolean {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
 
-    val pieceToPlace = if (pieceType.objectInstance != null) {
-      pieceType.objectInstance
-    } else {
-      pieceType.primaryConstructor?.call(this)
-    } ?: error("No constructor found with a single ${Team::class.simpleName} argument")
+    val pieceToPlace =
+        if (pieceType.objectInstance != null) {
+          pieceType.objectInstance
+        } else {
+          pieceType.primaryConstructor?.call(this)
+        }
+            ?: error("No constructor found with a single ${Team::class.simpleName} argument")
 
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace
-      require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) { "Piece's data does not point to this!" }
+      require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) {
+        "Piece's data does not point to this!"
+      }
       return true
     }
     return false
@@ -73,7 +76,6 @@ data class HexagonData(
   @get:JsonIgnore
   val invisible: Boolean
     get() = edge || isOpaque
-
 
   ///////////////////
   // serialization //
@@ -93,15 +95,16 @@ data class HexagonData(
 
   companion object {
 
-    //Can move to
+    // Can move to
     const val BRIGHTNESS = 0.9f
 
-    //mouse hovering over, add this to the current hex under the mouse
+    // mouse hovering over, add this to the current hex under the mouse
     const val SELECTED = 0.1f
 
     private const val EXPECTED_NEIGHBORS = 6
 
-    fun isEdgeHexagon(hex: Hexagon<HexagonData>, island: Island) = island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
+    fun isEdgeHexagon(hex: Hexagon<HexagonData>, island: Island) =
+        island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
 
     val EDGE_DATA = HexagonData(edge = true)
   }

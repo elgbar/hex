@@ -3,9 +3,7 @@ package no.elg.hex.util
 import com.badlogic.gdx.graphics.Color
 import kotlin.random.Random
 
-/**
- * @author Elg
- */
+/** @author Elg */
 
 /**
  * Inverse the color.
@@ -25,9 +23,11 @@ fun Color.dim(percent: Float): Color {
   return this.apply { mul(r * percent, g * percent, b * percent, 1f) }
 }
 
-/**
- * Create a random color
- */
+/** Create a random color */
 fun randomColor(randomizeAlpha: Boolean = false): Color {
-  return Color(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), if (randomizeAlpha) Random.nextFloat() else 1f)
+  return Color(
+      Random.nextFloat(),
+      Random.nextFloat(),
+      Random.nextFloat(),
+      if (randomizeAlpha) Random.nextFloat() else 1f)
 }

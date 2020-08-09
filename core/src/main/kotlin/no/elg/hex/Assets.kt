@@ -19,10 +19,7 @@ import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
 import no.elg.hex.screens.LevelSelectScreen
 
-
-/**
- * @author Elg
- */
+/** @author Elg */
 class Assets : AssetManager() {
 
   var finishMainConst: Boolean = false
@@ -59,16 +56,20 @@ class Assets : AssetManager() {
   val originalSprites: TextureAtlas by lazy { get<TextureAtlas>(ORIGINAL_SPRITES_ATLAS) }
 
   private fun findSprite(regionName: String): AtlasRegion {
-    val region = if (Hex.args.retro) {
-      Hex.assets.originalSprites.findRegion(regionName)
-    } else {
-      Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
-    }
+    val region =
+        if (Hex.args.retro) {
+          Hex.assets.originalSprites.findRegion(regionName)
+        } else {
+          Hex.assets.sprites.findRegion(regionName)
+              ?: Hex.assets.originalSprites.findRegion(regionName)
+        }
     region.flip(false, true)
     return region
   }
 
-  private fun findAnimation(regionPrefix: String, totalFrames: Int, frameDuration: Float): Animation<AtlasRegion> {
+  private fun findAnimation(
+      regionPrefix: String, totalFrames: Int, frameDuration: Float
+  ): Animation<AtlasRegion> {
     val array = Array<AtlasRegion>()
     for (frame in 0 until totalFrames) {
       array.add(findSprite(regionPrefix + frame))
@@ -87,7 +88,6 @@ class Assets : AssetManager() {
   val spearman by lazy { findAnimation("man1", 5, 1 / 15f) }
   val knight by lazy { findAnimation("man2", 5, 1 / 17f) }
   val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
-
 
   init {
     super.setErrorListener { _, throwable -> throwable.printStackTrace() }
@@ -109,14 +109,14 @@ class Assets : AssetManager() {
 
     font(bold = false, italic = false)
 
-    //essential assets for the loading splash screen
+    // essential assets for the loading splash screen
 
     // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
     finishLoading()
 
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
 
-    //rest of the fonts
+    // rest of the fonts
     font(bold = false, italic = true)
     font(bold = true, italic = false)
     font(bold = true, italic = true)
@@ -138,5 +138,4 @@ class Assets : AssetManager() {
   fun finishMain() {
     finishMainConst = true
   }
-
 }

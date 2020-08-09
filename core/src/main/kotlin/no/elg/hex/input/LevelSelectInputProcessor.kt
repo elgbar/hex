@@ -3,6 +3,7 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.InputAdapter
+import java.lang.Float.max
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.LevelSelectScreen.mouseX
 import no.elg.hex.screens.LevelSelectScreen.mouseY
@@ -11,11 +12,8 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import java.lang.Float.max
 
-/**
- * @author Elg
- */
+/** @author Elg */
 object LevelSelectInputProcessor : InputAdapter() {
 
   private const val SCROLL_SPEED = 40f
@@ -41,7 +39,8 @@ object LevelSelectInputProcessor : InputAdapter() {
     val oldY = LevelSelectScreen.camera.position.y
     val min = screenHeight / 2
 
-    LevelSelectScreen.camera.position.y = (oldY + amount * SCROLL_SPEED).coerceIn(min..max(min, y + height - screenHeight))
+    LevelSelectScreen.camera.position.y =
+        (oldY + amount * SCROLL_SPEED).coerceIn(min..max(min, y + height - screenHeight))
     return true
   }
 }

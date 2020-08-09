@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-/**
- * @author Elg
- */
+/** @author Elg */
 class OpaquenessEditorTest {
 
   init {
@@ -56,5 +54,4 @@ class OpaquenessEditorTest {
     OpaquenessEditor.`Toggle opaqueness`.edit(hex)
     assertFalse(data.isOpaque)
   }
-
 }

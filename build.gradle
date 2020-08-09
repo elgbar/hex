@@ -23,12 +23,14 @@ buildscript {
   }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:5.1.1"
   }
 }
 
-allprojects {
+subprojects {
   apply plugin: "kotlin"
   apply plugin: "idea"
+  apply plugin: "com.diffplug.spotless"
 
   version = '1.0'
 
@@ -48,6 +50,26 @@ allprojects {
   test {
     useJUnitPlatform()
   }
+
+  spotless {
+    kotlin {
+      ktfmt("0.15")
+    }
+    groovyGradle {
+      target '*.gradle' // default target of groovyGradle
+      greclipse()
+    }
+    format 'misc', {
+      // define the files to apply `misc` to
+      target '*.md', '.gitignore'
+
+      // define the steps to apply to those files
+      trimTrailingWhitespace()
+      indentWithSpaces(2)
+      endWithNewline()
+    }
+  }
+  assemble.dependsOn(spotlessApply)
 }
 
 tasks.named('wrapper') {

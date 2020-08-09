@@ -22,8 +22,8 @@ fun main(args: Array<String>) {
 
   config.backgroundFPS = 10
   config.foregroundFPS = 9999
-  config.vSyncEnabled = false //Why not? it's not like this is a competitive FPS
-  config.samples = 16 //max out the samples as this isn't a very heavy game.
+  config.vSyncEnabled = false // Why not? it's not like this is a competitive FPS
+  config.samples = 16 // max out the samples as this isn't a very heavy game.
   config.useHDPI = true
   config.addIcon("icons/icon32.png", Internal)
   config.addIcon("icons/icon128.png", Internal)
