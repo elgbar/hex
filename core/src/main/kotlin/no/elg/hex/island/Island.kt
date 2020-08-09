@@ -216,10 +216,11 @@ class Island(
     val hexTeam = this.getData(hexagons.first()).team
     require(hexagons.all { this.getData(it).team == hexTeam }) { "All hexagons given must be on the same team" }
 
-    //TODO make sure to take into account if there are already any pieces there
-//    hexagons.map { it.getData(this).piece.capitalPlacement to }
+    //Capitals should be prefer a worse location in favor of overwriting another piece
+    val maxPlacementPreference = hexagons.map { getData(it).piece.capitalPlacement }.min()!!
+    val feasibleHexagons = hexagons.filter { getData(it).piece.capitalPlacement <= maxPlacementPreference }
 
-    val contenders = HashSet<Hexagon<HexagonData>>(hexagons.size)
+    val contenders = HashSet<Hexagon<HexagonData>>(feasibleHexagons.size)
 
     //The maximum distance between two hexagons for this grid
     val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
