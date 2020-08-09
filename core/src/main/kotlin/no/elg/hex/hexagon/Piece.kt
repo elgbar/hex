@@ -168,7 +168,7 @@ sealed class StationaryPiece(final override val data: HexagonData) : Piece() {
   }
 
   override fun toString(): String {
-    return super.toString() + ": placed? $placed"
+    return "${this::class.simpleName}(placed? $placed)"
   }
 }
 
@@ -178,6 +178,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
   var balance: Int = 0
   override val cost: Int = 1
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Piece::class)
+  override val strength = PEASANT_STRENGTH
 
   /** Transfer everything to the given capital */
   fun transfer(to: Capital) {
@@ -218,7 +219,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
       hexagons.sumBy { island.getData(it).piece.cost }
 
-  override val strength = PEASANT_STRENGTH
+  override fun toString(): String = "${this::class.simpleName}(balance: $balance)"
 }
 
 class Castle(data: HexagonData) : StationaryPiece(data) {
@@ -231,17 +232,19 @@ class Grave(data: HexagonData) : StationaryPiece(data) {
   override val strength = NO_STRENGTH
   override val cost: Int = 1
 
-  private var timeToTree = 1f
+  private var roundsToTree: Byte = 1
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    if (timeToTree > 0) {
-      timeToTree--
+    if (roundsToTree > 0) {
+      roundsToTree--
       return
     }
     island.getData(pieceHex).setPiece(island.treeType(pieceHex))
   }
+
+  override fun toString(): String = "${this::class.simpleName}(timeToTree: $roundsToTree)"
 }
 
 //////////
@@ -358,9 +361,7 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
     return elapsedAnimationTime
   }
 
-  override fun toString(): String {
-    return super.toString() + ": moved? $moved"
-  }
+  override fun toString(): String = "${this::class.simpleName}(moved? $moved)"
 }
 
 class Peasant(data: HexagonData) : LivingPiece(data) {
