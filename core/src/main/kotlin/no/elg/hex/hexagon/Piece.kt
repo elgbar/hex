@@ -286,12 +286,12 @@ class PineTree(data: HexagonData) : TreePiece(data) {
       }
       if (otherPines.isNotEmpty()) {
         //Grow a tree between this pine and another pine
-        val otherPine = island.getData(otherPines.random()).piece as PineTree
+        val otherPine = island.getData(otherPines.random()).piece as TreePiece
         val loopData = island.getData(hexagon)
         if (loopData.setPiece(PineTree::class)) {
           hasGrown = true
           otherPine.hasGrown = true
-          (loopData.piece as PineTree).hasGrown = true
+          (loopData.piece as TreePiece).hasGrown = true
           break
         }
       }
@@ -312,7 +312,7 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
     val randomNeighborData = island.getData(hex)
 
     if (randomNeighborData.setPiece(PalmTree::class)) {
-      (randomNeighborData.piece as PineTree).hasGrown = true
+      (randomNeighborData.piece as TreePiece).hasGrown = true
       hasGrown = true
     }
   }
