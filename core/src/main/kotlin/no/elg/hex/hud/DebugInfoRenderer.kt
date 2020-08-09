@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.drawAll
-import no.elg.hex.input.BasicInputProcessor.Companion.MAX_ZOOM
-import no.elg.hex.input.BasicInputProcessor.Companion.MIN_ZOOM
+import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
+import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.getData
 
@@ -16,7 +16,7 @@ class DebugInfoRenderer(private val islandScreen: IslandScreen) : FrameUpdatable
 
   override fun frameUpdate() {
 
-    val basicInputHandler = islandScreen.basicInputProcessor
+    val basicInputHandler = islandScreen.basicIslandInputProcessor
 
     val screenPos = "Screen pos (%4d,%4d)".format(Gdx.input.x, Gdx.input.y)
     val realPos = "Real pos (% 5.0f,% 5.0f)".format(basicInputHandler.mouseX, basicInputHandler.mouseY)

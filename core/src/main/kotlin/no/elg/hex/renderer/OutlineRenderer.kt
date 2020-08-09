@@ -23,7 +23,7 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
     lineRenderer.begin(Filled)
     lineRenderer.projectionMatrix = islandScreen.camera.combined
 
-    val currHex = islandScreen.basicInputProcessor.cursorHex
+    val currHex = islandScreen.basicIslandInputProcessor.cursorHex
 
     fun draw(
       hexes: Iterable<Hexagon<HexagonData>>,

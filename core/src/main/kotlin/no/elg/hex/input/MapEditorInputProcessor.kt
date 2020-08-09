@@ -88,7 +88,7 @@ class MapEditorInputProcessor(
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
-      val cursorHex = islandScreen.basicInputProcessor.cursorHex ?: return true
+      val cursorHex = islandScreen.basicIslandInputProcessor.cursorHex ?: return true
 
       fun editHex(hexagon: Hexagon<HexagonData>) {
         opaquenessEditor.edit(hexagon)

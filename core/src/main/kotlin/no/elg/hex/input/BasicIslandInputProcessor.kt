@@ -18,7 +18,7 @@ import kotlin.math.abs
  *
  * @author Elg
  */
-class BasicInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
+class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
 
   var mouseX: Float = 0f
     private set

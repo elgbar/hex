@@ -10,7 +10,7 @@ import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.ScreenText
-import no.elg.hex.input.BasicInputProcessor
+import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.island.Island
@@ -44,7 +44,7 @@ class IslandScreen(
     }
   }
 
-  val basicInputProcessor: BasicInputProcessor by lazy { BasicInputProcessor(this) }
+  val basicIslandInputProcessor: BasicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
 
   private val verticesRenderer = VerticesRenderer(this)
@@ -52,7 +52,7 @@ class IslandScreen(
   private val spriteRenderer = SpriteRenderer(this)
 
   override fun show() {
-    Hex.inputMultiplexer.addProcessor(basicInputProcessor)
+    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.addProcessor(inputProcessor)
   }
 
@@ -97,7 +97,7 @@ class IslandScreen(
 
   override fun dispose() {
     super.dispose()
-    Hex.inputMultiplexer.removeProcessor(basicInputProcessor)
+    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
   }
 

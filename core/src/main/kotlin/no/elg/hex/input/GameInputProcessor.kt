@@ -36,7 +36,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     with(islandScreen) {
       when (button) {
         Buttons.LEFT -> {
-          val cursorHex = basicInputProcessor.cursorHex ?: return false
+          val cursorHex = basicIslandInputProcessor.cursorHex ?: return false
           val cursorHexData = island.getData(cursorHex)
           val territory = island.selected
 
