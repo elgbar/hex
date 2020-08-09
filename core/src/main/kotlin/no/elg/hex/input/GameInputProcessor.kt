@@ -33,20 +33,20 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
   var infiniteMoney = Hex.args.cheating
 
-  fun pickUp(island: Island, cursorHexData: HexagonData, territory: Territory) {
-    val cursorPiece = cursorHexData.piece
+  private fun pickUp(island: Island, hexData: HexagonData, territory: Territory) {
+    val cursorPiece = hexData.piece
     if (cursorPiece.movable &&
         cursorPiece is LivingPiece &&
         !cursorPiece.moved &&
-        cursorHexData.team == island.currentTeam) {
+        hexData.team == island.currentTeam) {
       // We currently don't hold anything in our hand, so pick it up!
       island.inHand = Hand(territory, cursorPiece)
-      cursorHexData.setPiece(Empty::class)
+      hexData.setPiece(Empty::class)
     }
     Gdx.app.debug("PLACE", "Hand was null, now it is ${island.inHand}")
   }
 
-  fun placeDown(
+  private fun placeDown(
       island: Island,
       territory: Territory,
       placeOn: Hexagon<HexagonData>,
@@ -108,31 +108,36 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     }
   }
 
+  fun click(hexagon: Hexagon<HexagonData>) {
+    val island = islandScreen.island
+    val cursorHexData = island.getData(hexagon)
+
+    val oldTerritory = island.selected
+    if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) &&
+        cursorHexData.team == island.currentTeam) {
+      island.select(hexagon)
+    }
+    val territory = island.selected
+    if (territory == null) {
+      Gdx.app.debug("PLACE", "Territory is still null after selecting it")
+      return
+    }
+
+    val hand = island.inHand
+    if (hand == null) {
+      pickUp(island, cursorHexData, territory)
+    } else {
+      placeDown(island, territory, hexagon, hand.piece, oldTerritory)
+    }
+  }
+
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
     with(islandScreen) {
       when (button) {
         Buttons.LEFT -> {
           val cursorHex = basicIslandInputProcessor.cursorHex ?: return false
-          val cursorHexData = island.getData(cursorHex)
-
-          val oldTerritory = island.selected
-          if ((oldTerritory == null || !oldTerritory.hexagons.contains(cursorHex)) &&
-              cursorHexData.team == island.currentTeam) {
-            island.select(cursorHex)
-          }
-          val territory = island.selected
-          if (territory == null) {
-            Gdx.app.debug("PLACE", "Territory is still null after selecting it")
-            return true
-          }
-
-          val hand = island.inHand
-          if (hand == null) {
-            pickUp(island, cursorHexData, territory)
-          } else {
-            placeDown(island, territory, cursorHex, hand.piece, oldTerritory)
-          }
+          click(cursorHex)
         }
         else -> return false
       }
@@ -142,6 +147,16 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
   override fun keyDown(keycode: Int): Boolean {
     if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
+
+    when (keycode) {
+      ENTER -> islandScreen.island.endTurn(this)
+      Keys.F12 -> if (Hex.args.debug) infiniteMoney = !infiniteMoney
+      else -> return buyUnit(keycode)
+    }
+    return true
+  }
+
+  fun buyUnit(keycode: Int): Boolean {
     fun setIfTerritorySelected(piece: Piece) {
       islandScreen.island.selected?.also {
         if (!infiniteMoney) {
@@ -154,15 +169,12 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         islandScreen.island.inHand = Hand(it, piece)
       }
     }
-
     when (keycode) {
-      ENTER -> islandScreen.island.endTurn()
       Keys.F1 -> setIfTerritorySelected(Castle(HexagonData.EDGE_DATA))
       Keys.F2 -> setIfTerritorySelected(Peasant(HexagonData.EDGE_DATA))
       Keys.F3 -> setIfTerritorySelected(Spearman(HexagonData.EDGE_DATA))
       Keys.F4 -> setIfTerritorySelected(Knight(HexagonData.EDGE_DATA))
       Keys.F5 -> setIfTerritorySelected(Baron(HexagonData.EDGE_DATA))
-      Keys.F12 -> if (Hex.args.debug) infiniteMoney = !infiniteMoney
       else -> return false
     }
     return true

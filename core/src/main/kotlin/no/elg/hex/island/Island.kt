@@ -14,6 +14,8 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
+import no.elg.hex.input.GameInputProcessor
+import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
@@ -103,7 +105,7 @@ class Island(
 
   private val teamToPlayer =
       HashMap<Team, AI?>().apply {
-        this.putAll(Team.values().map { it to RandomAI() })
+        this.putAll(Team.values().map { it to RandomAI })
         put(STARTING_TEAM, null) // player
       }
 
@@ -111,7 +113,7 @@ class Island(
   // Gameplay //
   //////////////
 
-  fun endTurn() {
+  fun endTurn(gameInputProcessor: GameInputProcessor) {
     select(null)
     currentTeam = Team.values().next(currentTeam)
     Gdx.app.debug("TURN", "Starting turn of $currentTeam")
@@ -131,9 +133,12 @@ class Island(
     select(null)
 
     teamToPlayer[currentTeam]?.also {
-      it.actionOnAll(this, currentTeam)
-
-      schedule(0.20f) { endTurn() }
+      it.actionOnAll(this, currentTeam, gameInputProcessor)
+      schedule(0.20f) {
+        if (Hex.screen is IslandScreen) {
+          endTurn(gameInputProcessor)
+        }
+      }
     }
   }
 
