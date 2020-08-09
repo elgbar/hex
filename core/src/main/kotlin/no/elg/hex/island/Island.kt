@@ -15,6 +15,7 @@ import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
 import no.elg.hex.util.next
 import no.elg.hex.util.trace
+import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
@@ -126,14 +127,21 @@ class Island(
   /**
    * Select the hex under the cursor
    */
-  fun select(hex: Hexagon<HexagonData>?) {
+  fun select(hexagon: Hexagon<HexagonData>?) {
 
     inHand = null
 
     selected = null
-    if (hex == null) return
+    if (hexagon == null) return
 
-    val territoryHexes = getTerritoryHexagons(hex) ?: return
+    val territoryHexes = getTerritoryHexagons(hexagon)
+    if (territoryHexes == null) {
+      val data = getData(hexagon)
+      if (data.piece is Capital) {
+        data.setPiece(treeType(hexagon))
+      }
+      return
+    }
     val team = this.getData(territoryHexes.first()).team
     require(territoryHexes.all { this.getData(it).team == team }) { "Wrong team!" }
 

@@ -23,6 +23,7 @@ import no.elg.hex.island.Island.Companion.PLAYER_TEAM
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
+import no.elg.hex.util.getNeighbors
 import kotlin.math.min
 import kotlin.reflect.full.isSubclassOf
 
@@ -87,6 +88,9 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
             val newPiece = cursorHexData.piece
             if (newPiece is LivingPiece) {
               newPiece.moved = moved
+            }
+            for (neighbor in island.getNeighbors(cursorHex)) {
+              island.select(neighbor)
             }
             //reselect territory to update it's values
             island.select(cursorHex)
