@@ -30,8 +30,6 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Hex
-import no.elg.hex.hexagon.Capital
-import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
@@ -44,9 +42,9 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.findHexagonsWithinRadius
-import no.elg.hex.util.getData
 import no.elg.hex.util.next
 import no.elg.hex.util.previous
+import no.elg.hex.util.regenerateCapitals
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
@@ -138,19 +136,7 @@ class MapEditorInputProcessor(
         LevelSelectScreen.play(islandScreen.id)
         publishMessage("Successfully reloaded island ${islandScreen.id}")
       } else return false
-      C -> if (isControlPressed()) {
-        val island = islandScreen.island
-        for (hexagon in island.hexagons) {
-          val data = island.getData(hexagon)
-          if (data.piece is Capital) {
-            data.setPiece(Empty::class)
-          }
-        }
-        for (hexagon in island.hexagons) {
-          island.select(hexagon)
-        }
-
-      } else return false
+      C -> if (isControlPressed()) islandScreen.island.regenerateCapitals() else return false
 
       else -> return false
     }

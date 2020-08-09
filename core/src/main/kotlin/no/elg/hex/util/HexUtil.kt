@@ -2,14 +2,18 @@ package no.elg.hex.util
 
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
+import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import no.elg.hex.hexagon.PalmTree
+import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.START_CAPITAL
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.HashSet
@@ -91,6 +95,23 @@ fun Island.calculateStrength(hexagon: Hexagon<HexagonData>): Int {
   return getNeighbors(hexagon).map { getData(it) }.filter { it.team == team }.map { it.piece.strength }.max()
     ?: error("No elements in list, not even this hexagon!")
 }
+
+fun Island.regenerateCapitals() {
+  forEachPieceType<Capital>() { _, data, _ -> data.setPiece(Empty::class) }
+  for (hexagon in hexagons) {
+    select(hexagon)
+  }
+  forEachPieceType<Capital>() { _, _, piece -> piece.balance = START_CAPITAL }
+}
+
+inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {
+  for (hexagon in hexagons) {
+    val data = getData(hexagon)
+    if (data.piece is T)
+      action(hexagon, data, data.piece as T)
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Taken from https://github.com/Hexworks/mixite/pull/56 TODO remove when this is in the library                     //

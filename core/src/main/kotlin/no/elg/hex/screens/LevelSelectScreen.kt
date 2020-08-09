@@ -21,8 +21,8 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.regenerateCapitals
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
-import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /**
@@ -50,18 +50,15 @@ object LevelSelectScreen : AbstractScreen() {
   val mouseY get() = unprojectVector.y
 
   private fun islandFiles(): GdxArray<FileHandle> {
-    val dir = Gdx.files.internal(ISLAND_SAVES_DIR)
     val files = GdxArray<FileHandle>()
 
-    if (dir.isDirectory) {
-      for (slot in 0..Int.MAX_VALUE) {
-        val file = getIslandFile(slot)
-        if (file.exists()) {
-          if (file.isDirectory) continue
-          files.add(file)
-        } else {
-          break
-        }
+    for (slot in 0..Int.MAX_VALUE) {
+      val file = getIslandFile(slot)
+      if (file.exists()) {
+        if (file.isDirectory) continue
+        files.add(file)
+      } else {
+        break
       }
     }
     return files
@@ -75,7 +72,7 @@ object LevelSelectScreen : AbstractScreen() {
 
     val islands = islandFiles()
     if (islands.isEmpty) {
-      play(-1, Island(40, 25, HEXAGONAL))
+      play(0)
       return
     }
 
@@ -148,7 +145,7 @@ object LevelSelectScreen : AbstractScreen() {
 
   fun play(id: Int) {
     val islandFile = getIslandFile(id)
-    val island = loadIsland(islandFile) ?: Island(40, 25, RECTANGULAR)
+    val island = loadIsland(islandFile)
     play(id, island)
   }
 
@@ -156,12 +153,12 @@ object LevelSelectScreen : AbstractScreen() {
     Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
   }
 
-  fun loadIsland(file: FileHandle): Island? {
+  fun loadIsland(file: FileHandle): Island {
     val json: String = try {
       requireNotNull(file.readString())
     } catch (e: Exception) {
       publishMessage(ScreenText("Failed to load island the name '${file.name()}'", color = Color.RED))
-      return null
+      "invalid island json"
     }
 
     return try {
@@ -169,7 +166,7 @@ object LevelSelectScreen : AbstractScreen() {
     } catch (e: Exception) {
       publishMessage(ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED))
       Gdx.app.debug("LOAD", e.message)
-      null
+      Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
     }
   }
 
