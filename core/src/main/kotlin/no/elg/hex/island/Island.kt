@@ -235,7 +235,7 @@ class Island(
     var greatestDistance = 1
 
 
-    fun finDistanceToClosestHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
+    fun findDistanceToClosestHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
       for (r in discardIfLessThan..maxRadius) {
         if (this.calculateRing(hex, r).any { this.getData(it).team != hexTeam }) {
           return r
@@ -244,8 +244,8 @@ class Island(
       return -1 //no hexes found we've won!
     }
 
-    for (hex in hexagons) {
-      val dist = finDistanceToClosestHex(hex, greatestDistance)
+    for (hex in feasibleHexagons) {
+      val dist = findDistanceToClosestHex(hex, greatestDistance)
       if (dist > greatestDistance) {
         //we have a new greatest distance
         greatestDistance = dist
