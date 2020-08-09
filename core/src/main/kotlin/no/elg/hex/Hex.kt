@@ -20,6 +20,7 @@ import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.LOG_TRACE
+import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 
 object Hex : ApplicationAdapter() {
@@ -44,11 +45,11 @@ object Hex : ApplicationAdapter() {
   var screen: Screen = SplashScreen
     set(value) {
       val old = field
-      Gdx.app.log("SCREEN", "Unloading old screen ${old::class.simpleName}")
+      Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
       if (old is AbstractScreen) {
         old.hide()
       }
-      Gdx.app.log("SCREEN", "Loading new screen ${value::class.simpleName}")
+      Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
       if (value is AbstractScreen) {
         value.show()
         value.resize(Gdx.graphics.width, Gdx.graphics.height)
