@@ -32,6 +32,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   var infiniteMoney = Hex.args.cheating
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
     with(islandScreen) {
       when (button) {
         Buttons.LEFT -> {
@@ -128,6 +129,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   override fun keyDown(keycode: Int): Boolean {
+    if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
     fun setIfTerritorySelected(piece: Piece) {
       islandScreen.island.selected?.also {
         if (!infiniteMoney) {
