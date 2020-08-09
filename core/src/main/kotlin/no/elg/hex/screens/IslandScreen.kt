@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
@@ -16,7 +17,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
-import no.elg.hex.screens.LevelSelectScreen.getIslandFile
+import no.elg.hex.screens.LevelSelectScreen.getIslandFileName
 
 /**
  * @author Elg
@@ -72,7 +73,7 @@ class IslandScreen(
 
 
   fun saveIsland(): Boolean {
-    val file = getIslandFile(id).file()
+    val file = Gdx.files.local(getIslandFileName(id))
 
     if (!island.validate()) {
       publishMessage(ScreenText("Island failed validation", color = Color.RED))
@@ -80,12 +81,18 @@ class IslandScreen(
     }
 
     if (file.isDirectory) {
-      publishMessage(ScreenText("Failed to save island the name '${file.name}' as the resulting file will be a directory.", color = Color.RED))
+      publishMessage(ScreenText("Failed to save island the name '${file.name()}' as the resulting file will be a directory.", color = Color.RED))
       return false
     }
-    file.writeText(island.serialize())
-    publishMessage(ScreenText("Successfully saved island '${file.name}'", color = Color.GREEN))
-    return true
+    return try {
+      file.writeString(island.serialize(), false)
+      publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
+      true
+    } catch (e: Throwable) {
+      publishMessage(ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))
+      e.printStackTrace()
+      false
+    }
   }
 
   override fun dispose() {

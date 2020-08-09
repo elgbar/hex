@@ -141,7 +141,13 @@ object LevelSelectScreen : AbstractScreen() {
     lineRenderer.end()
   }
 
-  fun getIslandFile(slot: Int): FileHandle = Gdx.files.internal("$ISLAND_SAVES_DIR/island-$slot.$ISLAND_FILE_ENDING")
+  fun getIslandFileName(slot: Int) = "$ISLAND_SAVES_DIR/island-$slot.$ISLAND_FILE_ENDING"
+
+  fun getIslandFile(slot: Int): FileHandle {
+    val path = getIslandFileName(slot)
+    val internal = Gdx.files.internal(path)
+    return if (internal.exists()) internal else Gdx.files.local(path)
+  }
 
   fun play(id: Int) {
     val islandFile = getIslandFile(id)
