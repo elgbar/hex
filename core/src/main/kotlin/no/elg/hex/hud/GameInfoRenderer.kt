@@ -1,6 +1,7 @@
 package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.Baron
@@ -13,6 +14,7 @@ import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
+import no.elg.hex.hud.ScreenDrawPosition.BOTTOM
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.hud.ScreenRenderer.batch
 import no.elg.hex.input.GameInputProcessor
@@ -31,6 +33,10 @@ class GameInfoRenderer(private val islandScreen: IslandScreen, gameInputProcesso
         ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),
         ScreenText("Holding: ", next = nullCheckedText(islandScreen.island.inHand)),
         position = TOP_RIGHT)
+    }
+
+    if (islandScreen.inputProcessor is GameInputProcessor && (islandScreen.inputProcessor as GameInputProcessor).infiniteMoney) {
+      ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM)
     }
 
     islandScreen.island.inHand?.also { (_, piece) ->
@@ -67,5 +73,9 @@ class GameInfoRenderer(private val islandScreen: IslandScreen, gameInputProcesso
       batch.end()
 
     }
+  }
+
+  companion object {
+    val CHEATING_SCREEN_TEXT = ScreenText("Cheating enabled!", color = Color.GOLD)
   }
 }

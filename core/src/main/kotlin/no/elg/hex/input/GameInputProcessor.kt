@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.InputAdapter
+import no.elg.hex.Hex
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -30,6 +31,7 @@ import kotlin.reflect.full.isSubclassOf
  */
 class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
 
+  var infiniteMoney = Hex.args.cheating
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     with(islandScreen) {
@@ -113,7 +115,12 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   override fun keyDown(keycode: Int): Boolean {
     fun setIfTerritorySelected(piece: Piece) {
       islandScreen.island.selected?.also {
-        it.capital.balance -= piece.price
+        if (!infiniteMoney) {
+          if (it.capital.balance < piece.price) {
+            return@also
+          }
+          it.capital.balance -= piece.price
+        }
         if (piece is LivingPiece) piece.moved = false
         islandScreen.island.inHand = Hand(it, piece)
       }
@@ -126,6 +133,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
       Keys.F3 -> setIfTerritorySelected(Spearman(HexagonData.EDGE_DATA))
       Keys.F4 -> setIfTerritorySelected(Knight(HexagonData.EDGE_DATA))
       Keys.F5 -> setIfTerritorySelected(Baron(HexagonData.EDGE_DATA))
+      Keys.F12 -> if (Hex.args.debug) infiniteMoney = !infiniteMoney
       else -> return false
     }
     return true

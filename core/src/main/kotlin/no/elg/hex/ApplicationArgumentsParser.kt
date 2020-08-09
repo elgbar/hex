@@ -11,4 +11,5 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val silent by parser.flagging("-s", "--silent", help = "Do not print anything to stdout or stderr")
   val mapEditor by parser.flagging("-e", "--map-editor", help = "Start the program in map editor mode")
   val retro by parser.flagging("-r", "--retro", help = "Use only the original textures")
+  val cheating by parser.flagging("-c", "--cheating", help = "Have infinite money")
 }
