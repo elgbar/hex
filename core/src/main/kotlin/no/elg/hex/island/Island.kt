@@ -20,6 +20,7 @@ import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
 import no.elg.hex.util.next
+import no.elg.hex.util.schedule
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -125,8 +126,6 @@ class Island(
       data.piece.beginTurn(this, hexagon, data, currentTeam)
     }
 
-    teamToPlayer[currentTeam]?.actionOnAll(this, currentTeam)
-
     if (currentTeam == STARTING_TEAM) {
       Gdx.app.debug("TURN", "New round!")
       for (hexagon in hexagons) {
@@ -134,6 +133,12 @@ class Island(
       }
     }
     select(null)
+
+    teamToPlayer[currentTeam]?.also {
+      it.actionOnAll(this, currentTeam)
+
+      schedule(0.20f) { endTurn() }
+    }
   }
 
   /** Select the hex under the cursor */
@@ -143,7 +148,7 @@ class Island(
     selected = null
 
     if (hexagon == null) {
-      Gdx.app.debug("SELECT", "Unselecting currently selected territory")
+      Gdx.app.trace("SELECT", "Unselecting currently selected territory")
       return true
     }
 
@@ -155,7 +160,7 @@ class Island(
       }
       selected = oldSelected
       Gdx.app
-          .debug("SELECT", "Hex to select does not connect with enough hexagons to be a territory")
+          .trace("SELECT", "Hex to select does not connect with enough hexagons to be a territory")
       return false
     }
     val team = this.getData(territoryHexes.first()).team

@@ -24,8 +24,8 @@ data class HexagonData(
      * prevent that and gain pixel perfect hexagon accuracy the player should not know these exists.
      *
      * @see no.elg.hex.util.getHexagon
-     * @see no.elg.hex.hexagon.renderer.OutlineRenderer
-     * @see no.elg.hex.hexagon.renderer.VerticesRenderer
+     * @see no.elg.hex.renderer.OutlineRenderer
+     * @see no.elg.hex.renderer.VerticesRenderer
      */
     val edge: Boolean = false,
     override var isOpaque: Boolean = edge,

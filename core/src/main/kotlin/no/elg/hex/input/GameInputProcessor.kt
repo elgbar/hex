@@ -20,6 +20,7 @@ import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.island.Hand
+import no.elg.hex.island.Island
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData

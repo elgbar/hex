@@ -45,7 +45,7 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
   return this.grid.getByPixelCoordinate(x, y).let {
     if (it.isEmpty()) return@let null
     val data = this.getData(it.get())
-    if (data.edge || (!Hex.args.mapEditor && data.isOpaque)) null else it.get()
+    if (data.edge || (!Hex.args.mapEditor && data.invisible)) null else it.get()
   }
 }
 
@@ -109,6 +109,7 @@ fun Island.regenerateCapitals() {
   for (hexagon in hexagons) {
     select(hexagon)
   }
+  select(null)
   forEachPieceType<Capital>() { _, _, piece -> piece.balance = START_CAPITAL }
 }
 
@@ -142,6 +143,7 @@ fun Island.getTerritories(team: Team): Collection<Territory> {
       select(hexagon)
       selected?.also { territories.add(it) }
     }
+    select(null)
   }
   return territories
 }
