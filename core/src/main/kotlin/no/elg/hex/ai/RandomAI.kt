@@ -15,7 +15,8 @@ import org.hexworks.mixite.core.api.Hexagon
 /** @author Elg */
 object RandomAI : AI {
 
-  private val buttons = arrayOf(Keys.F1, Keys.F2)
+  private val buttons =
+    arrayOf(Keys.F1, Keys.F2, Keys.F3, Keys.F4, Keys.F5, Keys.F2, Keys.F3)
 
   @ExperimentalStdlibApi
   override fun action(territory: Territory, gameInputProcessor: GameInputProcessor) {
