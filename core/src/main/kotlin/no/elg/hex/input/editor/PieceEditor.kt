@@ -31,7 +31,8 @@ sealed class PieceEditor(val islandScreen: IslandScreen) : Editor() {
       require(islandScreen.inputProcessor is MapEditorInputProcessor) {
         "Tried change editor while the input processor is not ${MapEditorInputProcessor::class.simpleName}"
       }
-      islandScreen.island
+      islandScreen
+          .island
           .getData(hexagon)
           .setPiece((islandScreen.inputProcessor as MapEditorInputProcessor).selectedPiece)
     }

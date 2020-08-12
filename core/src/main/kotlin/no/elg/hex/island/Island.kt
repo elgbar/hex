@@ -7,7 +7,6 @@ import kotlin.math.max
 import no.elg.hex.Hex
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.RandomAI
-import no.elg.hex.ai.actionOnAll
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
@@ -103,9 +102,10 @@ class Island(
   var currentTeam: Team = STARTING_TEAM
     private set
 
+  @ExperimentalStdlibApi
   private val teamToPlayer =
       HashMap<Team, AI?>().apply {
-        this.putAll(Team.values().map { it to RandomAI })
+        this.putAll(Team.values().map { it to RandomAI(it) })
         put(STARTING_TEAM, null) // player
       }
 
@@ -113,6 +113,7 @@ class Island(
   // Gameplay //
   //////////////
 
+  @ExperimentalStdlibApi
   fun endTurn(gameInputProcessor: GameInputProcessor) {
     select(null)
     currentTeam = Team.values().next(currentTeam)
@@ -133,8 +134,8 @@ class Island(
     select(null)
 
     teamToPlayer[currentTeam]?.also {
-      it.actionOnAll(this, currentTeam, gameInputProcessor)
-      schedule(0.20f) {
+      it.action(this, gameInputProcessor)
+      schedule(0.05f) {
         if (Hex.screen is IslandScreen) {
           endTurn(gameInputProcessor)
         }
@@ -160,8 +161,8 @@ class Island(
         data.setPiece(treeType(hexagon))
       }
       selected = oldSelected
-      Gdx.app
-          .trace("SELECT", "Hex to select does not connect with enough hexagons to be a territory")
+      Gdx.app.trace(
+          "SELECT", "Hex to select does not connect with enough hexagons to be a territory")
       return false
     }
     val team = this.getData(territoryHexes.first()).team
@@ -276,10 +277,9 @@ class Island(
 
     require(contenders.isNotEmpty()) { "No capital contenders found!" }
 
-    Gdx.app
-        .trace(
-            "ISLAND",
-            "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
+    Gdx.app.trace(
+        "ISLAND",
+        "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
 
     if (contenders.size == 1) return contenders.first()
 
@@ -302,7 +302,8 @@ class Island(
                             (if (data.invisible) 0.5 else 0.0)
                       })
             }
-            .maxBy { it.second }!!.first
+            .maxBy { it.second }!!
+        .first
   }
 
   ///////////////////
@@ -333,10 +334,9 @@ class Island(
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         if (this.getData(hexagon).piece is Capital) {
-          Gdx.app
-              .log(
-                  "Island Validation",
-                  "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
+          Gdx.app.log(
+              "Island Validation",
+              "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
           valid = false
         }
         continue
@@ -344,16 +344,14 @@ class Island(
 
       val capitalCount = connectedHexes.count { this.getData(it).piece is Capital }
       if (capitalCount < 1) {
-        Gdx.app
-            .log(
-                "Island Validation",
-                "There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
+        Gdx.app.log(
+            "Island Validation",
+            "There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
         valid = false
       } else if (capitalCount > 1) {
-        Gdx.app
-            .log(
-                "Island Validation",
-                "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
+        Gdx.app.log(
+            "Island Validation",
+            "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
         valid = false
       }
 

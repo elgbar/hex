@@ -34,7 +34,8 @@ object MessagesRenderer : FrameUpdatable {
             message.copy(color = message.color.cpy().also { it.a = alpha })
           } else {
             message
-          }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
+          }
+          .draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
 
       val newTime = timeLeft - Gdx.graphics.rawDeltaTime
       if (newTime > 0f) {
