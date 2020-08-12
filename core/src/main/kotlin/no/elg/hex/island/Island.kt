@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlin.math.max
 import no.elg.hex.Hex
 import no.elg.hex.ai.AI
-import no.elg.hex.ai.RandomAI
+import no.elg.hex.ai.NotAsRandomAI
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
@@ -105,8 +105,8 @@ class Island(
   @ExperimentalStdlibApi
   private val teamToPlayer =
       HashMap<Team, AI?>().apply {
-        this.putAll(Team.values().map { it to RandomAI(it) })
-        put(STARTING_TEAM, null) // player
+        this.putAll(Team.values().map { it to NotAsRandomAI(it) })
+      //        put(STARTING_TEAM, null) // player
       }
 
   //////////////
@@ -251,12 +251,12 @@ class Island(
 
     val contenders = HashSet<Hexagon<HexagonData>>(feasibleHexagons.size)
 
-    // The maximum distance between two hexagons for this grid
-    val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
-
     var greatestDistance = 1
 
-    fun findDistanceToClosestHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
+    fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
+      // The maximum distance between two hexagons for this grid
+      val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
+
       for (r in discardIfLessThan..maxRadius) {
         if (this.calculateRing(hex, r).any { this.getData(it).team != hexTeam }) {
           return r
@@ -266,7 +266,7 @@ class Island(
     }
 
     for (hex in feasibleHexagons) {
-      val dist = findDistanceToClosestHex(hex, greatestDistance)
+      val dist = findDistanceToClosestEnemyHex(hex, greatestDistance)
       if (dist > greatestDistance) {
         // we have a new greatest distance
         greatestDistance = dist
