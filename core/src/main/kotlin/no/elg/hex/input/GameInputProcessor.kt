@@ -162,7 +162,6 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
   fun buyUnit(piece: Piece): Boolean {
     islandScreen.island.selected?.also {
-      println("aaaaaaaa")
       if (!infiniteMoney) {
         if (!it.capital.canBuy(piece)) {
           return@also
