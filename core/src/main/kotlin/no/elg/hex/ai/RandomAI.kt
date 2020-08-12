@@ -93,7 +93,7 @@ class RandomAI(override val team: Team) : AI {
           HashSet<Hexagon<HexagonData>>(
               territory.hexagons.filter {
                 val piece = territory.island.getData(it).piece
-                !(piece is Castle || piece is Capital || piece is Baron)
+                !(piece is Castle || piece is Capital || piece is LivingPiece)
               })
 
       val hexagon = placableHexes.randomOrNull() ?: return
