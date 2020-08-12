@@ -53,7 +53,7 @@ subprojects {
 
   spotless {
     kotlin {
-      ktfmt("0.15")
+      ktfmt("0.17")
     }
     groovyGradle {
       target '*.gradle' // default target of groovyGradle
