@@ -136,7 +136,7 @@ class Island(
     teamToPlayer[currentTeam]?.also {
       it.action(this, gameInputProcessor)
       schedule(0.05f) {
-        if (Hex.screen is IslandScreen) {
+        if (Hex.screen is IslandScreen && currentTeam != STARTING_TEAM) {
           endTurn(gameInputProcessor)
         }
       }
