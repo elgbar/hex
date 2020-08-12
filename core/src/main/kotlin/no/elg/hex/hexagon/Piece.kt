@@ -5,6 +5,7 @@ import kotlin.reflect.KClass
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.createInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.treeType
@@ -89,10 +90,9 @@ sealed class Piece {
   open fun place(onto: HexagonData): Boolean {
     return if (!Hex.args.mapEditor &&
         (!(onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }))) {
-      Gdx.app
-          .debug(
-              "${this::class.simpleName}-${this::place.name}",
-              "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}")
+      Gdx.app.debug(
+          "${this::class.simpleName}-${this::place.name}",
+          "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}")
       false
     } else {
       true
@@ -219,6 +219,11 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
       hexagons.sumBy { island.getData(it).piece.cost }
 
+  fun canBuy(piece: KClass<out Piece>): Boolean =
+      canBuy(piece.createInstance(HexagonData.EDGE_DATA))
+
+  fun canBuy(piece: Piece): Boolean = balance >= piece.price
+
   override fun toString(): String = "${this::class.simpleName}(balance: $balance)"
 }
 
@@ -273,7 +278,8 @@ class PineTree(data: HexagonData) : TreePiece(data) {
 
     // Find all empty neighbor hexes that are empty
     val list =
-        island.getNeighbors(pieceHex)
+        island
+            .getNeighbors(pieceHex)
             .filter {
               val piece = island.getData(it).piece
               piece is Empty && island.treeType(it) == PineTree::class
@@ -310,7 +316,8 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
     if (hasGrown) return
     // Find all empty neighbor hexes that are empty along the cost
     val hex =
-        island.getNeighbors(pieceHex)
+        island
+            .getNeighbors(pieceHex)
             .filter {
               val piece = island.getData(it).piece
               piece is Empty && island.treeType(it) == PalmTree::class
@@ -350,6 +357,10 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
     } else {
       moved = false
     }
+  }
+
+  fun canMerge(with: LivingPiece): Boolean {
+    return this.strength + with.strength > BARON_STRENGTH
   }
 
   fun updateAnimationTime(): Float {

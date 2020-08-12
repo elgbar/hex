@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
 import no.elg.hex.island.Island
+import no.elg.hex.util.createInstance
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
 
@@ -46,14 +46,7 @@ data class HexagonData(
   @JsonSetter("pieceType")
   fun setPiece(pieceType: KClass<out Piece>): Boolean {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
-
-    val pieceToPlace =
-        if (pieceType.objectInstance != null) {
-          pieceType.objectInstance
-        } else {
-          pieceType.primaryConstructor?.call(this)
-        }
-            ?: error("No constructor found with a single ${Team::class.simpleName} argument")
+    val pieceToPlace = pieceType.createInstance(this)
 
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace

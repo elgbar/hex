@@ -7,7 +7,6 @@ import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.InputAdapter
 import kotlin.reflect.full.isSubclassOf
 import no.elg.hex.Hex
-import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -65,20 +64,17 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         newPiece is LivingPiece &&
         hexData.team == territory.team) {
       // merge cursor piece with held piece
-      val newStr = newPiece.strength + oldPiece.strength
-      if (newStr > BARON_STRENGTH) return // cannot merge
+      if (newPiece.canMerge(oldPiece)) return // cannot merge
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
-      strengthToType(newStr) to (newPiece.moved || oldPiece.moved)
+      strengthToType(newPiece.strength + oldPiece.strength) to (newPiece.moved || oldPiece.moved)
     } else {
       newPiece::class to (hexData.team != island.currentTeam || oldPiece !is Empty)
     }
 
     if (newPieceType.isSubclassOf(LivingPiece::class)) {
       if (hexData.team == territory.team && (oldPiece is Capital || oldPiece is Castle)) {
-        Gdx.app
-            .debug(
-                "PLACE",
-                "Cannot place a living entity of the same team onto a capital or castle piece")
+        Gdx.app.debug(
+            "PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
         return
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
         Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
@@ -86,10 +82,9 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
       }
     } else if (Castle::class == newPieceType) {
       if (hexData.team != territory.team) {
-        Gdx.app
-            .debug(
-                "PLACE",
-                "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
+        Gdx.app.debug(
+            "PLACE",
+            "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
         return
       }
     } else if (Castle::class != newPieceType) {
@@ -150,38 +145,46 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     return true
   }
 
+  @ExperimentalStdlibApi
   override fun keyDown(keycode: Int): Boolean {
     if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
 
     when (keycode) {
       ENTER -> islandScreen.island.endTurn(this)
       Keys.F12 -> if (Hex.args.debug) infiniteMoney = !infiniteMoney
-      else -> return buyUnit(keycode)
+      else -> {
+        val piece = keycodeToPiece(keycode) ?: return false
+        return buyUnit(piece)
+      }
     }
     return true
   }
 
-  fun buyUnit(keycode: Int): Boolean {
-    fun setIfTerritorySelected(piece: Piece) {
-      islandScreen.island.selected?.also {
-        if (!infiniteMoney) {
-          if (it.capital.balance < piece.price) {
-            return@also
-          }
-          it.capital.balance -= piece.price
+  fun buyUnit(piece: Piece): Boolean {
+    islandScreen.island.selected?.also {
+      println("aaaaaaaa")
+      if (!infiniteMoney) {
+        if (!it.capital.canBuy(piece)) {
+          return@also
         }
-        if (piece is LivingPiece) piece.moved = false
-        islandScreen.island.inHand = Hand(it, piece)
+        it.capital.balance -= piece.price
       }
-    }
-    when (keycode) {
-      Keys.F1 -> setIfTerritorySelected(Castle(HexagonData.EDGE_DATA))
-      Keys.F2 -> setIfTerritorySelected(Peasant(HexagonData.EDGE_DATA))
-      Keys.F3 -> setIfTerritorySelected(Spearman(HexagonData.EDGE_DATA))
-      Keys.F4 -> setIfTerritorySelected(Knight(HexagonData.EDGE_DATA))
-      Keys.F5 -> setIfTerritorySelected(Baron(HexagonData.EDGE_DATA))
-      else -> return false
+      if (piece is LivingPiece) piece.moved = false
+      islandScreen.island.inHand = Hand(it, piece)
     }
     return true
+  }
+
+  companion object {
+    fun keycodeToPiece(keycode: Int): Piece? {
+      return when (keycode) {
+        Keys.F1 -> Castle(HexagonData.EDGE_DATA)
+        Keys.F2 -> Peasant(HexagonData.EDGE_DATA)
+        Keys.F3 -> Spearman(HexagonData.EDGE_DATA)
+        Keys.F4 -> Knight(HexagonData.EDGE_DATA)
+        Keys.F5 -> Baron(HexagonData.EDGE_DATA)
+        else -> return null
+      }
+    }
   }
 }
