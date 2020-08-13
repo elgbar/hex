@@ -105,7 +105,7 @@ class RandomAI(override val team: Team) : AI {
           HashSet<Hexagon<HexagonData>>(
               territory.hexagons.filter {
                 val piece = territory.island.getData(it).piece
-                !((piece is LivingPiece && !piece.canMerge(handPiece)) ||
+                !((piece is LivingPiece && !piece.canNotMerge(handPiece)) ||
                     piece is Castle ||
                     piece is Capital)
               })

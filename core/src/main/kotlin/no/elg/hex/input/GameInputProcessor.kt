@@ -64,7 +64,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         newPiece is LivingPiece &&
         hexData.team == territory.team) {
       // merge cursor piece with held piece
-      if (newPiece.canMerge(oldPiece)) return // cannot merge
+      if (newPiece.canNotMerge(oldPiece)) return // cannot merge
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
       strengthToType(newPiece.strength + oldPiece.strength) to (newPiece.moved || oldPiece.moved)
     } else {

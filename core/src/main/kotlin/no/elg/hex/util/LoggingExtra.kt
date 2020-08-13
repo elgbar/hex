@@ -18,6 +18,10 @@ fun Application.trace(tag: String, message: String) {
   if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message)
 }
 
+fun Application.trace(tag: String, message: () -> String) {
+  if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message())
+}
+
 fun Application.trace(tag: String, message: String, exception: Throwable) {
   if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message, exception)
 }

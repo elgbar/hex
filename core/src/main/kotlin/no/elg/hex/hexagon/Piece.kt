@@ -28,10 +28,12 @@ fun strengthToType(str: Int): KClass<out LivingPiece> {
     KNIGHT_STRENGTH -> Knight::class
     BARON_STRENGTH -> Baron::class
     else ->
-        error(
-            "Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)")
+      error(
+          "Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)")
   }
 }
+
+fun mergedType(piece1: LivingPiece, piece2: LivingPiece) = strengthToType(piece1.strength + piece2.strength)
 
 enum class CapitalPlacementPreference {
   /**
@@ -359,7 +361,7 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
     }
   }
 
-  fun canMerge(with: LivingPiece): Boolean {
+  fun canNotMerge(with: LivingPiece): Boolean {
     return this.strength + with.strength > BARON_STRENGTH
   }
 
