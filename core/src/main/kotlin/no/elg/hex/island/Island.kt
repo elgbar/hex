@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlin.math.max
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import no.elg.hex.Hex
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.NotAsRandomAI
@@ -118,35 +120,38 @@ class Island(
   @ExperimentalStdlibApi
   fun endTurn(gameInputProcessor: GameInputProcessor) {
     select(null)
-    val capitals = hexagons.filter { getData(it).piece is Capital }
-    if (capitals.size == 1) {
-      Gdx.app.log("TURN", "Team ${getData(capitals.first()).team} won!")
-      return
-    }
 
-    currentTeam = Team.values().next(currentTeam)
-    Gdx.app.debug("TURN", "Starting turn of $currentTeam")
-
-    for (hexagon in hexagons) {
-      val data = this.getData(hexagon)
-      if (data.team != currentTeam) continue
-      data.piece.beginTurn(this, hexagon, data, currentTeam)
-    }
-
-    if (currentTeam == STARTING_TEAM) {
-      Gdx.app.debug("TURN", "New round!")
-      round++
-      for (hexagon in hexagons) {
-        this.getData(hexagon).piece.newRound(this, hexagon)
+    GlobalScope.launch {
+      val capitals = hexagons.filter { getData(it).piece is Capital }
+      if (capitals.size == 1) {
+        Gdx.app.log("TURN", "Team ${getData(capitals.first()).team} won!")
+        return@launch
       }
-    }
-    select(null)
 
-    teamToPlayer[currentTeam]?.also {
-      it.action(this, gameInputProcessor)
-      schedule(0.05f) {
-        if (Hex.screen is IslandScreen && currentTeam != STARTING_TEAM) {
-          endTurn(gameInputProcessor)
+      currentTeam = Team.values().next(currentTeam)
+      Gdx.app.debug("TURN", "Starting turn of $currentTeam")
+
+      for (hexagon in hexagons) {
+        val data = this@Island.getData(hexagon)
+        if (data.team != currentTeam) continue
+        data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
+      }
+
+      if (currentTeam == STARTING_TEAM) {
+        Gdx.app.debug("TURN", "New round!")
+        round++
+        for (hexagon in hexagons) {
+          this@Island.getData(hexagon).piece.newRound(this@Island, hexagon)
+        }
+      }
+      select(null)
+
+      teamToPlayer[currentTeam]?.also {
+        it.action(this@Island, gameInputProcessor)
+        schedule(0.05f) {
+          if (Hex.screen is IslandScreen && currentTeam != STARTING_TEAM) {
+            endTurn(gameInputProcessor)
+          }
         }
       }
     }
