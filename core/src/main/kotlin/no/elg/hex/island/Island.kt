@@ -149,7 +149,7 @@ class Island(
       teamToPlayer[currentTeam]?.also {
         it.action(this@Island, gameInputProcessor)
         schedule(0.05f) {
-          if (Hex.screen is IslandScreen && currentTeam != STARTING_TEAM) {
+          if (Hex.screen is IslandScreen) {
             endTurn(gameInputProcessor)
           }
         }
@@ -305,18 +305,18 @@ class Island(
     val expectedHexagons = 6 * greatestDistance
 
     return contenders
-        .map { origin: Hexagon<HexagonData> ->
-          val ring = this.calculateRing(origin, greatestDistance)
-          origin to
-              ((expectedHexagons - ring.size) // non-existent hexes count as ours
+            .map { origin: Hexagon<HexagonData> ->
+              val ring = this.calculateRing(origin, greatestDistance)
+              origin to
+                  ((expectedHexagons - ring.size) // non-existent hexes count as ours
                   +
-                  ring.sumByDouble {
-                    val data = this.getData(it)
-                    (if (data.team == hexTeam) 1.0 else 0.0) +
-                        (if (data.invisible) 0.5 else 0.0)
-                  })
-        }
-        .maxBy { it.second }!!
+                      ring.sumByDouble {
+                        val data = this.getData(it)
+                        (if (data.team == hexTeam) 1.0 else 0.0) +
+                            (if (data.invisible) 0.5 else 0.0)
+                      })
+            }
+            .maxBy { it.second }!!
         .first
   }
 
@@ -397,11 +397,11 @@ class Island(
   @get:JsonValue
   private val dto
     get() =
-      IslandDTO(
-          grid.gridData.gridWidth,
-          grid.gridData.gridHeight,
-          grid.gridData.gridLayout,
-          grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to this.getData(it) }.toMap())
+        IslandDTO(
+            grid.gridData.gridWidth,
+            grid.gridData.gridHeight,
+            grid.gridData.gridLayout,
+            grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to this.getData(it) }.toMap())
 
   private data class IslandDTO(
       val width: Int,

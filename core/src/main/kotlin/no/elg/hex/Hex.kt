@@ -63,8 +63,12 @@ object Hex : ApplicationAdapter() {
     }
 
     Gdx.app.logLevel =
-        if (args.silent) LOG_NONE
-        else if (args.trace) LOG_TRACE else if (args.debug) LOG_DEBUG else LOG_INFO
+        when {
+          args.silent -> LOG_NONE
+          args.trace -> LOG_TRACE
+          args.debug -> LOG_DEBUG
+          else -> LOG_INFO
+        }
 
     val backgroundColor: Color =
         if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62")

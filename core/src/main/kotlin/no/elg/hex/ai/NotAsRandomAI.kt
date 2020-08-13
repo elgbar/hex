@@ -1,7 +1,7 @@
 package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
-import no.elg.hex.hexagon.BARON_STRENGTH
+import kotlin.math.abs
 import kotlin.random.Random.Default as random
 import kotlin.reflect.KClass
 import no.elg.hex.hexagon.Baron
@@ -17,7 +17,6 @@ import no.elg.hex.hexagon.NO_STRENGTH
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.SPEARMAN_STRENGTH
-import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.mergedType
@@ -33,7 +32,6 @@ import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.math.abs
 
 /**
  * An AI that does random actions for a random amount of time. All action it can take will have some
@@ -52,15 +50,13 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   }
 
   private val buyablePieces =
-      arrayOf(
-          Castle::class,
-          Peasant::class
-//          Spearman::class,
-//          Knight::class,
-//          Baron::class,
-//          Peasant::class,
-//          Spearman::class
-      )
+      arrayOf(Castle::class, Peasant::class
+          //          Spearman::class,
+          //          Knight::class,
+          //          Baron::class,
+          //          Peasant::class,
+          //          Spearman::class
+          )
 
   fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
     think { "Picking up a piece" }
@@ -154,7 +150,7 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
 
               tryAttack(Capital::class)
                   ?: tryAttack(Castle::class) ?: tryAttack(LivingPiece::class)
-                  ?: attackableHexes.randomOrNull() ?: return
+                      ?: attackableHexes.randomOrNull() ?: return
             } else {
               think { "No territory is attackable" }
 
@@ -165,16 +161,28 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
                 graveHexagons.random()
               } else if (random.nextFloat() >= 0.25) {
                 think { "Place the held piece randomly" }
-                territory.hexagons.filter { territory.island.getData(it).piece is Empty }.randomOrNull()
+                territory
+                    .hexagons
+                    .filter { territory.island.getData(it).piece is Empty }
+                    .randomOrNull()
               } else {
-                val maxBorderStr = territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.max()
-                    ?: NO_STRENGTH
+                val maxBorderStr =
+                    territory
+                        .enemyBorderHexes
+                        .map { territory.island.getData(it).piece.strength }
+                        .max()
+                        ?: NO_STRENGTH
 
-                val shouldMergeToKnight = maxBorderStr >= SPEARMAN_STRENGTH && territory.hexagons.count { territory.island.getData(it).piece is Knight } < MAX_TOTAL_KNIGHTS - 1
-                val shouldMergeToBaron = maxBorderStr >= KNIGHT_STRENGTH && territory.hexagons.count {
-                  val piece = territory.island.getData(it).piece
-                  piece is Knight || piece is Baron
-                } < MAX_TOTAL_BARONS - 1
+                val shouldMergeToKnight =
+                    maxBorderStr >= SPEARMAN_STRENGTH &&
+                        territory.hexagons.count { territory.island.getData(it).piece is Knight } <
+                            MAX_TOTAL_KNIGHTS - 1
+                val shouldMergeToBaron =
+                    maxBorderStr >= KNIGHT_STRENGTH &&
+                        territory.hexagons.count {
+                          val piece = territory.island.getData(it).piece
+                          piece is Knight || piece is Baron
+                        } < MAX_TOTAL_BARONS - 1
                 if (!shouldMergeToBaron) {
                   think { "Should not merge to baron right now" }
                 }
@@ -197,7 +205,9 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
                   val mergedType = mergedType(piece, handPiece).createHandInstance()
 
                   val newIncome = territory.income - piece.cost - handPiece.cost + mergedType.cost
-                  think { "NewIncome would be $newIncome I want at least ${mergedType.cost / 2} to accept this merge" }
+                  think {
+                    "NewIncome would be $newIncome I want at least ${mergedType.cost / 2} to accept this merge"
+                  }
                   newIncome >= abs(mergedType.cost) / 2
                 }
               }
@@ -207,7 +217,9 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
         think { "Failed to find any enemy hexagon to attack" }
         return
       }
-      think { "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} (which is a ${territory.island.getData(hexagon).piece} of team ${territory.island.getData(hexagon).team})" }
+      think {
+        "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} (which is a ${territory.island.getData(hexagon).piece} of team ${territory.island.getData(hexagon).team})"
+      }
       gameInputProcessor.click(hexagon)
     }
   }
