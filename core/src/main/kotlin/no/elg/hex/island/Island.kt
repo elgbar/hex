@@ -116,6 +116,12 @@ class Island(
   @ExperimentalStdlibApi
   fun endTurn(gameInputProcessor: GameInputProcessor) {
     select(null)
+    val capitals = hexagons.filter { getData(it).piece is Capital }
+    if (capitals.size == 1) {
+      Gdx.app.log("TURN", "Team ${getData(capitals.first()).team} won!")
+      return
+    }
+
     currentTeam = Team.values().next(currentTeam)
     Gdx.app.debug("TURN", "Starting turn of $currentTeam")
 
