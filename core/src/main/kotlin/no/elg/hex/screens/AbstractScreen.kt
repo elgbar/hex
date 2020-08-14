@@ -21,6 +21,12 @@ abstract class AbstractScreen : ScreenAdapter() {
 
   abstract override fun render(delta: Float)
 
+  fun updateCamera() {
+    camera.update()
+    batch.projectionMatrix = camera.combined
+    lineRenderer.projectionMatrix = camera.combined
+  }
+
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(true, width.toFloat(), height.toFloat())
 
