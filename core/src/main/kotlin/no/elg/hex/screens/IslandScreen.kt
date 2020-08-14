@@ -18,6 +18,7 @@ import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.LevelSelectScreen.getIslandFileName
+import java.lang.Float.max
 
 /** @author Elg */
 class IslandScreen(val id: Int, val island: Island, private val renderHud: Boolean = true) :
@@ -93,11 +94,15 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     super.resize(width, height)
     val data = island.grid.gridData
 
-    val x = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat() / 2f
-    val y = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat() / 2f
+    val totalGridWidth = (data.gridWidth * data.hexagonWidth + data.gridWidth).toFloat()
+    val totalGridHeight = (data.gridHeight * data.hexagonHeight + data.gridHeight).toFloat()
+
+    val x = totalGridWidth / 2f
+    val y = totalGridHeight / 2f
 
     camera.position.x = x
     camera.position.y = y
+    camera.zoom = max(totalGridWidth / camera.viewportWidth, totalGridHeight / camera.viewportHeight)
   }
 
   override fun show() {
