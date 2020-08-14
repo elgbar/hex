@@ -19,6 +19,8 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.play
 
 /** @author Elg */
 object LevelSelectInputProcessor : InputAdapter() {
@@ -41,7 +43,7 @@ object LevelSelectInputProcessor : InputAdapter() {
       Buttons.LEFT -> {
         val index = getHoveringIslandIndex()
         if (index != INVALID_ISLAND_INDEX) {
-          LevelSelectScreen.play(index)
+          play(index)
         } else {
           val (x, y, width, height) = LevelSelectScreen.rect(islandAmount)
           if (mouseX in x..x + width && mouseY in y..y + height) {

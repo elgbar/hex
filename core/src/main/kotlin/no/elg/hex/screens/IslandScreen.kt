@@ -1,15 +1,12 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.graphics.Color
+import java.lang.Float.max
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
-import no.elg.hex.hud.MessagesRenderer.publishMessage
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
@@ -17,8 +14,6 @@ import no.elg.hex.island.Island
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
-import no.elg.hex.screens.LevelSelectScreen.getIslandFileName
-import java.lang.Float.max
 
 /** @author Elg */
 class IslandScreen(val id: Int, val island: Island, private val renderHud: Boolean = true) :
@@ -64,32 +59,6 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     }
   }
 
-  fun saveIsland(): Boolean {
-    val file = Gdx.files.local(getIslandFileName(id))
-
-    if (!island.validate()) {
-      publishMessage(ScreenText("Island failed validation", color = Color.RED))
-      return false
-    }
-
-    if (file.isDirectory) {
-      publishMessage(
-          ScreenText(
-              "Failed to save island the name '${file.name()}' as the resulting file will be a directory.",
-              color = Color.RED))
-      return false
-    }
-    return try {
-      file.writeString(island.serialize(), false)
-      publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
-      true
-    } catch (e: Throwable) {
-      publishMessage(ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))
-      e.printStackTrace()
-      false
-    }
-  }
-
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     val data = island.grid.gridData
@@ -102,7 +71,8 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
 
     camera.position.x = x
     camera.position.y = y
-    camera.zoom = max(totalGridWidth / camera.viewportWidth, totalGridHeight / camera.viewportHeight)
+    camera.zoom =
+        max(totalGridWidth / camera.viewportWidth, totalGridHeight / camera.viewportHeight)
   }
 
   override fun show() {

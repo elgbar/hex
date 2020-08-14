@@ -17,7 +17,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoa
 import com.badlogic.gdx.utils.Array as GdxArray
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
-import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.util.getIslandFile
+import no.elg.hex.util.getIslandFileName
 
 /** @author Elg */
 class Assets : AssetManager() {
@@ -130,15 +131,15 @@ class Assets : AssetManager() {
     load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
 
     loadingInfo = "islands"
-    
+
     val oldIslands = GdxArray<Island>()
     getAll(Island::class.java, oldIslands)
 
     for (slot in 0..Int.MAX_VALUE) {
-      val file = LevelSelectScreen.getIslandFile(slot)
+      val file = getIslandFile(slot)
       if (file.exists()) {
         if (file.isDirectory) continue
-        load(LevelSelectScreen.getIslandFileName(slot), Island::class.java)
+        load(getIslandFileName(slot), Island::class.java)
       } else {
         break
       }

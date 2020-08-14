@@ -1,7 +1,6 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -9,8 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array as GdxArray
-import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
-import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.input.LevelSelectInputProcessor
@@ -19,6 +16,9 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.getIslandFile
+import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.play
 
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
@@ -40,8 +40,12 @@ object LevelSelectScreen : AbstractScreen() {
   val mouseY
     get() = unprojectVector.y
 
-
-  private val previewSize get() = ((Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) / PREVIEWS_PER_ROW).toInt()
+  private val previewSize
+    get() =
+        ((Gdx.graphics.width -
+                (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
+                PREVIEWS_PER_ROW)
+            .toInt()
 
   private fun renderPreviews() {
     for (buffer in islandPreviews) {
@@ -146,22 +150,6 @@ object LevelSelectScreen : AbstractScreen() {
     }
 
     lineRenderer.end()
-  }
-
-  fun getIslandFileName(slot: Int) = "$ISLAND_SAVES_DIR/island-$slot.$ISLAND_FILE_ENDING"
-
-  fun getIslandFile(slot: Int): FileHandle {
-    val path = getIslandFileName(slot)
-    val internal = Gdx.files.internal(path)
-    return if (internal.exists()) internal else Gdx.files.local(path)
-  }
-
-  fun play(id: Int) {
-    play(id, Hex.assets.get(getIslandFileName(id)))
-  }
-
-  fun play(id: Int, island: Island) {
-    Gdx.app.postRunnable { Hex.screen = IslandScreen(id, island) }
   }
 
   override fun resize(width: Int, height: Int) {

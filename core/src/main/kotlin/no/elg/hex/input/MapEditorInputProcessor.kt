@@ -43,11 +43,13 @@ import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.screens.IslandScreen
-import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.next
+import no.elg.hex.util.play
 import no.elg.hex.util.previous
 import no.elg.hex.util.regenerateCapitals
+import no.elg.hex.util.saveIsland
+import no.elg.hex.util.serialize
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
@@ -106,9 +108,9 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
   override fun keyDown(keycode: Int): Boolean {
     if (isControlPressed()) {
       when (keycode) {
-        O -> islandScreen.saveIsland()
+        O -> saveIsland(islandScreen.id, islandScreen.island)
         R -> {
-          LevelSelectScreen.play(islandScreen.id)
+          play(islandScreen.id)
           publishMessage("Successfully reloaded island ${islandScreen.id}")
         }
         C -> islandScreen.island.regenerateCapitals()
@@ -164,7 +166,7 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
       publishMessage(ScreenText("No quick save found", Color.RED))
       return
     }
-    LevelSelectScreen.play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))
+    play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))
   }
 
   private fun isShiftPressed(): Boolean =

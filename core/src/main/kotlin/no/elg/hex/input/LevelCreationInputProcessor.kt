@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputAdapter
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.util.play
 import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 
 /** @author Elg */
@@ -19,7 +20,7 @@ object LevelCreationInputProcessor : InputAdapter() {
     Gdx.app.debug(
         "CREATOR",
         "Creating island ${LevelSelectScreen.islandAmount} with a dimension of $width x $height and layout $layout")
-    LevelSelectScreen.play(LevelSelectScreen.islandAmount, Island(width, height, layout))
+    play(LevelSelectScreen.islandAmount, Island(width, height, layout))
     return true
   }
 

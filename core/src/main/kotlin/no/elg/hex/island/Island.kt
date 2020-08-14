@@ -374,8 +374,6 @@ class Island(
     return valid
   }
 
-  fun serialize(): String = Hex.mapper.writeValueAsString(this)
-
   companion object {
     const val GRID_RADIUS = 20.0
 
