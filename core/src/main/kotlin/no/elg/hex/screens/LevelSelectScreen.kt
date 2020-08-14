@@ -33,8 +33,6 @@ object LevelSelectScreen : AbstractScreen() {
   private val SELECT_COLOR = Color.GREEN
 
   private val islandPreviews = GdxArray<FrameBuffer>()
-  private val batch: SpriteBatch by lazy { SpriteBatch() }
-  private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
   private val unprojectVector = Vector3()
 

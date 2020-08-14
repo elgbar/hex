@@ -52,6 +52,7 @@ object Hex : ApplicationAdapter() {
       Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
       if (value is AbstractScreen) {
         value.show()
+        value.render(0f)
         value.resize(Gdx.graphics.width, Gdx.graphics.height)
       }
       field = value

@@ -2,11 +2,8 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
-import no.elg.hex.Assets
 import no.elg.hex.Hex
 
 /** @author Elg */
@@ -14,9 +11,7 @@ object SplashScreen : AbstractScreen() {
 
   private val startTime: Long = System.currentTimeMillis()
 
-  private val font: BitmapFont by lazy { Hex.assets.get<BitmapFont>(Assets.REGULAR_FONT) }
-  private val layout by lazy { GlyphLayout(font, "") }
-  private val batch: SpriteBatch by lazy { SpriteBatch() }
+  private val layout by lazy { GlyphLayout() }
 
   override fun render(delta: Float) {
 
