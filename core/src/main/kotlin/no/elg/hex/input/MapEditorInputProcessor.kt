@@ -104,6 +104,18 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
   }
 
   override fun keyDown(keycode: Int): Boolean {
+    if (isControlPressed()) {
+      when (keycode) {
+        O -> islandScreen.saveIsland()
+        R -> {
+          LevelSelectScreen.play(islandScreen.id)
+          publishMessage("Successfully reloaded island ${islandScreen.id}")
+        }
+        C -> islandScreen.island.regenerateCapitals()
+      }
+      return true
+    }
+
     when (keycode) {
       F1 -> showHelp = !showHelp
       W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
@@ -138,13 +150,6 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
         publishMessage("Quicksaved")
       }
       F9 -> quickload()
-      O -> if (isControlPressed()) islandScreen.saveIsland() else return false
-      R ->
-          if (isControlPressed()) {
-            LevelSelectScreen.play(islandScreen.id)
-            publishMessage("Successfully reloaded island ${islandScreen.id}")
-          } else return false
-      C -> if (isControlPressed()) islandScreen.island.regenerateCapitals() else return false
       else -> return false
     }
     return true
@@ -164,6 +169,7 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
 
   private fun isShiftPressed(): Boolean =
       Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
+
   private fun isControlPressed(): Boolean =
       Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
 
