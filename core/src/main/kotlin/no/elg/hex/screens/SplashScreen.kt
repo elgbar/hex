@@ -9,24 +9,34 @@ import no.elg.hex.Hex
 /** @author Elg */
 object SplashScreen : AbstractScreen() {
 
-  private val startTime: Long = System.currentTimeMillis()
+  private var startTime: Long = System.currentTimeMillis()
 
   private val layout by lazy { GlyphLayout() }
+
+  override fun show() {
+    startTime = System.currentTimeMillis()
+  }
 
   override fun render(delta: Float) {
 
     if (Hex.assets.finishMainConst && Hex.assets.update()) {
-      Gdx.app.log("Splash", "All assets finished loading")
+      Gdx.app.log("SPLASH", "All assets finished loading")
       Hex.screen = LevelSelectScreen
     } else {
       camera.update()
       batch.begin()
 
       val txt =
-          "LOADING %2.0f%% %n%n${System.currentTimeMillis() - startTime} ms".format(
+          "Loading ${Hex.assets.loadingInfo}%n%n%2.0f%%%n%n${System.currentTimeMillis() - startTime} ms".format(
               Hex.assets.progress * 100)
-      layout.setText(font, txt, Color.WHITE, Gdx.graphics.width.toFloat(), Align.center, true)
-      font.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
+      layout.setText(
+          Hex.assets.regularFont,
+          txt,
+          Color.WHITE,
+          Gdx.graphics.width.toFloat(),
+          Align.center,
+          true)
+      Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
       batch.end()
     }
   }

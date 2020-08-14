@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
-import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Array as GdxArray
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
 import no.elg.hex.screens.LevelSelectScreen
@@ -23,6 +23,9 @@ import no.elg.hex.screens.LevelSelectScreen
 class Assets : AssetManager() {
 
   var finishMainConst: Boolean = false
+    private set
+
+  var loadingInfo = "not begun"
     private set
 
   companion object {
@@ -70,7 +73,7 @@ class Assets : AssetManager() {
   private fun findAnimation(
       regionPrefix: String, totalFrames: Int, frameDuration: Float
   ): Animation<AtlasRegion> {
-    val array = Array<AtlasRegion>()
+    val array = GdxArray<AtlasRegion>()
     for (frame in 0 until totalFrames) {
       array.add(findSprite(regionPrefix + frame))
     }
@@ -116,13 +119,20 @@ class Assets : AssetManager() {
 
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
 
+    loadingInfo = "fonts"
     // rest of the fonts
     font(bold = false, italic = true)
     font(bold = true, italic = false)
     font(bold = true, italic = true)
 
+    loadingInfo = "sprites"
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
     load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
+
+    loadingInfo = "islands"
+    
+    val oldIslands = GdxArray<Island>()
+    getAll(Island::class.java, oldIslands)
 
     for (slot in 0..Int.MAX_VALUE) {
       val file = LevelSelectScreen.getIslandFile(slot)
