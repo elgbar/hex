@@ -23,9 +23,7 @@ import no.elg.hex.util.component4
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
 
-  private const val FRAME_BUFFER_SIZE = 1024
-
-  private const val PREVIEWS_PER_ROW = 3
+  private const val PREVIEWS_PER_ROW = 5
   private const val PREVIEW_PADDING_PERCENT = 0.025f
 
   private val NOT_SELECTED_COLOR = Color.LIGHT_GRAY
@@ -126,6 +124,26 @@ object LevelSelectScreen : AbstractScreen() {
       drawBox(x, y, width, height)
     }
     batch.end()
+
+    if (Hex.args.mapEditor) {
+      val (x, y, width, height) = rect(islandPreviews.size)
+
+      lineRenderer.line(
+          x + width / 2f,
+          y + height / 2f + height / 10f,
+          x + width / 2f,
+          y + height / 2f - height / 10f,
+          Color.WHITE,
+          Color.WHITE)
+      lineRenderer.line(
+          x + width / 2f + width / 10f,
+          y + height / 2f,
+          x + width / 2f - width / 10f,
+          y + height / 2f,
+          Color.WHITE,
+          Color.WHITE)
+      drawBox(x, y, width, height)
+    }
 
     lineRenderer.end()
   }
