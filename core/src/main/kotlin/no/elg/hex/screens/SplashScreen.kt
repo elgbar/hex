@@ -18,17 +18,23 @@ object SplashScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-
     if (Hex.assets.finishMainConst && Hex.assets.update()) {
       Gdx.app.log("SPLASH", "All assets finished loading")
       Hex.screen = LevelSelectScreen
     } else {
-      camera.update()
       batch.begin()
 
       val txt =
-          "Loading ${Hex.assets.loadingInfo}%n%n%2.0f%%%n%n${System.currentTimeMillis() - startTime} ms".format(
-              Hex.assets.progress * 100)
+          """
+          |Loading ${Hex.assets.loadingInfo}
+          |
+          |%2.0f%%
+          |
+          |${System.currentTimeMillis() - startTime} ms
+          """
+              .trimMargin()
+              .format(Hex.assets.progress * 100)
+
       layout.setText(
           Hex.assets.regularFont,
           txt,

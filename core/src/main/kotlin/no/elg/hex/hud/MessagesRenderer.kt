@@ -8,8 +8,8 @@ import no.elg.hex.hud.ScreenRenderer.draw
 /** @author Elg */
 object MessagesRenderer : FrameUpdatable {
 
-  const val DURATION_SECONDS = 10f
-  const val FADE_START = 0.5f
+  private const val DURATION_SECONDS = 10f
+  private const val FADE_START = 0.5f
 
   private val messages = ArrayList<Pair<ScreenText, Float>>()
 
