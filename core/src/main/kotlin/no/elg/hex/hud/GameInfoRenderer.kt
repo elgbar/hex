@@ -57,12 +57,10 @@ class GameInfoRenderer(
             is Empty -> return@also
           }
 
-      region.flip(false, true)
-
       batch.draw(
           region,
           Gdx.graphics.width / 2f,
-          Gdx.graphics.height - region.packedHeight * 2.5f,
+          region.packedHeight * 0.5f,
           0f,
           0f,
           region.packedWidth.toFloat(),
@@ -71,7 +69,6 @@ class GameInfoRenderer(
           2f,
           0f)
 
-      region.flip(false, true)
       batch.end()
     }
   }
