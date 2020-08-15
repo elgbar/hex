@@ -20,6 +20,7 @@ import no.elg.hex.hexagon.SPEARMAN_STRENGTH
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.mergedType
+import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -34,9 +35,9 @@ import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 
 /**
- * An AI that does random actions for a random amount of time. All action it can take will have some
- * value. For example it will not click on an empty hexagon in a territory when it does not hold
- * anything in it's hand.
+ * An AI that does semi-random actions for a until it amount of time. All action it can take will
+ * have some value. For example it will not click on an empty hexagon in a territory when it does
+ * not hold anything in it's hand.
  *
  * This AI operates independently on each territory in the given team. It has no long term goals.
  *
@@ -48,6 +49,9 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   private fun think(words: () -> String) {
     Gdx.app.trace("NARAI-$team", words)
   }
+
+  // list of hexagon not to be picked up
+  private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
 
   private val buyablePieces =
       arrayOf(Castle::class, Peasant::class
@@ -70,7 +74,7 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
         HashSet<Hexagon<HexagonData>>(
             territory.hexagons.filter {
               val piece = territory.island.getData(it).piece
-              piece is LivingPiece && !piece.moved
+              piece is LivingPiece && !piece.moved && !hexBlacklist.contains(it)
             })
 
     // only buy if there are no more units to move
@@ -145,6 +149,7 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
                   think { "Will attack a ${type.simpleName}" }
                   attackableOfType.random()
                 }
+                think { "Cannot find any ${type.simpleName} to attack" }
                 return null
               }
 
@@ -156,60 +161,21 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
 
               val graveHexagons =
                   territory.hexagons.filter { territory.island.getData(it).piece is Grave }
+
               if (graveHexagons.isNotEmpty()) {
                 think { "But there is a hexagon with a grave, lets clean it up early" }
                 graveHexagons.random()
-              } else if (random.nextFloat() >= 0.25) {
-                think { "Place the held piece randomly" }
-                territory
-                    .hexagons
-                    .filter { territory.island.getData(it).piece is Empty }
-                    .randomOrNull()
-              } else {
-                val maxBorderStr =
+              } else if (random.nextFloat() >= 0.15f) {
+                think { "Place the held piece randomly on empty hexagon" }
+                val emptyHex: Hexagon<HexagonData>? =
                     territory
-                        .enemyBorderHexes
-                        .map { territory.island.getData(it).piece.strength }
-                        .max()
-                        ?: NO_STRENGTH
-
-                val shouldMergeToKnight =
-                    maxBorderStr >= SPEARMAN_STRENGTH &&
-                        territory.hexagons.count { territory.island.getData(it).piece is Knight } <
-                            MAX_TOTAL_KNIGHTS - 1
-                val shouldMergeToBaron =
-                    maxBorderStr >= KNIGHT_STRENGTH &&
-                        territory.hexagons.count {
-                          val piece = territory.island.getData(it).piece
-                          piece is Knight || piece is Baron
-                        } < MAX_TOTAL_BARONS - 1
-                if (!shouldMergeToBaron) {
-                  think { "Should not merge to baron right now" }
-                }
-                if (!shouldMergeToKnight) {
-                  think { "Should not merge to knight right now" }
-                }
-
-                territory.hexagons.find {
-                  val piece = territory.island.getData(it).piece
-                  if (piece !is LivingPiece || piece.canNotMerge(handPiece)) {
-                    return@find false
-                  }
-                  if (piece is Knight && !shouldMergeToKnight) {
-                    return@find false
-                  }
-                  if (piece is Baron && !shouldMergeToBaron) {
-                    return@find false
-                  }
-
-                  val mergedType = mergedType(piece, handPiece).createHandInstance()
-
-                  val newIncome = territory.income - piece.cost - handPiece.cost + mergedType.cost
-                  think {
-                    "NewIncome would be $newIncome I want at least ${mergedType.cost / 2} to accept this merge"
-                  }
-                  newIncome >= abs(mergedType.cost) / 2
-                }
+                        .hexagons
+                        .filter { territory.island.getData(it).piece is Empty }
+                        .randomOrNull()
+                if (emptyHex != null) hexBlacklist.add(emptyHex)
+                emptyHex
+              } else {
+                mergeWithLivingTerritoryPiece(handPiece, territory)
               }
             }
           }
@@ -228,6 +194,7 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
     island.select(island.hexagons.first())
     for (territory in island.getTerritories(team)) {
+      hexBlacklist.clear()
       do {
         island.select(territory.hexagons.first())
         val sel = territory.island.selected ?: continue
@@ -239,6 +206,59 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
       } while (random.nextFloat() > 0.005f)
     }
     island.select(null)
+  }
+
+  private fun mergeWithLivingTerritoryPiece(
+      handPiece: LivingPiece, territory: Territory
+  ): Hexagon<HexagonData>? {
+    think { "Will try to merge piece with another piece" }
+    val maxBorderStr =
+        territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.max()
+            ?: NO_STRENGTH
+
+    think {
+      if (maxBorderStr > 0)
+          "The highest level threat on my boarder has the strength of a ${strengthToType(maxBorderStr)::simpleName}"
+      else "I have vanquished my foes!"
+    }
+
+    val knights = territory.hexagons.count { territory.island.getData(it).piece is Knight }
+    val barons = territory.hexagons.count { territory.island.getData(it).piece is Baron }
+
+    think { "There are $knights knights and $barons barons in this territory" }
+
+    val disallowKnight = maxBorderStr < SPEARMAN_STRENGTH || knights >= MAX_TOTAL_KNIGHTS - 1
+    if (disallowKnight) {
+      think { "Should not merge to knight right now as the threat is not high enough" }
+    }
+
+    val disallowBaron = maxBorderStr < KNIGHT_STRENGTH || barons >= MAX_TOTAL_BARONS - 1
+    if (disallowBaron) {
+      think { "Should not merge to baron right now as the threat is not high enough" }
+    }
+
+    return territory.hexagons.find {
+      val piece = territory.island.getData(it).piece
+      if (piece !is LivingPiece || piece.canNotMerge(handPiece)) {
+        return@find false
+      }
+      if (piece is Knight && disallowKnight) {
+        return@find false
+      }
+      if (piece is Baron && disallowBaron) {
+        return@find false
+      }
+
+      think { "I can merge handpiece ${handPiece::class.simpleName}" }
+
+      val mergedType = mergedType(piece, handPiece).createHandInstance()
+
+      val newIncome = territory.income - piece.cost - handPiece.cost + mergedType.cost
+      think {
+        "New income would be $newIncome I want at least ${mergedType.cost / 2} to accept this merge"
+      }
+      newIncome >= abs(mergedType.cost) / 2
+    }
   }
 
   fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
