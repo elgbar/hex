@@ -13,7 +13,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
-import java.awt.Toolkit
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
@@ -39,8 +38,6 @@ object Hex : ApplicationAdapter() {
     private set
 
   val inputMultiplexer = InputMultiplexer()
-
-  val scale: Int = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
 
   var screen: Screen = SplashScreen
     set(value) {
@@ -76,10 +73,11 @@ object Hex : ApplicationAdapter() {
     Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f)
 
     assets = Assets()
+    screen = SplashScreen
 
     Gdx.input.inputProcessor = inputMultiplexer
 
-    if (scale > 1) {
+    if (Assets.scale > 1) {
       VisUI.load(X2)
     } else {
       VisUI.load(X1)

@@ -48,7 +48,11 @@ class Assets : AssetManager() {
     const val REGULAR_FONT = "fonts/UbuntuMono-R.ttf"
     const val REGULAR_ITALIC_FONT = "fonts/UbuntuMono-RI.ttf"
 
-    const val FONT_SIZE = 20
+    private const val FONT_SIZE = 20
+
+    val scale: Int = if (java.awt.Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
+
+    val fontSize = FONT_SIZE * scale
   }
 
   val boldFont: BitmapFont by lazy { get<BitmapFont>(BOLD_FONT) }
@@ -105,8 +109,9 @@ class Assets : AssetManager() {
       val italicness = if (italic) "I" else ""
 
       val parameter = FreeTypeFontLoaderParameter()
-      parameter.fontParameters.size = FONT_SIZE * Hex.scale
+      parameter.fontParameters.size = fontSize
       parameter.fontParameters.minFilter = Linear
+      parameter.fontParameters.flip = true
       parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
       load(parameter.fontFileName, BITMAP_FONT, parameter)
     }

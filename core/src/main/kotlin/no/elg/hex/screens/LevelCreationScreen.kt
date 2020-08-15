@@ -1,8 +1,7 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import no.elg.hex.Assets.Companion.FONT_SIZE
+import no.elg.hex.Assets
 import no.elg.hex.Hex
 import no.elg.hex.input.LevelCreationInputProcessor
 
@@ -19,7 +18,6 @@ object LevelCreationScreen : AbstractScreen() {
     //    lineRenderer.end()
 
     batch.begin()
-    Hex.assets.regularFont.color = Color.WHITE
 
     val text =
         """
@@ -33,12 +31,10 @@ object LevelCreationScreen : AbstractScreen() {
     val longestLine = (text.lineSequence().maxBy { it.length }?.length ?: text.length)
     val lines = text.lineSequence().count()
 
-    //    layout.setText(Hex.assets.regularFont, text, Color.WHITE, Gdx.graphics.width.toFloat(),
-    // Align.center, true)
     Hex.assets.regularFont.draw(
         batch,
         text,
-        Gdx.graphics.width / 2f - longestLine / 4f * FONT_SIZE,
+        Gdx.graphics.width / 2f - longestLine / 2f * Assets.fontSize,
         Gdx.graphics.height / 2f + (lines / 2f) * Hex.assets.regularFont.capHeight)
 
     batch.end()

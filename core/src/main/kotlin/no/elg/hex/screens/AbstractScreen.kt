@@ -14,9 +14,7 @@ abstract class AbstractScreen : ScreenAdapter() {
   protected val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
 
   val camera: OrthographicCamera by lazy {
-    OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).also {
-      it.setToOrtho(true)
-    }
+    OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
   }
 
   abstract override fun render(delta: Float)

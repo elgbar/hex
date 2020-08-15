@@ -14,7 +14,7 @@ import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
-import no.elg.hex.hud.ScreenDrawPosition.BOTTOM
+import no.elg.hex.hud.ScreenDrawPosition.BOTTOM_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.hud.ScreenRenderer.batch
 import no.elg.hex.input.GameInputProcessor
@@ -38,7 +38,7 @@ class GameInfoRenderer(
 
     if (islandScreen.inputProcessor is GameInputProcessor &&
         (islandScreen.inputProcessor as GameInputProcessor).infiniteMoney) {
-      ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM)
+      ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
     }
 
     islandScreen.island.inHand?.also { (_, piece) ->

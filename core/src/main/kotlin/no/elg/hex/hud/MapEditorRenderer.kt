@@ -2,7 +2,7 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hud.ScreenDrawPosition.BOTTOM
+import no.elg.hex.hud.ScreenDrawPosition.BOTTOM_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor.Companion.MAX_BRUSH_SIZE
@@ -85,9 +85,9 @@ class MapEditorRenderer(
           position = TOP_RIGHT)
 
       if (showHelp) {
-        ScreenRenderer.drawAll(*shownHelp, position = BOTTOM)
+        ScreenRenderer.drawAll(*shownHelp, position = BOTTOM_LEFT)
       } else {
-        ScreenRenderer.drawAll(*hiddenHelp, position = BOTTOM)
+        ScreenRenderer.drawAll(*hiddenHelp, position = BOTTOM_LEFT)
       }
     }
   }

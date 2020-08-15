@@ -6,21 +6,21 @@ import com.badlogic.gdx.graphics.Color.GREEN
 import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Color.YELLOW
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import kotlin.math.sign
-import no.elg.hex.Assets.Companion.FONT_SIZE
+import no.elg.hex.Assets.Companion.fontSize
 import no.elg.hex.Hex
 import no.elg.hex.api.Resizable
-import no.elg.hex.hud.ScreenDrawPosition.TOP
+import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
 
-enum class ScreenDrawPosition(val bottom: Boolean, val right: Boolean) {
-  TOP(false, false),
-  BOTTOM(true, false),
-  TOP_RIGHT(false, true),
-  BOTTOM_RIGHT(true, true)
+enum class ScreenDrawPosition(val top: Boolean, val right: Boolean) {
+  TOP_LEFT(true, false),
+  BOTTOM_LEFT(false, false),
+  TOP_RIGHT(true, true),
+  BOTTOM_RIGHT(false, true)
 }
 
 data class ScreenText(
@@ -133,16 +133,19 @@ fun booleanText(
 
 object ScreenRenderer : Disposable, Resizable {
 
-  val spacing: Float = FONT_SIZE * Hex.scale / 2f
+  val spacing: Float = fontSize / 2f
   val batch: SpriteBatch = SpriteBatch()
+  private val camera = OrthographicCamera()
 
   init {
     resize(Gdx.graphics.width, Gdx.graphics.height)
   }
 
-  fun ScreenText.draw(line: Int, position: ScreenDrawPosition = TOP, offsetX: Float = spacing) {
+  fun ScreenText.draw(
+      line: Int, position: ScreenDrawPosition = TOP_LEFT, offsetX: Float = spacing
+  ) {
     val y =
-        if (position.bottom) {
+        if (position.top) {
           spacing * line * 2f + spacing
         } else {
           Gdx.graphics.height - spacing * line * 2f
@@ -159,22 +162,22 @@ object ScreenRenderer : Disposable, Resizable {
 
       totalLength - spacing * text.length to totalLength
     } else offsetX to offsetX + spacing * text.length
-
     font.color = color
     font.draw(batch, text, x, y)
     next?.draw(line, position, nextOffsetX)
   }
 
   /** Draw all given text on different lines */
-  fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP) {
+  fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP_LEFT) {
 
-    if (position.bottom) {
+    if (!position.top) {
       screenTexts.reverse()
     }
+    val offset = if (position.top) 0 else 1
 
     begin()
     for ((line, screenText) in screenTexts.withIndex()) {
-      screenText.draw(line + 1, position)
+      screenText.draw(line + offset, position)
     }
     end()
   }
@@ -192,6 +195,7 @@ object ScreenRenderer : Disposable, Resizable {
   }
 
   override fun resize(width: Int, height: Int) {
-    batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, width.toFloat(), height.toFloat())
+    camera.setToOrtho(true)
+    batch.projectionMatrix = camera.combined
   }
 }
