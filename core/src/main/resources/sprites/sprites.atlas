@@ -1,54 +1,96 @@
 
 sprites.png
-size: 1401,1401
+size: 2048,2048
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 castle
   rotate: false
-  xy: 1057, 345
+  xy: 772, 1518
   size: 318, 528
   orig: 318, 528
   offset: 0, 0
   index: -1
-flag
-  rotate: false
-  xy: 449, 241
-  size: 217, 574
-  orig: 217, 574
-  offset: 0, 0
-  index: -1
 grave
   rotate: false
-  xy: 670, 364
+  xy: 2, 1546
   size: 383, 500
   orig: 383, 500
   offset: 0, 0
   index: -1
 palm
   rotate: false
-  xy: 1020, 877
+  xy: 389, 1524
   size: 379, 522
   orig: 379, 522
   offset: 0, 0
   index: -1
 pine
   rotate: false
-  xy: 2, 175
+  xy: 1603, 1406
   size: 443, 640
   orig: 443, 640
   offset: 0, 0
   index: -1
 village
   rotate: false
-  xy: 511, 868
-  size: 505, 531
-  orig: 505, 531
+  xy: 1529, 238
+  size: 505, 580
+  orig: 505, 580
   offset: 0, 0
   index: -1
 village0
   rotate: false
-  xy: 2, 819
+  xy: 1094, 1466
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village1
+  rotate: false
+  xy: 1020, 298
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village2
+  rotate: false
+  xy: 2, 940
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village3
+  rotate: false
+  xy: 511, 934
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village4
+  rotate: false
+  xy: 1020, 882
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village5
+  rotate: false
+  xy: 1529, 822
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village6
+  rotate: false
+  xy: 2, 356
+  size: 505, 580
+  orig: 505, 580
+  offset: 0, 0
+  index: -1
+village7
+  rotate: false
+  xy: 511, 350
   size: 505, 580
   orig: 505, 580
   offset: 0, 0

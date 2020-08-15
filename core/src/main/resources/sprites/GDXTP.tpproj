@@ -11,8 +11,8 @@ fast=false
 filterMag=Nearest
 filterMin=Nearest
 ignoreBlankImages=true
-maxHeight=2048
-maxWidth=2048
+maxHeight=4096
+maxWidth=4096
 minHeight=16
 minWidth=16
 paddingX=4
@@ -32,7 +32,7 @@ limitMemory=false
 useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:nearest}]
-inputFiles=[{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation/flag.png,type:Ignore}]
 
 
 ---
