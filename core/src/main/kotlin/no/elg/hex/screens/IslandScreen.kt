@@ -8,8 +8,6 @@ import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.BasicIslandInputProcessor
-import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
-import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.island.Island
@@ -26,7 +24,6 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     AbstractScreen() {
 
   private fun calcVisibleGridSize(): DoubleArray {
-    val data = island.grid.gridData
     val visible = island.hexagons.filterNot { island.getData(it).invisible }
 
     val minX = visible.minBy { it.center.coordinateX }!!.center.coordinateX
@@ -111,7 +108,7 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     val widthZoom = (maxX - minX + padding * data.hexagonWidth) / camera.viewportWidth
     val heightZoom = (maxY - minY + padding * data.hexagonHeight) / camera.viewportHeight
 
-    camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
+    camera.zoom = max(widthZoom, heightZoom).toFloat()
   }
 
   override fun show() {
