@@ -25,6 +25,7 @@ object LevelSelectScreen : AbstractScreen() {
 
   private const val PREVIEWS_PER_ROW = 5
   private const val PREVIEW_PADDING_PERCENT = 0.025f
+  private const val MIN_PREVIEW_SIZE = 512
 
   private val NOT_SELECTED_COLOR = Color.LIGHT_GRAY
   private val SELECT_COLOR = Color.GREEN
@@ -43,9 +44,8 @@ object LevelSelectScreen : AbstractScreen() {
   private val previewSize
     get() =
         ((Gdx.graphics.width -
-                (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
-                PREVIEWS_PER_ROW)
-            .toInt()
+            (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
+            PREVIEWS_PER_ROW)
 
   private fun renderPreviews() {
     for (buffer in islandPreviews) {
@@ -58,7 +58,7 @@ object LevelSelectScreen : AbstractScreen() {
       play(0)
       return
     }
-    val previewSize = this.previewSize
+    val previewSize = (2 * this.previewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
 
     for (slot in 0..Int.MAX_VALUE) {
       val file = getIslandFile(slot)
@@ -102,7 +102,7 @@ object LevelSelectScreen : AbstractScreen() {
     val gridY = index / PREVIEWS_PER_ROW
 
     val padding: Float = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
-    val size: Float = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
+    val size: Float = this.previewSize
 
     return Rectangle(
         padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size)
