@@ -1,6 +1,8 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlin.math.max
@@ -15,11 +17,14 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
+import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.screens.IslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.getData
+import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.next
 import no.elg.hex.util.schedule
 import no.elg.hex.util.trace
@@ -348,9 +353,10 @@ class Island(
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         if (this.getData(hexagon).piece is Capital) {
-          Gdx.app.log(
-              "Island Validation",
-              "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
+          publishMessage(
+              ScreenText(
+                  "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.",
+                  Color.RED))
           valid = false
         }
         continue
@@ -358,18 +364,44 @@ class Island(
 
       val capitalCount = connectedHexes.count { this.getData(it).piece is Capital }
       if (capitalCount < 1) {
-        Gdx.app.log(
-            "Island Validation",
-            "There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
+        publishMessage(
+            ScreenText(
+                "There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.",
+                Color.RED))
         valid = false
       } else if (capitalCount > 1) {
-        Gdx.app.log(
-            "Island Validation",
-            "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
+        publishMessage(
+            ScreenText(
+                "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.",
+                Color.RED))
         valid = false
       }
+    }
 
-      // TODO check connectedness
+    // check that every hexagon is connected
+
+    val visibleNeighbors = HashSet<Hexagon<HexagonData>>(hexagons.size)
+    val toCheck = Queue<Hexagon<HexagonData>>(hexagons.size * 2)
+    toCheck.addFirst(hexagons.first { !getData(it).invisible })
+
+    do {
+      val curr: Hexagon<HexagonData> = toCheck.removeFirst()
+      if (visibleNeighbors.contains(curr)) continue
+      val neighbors = getNeighbors(curr)
+
+      for (neighbor in neighbors) {
+        if (visibleNeighbors.contains(neighbor)) continue
+        toCheck.addLast(neighbor)
+      }
+      visibleNeighbors += curr
+    } while (!toCheck.isEmpty)
+
+    val allVisibleHexagons = hexagons.filterNot { getData(it).invisible }
+
+    if (!allVisibleHexagons.containsAll(visibleNeighbors) ||
+        !visibleNeighbors.containsAll(allVisibleHexagons)) {
+      publishMessage(ScreenText("The visible hexagon grid is not connected.", Color.RED))
+      valid = false
     }
     return valid
   }
