@@ -1,6 +1,9 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
+import javax.sound.sampled.Line
 import no.elg.hex.Assets
 import no.elg.hex.Hex
 import no.elg.hex.input.LevelCreationInputProcessor
@@ -9,13 +12,13 @@ import no.elg.hex.input.LevelCreationInputProcessor
 object LevelCreationScreen : AbstractScreen() {
 
   override fun render(delta: Float) {
-    //    lineRenderer.begin(Line)
-    //    lineRenderer.color = Color.LIGHT_GRAY
-    //    lineRenderer.line(Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f,
-    // Gdx.graphics.height.toFloat())
-    //    lineRenderer.line(0f, Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(),
-    // Gdx.graphics.height / 2f)
-    //    lineRenderer.end()
+    lineRenderer.begin(ShapeType.Line)
+    lineRenderer.color = Color.LIGHT_GRAY
+    lineRenderer.line(
+        Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f, Gdx.graphics.height.toFloat())
+    lineRenderer.line(
+        0f, Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height / 2f)
+    lineRenderer.end()
 
     batch.begin()
 
@@ -34,8 +37,8 @@ object LevelCreationScreen : AbstractScreen() {
     Hex.assets.regularFont.draw(
         batch,
         text,
-        Gdx.graphics.width / 2f - longestLine / 2f * Assets.fontSize,
-        Gdx.graphics.height / 2f + (lines / 2f) * Hex.assets.regularFont.capHeight)
+        (Gdx.graphics.width - longestLine / 2 * Assets.fontSize) / 2f,
+        (Gdx.graphics.height - lines * Hex.assets.regularFont.capHeight) / 2f)
 
     batch.end()
   }
