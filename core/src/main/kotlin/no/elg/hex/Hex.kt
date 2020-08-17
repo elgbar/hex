@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
-import com.kotcrab.vis.ui.VisUI.SkinScale.X1
-import com.kotcrab.vis.ui.VisUI.SkinScale.X2
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
@@ -77,12 +75,6 @@ object Hex : ApplicationAdapter() {
 
     Gdx.input.inputProcessor = inputMultiplexer
 
-    if (Assets.scale > 1) {
-      VisUI.load(X2)
-    } else {
-      VisUI.load(X1)
-    }
-
     // must be last
     assets.finishMain()
   }
@@ -96,5 +88,9 @@ object Hex : ApplicationAdapter() {
   override fun resize(width: Int, height: Int) {
     ScreenRenderer.resize(width, height)
     screen.resize(width, height)
+  }
+
+  override fun dispose() {
+    VisUI.dispose()
   }
 }

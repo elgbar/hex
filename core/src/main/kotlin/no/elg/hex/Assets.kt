@@ -15,6 +15,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
 import com.badlogic.gdx.utils.Array as GdxArray
+import com.kotcrab.vis.ui.VisUI
+import com.kotcrab.vis.ui.VisUI.SkinScale.X1
+import com.kotcrab.vis.ui.VisUI.SkinScale.X2
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
@@ -55,13 +58,13 @@ class Assets : AssetManager() {
     val fontSize = FONT_SIZE * scale
   }
 
-  val boldFont: BitmapFont by lazy { get<BitmapFont>(BOLD_FONT) }
-  val boldItalicFont: BitmapFont by lazy { get<BitmapFont>(BOLD_ITALIC_FONT) }
-  val regularFont: BitmapFont by lazy { get<BitmapFont>(REGULAR_FONT) }
-  val regularItalicFont: BitmapFont by lazy { get<BitmapFont>(REGULAR_ITALIC_FONT) }
+  val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
+  val boldItalicFont: BitmapFont by lazy { get(BOLD_ITALIC_FONT) }
+  val regularFont: BitmapFont by lazy { get(REGULAR_FONT) }
+  val regularItalicFont: BitmapFont by lazy { get(REGULAR_ITALIC_FONT) }
 
-  val sprites: TextureAtlas by lazy { get<TextureAtlas>(SPRITE_ATLAS) }
-  val originalSprites: TextureAtlas by lazy { get<TextureAtlas>(ORIGINAL_SPRITES_ATLAS) }
+  val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
+  val originalSprites: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS) }
 
   private fun findSprite(regionName: String): AtlasRegion {
     val region =
@@ -130,6 +133,10 @@ class Assets : AssetManager() {
     font(bold = false, italic = true)
     font(bold = true, italic = false)
     font(bold = true, italic = true)
+
+    loadingInfo = "VisUI"
+
+    if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
 
     loadingInfo = "sprites"
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
