@@ -27,17 +27,17 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
   private fun calcVisibleGridSize(): DoubleArray {
     val visible = island.hexagons.filterNot { island.getData(it).invisible }
 
-    val minX = visible.minBy { it.center.coordinateX }!!.center.coordinateX
-    val maxX = visible.maxBy { it.center.coordinateX }!!.center.coordinateX
+    val minX = visible.minOf { it.center.coordinateX }
+    val maxX = visible.maxOf { it.center.coordinateX }
 
-    val minY = visible.minBy { it.center.coordinateY }!!.center.coordinateY
-    val maxY = visible.maxBy { it.center.coordinateY }!!.center.coordinateY
+    val minY = visible.minOf { it.center.coordinateY }
+    val maxY = visible.maxOf { it.center.coordinateY }
 
-    val maxInvX = island.hexagons.maxBy { it.center.coordinateX }!!.center.coordinateX
-    val minInvX = island.hexagons.minBy { it.center.coordinateX }!!.center.coordinateX
+    val minInvX = island.hexagons.minOf { it.center.coordinateX }
+    val maxInvX = island.hexagons.maxOf { it.center.coordinateX }
 
-    val maxInvY = island.hexagons.maxBy { it.center.coordinateY }!!.center.coordinateY
-    val minInvY = island.hexagons.minBy { it.center.coordinateY }!!.center.coordinateY
+    val minInvY = island.hexagons.minOf { it.center.coordinateY }
+    val maxInvY = island.hexagons.maxOf { it.center.coordinateY }
     return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, minInvX, maxInvY, minInvY)
   }
 
