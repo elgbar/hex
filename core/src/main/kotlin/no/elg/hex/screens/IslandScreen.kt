@@ -11,6 +11,7 @@ import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.STARTING_TEAM
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
@@ -111,9 +112,14 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     camera.zoom = max(widthZoom, heightZoom).toFloat()
   }
 
+  @ExperimentalStdlibApi
   override fun show() {
     Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.addProcessor(inputProcessor)
+
+    if (island.currentTeam != STARTING_TEAM && inputProcessor is GameInputProcessor) {
+      island.endTurn(inputProcessor as GameInputProcessor)
+    }
   }
 
   override fun hide() {
