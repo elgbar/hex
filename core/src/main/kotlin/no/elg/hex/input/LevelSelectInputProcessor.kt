@@ -44,7 +44,7 @@ object LevelSelectInputProcessor : InputAdapter() {
         val index = getHoveringIslandIndex()
         if (index != INVALID_ISLAND_INDEX) {
           play(index)
-        } else {
+        } else if (Hex.args.mapEditor) {
           val (x, y, width, height) = LevelSelectScreen.rect(islandAmount)
           if (mouseX in x..x + width && mouseY in y..y + height) {
             Hex.screen = LevelCreationScreen
