@@ -14,13 +14,35 @@ import kotlin.math.sign
 import no.elg.hex.Assets.Companion.fontSize
 import no.elg.hex.Hex
 import no.elg.hex.api.Resizable
+import no.elg.hex.hud.ScreenDrawPosition.HorizontalPosition.HORIZONTAL_CENTER
+import no.elg.hex.hud.ScreenDrawPosition.HorizontalPosition.LEFT
+import no.elg.hex.hud.ScreenDrawPosition.HorizontalPosition.RIGHT
 import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
+import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.BOTTOM
+import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.TOP
+import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.VERTICAL_CENTER
 
-enum class ScreenDrawPosition(val top: Boolean, val right: Boolean) {
-  TOP_LEFT(true, false),
-  BOTTOM_LEFT(false, false),
-  TOP_RIGHT(true, true),
-  BOTTOM_RIGHT(false, true)
+enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: HorizontalPosition) {
+  TOP_LEFT(TOP, LEFT),
+  TOP_CENTER(TOP, HORIZONTAL_CENTER),
+  TOP_RIGHT(TOP, RIGHT),
+  CENTER_LEFT(VERTICAL_CENTER, LEFT),
+  CENTER_CENTER(VERTICAL_CENTER, HORIZONTAL_CENTER),
+  CENTER_RIGHT(VERTICAL_CENTER, RIGHT),
+  BOTTOM_LEFT(BOTTOM, LEFT),
+  BOTTOM_CENTER(BOTTOM, HORIZONTAL_CENTER),
+  BOTTOM_RIGHT(BOTTOM, RIGHT);
+
+  enum class HorizontalPosition {
+    LEFT,
+    HORIZONTAL_CENTER,
+    RIGHT
+  }
+  enum class VerticalPosition {
+    TOP,
+    VERTICAL_CENTER,
+    BOTTOM
+  }
 }
 
 data class ScreenText(
@@ -145,23 +167,27 @@ object ScreenRenderer : Disposable, Resizable {
       line: Int, position: ScreenDrawPosition = TOP_LEFT, offsetX: Float = spacing
   ) {
     val y =
-        if (position.top) {
-          spacing * line * 2f + spacing
-        } else {
-          Gdx.graphics.height - spacing * line * 2f
+        when (position.vertical) {
+          TOP -> spacing * line * 2f + spacing
+          BOTTOM -> Gdx.graphics.height - spacing * line * 2f
+          VERTICAL_CENTER -> TODO()
         }
 
-    val (x, nextOffsetX) = if (position.right) {
-      var ctr = 1f
-      var curr: ScreenText? = next
-      while (curr != null) {
-        ctr += curr.text.length
-        curr = curr.next
-      }
-      val totalLength = Gdx.graphics.width - spacing * ctr
+    val (x, nextOffsetX) = when (position.horizontal) {
+      RIGHT -> {
+        var ctr = 1f
+        var curr: ScreenText? = next
+        while (curr != null) {
+          ctr += curr.text.length
+          curr = curr.next
+        }
+        val totalLength = Gdx.graphics.width - spacing * ctr
 
-      totalLength - spacing * text.length to totalLength
-    } else offsetX to offsetX + spacing * text.length
+        totalLength - spacing * text.length to totalLength
+      }
+      LEFT -> offsetX to offsetX + spacing * text.length
+      HORIZONTAL_CENTER -> TODO()
+    }
     font.color = color
     font.draw(batch, text, x, y)
     next?.draw(line, position, nextOffsetX)
@@ -170,10 +196,10 @@ object ScreenRenderer : Disposable, Resizable {
   /** Draw all given text on different lines */
   fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP_LEFT) {
 
-    if (!position.top) {
+    if (position.vertical == BOTTOM) {
       screenTexts.reverse()
     }
-    val offset = if (position.top) 0 else 1
+    val offset = if (position.vertical == TOP) 0 else 1
 
     begin()
     for ((line, screenText) in screenTexts.withIndex()) {
