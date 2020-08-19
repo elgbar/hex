@@ -41,8 +41,10 @@ class GameInfoRenderer(
       ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
     }
 
+    batch.begin()
+    Hex.assets.boldFont.color = Color.WHITE
+    Hex.assets.boldFont.draw(batch, "Turn ${islandScreen.island.turn}", Gdx.graphics.width / 2f, 0f)
     islandScreen.island.inHand?.also { (_, piece) ->
-      batch.begin()
       val region =
           when (piece) {
             is Capital -> Hex.assets.capital
@@ -57,20 +59,21 @@ class GameInfoRenderer(
             is Empty -> return@also
           }
 
-      batch.draw(
-          region,
-          Gdx.graphics.width / 2f,
-          region.packedHeight * 0.5f,
-          0f,
-          0f,
-          region.packedWidth.toFloat(),
-          region.packedHeight.toFloat(),
-          2f,
-          2f,
-          0f)
+      val height = (Gdx.graphics.height * 0.1f)
+      val width = height * (region.packedWidth / region.packedHeight.toFloat())
 
-      batch.end()
+      val handWidth =
+          height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
+
+      batch.draw(
+          Hex.assets.hand,
+          (Gdx.graphics.width - handWidth / 2f) / 2f,
+          (height + height / 2) / 2f,
+          handWidth,
+          height)
+      batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
     }
+    batch.end()
   }
 
   companion object {

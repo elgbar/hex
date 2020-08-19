@@ -44,7 +44,8 @@ class Island(
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap()
 ) {
 
-  private var round = 1
+  var turn = 1
+    private set
   val grid: HexagonalGrid<HexagonData>
 
   /** Prefer this over calling [grid.hexagons] as this has better performance */
@@ -113,8 +114,8 @@ class Island(
   private val teamToPlayer =
       HashMap<Team, AI?>().apply {
         this.putAll(Team.values().map { it to NotAsRandomAI(it) })
-        //        put(STARTING_TEAM, null) // player
-        put(STARTING_TEAM, NotAsRandomAI(STARTING_TEAM, true)) // player
+        put(STARTING_TEAM, null) // player
+      //        put(STARTING_TEAM, NotAsRandomAI(STARTING_TEAM, true)) // player
       }
 
   //////////////
@@ -142,7 +143,7 @@ class Island(
 
       if (currentTeam == STARTING_TEAM) {
         Gdx.app.debug("TURN", "New round!")
-        round++
+        turn++
         for (hexagon in hexagons) {
           this@Island.getData(hexagon).piece.newRound(this@Island, hexagon)
         }
