@@ -15,6 +15,7 @@ import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hud.ScreenDrawPosition.BOTTOM_LEFT
+import no.elg.hex.hud.ScreenDrawPosition.TOP_CENTER
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.hud.ScreenRenderer.batch
 import no.elg.hex.input.GameInputProcessor
@@ -27,13 +28,21 @@ class GameInfoRenderer(
 
   override fun frameUpdate() {
     islandScreen.island.selected?.also { selected ->
-      ScreenRenderer.drawAll(
-          ScreenText(
-              "Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) }),
-          ScreenText(
-              "Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) }),
-          ScreenText("Holding: ", next = nullCheckedText(islandScreen.island.inHand)),
-          position = TOP_RIGHT)
+      val list =
+          mutableListOf(
+              ScreenText(
+                  "Treasury: ",
+                  next = signColoredText(selected.capital.balance) { "%d".format(it) }),
+              ScreenText(
+                  "Estimated income: ",
+                  next = signColoredText(selected.income) { "%+d".format(it) }))
+      if (Hex.args.debug || Hex.args.trace) {
+        list +=
+            ScreenText(
+                "Holding: ",
+                next = nullCheckedText(islandScreen.island.inHand, color = Color.YELLOW))
+      }
+      ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
     }
 
     if (islandScreen.inputProcessor is GameInputProcessor &&
