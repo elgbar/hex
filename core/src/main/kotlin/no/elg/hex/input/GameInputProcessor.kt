@@ -3,7 +3,9 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.Input.Keys.BACKSPACE
 import com.badlogic.gdx.Input.Keys.ENTER
+import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.InputAdapter
 import kotlin.reflect.full.isSubclassOf
 import no.elg.hex.Hex
@@ -150,6 +152,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
 
     when (keycode) {
       ENTER -> islandScreen.island.endTurn(this)
+      BACKSPACE, SPACE -> islandScreen.island.inHand = null
       Keys.F12 -> if (Hex.args.debug || Hex.args.trace) infiniteMoney = !infiniteMoney
       else -> {
         val piece = keycodeToPiece(keycode) ?: return false
