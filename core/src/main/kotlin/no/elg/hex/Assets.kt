@@ -1,5 +1,6 @@
 package no.elg.hex
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
@@ -18,6 +19,9 @@ import com.badlogic.gdx.utils.Array as GdxArray
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
+import ktx.style.label
+import ktx.style.visTextButton
+import ktx.style.visTextField
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
@@ -50,6 +54,8 @@ class Assets : AssetManager() {
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
     const val REGULAR_FONT = "fonts/UbuntuMono-R.ttf"
     const val REGULAR_ITALIC_FONT = "fonts/UbuntuMono-RI.ttf"
+
+    const val NOT_FLIPED_SUFFIX = "-NF"
 
     private const val FONT_SIZE = 20
 
@@ -89,6 +95,7 @@ class Assets : AssetManager() {
     return Animation(frameDuration, array, LOOP_PINGPONG)
   }
 
+  val hand by lazy { findSprite("hand") }
   val pine by lazy { findSprite("pine") }
   val palm by lazy { findSprite("palm") }
   val capital by lazy { findSprite("village") }
@@ -107,19 +114,23 @@ class Assets : AssetManager() {
     setLoader(BITMAP_FONT, ".ttf", FreetypeFontLoader(resolver))
     setLoader(FREE_TYPE_FONT_GEN, FreeTypeFontGeneratorLoader(resolver))
 
-    fun font(bold: Boolean, italic: Boolean) {
+    fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true) {
       val boldness = if (bold) "B" else "R"
       val italicness = if (italic) "I" else ""
 
       val parameter = FreeTypeFontLoaderParameter()
       parameter.fontParameters.size = fontSize
       parameter.fontParameters.minFilter = Linear
-      parameter.fontParameters.flip = true
+      parameter.fontParameters.flip = flip
       parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
-      load(parameter.fontFileName, BITMAP_FONT, parameter)
+      val name =
+          if (flip) "fonts/UbuntuMono-$boldness$italicness.ttf"
+          else "fonts/UbuntuMono-$boldness$italicness$NOT_FLIPED_SUFFIX.ttf"
+      load(name, BITMAP_FONT, parameter)
+      Gdx.app.debug("ASSET", "loaded $name")
     }
 
-    font(bold = false, italic = false)
+    loadFont(bold = false, italic = false)
 
     // essential assets for the loading splash screen
 
@@ -130,16 +141,27 @@ class Assets : AssetManager() {
 
     loadingInfo = "fonts"
     // rest of the fonts
-    font(bold = false, italic = true)
-    font(bold = true, italic = false)
-    font(bold = true, italic = true)
+    loadFont(bold = false, italic = true)
+    loadFont(bold = true, italic = false)
+    loadFont(bold = true, italic = true)
 
     loadingInfo = "VisUI"
 
     if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
+    with(VisUI.getSkin()) {
+      loadFont(bold = false, italic = false, flip = false)
+      val notFlippedFont =
+          finishLoadingAsset<BitmapFont>("fonts/UbuntuMono-R$NOT_FLIPED_SUFFIX.ttf")
+      label(extend = "default") { font = notFlippedFont }
+      visTextField(extend = "default") { font = notFlippedFont }
+      visTextButton(extend = "default") { font = notFlippedFont }
+    }
 
     loadingInfo = "sprites"
-    load(SPRITE_ATLAS, TEXTURE_ATLAS)
+
+    if (!Hex.args.retro) {
+      load(SPRITE_ATLAS, TEXTURE_ATLAS)
+    }
     load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
 
     loadingInfo = "islands"

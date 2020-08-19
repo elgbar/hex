@@ -11,6 +11,7 @@ buildscript {
     kiwiVersion = '1.9.1.9.6'
     jacksonVersion = "2.11.1"
     junitVersion = "5.4.2"
+    ktxVersion = "1.9.11-b1"
   }
 
   repositories {
@@ -105,6 +106,11 @@ project(":core") {
     api "com.kotcrab.vis:vis-ui:$visVersion"
     api "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8"
+
+    implementation "io.github.libktx:ktx-vis:$ktxVersion"
+    implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
+    implementation "io.github.libktx:ktx-style:$ktxVersion"
+    implementation "io.github.libktx:ktx-actors:$ktxVersion"
 
     api "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 

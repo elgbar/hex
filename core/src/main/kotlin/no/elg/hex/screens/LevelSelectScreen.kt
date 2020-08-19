@@ -47,6 +47,17 @@ object LevelSelectScreen : AbstractScreen() {
             (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
             PREVIEWS_PER_ROW)
 
+  fun renderPreview(island: Island, previewSize: Int): FrameBuffer {
+    val islandScreen = IslandScreen(-1, island, false)
+    islandScreen.resize(previewSize, previewSize)
+    val buffer = FrameBuffer(RGBA8888, previewSize, previewSize, false)
+    buffer.begin()
+    islandScreen.render(0f)
+    buffer.end()
+    islandScreen.dispose()
+    return buffer
+  }
+
   private fun renderPreviews() {
     for (buffer in islandPreviews) {
       buffer.dispose()
@@ -70,14 +81,7 @@ object LevelSelectScreen : AbstractScreen() {
         if (!Hex.assets.isLoaded(fileName, Island::class.java)) {
           Hex.assets.load(fileName, Island::class.java)
         }
-        val islandScreen = IslandScreen(slot, Hex.assets.finishLoadingAsset(fileName), false)
-        islandScreen.resize(previewSize, previewSize)
-        val buffer = FrameBuffer(RGBA8888, previewSize, previewSize, false)
-        buffer.begin()
-        islandScreen.render(0f)
-        buffer.end()
-        islandPreviews.add(buffer)
-        islandScreen.dispose()
+        islandPreviews.add(renderPreview(Hex.assets.finishLoadingAsset(fileName), previewSize))
       } else {
         break
       }
