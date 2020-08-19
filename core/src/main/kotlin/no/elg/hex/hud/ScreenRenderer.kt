@@ -38,6 +38,7 @@ enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: Ho
     HORIZONTAL_CENTER,
     RIGHT
   }
+
   enum class VerticalPosition {
     TOP,
     VERTICAL_CENTER,
@@ -176,20 +177,27 @@ object ScreenRenderer : Disposable, Resizable {
           VERTICAL_CENTER -> TODO()
         }
 
+    fun totalLength(): Float {
+      var ctr = 1f
+      var curr: ScreenText? = next
+      while (curr != null) {
+        ctr += curr.text.length
+        curr = curr.next
+      }
+      return Gdx.graphics.width - spacing * ctr
+    }
+
     val (x, nextOffsetX) = when (position.horizontal) {
       RIGHT -> {
-        var ctr = 1f
-        var curr: ScreenText? = next
-        while (curr != null) {
-          ctr += curr.text.length
-          curr = curr.next
-        }
-        val totalLength = Gdx.graphics.width - spacing * ctr
-
+        val totalLength = totalLength()
         totalLength - spacing * text.length to totalLength
       }
       LEFT -> offsetX to offsetX + spacing * text.length
-      HORIZONTAL_CENTER -> TODO()
+      HORIZONTAL_CENTER -> {
+        require(next == null) { "Horizontal centred text cannot have a next element" }
+        val totalLength = totalLength()
+        totalLength / 2 to 0f
+      }
     }
     font.color = color
     font.draw(batch, text, x, y)
