@@ -76,11 +76,7 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun render() {
-    if (screen != SplashScreen) {
-      screen.renderBackground()
-    } else {
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
-    }
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     screen.render(Gdx.graphics.deltaTime)
     MessagesRenderer.frameUpdate()
   }
