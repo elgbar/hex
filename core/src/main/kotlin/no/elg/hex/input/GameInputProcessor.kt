@@ -145,7 +145,6 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     return true
   }
 
-  @ExperimentalStdlibApi
   override fun keyDown(keycode: Int): Boolean {
     if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
 

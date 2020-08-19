@@ -30,7 +30,6 @@ import org.hexworks.mixite.core.api.Hexagon
  *
  * @author Elg
  */
-@ExperimentalStdlibApi
 class RandomAI(override val team: Team) : AI {
 
   private val buyablePieces =
@@ -117,7 +116,6 @@ class RandomAI(override val team: Team) : AI {
     }
   }
 
-  @ExperimentalStdlibApi
   override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
     island.select(island.hexagons.first())
     for (territory in island.getTerritories(team)) {

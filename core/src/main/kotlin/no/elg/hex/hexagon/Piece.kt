@@ -314,7 +314,7 @@ class PineTree(data: HexagonData) : TreePiece(data) {
 }
 
 class PalmTree(data: HexagonData) : TreePiece(data) {
-  @ExperimentalStdlibApi
+
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
     // Find all empty neighbor hexes that are empty along the cost

@@ -110,7 +110,6 @@ class Island(
   var currentTeam: Team = STARTING_TEAM
     private set
 
-  @ExperimentalStdlibApi
   private val teamToPlayer =
       HashMap<Team, AI?>().apply {
         this.putAll(Team.values().map { it to NotAsRandomAI(it) })
@@ -122,7 +121,6 @@ class Island(
   // Gameplay //
   //////////////
 
-  @ExperimentalStdlibApi
   fun endTurn(gameInputProcessor: GameInputProcessor) {
     select(null)
 

@@ -112,7 +112,6 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     camera.zoom = max(widthZoom, heightZoom).toFloat()
   }
 
-  @ExperimentalStdlibApi
   override fun show() {
     Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.addProcessor(inputProcessor)

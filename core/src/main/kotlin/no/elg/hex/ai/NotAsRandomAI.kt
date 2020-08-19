@@ -43,7 +43,6 @@ import org.hexworks.mixite.core.api.Hexagon
  *
  * @author Elg
  */
-@ExperimentalStdlibApi
 class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) : AI {
 
   private fun think(words: () -> String) {
@@ -190,7 +189,6 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
     }
   }
 
-  @ExperimentalStdlibApi
   override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
     island.select(island.hexagons.first())
     for (territory in island.getTerritories(team)) {
