@@ -16,9 +16,8 @@ class DebugInfoRenderer(private val islandScreen: IslandScreen) : FrameUpdatable
 
     val basicInputHandler = islandScreen.basicIslandInputProcessor
 
-    val screenPos = "Screen pos (%4d,%4d)".format(Gdx.input.x, Gdx.input.y)
-    val realPos =
-        "Real pos (% 5.0f,% 5.0f)".format(basicInputHandler.mouseX, basicInputHandler.mouseY)
+    val screenPos = "%4d,%4d".format(Gdx.input.x, Gdx.input.y)
+    val realPos = "% 5.0f,% 5.0f".format(basicInputHandler.mouseX, basicInputHandler.mouseY)
     val cursorHex = basicInputHandler.cursorHex
     val cursorData = if (cursorHex != null) islandScreen.island.getData(cursorHex) else null
     drawAll(
@@ -36,10 +35,19 @@ class DebugInfoRenderer(private val islandScreen: IslandScreen) : FrameUpdatable
                     MAX_ZOOM,
                     format = { "%.2f".format(it) })),
         ScreenText(
-            "Island is ${islandScreen.island.grid.gridData.gridWidth} x ${islandScreen.island.grid.gridData.gridHeight} ${islandScreen.island.grid.gridData.gridLayout}"),
-        ScreenText("Current team is ${islandScreen.island.currentTeam}"),
-        ScreenText(screenPos),
-        ScreenText(realPos),
+            "Island is ",
+            next =
+                ScreenText(
+                    "${islandScreen.island.grid.gridData.gridWidth} x ${islandScreen.island.grid.gridData.gridHeight} ${islandScreen.island.grid.gridData.gridLayout}",
+                    color = Color.YELLOW)),
+        ScreenText(
+            "Current team is ",
+            next = ScreenText(islandScreen.island.currentTeam, color = Color.YELLOW)),
+        ScreenText(
+            "Screen pos (",
+            next = ScreenText(screenPos, color = Color.YELLOW, next = ScreenText(")"))),
+        ScreenText(
+            "Real pos (", next = ScreenText(realPos, color = Color.YELLOW, next = ScreenText(")"))),
         ScreenText(
             "Pointing at hex ",
             next =

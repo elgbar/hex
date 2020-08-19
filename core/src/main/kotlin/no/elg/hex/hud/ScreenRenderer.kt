@@ -46,12 +46,15 @@ enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: Ho
 }
 
 data class ScreenText(
-    val text: String,
+    val any: Any,
     val color: Color = WHITE,
     val bold: Boolean = false,
     val italic: Boolean = false,
     val next: ScreenText? = null
 ) {
+
+  val text = any.toString()
+
   val font: BitmapFont =
       when {
         !bold && !italic -> Hex.assets.regularFont
