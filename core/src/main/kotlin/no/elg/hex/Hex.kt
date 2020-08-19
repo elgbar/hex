@@ -6,7 +6,6 @@ import com.badlogic.gdx.Application.LOG_NONE
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -37,19 +36,16 @@ object Hex : ApplicationAdapter() {
 
   val inputMultiplexer = InputMultiplexer()
 
-  var screen: Screen = SplashScreen
+  var screen: AbstractScreen = SplashScreen
     set(value) {
       val old = field
       Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
-      if (old is AbstractScreen) {
-        old.hide()
-      }
+      old.hide()
       Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
-      if (value is AbstractScreen) {
-        value.show()
-        value.render(0f)
-        value.resize(Gdx.graphics.width, Gdx.graphics.height)
-      }
+      value.show()
+      value.render(0f)
+      value.resize(Gdx.graphics.width, Gdx.graphics.height)
+
       field = value
     }
 
@@ -80,7 +76,11 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun render() {
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+    if (screen != SplashScreen) {
+      screen.renderBackground()
+    } else {
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+    }
     screen.render(Gdx.graphics.deltaTime)
     MessagesRenderer.frameUpdate()
   }
