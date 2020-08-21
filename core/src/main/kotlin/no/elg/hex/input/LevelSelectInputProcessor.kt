@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color
 import java.lang.Float.max
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
@@ -65,6 +66,28 @@ object LevelSelectInputProcessor : InputAdapter() {
     camera.position.y =
         (oldY + amount * SCROLL_SPEED).coerceIn(min..max(min, y + height - screenHeight))
     LevelSelectScreen.updateCamera()
+    return true
+  }
+
+  override fun keyDown(keycode: Int): Boolean {
+    when (keycode) {
+      Keys.FORWARD_DEL, Keys.DEL -> {
+        val index = getHoveringIslandIndex()
+        if (index == INVALID_ISLAND_INDEX) return false
+        Gdx.app.debug("SELECT", "Deleting island $index")
+        val fileName = getIslandFileName(index)
+
+        if (!Gdx.files.local(fileName).delete()) {
+          publishWarning("Failed to delete island $index")
+        } else {
+          Hex.assets.unload(fileName)
+          publishMessage(ScreenText("Deleted island $index", Color.GREEN))
+        }
+
+        Hex.screen = LevelSelectScreen
+      }
+      else -> return false
+    }
     return true
   }
 }
