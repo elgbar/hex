@@ -35,7 +35,7 @@ object Hex : ApplicationAdapter() {
     private set
 
   val inputMultiplexer = InputMultiplexer()
-  
+
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
 

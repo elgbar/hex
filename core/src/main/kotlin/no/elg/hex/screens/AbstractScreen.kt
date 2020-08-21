@@ -5,6 +5,7 @@ import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import no.elg.hex.Hex
 import no.elg.hex.util.isLazyInitialized
 
 /** @author Elg */
@@ -34,5 +35,24 @@ abstract class AbstractScreen : ScreenAdapter() {
     if (::lineRenderer.isLazyInitialized) {
       lineRenderer.projectionMatrix = camera.combined
     }
+  }
+
+  fun renderBackground() {
+    batch.begin()
+
+    val bgWidth = Hex.assets.background.packedWidth.toFloat()
+    val bgHeight = Hex.assets.background.packedHeight.toFloat()
+
+    var offsetY = 0
+    do {
+      var offsetX = 0
+      do {
+        batch.draw(Hex.assets.background, offsetX * bgWidth, offsetY * bgHeight)
+        offsetX++
+      } while (offsetX < Gdx.graphics.width.toFloat())
+      offsetY++
+    } while (offsetY < Gdx.graphics.height.toFloat())
+
+    batch.end()
   }
 }

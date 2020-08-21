@@ -42,9 +42,9 @@ object LevelSelectScreen : AbstractScreen() {
 
   private val previewSize
     get() =
-      ((Gdx.graphics.width -
-          (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
-          PREVIEWS_PER_ROW)
+        ((Gdx.graphics.width -
+            (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
+            PREVIEWS_PER_ROW)
 
   fun renderPreview(island: Island, previewSize: Int): FrameBuffer {
     val islandScreen = IslandScreen(-1, island, false)
