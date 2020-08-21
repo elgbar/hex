@@ -76,7 +76,7 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     spriteRenderer.frameUpdate()
 
     if (renderHud) {
-      if (Hex.args.debug || Hex.args.trace) {
+      if (Hex.debug) {
         debugRenderer.frameUpdate()
       }
       frameUpdatable.frameUpdate()

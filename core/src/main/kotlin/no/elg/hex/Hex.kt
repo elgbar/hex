@@ -35,6 +35,9 @@ object Hex : ApplicationAdapter() {
     private set
 
   val inputMultiplexer = InputMultiplexer()
+  
+  val debug by lazy { args.debug || args.trace }
+  val trace by lazy { args.trace }
 
   var screen: AbstractScreen = SplashScreen
     set(value) {
@@ -45,7 +48,6 @@ object Hex : ApplicationAdapter() {
       value.show()
       value.render(0f)
       value.resize(Gdx.graphics.width, Gdx.graphics.height)
-
       field = value
     }
 

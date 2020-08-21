@@ -36,7 +36,7 @@ class GameInfoRenderer(
               ScreenText(
                   "Estimated income: ",
                   next = signColoredText(selected.income) { "%+d".format(it) }))
-      if (Hex.args.debug || Hex.args.trace) {
+      if (Hex.debug) {
         list +=
             ScreenText(
                 "Holding: ",

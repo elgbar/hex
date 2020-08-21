@@ -153,7 +153,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     when (keycode) {
       ENTER -> islandScreen.island.endTurn(this)
       BACKSPACE, SPACE -> islandScreen.island.inHand = null
-      Keys.F12 -> if (Hex.args.debug || Hex.args.trace) infiniteMoney = !infiniteMoney
+      Keys.F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
       else -> {
         val piece = keycodeToPiece(keycode) ?: return false
         return buyUnit(piece)
