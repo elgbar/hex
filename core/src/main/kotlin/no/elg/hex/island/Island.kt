@@ -17,6 +17,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
+import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.GameInputProcessor
@@ -399,7 +400,7 @@ class Island(
 
     if (!allVisibleHexagons.containsAll(visibleNeighbors) ||
         !visibleNeighbors.containsAll(allVisibleHexagons)) {
-      publishMessage(ScreenText("The visible hexagon grid is not connected.", Color.RED))
+      publishError("The visible hexagon grid is not connected.")
       valid = false
     }
     return valid

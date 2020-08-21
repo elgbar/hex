@@ -28,12 +28,10 @@ object SplashScreen : AbstractScreen() {
           """
           |Loading ${Hex.assets.loadingInfo}
           |
-          |%2.0f%%
+          |${"%2.0f".format(Hex.assets.progress * 100)}%
           |
           |${System.currentTimeMillis() - startTime} ms
-          """
-              .trimMargin()
-              .format(Hex.assets.progress * 100)
+          """.trimMargin()
 
       layout.setText(
           Hex.assets.regularFont,

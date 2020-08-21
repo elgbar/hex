@@ -27,7 +27,6 @@ import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.Input.Keys.UP
 import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlin.math.max
 import kotlin.math.min
@@ -37,8 +36,8 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
@@ -163,7 +162,7 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
 
   fun quickload() {
     if (quickSavedIsland.isEmpty()) {
-      publishMessage(ScreenText("No quick save found", Color.RED))
+      publishError("No quick save found")
       return
     }
     play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))

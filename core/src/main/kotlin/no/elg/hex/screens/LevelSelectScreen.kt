@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array as GdxArray
 import no.elg.hex.Hex
-import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.util.component1
@@ -42,9 +42,9 @@ object LevelSelectScreen : AbstractScreen() {
 
   private val previewSize
     get() =
-        ((Gdx.graphics.width -
-            (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
-            PREVIEWS_PER_ROW)
+      ((Gdx.graphics.width -
+          (1 + PREVIEWS_PER_ROW) * (Gdx.graphics.width * PREVIEW_PADDING_PERCENT)) /
+          PREVIEWS_PER_ROW)
 
   fun renderPreview(island: Island, previewSize: Int): FrameBuffer {
     val islandScreen = IslandScreen(-1, island, false)
@@ -64,7 +64,9 @@ object LevelSelectScreen : AbstractScreen() {
     islandPreviews.clear()
 
     if (!Hex.assets.isLoaded(getIslandFileName(0))) {
-      publishMessage("Failed to find any islands to load, generating a new island")
+      if (!Hex.args.`disable-island-loading`) {
+        publishWarning("Failed to find any islands to load")
+      }
       return
     }
     val previewSize = (2 * this.previewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
@@ -117,6 +119,7 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
+
     unprojectVector.x = Gdx.input.x.toFloat()
     unprojectVector.y = Gdx.input.y.toFloat()
 

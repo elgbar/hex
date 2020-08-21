@@ -17,6 +17,14 @@ object MessagesRenderer : FrameUpdatable {
     publishMessage(ScreenText(message, color = Color.LIGHT_GRAY))
   }
 
+  fun publishWarning(message: String) {
+    publishMessage(ScreenText(message, color = Color.YELLOW))
+  }
+
+  fun publishError(message: String) {
+    publishMessage(ScreenText(message, color = Color.RED))
+  }
+
   fun publishMessage(message: ScreenText) {
     Gdx.app.log("MESSAGE", message.text)
     messages.add(0, message to DURATION_SECONDS)

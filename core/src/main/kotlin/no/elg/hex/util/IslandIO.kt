@@ -5,7 +5,9 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Assets
 import no.elg.hex.Hex
-import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.hud.MessagesRenderer.publishError
+import no.elg.hex.hud.MessagesRenderer.publishMessage
+import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
 import no.elg.hex.screens.IslandScreen
@@ -20,7 +22,13 @@ fun getIslandFile(slot: Int): FileHandle {
 }
 
 fun play(id: Int) {
-  play(id, Hex.assets.get(getIslandFileName(id)))
+  val assetId = getIslandFileName(id)
+  if (Hex.assets.isLoaded(assetId)) {
+    val island: Island = Hex.assets[assetId] ?: return
+    play(id, island)
+  } else {
+    publishWarning("Tried to play island $id, but no such island is loaded")
+  }
 }
 
 fun play(id: Int, island: Island) {
@@ -31,25 +39,21 @@ fun saveIsland(id: Int, island: Island): Boolean {
   val file = Gdx.files.local(getIslandFileName(id))
 
   if (!island.validate()) {
-    MessagesRenderer.publishMessage(ScreenText("Island failed validation", color = Color.RED))
+    publishError("Island failed validation")
     return false
   }
 
   if (file.isDirectory) {
-    MessagesRenderer.publishMessage(
-        ScreenText(
-            "Failed to save island the name '${file.name()}' as the resulting file will be a directory.",
-            color = Color.RED))
+    publishError(
+        "Failed to save island the name '${file.name()}' as the resulting file will be a directory.")
     return false
   }
   return try {
     file.writeString(island.serialize(), false)
-    MessagesRenderer.publishMessage(
-        ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
+    publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
     true
   } catch (e: Throwable) {
-    MessagesRenderer.publishMessage(
-        ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))
+    publishMessage(ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))
     e.printStackTrace()
     false
   }
