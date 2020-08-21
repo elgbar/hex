@@ -12,4 +12,5 @@ class ApplicationArgumentsParser(parser: ArgParser) {
       "-e", "--map-editor", help = "Start the program in map editor mode")
   val retro by parser.flagging("-r", "--retro", help = "Use only the original textures")
   val cheating by parser.flagging("-c", "--cheating", help = "Have infinite money")
+  val `disable-island-loading` by parser.flagging("Don't load islands")
 }

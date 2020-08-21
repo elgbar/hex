@@ -18,7 +18,7 @@ object SplashScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-    if (Hex.assets.finishMainConst && Hex.assets.update()) {
+    if (Hex.assets.mainFinishedLoading && Hex.assets.update()) {
       Gdx.app.log("SPLASH", "All assets finished loading")
       Hex.screen = LevelSelectScreen
     } else {

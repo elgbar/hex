@@ -30,7 +30,7 @@ import no.elg.hex.util.getIslandFileName
 /** @author Elg */
 class Assets : AssetManager() {
 
-  var finishMainConst: Boolean = false
+  var mainFinishedLoading: Boolean = false
     private set
 
   var loadingInfo = "not begun"
@@ -170,18 +170,20 @@ class Assets : AssetManager() {
     val oldIslands = GdxArray<Island>()
     getAll(Island::class.java, oldIslands)
 
-    for (slot in 0..Int.MAX_VALUE) {
-      val file = getIslandFile(slot)
-      if (file.exists()) {
-        if (file.isDirectory) continue
-        load(getIslandFileName(slot), Island::class.java)
-      } else {
-        break
+    if (!Hex.args.`disable-island-loading`) {
+      for (slot in 0..Int.MAX_VALUE) {
+        val file = getIslandFile(slot)
+        if (file.exists()) {
+          if (file.isDirectory) continue
+          load(getIslandFileName(slot), Island::class.java)
+        } else {
+          break
+        }
       }
     }
   }
 
   fun finishMain() {
-    finishMainConst = true
+    mainFinishedLoading = true
   }
 }

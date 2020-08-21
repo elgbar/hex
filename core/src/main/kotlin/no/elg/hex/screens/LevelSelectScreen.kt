@@ -18,7 +18,6 @@ import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
-import no.elg.hex.util.play
 
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
@@ -66,7 +65,6 @@ object LevelSelectScreen : AbstractScreen() {
 
     if (!Hex.assets.isLoaded(getIslandFileName(0))) {
       publishMessage("Failed to find any islands to load, generating a new island")
-      play(0)
       return
     }
     val previewSize = (2 * this.previewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
