@@ -60,8 +60,9 @@ object LevelCreationScreen : AbstractScreen() {
         }
         val layoutSpinner: ArraySpinnerModel<HexagonalGridLayout> =
             ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
-        val widthSpinner = IntSpinnerModel(10, 1, Int.MAX_VALUE)
-        val heightSpinner = IntSpinnerModel(10, 1, Int.MAX_VALUE)
+
+        val widthSpinner = IntSpinnerModel(19, 1, Int.MAX_VALUE)
+        val heightSpinner = IntSpinnerModel(19, 1, Int.MAX_VALUE)
 
         var previewBuffer: FrameBuffer? = null
 
@@ -156,6 +157,7 @@ object LevelCreationScreen : AbstractScreen() {
                 textField.addValidator(validator)
                 onChangeEvent { renderPreview() }
 
+                layoutSpinner.current = HEXAGONAL
               }
         }
 
