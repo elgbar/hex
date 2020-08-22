@@ -112,6 +112,7 @@ object LevelCreationScreen : AbstractScreen() {
                   val region = TextureRegion(it.colorBufferTexture)
                   region.flip(false, true)
                   previewImage.drawable = TextureRegionDrawable(region)
+                  previewImage.width = region.regionWidth.toFloat()
                   previewImage.inCell.fill(previewImage.height / previewImage.width, 0f)
                   this@visTable.pack()
                 }
