@@ -41,7 +41,7 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, maxInvY)
   }
 
-  private val visibleGridSize by lazy { calcVisibleGridSize() }
+  val visibleGridSize by lazy { calcVisibleGridSize() }
 
   val inputProcessor: InputProcessor by lazy {
     if (Hex.args.mapEditor) {

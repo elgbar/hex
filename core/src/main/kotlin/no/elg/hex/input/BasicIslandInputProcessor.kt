@@ -55,16 +55,23 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable) {
+
+      val (maxX, minX, maxY, minY) = islandScreen.visibleGridSize
+
       val zoom = islandScreen.camera.zoom
-      val x: Float = Gdx.input.deltaX * zoom
-      val y: Float = Gdx.input.deltaY * zoom
+      val dx = -Gdx.input.deltaX * zoom
+      val dy = -Gdx.input.deltaY * zoom
 
       // Make the little movements when clicking fast less noticeable
-      if (abs(x) < MIN_MOVE_AMOUNT * zoom && abs(y) < MIN_MOVE_AMOUNT * zoom) {
+      if (abs(dx) < MIN_MOVE_AMOUNT * zoom && abs(dy) < MIN_MOVE_AMOUNT * zoom) {
         return false
       }
 
-      islandScreen.camera.translate(-x, -y)
+      islandScreen.camera.translate(dx, dy)
+      islandScreen.camera.position.x =
+          islandScreen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+      islandScreen.camera.position.y =
+          islandScreen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
       return true
     }
     return false
