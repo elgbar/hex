@@ -12,7 +12,6 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
-import no.elg.hex.screens.LevelSelectScreen.PREVIEW_PADDING_PERCENT
 import no.elg.hex.screens.LevelSelectScreen.camera
 import no.elg.hex.screens.LevelSelectScreen.islandAmount
 import no.elg.hex.screens.LevelSelectScreen.mouseX
