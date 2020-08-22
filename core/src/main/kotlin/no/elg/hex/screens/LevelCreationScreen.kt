@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Value.minWidth
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Array as GdxArray
@@ -21,13 +20,14 @@ import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
+import ktx.actors.onChange
 import ktx.actors.onChangeEvent
 import ktx.actors.onClick
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
-import ktx.scene2d.vis.validator
 import ktx.scene2d.vis.visImage
+import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Assets
@@ -37,6 +37,10 @@ import no.elg.hex.island.Island.Companion.STARTING_TEAM
 import no.elg.hex.util.getData
 import no.elg.hex.util.play
 import org.hexworks.mixite.core.api.HexagonalGridLayout
+import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
+import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
+import org.hexworks.mixite.core.api.HexagonalGridLayout.TRAPEZOID
+import org.hexworks.mixite.core.api.HexagonalGridLayout.TRIANGULAR
 
 /** @author Elg */
 object LevelCreationScreen : AbstractScreen() {
@@ -130,6 +134,7 @@ object LevelCreationScreen : AbstractScreen() {
         Gdx.app.postRunnable { renderPreview() }
         row()
 
+        val spinner: Spinner
         horizontalGroup {
           space(20f)
 
@@ -142,18 +147,31 @@ object LevelCreationScreen : AbstractScreen() {
             textField.addValidator(validator)
             onChangeEvent { renderPreview() }
           }
-          spinner("Layout", layoutSpinner) {
-            cells
-                .get(1)
-                ?.minWidth(
+          spinner =
+              spinner("Layout", layoutSpinner) {
+                val minWidth =
                     Assets.fontSize *
-                        HexagonalGridLayout.values().maxOf { layout ->
-                          layout.name.length / 2f + 1
-                        })
-            textField.addValidator(validator)
-            onChangeEvent { renderPreview() }
-          }
+                        HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
+                cells.get(1)?.minWidth(minWidth)
+                textField.addValidator(validator)
+                onChangeEvent { renderPreview() }
+
+              }
         }
+
+        row()
+
+        fun layoutExplanation(): String =
+            when (layoutSpinner.current) {
+              RECTANGULAR -> "A rectangular layout has no special rules."
+              HEXAGONAL ->
+                  "The hexagonal layout must have equal width and height and it must be odd."
+              TRAPEZOID -> "A trapezoid layout has no special rules."
+              TRIANGULAR -> "A triangular layout must have equal width and height."
+              else -> "Invalid layout: ${layoutSpinner.current}"
+            }
+
+        visLabel(layoutExplanation()) { spinner.onChange { setText(layoutExplanation()) } }
 
         row()
 
