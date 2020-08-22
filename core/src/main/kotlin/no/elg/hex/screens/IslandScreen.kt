@@ -27,17 +27,17 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
   private fun calcVisibleGridSize(): DoubleArray {
     val visible = island.hexagons.filterNot { island.getData(it).invisible }
 
-    val minX = visible.minOf { it.center.coordinateX }
-    val maxX = visible.maxOf { it.center.coordinateX }
+    val minX = visible.minOf { it.externalBoundingBox.x }
+    val maxX = visible.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
 
-    val minY = visible.minOf { it.center.coordinateY }
-    val maxY = visible.maxOf { it.center.coordinateY }
+    val minY = visible.minOf { it.externalBoundingBox.y + it.externalBoundingBox.height }
+    val maxY = visible.maxOf { it.externalBoundingBox.y }
 
-    val minInvX = island.hexagons.minOf { it.center.coordinateX }
-    val maxInvX = island.hexagons.maxOf { it.center.coordinateX }
+    val minInvX = island.hexagons.minOf { it.externalBoundingBox.x }
+    val maxInvX = island.hexagons.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
 
-    val minInvY = island.hexagons.minOf { it.center.coordinateY }
-    val maxInvY = island.hexagons.maxOf { it.center.coordinateY }
+    val minInvY = island.hexagons.minOf { it.externalBoundingBox.y + it.externalBoundingBox.height }
+    val maxInvY = island.hexagons.maxOf { it.externalBoundingBox.y }
     return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, minInvX, maxInvY, minInvY)
   }
 
@@ -88,7 +88,7 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     val data = island.grid.gridData
 
     val (maxX, minX, maxY, minY, maxInvX, minInvX, maxInvY, minInvY) = if (Hex.args.mapEditor)
-        calcVisibleGridSize()
+      calcVisibleGridSize()
     else visibleGridSize
 
     // Sum the distance from the edge of the grid to the first visible hexagon
@@ -97,18 +97,17 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     val gridWidthOffset = minInvX - minX + maxInvX - maxX
     val gridHeightOffset = minInvY - minY + maxInvY - maxY
 
-    // TBH I do not know what drives the extra width size
-    val islandCenterX = ((data.gridWidth + 0.5 - 0.15) * data.hexagonWidth - gridWidthOffset) / 2
-    val islandCenterY = ((data.gridHeight + 0.5) * data.hexagonHeight - gridHeightOffset) / 2
+    val islandCenterX = (maxInvX - minInvX - gridWidthOffset) / 2
+    val islandCenterY = (maxInvY - minInvY - gridHeightOffset) / 2
 
-    camera.position.x = islandCenterX.toFloat()
-    camera.position.y = islandCenterY.toFloat()
 
     // Add some padding as the min/max x/y are calculated from the center of the hexagons
     val padding = 2
     val widthZoom = (maxX - minX + padding * data.hexagonWidth) / camera.viewportWidth
     val heightZoom = (maxY - minY + padding * data.hexagonHeight) / camera.viewportHeight
 
+    camera.position.x = islandCenterX.toFloat()
+    camera.position.y = islandCenterY.toFloat()
     camera.zoom = max(widthZoom, heightZoom).toFloat()
   }
 
