@@ -20,6 +20,7 @@ import com.kotcrab.vis.ui.util.form.FormInputValidator
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import com.kotcrab.vis.ui.widget.spinner.Spinner
 import ktx.actors.onChangeEvent
 import ktx.actors.onClick
 import ktx.scene2d.actors
@@ -76,7 +77,10 @@ object LevelCreationScreen : AbstractScreen() {
                 .coerceAtLeast(1024)
 
         val previewImage =
-            visImage(Texture(previewSize, previewSize, Pixmap.Format.RGBA8888)) { it.expandX() }
+            visImage(Texture(previewSize, previewSize, Pixmap.Format.RGBA8888)) {
+              it.expand()
+              it.fill()
+            }
 
         val disableables = mutableListOf<Disableable>()
 
@@ -107,15 +111,19 @@ object LevelCreationScreen : AbstractScreen() {
           if (layoutSpinner.current.gridLayoutStrategy.checkParameters(
               widthSpinner.value, heightSpinner.value)) {
 
+            // force update to imageWidth and imageHeight to make sure we have the correct size
+            this@visTable.pack()
+
             previewBuffer =
-                LevelSelectScreen.renderPreview(createIsland(true), previewSize).also {
-                  val region = TextureRegion(it.colorBufferTexture)
-                  region.flip(false, true)
-                  previewImage.drawable = TextureRegionDrawable(region)
-                  previewImage.width = region.regionWidth.toFloat()
-                  previewImage.inCell.fill(previewImage.height / previewImage.width, 0f)
-                  this@visTable.pack()
-                }
+                LevelSelectScreen.renderPreview(
+                        createIsland(true),
+                        previewImage.imageWidth.toInt(),
+                        previewImage.imageHeight.toInt())
+                    .also {
+                      val region = TextureRegion(it.colorBufferTexture)
+                      region.flip(false, true)
+                      previewImage.drawable = TextureRegionDrawable(region)
+                    }
           }
         }
 
@@ -126,6 +134,7 @@ object LevelCreationScreen : AbstractScreen() {
           space(20f)
 
           spinner("Width", widthSpinner) {
+            name = WIDTH_SPINNER_NAME
             textField.addValidator(validator)
             onChangeEvent { renderPreview() }
           }
@@ -212,6 +221,12 @@ object LevelCreationScreen : AbstractScreen() {
     camera.setToOrtho(false)
     stage.viewport.setWorldSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     stage.viewport.setScreenSize(Gdx.graphics.width, Gdx.graphics.height)
-    (stage.actors.first() as VisTable).pack()
+    val visTable = stage.actors.first() as VisTable
+    val spinner = visTable.findActor<Spinner>(WIDTH_SPINNER_NAME)
+
+    spinner.notifyValueChanged(true)
+    visTable.pack()
   }
+
+  const val WIDTH_SPINNER_NAME = "width"
 }
