@@ -40,11 +40,10 @@ object LevelSelectScreen : AbstractScreen() {
   val mouseY
     get() = unprojectVector.y
 
-  
-  val padding: Float get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
+  val padding: Float
+    get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
   private val previewSize
     get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
-
 
   fun renderPreview(island: Island, previewSize: Int): FrameBuffer {
     val islandScreen = IslandScreen(-1, island, false)
