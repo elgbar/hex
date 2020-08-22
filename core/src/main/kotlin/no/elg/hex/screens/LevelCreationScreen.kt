@@ -10,11 +10,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Value.minWidth
+import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Array as GdxArray
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import com.kotcrab.vis.ui.util.form.FormInputValidator
+import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import ktx.actors.onChangeEvent
@@ -26,6 +29,7 @@ import ktx.scene2d.vis.validator
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
+import no.elg.hex.Assets
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.STARTING_TEAM
@@ -41,7 +45,129 @@ object LevelCreationScreen : AbstractScreen() {
           ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
 
   init {
-    resetActors()
+    stage.actors {
+      visTable {
+        defaults().pad(20f)
+        setFillParent(true)
+        setRound(false)
+        if (Hex.debug) {
+          debug()
+        }
+        val layoutSpinner: ArraySpinnerModel<HexagonalGridLayout> =
+            ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
+        val widthSpinner = IntSpinnerModel(10, 1, Int.MAX_VALUE)
+        val heightSpinner = IntSpinnerModel(10, 1, Int.MAX_VALUE)
+
+        var previewBuffer: FrameBuffer? = null
+
+        fun createIsland(isPreview: Boolean): Island {
+          return Island(widthSpinner.value + 2, heightSpinner.value + 2, layoutSpinner.current)
+              .also {
+                if (isPreview) {
+                  for (hexagon in it.hexagons) {
+                    it.getData(hexagon).team = STARTING_TEAM
+                  }
+                }
+              }
+        }
+
+        val previewSize =
+            (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2)
+                .coerceAtLeast(1024)
+
+        val previewImage =
+            visImage(Texture(previewSize, previewSize, Pixmap.Format.RGBA8888)) { it.expandX() }
+
+        val disableables = mutableListOf<Disableable>()
+
+        val validator =
+            object : FormInputValidator("Invalid width/height for given layout") {
+              override fun validate(input: String?): Boolean {
+                val valid =
+                    layoutSpinner.current?.gridLayoutStrategy?.checkParameters(
+                        widthSpinner.value, heightSpinner.value)
+                        ?: true
+
+                for (disableable in disableables) {
+                  disableable.isDisabled = !valid
+                }
+
+                return valid
+              }
+            }
+
+        fun renderPreview() {
+          previewBuffer?.dispose()
+          validator.validateInput(null)
+
+          widthSpinner.setValue(widthSpinner.value, false)
+          heightSpinner.setValue(heightSpinner.value, false)
+          layoutSpinner.setCurrent(layoutSpinner.current, false)
+
+          if (layoutSpinner.current.gridLayoutStrategy.checkParameters(
+              widthSpinner.value, heightSpinner.value)) {
+
+            previewBuffer =
+                LevelSelectScreen.renderPreview(createIsland(true), previewSize).also {
+                  val region = TextureRegion(it.colorBufferTexture)
+                  region.flip(false, true)
+                  previewImage.drawable = TextureRegionDrawable(region)
+                  previewImage.inCell.fill(previewImage.height / previewImage.width, 0f)
+                  this@visTable.pack()
+                }
+          }
+        }
+
+        Gdx.app.postRunnable { renderPreview() }
+        row()
+
+        horizontalGroup {
+          space(20f)
+
+          spinner("Width", widthSpinner) {
+            textField.addValidator(validator)
+            onChangeEvent { renderPreview() }
+          }
+          spinner("Height", heightSpinner) {
+            textField.addValidator(validator)
+            onChangeEvent { renderPreview() }
+          }
+          spinner("Layout", layoutSpinner) {
+            cells
+                .get(1)
+                ?.minWidth(
+                    Assets.fontSize *
+                        HexagonalGridLayout.values().maxOf { layout ->
+                          layout.name.length / 2f + 1
+                        })
+            textField.addValidator(validator)
+            onChangeEvent { renderPreview() }
+          }
+        }
+
+        row()
+
+        horizontalGroup {
+          space(20f)
+
+          visTextButton("Create island") {
+            disableables.add(this)
+
+            onClick {
+              if (this.isDisabled) return@onClick
+              Gdx.app.debug(
+                  "CREATOR",
+                  "Creating island ${LevelSelectScreen.islandAmount} with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}")
+              play(LevelSelectScreen.islandAmount, createIsland(false))
+            }
+          }
+
+          visTextButton("Cancel") { onClick { Hex.screen = LevelSelectScreen } }
+        }
+
+        pack()
+      }
+    }
   }
 
   val inputListener =
@@ -54,118 +180,6 @@ object LevelCreationScreen : AbstractScreen() {
           return true
         }
       }
-
-  fun resetActors() {
-    stage.actors.clear()
-    stage.actors {
-      visTable(defaultSpacing = true) {
-        defaults().pad(20f)
-        setFillParent(true)
-        if (Hex.debug) {
-          debug()
-        }
-        validator {
-          setFillParent(true)
-          val layoutSpinner: ArraySpinnerModel<HexagonalGridLayout> =
-              ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
-          val widthSpinner = IntSpinnerModel(10, 1, Int.MAX_VALUE)
-          val heightSpinner = IntSpinnerModel(10, 1, Int.MAX_VALUE)
-
-          var previewBuffer: FrameBuffer? = null
-
-          fun createIsland(isPreview: Boolean): Island {
-            return Island(widthSpinner.value + 2, heightSpinner.value + 2, layoutSpinner.current)
-                .also {
-                  if (isPreview) {
-                    for (hexagon in it.hexagons) {
-                      it.getData(hexagon).team = STARTING_TEAM
-                    }
-                  }
-                }
-          }
-
-          val previewSize =
-              (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2)
-                  .coerceAtLeast(1024)
-
-          val previewImage =
-              visImage(Texture(previewSize, previewSize, Pixmap.Format.RGBA8888)) { cell ->
-                cell.colspan(3)
-                cell.expandX()
-              }
-
-          fun renderPreview() {
-            previewBuffer?.dispose()
-
-            widthSpinner.setValue(widthSpinner.value, false)
-            heightSpinner.setValue(heightSpinner.value, false)
-            layoutSpinner.setCurrent(layoutSpinner.current, false)
-
-            if (layoutSpinner.current.gridLayoutStrategy.checkParameters(
-                    widthSpinner.value, heightSpinner.value)) {
-
-              previewBuffer =
-                  LevelSelectScreen.renderPreview(createIsland(true), previewSize).also {
-                    val region = TextureRegion(it.colorBufferTexture)
-                    region.flip(false, true)
-                    previewImage.drawable = TextureRegionDrawable(region)
-                    previewImage.inCell.fill(previewImage.height / previewImage.width, 0f)
-                    this@visTable.pack()
-                  }
-            }
-          }
-
-          Gdx.app.postRunnable { renderPreview() }
-          row()
-
-          val validator =
-              object : FormInputValidator("Invalid width/height for given layout") {
-                override fun validate(input: String?): Boolean {
-                  return layoutSpinner.current?.gridLayoutStrategy?.checkParameters(
-                      widthSpinner.value, heightSpinner.value)
-                      ?: true
-                }
-              }
-
-          spinner("Width", widthSpinner) {
-            inCell.uniform()
-            textField.addValidator(validator)
-            onChangeEvent { renderPreview() }
-          }
-          spinner("Height", heightSpinner) {
-            inCell.uniform()
-            textField.addValidator(validator)
-            onChangeEvent { renderPreview() }
-          }
-          spinner("Layout", layoutSpinner) {
-            inCell.fill(0.75f, 0f)
-            textField.addValidator(validator)
-            onChangeEvent { renderPreview() }
-          }
-
-          row()
-
-          horizontalGroup {
-            it.colspan(3)
-            space(20f)
-
-            visTextButton("Create island") {
-              addDisableTarget(this)
-              onClick {
-                Gdx.app.debug(
-                    "CREATOR",
-                    "Creating island ${LevelSelectScreen.islandAmount} with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}")
-                play(LevelSelectScreen.islandAmount, createIsland(false))
-              }
-            }
-
-            visTextButton("Cancel") { onClick { Hex.screen = LevelSelectScreen } }
-          }
-        }
-        pack()
-      }
-    }
-  }
 
   override fun render(delta: Float) {
     stage.act(delta)
@@ -197,6 +211,6 @@ object LevelCreationScreen : AbstractScreen() {
     camera.setToOrtho(false)
     stage.viewport.setWorldSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     stage.viewport.setScreenSize(Gdx.graphics.width, Gdx.graphics.height)
-    resetActors()
+    (stage.actors.first() as VisTable).pack()
   }
 }
