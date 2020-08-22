@@ -12,6 +12,7 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.LevelSelectScreen.PREVIEW_PADDING_PERCENT
 import no.elg.hex.screens.LevelSelectScreen.camera
 import no.elg.hex.screens.LevelSelectScreen.islandAmount
 import no.elg.hex.screens.LevelSelectScreen.mouseX
@@ -64,7 +65,8 @@ object LevelSelectInputProcessor : InputAdapter() {
     val min = screenHeight / 2f
 
     camera.position.y =
-        (oldY + amount * SCROLL_SPEED).coerceIn(min..max(min, y + height - screenHeight))
+        (oldY + amount * SCROLL_SPEED).coerceIn(
+            min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding))
     LevelSelectScreen.updateCamera()
     return true
   }
