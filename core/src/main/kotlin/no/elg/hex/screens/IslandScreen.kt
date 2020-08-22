@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import kotlin.math.max
 import no.elg.hex.Hex
@@ -18,6 +19,7 @@ import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.component7
 import no.elg.hex.util.component8
+import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 
 /** @author Elg */
@@ -33,12 +35,10 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     val minY = visible.minOf { it.externalBoundingBox.y + it.externalBoundingBox.height }
     val maxY = visible.maxOf { it.externalBoundingBox.y }
 
-    val minInvX = island.hexagons.minOf { it.externalBoundingBox.x }
     val maxInvX = island.hexagons.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
-
-    val minInvY = island.hexagons.minOf { it.externalBoundingBox.y + it.externalBoundingBox.height }
     val maxInvY = island.hexagons.maxOf { it.externalBoundingBox.y }
-    return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, minInvX, maxInvY, minInvY)
+
+    return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, maxInvY)
   }
 
   private val visibleGridSize by lazy { calcVisibleGridSize() }
@@ -87,24 +87,41 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
     super.resize(width, height)
     val data = island.grid.gridData
 
-    val (maxX, minX, maxY, minY, maxInvX, minInvX, maxInvY, minInvY) = if (Hex.args.mapEditor)
-      calcVisibleGridSize()
+    val (maxX, minX, maxY, minY, maxInvX, maxInvY) = if (Hex.args.mapEditor) calcVisibleGridSize()
     else visibleGridSize
 
     // Sum the distance from the edge of the grid to the first visible hexagon
     // |.###..| (`.` are invisible, `#` are visible hexagons)
     // The offset would then be 3
-    val gridWidthOffset = minInvX - minX + maxInvX - maxX
-    val gridHeightOffset = minInvY - minY + maxInvY - maxY
+    val gridWidthOffset = maxInvX - minX - maxX
+    val gridHeightOffset = maxInvY - minY - maxY
 
-    val islandCenterX = (maxInvX - minInvX - gridWidthOffset) / 2
-    val islandCenterY = (maxInvY - minInvY - gridHeightOffset) / 2
-
+    val islandCenterX = (maxInvX - gridWidthOffset) / 2
+    val islandCenterY = (maxInvY - gridHeightOffset) / 2
 
     // Add some padding as the min/max x/y are calculated from the center of the hexagons
     val padding = 2
     val widthZoom = (maxX - minX + padding * data.hexagonWidth) / camera.viewportWidth
     val heightZoom = (maxY - minY + padding * data.hexagonHeight) / camera.viewportHeight
+
+    Gdx.app.debug("ISLAND RESIZE") {
+      """
+      maxX = $maxX
+      minX = $minX
+      maxY = $maxY
+      minY = $minY
+      maxInvX = $maxInvX
+      maxInvY = $maxInvY
+      minInX = 0.0
+      minInY = 0.0
+  
+      gridWidthOffset = $gridWidthOffset
+      gridHeightOffset = $gridHeightOffset
+    
+      islandCenterX = $islandCenterX
+      islandCenterY = $islandCenterY
+  """.trimIndent()
+    }
 
     camera.position.x = islandCenterX.toFloat()
     camera.position.y = islandCenterY.toFloat()

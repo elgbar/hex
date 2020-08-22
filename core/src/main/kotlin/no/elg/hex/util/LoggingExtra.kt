@@ -25,3 +25,7 @@ fun Application.trace(tag: String, message: () -> String) {
 fun Application.trace(tag: String, message: String, exception: Throwable) {
   if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message, exception)
 }
+
+fun Application.debug(tag: String, message: () -> String) {
+  if (logLevel >= LOG_TRACE) applicationLogger.debug(tag, message())
+}
