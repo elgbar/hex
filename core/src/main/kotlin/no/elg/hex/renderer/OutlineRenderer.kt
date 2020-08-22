@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled
 import com.badlogic.gdx.utils.Disposable
+import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
@@ -34,7 +35,9 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
       for (hexagon in hexes) {
         val points = hexagon.points
         val data = islandScreen.island.getData(hexagon)
-        if (data.invisible) continue
+        val drawEdges = data.edge && Hex.args.`draw-edges`
+
+        if (data.invisible && !drawEdges) continue
 
         val brightness =
             HexagonData.BRIGHTNESS +
@@ -42,7 +45,8 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
                 else 0f)
 
         lineRenderer.color =
-            (color ?: data.color).cpy().mul(brightness, brightness, brightness, alpha)
+            if (drawEdges) Color.WHITE
+            else (color ?: data.color).cpy().mul(brightness, brightness, brightness, alpha)
 
         for (i in points.indices) {
           val point = points[i]
