@@ -2,19 +2,18 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hud.ScreenDrawPosition.BOTTOM_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.input.MapEditorInputProcessor
-import no.elg.hex.input.MapEditorInputProcessor.Companion.MAX_BRUSH_SIZE
-import no.elg.hex.input.MapEditorInputProcessor.Companion.MIN_BRUSH_SIZE
 import no.elg.hex.input.editor.Editor.Companion.editorText
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.MapEditorScreen
+import no.elg.hex.screens.MapEditorScreen.Companion.MAX_BRUSH_SIZE
+import no.elg.hex.screens.MapEditorScreen.Companion.MIN_BRUSH_SIZE
 
 /** @author Elg */
 class MapEditorRenderer(
-    private val islandScreen: IslandScreen,
+    private val mapEditorScreen: MapEditorScreen,
     private val mapEditorInputProcessor: MapEditorInputProcessor
 ) : FrameUpdatable {
 
@@ -51,6 +50,31 @@ class MapEditorRenderer(
 
   override fun frameUpdate() {
     with(mapEditorInputProcessor) {
+      val editorInfo =
+          when (editor) {
+            is TeamEditor ->
+                ScreenText(
+                    "Selected team: ",
+                    next =
+                        when (editor as TeamEditor) {
+                          is TeamEditor.`Set team` ->
+                              ScreenText(selectedTeam.name, color = Color.YELLOW)
+                          is TeamEditor.`Randomize team` ->
+                              ScreenText("random", color = Color.PURPLE)
+                        })
+            is PieceEditor ->
+                ScreenText(
+                    "Selected piece: ",
+                    next =
+                        when (editor as PieceEditor) {
+                          is PieceEditor.`Set piece` ->
+                              nullCheckedText(selectedPiece.simpleName, color = Color.YELLOW)
+                          is PieceEditor.`Randomize piece` ->
+                              ScreenText("random", color = Color.PURPLE)
+                        })
+            else -> emptyText()
+          }
+
       ScreenRenderer.drawAll(
           ScreenText(
               "Brush radius: ",
@@ -58,37 +82,17 @@ class MapEditorRenderer(
                   validatedText(brushRadius, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, color = Color.YELLOW)),
           ScreenText(
               "Island id: ",
-              next = validatedText(islandScreen.id, 0, Int.MAX_VALUE, color = Color.YELLOW)),
-          ScreenText(
-              "Selected team: ",
-              next =
-                  when (teamEditor) {
-                    is TeamEditor.`Set team` -> ScreenText(selectedTeam.name, color = Color.YELLOW)
-                    is TeamEditor.`Randomize team` -> ScreenText("random", color = Color.PURPLE)
-                    is TeamEditor.Disabled ->
-                        ScreenText(selectedTeam.name, color = Color.LIGHT_GRAY)
-                  }),
-          ScreenText(
-              "Selected piece: ",
-              next =
-                  when (pieceEditor) {
-                    is PieceEditor.`Set piece` ->
-                        nullCheckedText(selectedPiece.simpleName, color = Color.YELLOW)
-                    is PieceEditor.`Randomize piece` -> ScreenText("random", color = Color.PURPLE)
-                    is PieceEditor.Disabled ->
-                        nullCheckedText(selectedPiece.simpleName, color = Color.LIGHT_GRAY)
-                  }),
+              next = validatedText(mapEditorScreen.id, 0, Int.MAX_VALUE, color = Color.YELLOW)),
+          ScreenText("Editor: ", next = editorText(editor)),
           emptyText(),
-          ScreenText("Opaqueness editor: ", next = editorText(opaquenessEditor)),
-          ScreenText("Team editor: ", next = editorText(teamEditor)),
-          ScreenText("Piece editor: ", next = editorText(pieceEditor)),
+          editorInfo,
           position = TOP_RIGHT)
 
-      if (showHelp) {
-        ScreenRenderer.drawAll(*shownHelp, position = BOTTOM_LEFT)
-      } else {
-        ScreenRenderer.drawAll(*hiddenHelp, position = BOTTOM_LEFT)
-      }
+    //      if (showHelp) {
+    //        ScreenRenderer.drawAll(*shownHelp, position = BOTTOM_LEFT)
+    //      } else {
+    //        ScreenRenderer.drawAll(*hiddenHelp, position = BOTTOM_LEFT)
+    //      }
     }
   }
 }

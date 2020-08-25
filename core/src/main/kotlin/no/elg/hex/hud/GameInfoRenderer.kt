@@ -45,8 +45,7 @@ class GameInfoRenderer(
       ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
     }
 
-    if (islandScreen.inputProcessor is GameInputProcessor &&
-        (islandScreen.inputProcessor as GameInputProcessor).infiniteMoney) {
+    if (islandScreen.inputProcessor.infiniteMoney) {
       ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
     }
 

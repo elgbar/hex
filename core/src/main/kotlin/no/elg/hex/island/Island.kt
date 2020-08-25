@@ -406,6 +406,14 @@ class Island(
     return valid
   }
 
+  fun undo() {
+    TODO("not implemented")
+  }
+
+  fun redo() {
+    TODO("not implemented")
+  }
+
   companion object {
     const val GRID_RADIUS = 20.0
 

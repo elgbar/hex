@@ -1,16 +1,12 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputProcessor
 import kotlin.math.max
 import no.elg.hex.Hex
-import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
-import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.GameInputProcessor
-import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.STARTING_TEAM
 import no.elg.hex.renderer.OutlineRenderer
@@ -23,7 +19,7 @@ import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 
 /** @author Elg */
-class IslandScreen(val id: Int, val island: Island, private val renderHud: Boolean = true) :
+class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = true) :
     AbstractScreen() {
 
   private fun calcVisibleGridSize(): DoubleArray {
@@ -43,21 +39,8 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
 
   val visibleGridSize by lazy { calcVisibleGridSize() }
 
-  val inputProcessor: InputProcessor by lazy {
-    if (Hex.args.mapEditor) {
-      MapEditorInputProcessor(this)
-    } else {
-      GameInputProcessor(this)
-    }
-  }
-
-  private val frameUpdatable: FrameUpdatable by lazy {
-    if (Hex.args.mapEditor) {
-      MapEditorRenderer(this, inputProcessor as MapEditorInputProcessor)
-    } else {
-      GameInfoRenderer(this, inputProcessor as GameInputProcessor)
-    }
-  }
+  val inputProcessor by lazy { GameInputProcessor(this) }
+  private val frameUpdatable by lazy { GameInfoRenderer(this, inputProcessor) }
 
   val basicIslandInputProcessor: BasicIslandInputProcessor by lazy {
     BasicIslandInputProcessor(this)
@@ -129,11 +112,13 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
   }
 
   override fun show() {
-    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
-    Hex.inputMultiplexer.addProcessor(inputProcessor)
+    if (!renderHud) {
+      Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
+      Hex.inputMultiplexer.addProcessor(inputProcessor)
 
-    if (island.currentTeam != STARTING_TEAM && inputProcessor is GameInputProcessor) {
-      island.endTurn(inputProcessor as GameInputProcessor)
+      if (island.currentTeam != STARTING_TEAM && inputProcessor is GameInputProcessor) {
+        island.endTurn(inputProcessor as GameInputProcessor)
+      }
     }
   }
 
@@ -144,7 +129,9 @@ class IslandScreen(val id: Int, val island: Island, private val renderHud: Boole
 
   override fun dispose() {
     super.dispose()
-    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
-    Hex.inputMultiplexer.removeProcessor(inputProcessor)
+    if (!renderHud) {
+      Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
+      Hex.inputMultiplexer.removeProcessor(inputProcessor)
+    }
   }
 }

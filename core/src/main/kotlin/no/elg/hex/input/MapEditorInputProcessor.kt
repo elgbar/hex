@@ -3,68 +3,34 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys.A
-import com.badlogic.gdx.Input.Keys.C
-import com.badlogic.gdx.Input.Keys.CONTROL_LEFT
-import com.badlogic.gdx.Input.Keys.CONTROL_RIGHT
 import com.badlogic.gdx.Input.Keys.DOWN
-import com.badlogic.gdx.Input.Keys.F1
-import com.badlogic.gdx.Input.Keys.F5
-import com.badlogic.gdx.Input.Keys.F9
-import com.badlogic.gdx.Input.Keys.NUMPAD_1
-import com.badlogic.gdx.Input.Keys.NUMPAD_2
-import com.badlogic.gdx.Input.Keys.NUMPAD_3
-import com.badlogic.gdx.Input.Keys.NUM_1
-import com.badlogic.gdx.Input.Keys.NUM_2
-import com.badlogic.gdx.Input.Keys.NUM_3
-import com.badlogic.gdx.Input.Keys.O
 import com.badlogic.gdx.Input.Keys.PAGE_DOWN
 import com.badlogic.gdx.Input.Keys.PAGE_UP
 import com.badlogic.gdx.Input.Keys.Q
-import com.badlogic.gdx.Input.Keys.R
 import com.badlogic.gdx.Input.Keys.S
 import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
 import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.Input.Keys.UP
 import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
-import com.fasterxml.jackson.module.kotlin.readValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
-import no.elg.hex.Hex
-import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.MessagesRenderer.publishError
-import no.elg.hex.hud.MessagesRenderer.publishMessage
-import no.elg.hex.input.editor.OpaquenessEditor
-import no.elg.hex.input.editor.PieceEditor
-import no.elg.hex.input.editor.TeamEditor
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.input.editor.Editor
+import no.elg.hex.input.editor.NOOPEditor
+import no.elg.hex.screens.MapEditorScreen
+import no.elg.hex.screens.MapEditorScreen.Companion.MAX_BRUSH_SIZE
+import no.elg.hex.screens.MapEditorScreen.Companion.MIN_BRUSH_SIZE
 import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.next
-import no.elg.hex.util.play
 import no.elg.hex.util.previous
-import no.elg.hex.util.regenerateCapitals
-import no.elg.hex.util.saveIsland
-import no.elg.hex.util.serialize
-import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
-class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
-
-  private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(islandScreen)
-  private val teamEditors = TeamEditor.generateTeamEditors(islandScreen)
-  private val pieceEditors = PieceEditor.generatePieceEditors(islandScreen)
-
-  private var quickSavedIsland: String = ""
-
-  init {
-    quicksave()
-  }
-
-  var showHelp = false
+class MapEditorInputProcessor(private val mapEditorScreen: MapEditorScreen) : InputAdapter() {
 
   var brushRadius: Int = 1
     private set
@@ -75,29 +41,32 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
   var selectedPiece: KClass<out Piece> = PIECES.first()
     private set
 
-  var opaquenessEditor: OpaquenessEditor = opaquenessEditors.last()
-    private set
-  var teamEditor: TeamEditor = teamEditors.last()
-    private set
-  var pieceEditor: PieceEditor = pieceEditors.last()
-    private set
+  var editors: List<Editor> = emptyList()
+    internal set(value) {
+      field = value
+      editor = value.firstOrNull() ?: NOOPEditor
+    }
+
+  var editor: Editor = NOOPEditor
+    internal set(value) {
+      if (value == NOOPEditor || value in editors) {
+        field = value
+      } else {
+        field = NOOPEditor
+        publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
+      }
+    }
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
-      val cursorHex = islandScreen.basicIslandInputProcessor.cursorHex ?: return true
-
-      fun editHex(hexagon: Hexagon<HexagonData>) {
-        opaquenessEditor.edit(hexagon)
-        teamEditor.edit(hexagon)
-        pieceEditor.edit(hexagon)
-      }
+      val cursorHex = mapEditorScreen.basicIslandInputProcessor.cursorHex ?: return true
 
       if (isShiftPressed()) {
-        for (hexagon in islandScreen.island.findHexagonsWithinRadius(cursorHex, brushRadius)) {
-          editHex(hexagon)
+        for (hexagon in mapEditorScreen.island.findHexagonsWithinRadius(cursorHex, brushRadius)) {
+          editor.edit(hexagon)
         }
       } else {
-        editHex(cursorHex)
+        editor.edit(cursorHex)
       }
       return true
     }
@@ -105,77 +74,24 @@ class MapEditorInputProcessor(private val islandScreen: IslandScreen) : InputAda
   }
 
   override fun keyDown(keycode: Int): Boolean {
-    if (isControlPressed()) {
-      when (keycode) {
-        O -> saveIsland(islandScreen.id, islandScreen.island)
-        R -> {
-          play(islandScreen.id)
-          publishMessage("Successfully reloaded island ${islandScreen.id}")
-        }
-        C -> islandScreen.island.regenerateCapitals()
-      }
-      return true
-    }
-
     when (keycode) {
-      F1 -> showHelp = !showHelp
       W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
       S, PAGE_DOWN, DOWN -> brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
       Q ->
           selectedTeam =
               Team.values().let {
-                if (isShiftPressed()) it.previous(selectedTeam) else it.next(selectedTeam)
+                if (isShiftPressed()) it.previous(selectedTeam)!! else it.next(selectedTeam)
               }
       A ->
           selectedPiece =
               PIECES.let {
-                if (isShiftPressed()) it.previous(selectedPiece) else it.next(selectedPiece)
+                if (isShiftPressed()) it.previous(selectedPiece)!! else it.next(selectedPiece)
               }
-      NUM_1, NUMPAD_1 ->
-          opaquenessEditor =
-              opaquenessEditors.let {
-                if (isShiftPressed()) it.previous(opaquenessEditor) else it.next(opaquenessEditor)
-              }
-      NUM_2, NUMPAD_2 ->
-          teamEditor =
-              teamEditors.let {
-                if (isShiftPressed()) it.previous(teamEditor) else it.next(teamEditor)
-              }
-      NUM_3, NUMPAD_3 ->
-          pieceEditor =
-              pieceEditors.let {
-                if (isShiftPressed()) it.previous(pieceEditor) else it.next(pieceEditor)
-              }
-      F5 -> {
-        quicksave()
-        publishMessage("Quicksaved")
-      }
-      F9 -> quickload()
       else -> return false
     }
     return true
   }
 
-  fun quicksave() {
-    quickSavedIsland = islandScreen.island.serialize()
-  }
-
-  fun quickload() {
-    if (quickSavedIsland.isEmpty()) {
-      publishError("No quick save found")
-      return
-    }
-    play(islandScreen.id, Hex.mapper.readValue(quickSavedIsland))
-  }
-
   private fun isShiftPressed(): Boolean =
       Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
-
-  private fun isControlPressed(): Boolean =
-      Gdx.input.isKeyPressed(CONTROL_LEFT) || Gdx.input.isKeyPressed(CONTROL_RIGHT)
-
-  companion object {
-    const val MAX_BRUSH_SIZE = 10
-    const val MIN_BRUSH_SIZE = 1
-  }
 }

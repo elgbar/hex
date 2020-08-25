@@ -19,9 +19,18 @@ import com.badlogic.gdx.utils.Array as GdxArray
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
+import ktx.scene2d.vis.visImageTextButton
+import ktx.style.imageTextButton
 import ktx.style.label
+import ktx.style.menu
+import ktx.style.menuItem
+import ktx.style.set
+import ktx.style.textButton
+import ktx.style.textField
+import ktx.style.visImageTextButton
 import ktx.style.visTextButton
 import ktx.style.visTextField
+import ktx.style.window
 import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
@@ -123,17 +132,16 @@ class Assets : AssetManager() {
     fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true) {
       val boldness = if (bold) "B" else "R"
       val italicness = if (italic) "I" else ""
+      val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
 
       val parameter = FreeTypeFontLoaderParameter()
       parameter.fontParameters.size = fontSize
       parameter.fontParameters.minFilter = Linear
       parameter.fontParameters.flip = flip
       parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
-      val name =
-          if (flip) "fonts/UbuntuMono-$boldness$italicness.ttf"
-          else "fonts/UbuntuMono-$boldness$italicness$NOT_FLIPED_SUFFIX.ttf"
+      val name = "fonts/UbuntuMono-$boldness$italicness$flippiness.ttf"
       load(name, BITMAP_FONT, parameter)
-      Gdx.app.debug("ASSET", "loaded $name")
+      Gdx.app.debug("ASSET", "loaded font '$name'")
     }
 
     loadFont(bold = false, italic = false)
@@ -150,17 +158,46 @@ class Assets : AssetManager() {
     loadFont(bold = false, italic = true)
     loadFont(bold = true, italic = false)
     loadFont(bold = true, italic = true)
+    loadFont(bold = false, italic = false, flip = false)
+    loadFont(bold = false, italic = true, flip = false)
+    loadFont(bold = true, italic = false, flip = false)
+    loadFont(bold = true, italic = true, flip = false)
 
     loadingInfo = "VisUI"
 
     if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
     with(VisUI.getSkin()) {
-      loadFont(bold = false, italic = false, flip = false)
-      val notFlippedFont =
-          finishLoadingAsset<BitmapFont>("fonts/UbuntuMono-R$NOT_FLIPED_SUFFIX.ttf")
+      val notFlippedFont = getFont(bold = false, italic = false, flip = false)
+      val boldNotFlippedFont = getFont(bold = false, italic = false, flip = false)
+
+      this["default-font"] = notFlippedFont
+
       label(extend = "default") { font = notFlippedFont }
+      label(extend = "link-label") { font = notFlippedFont }
+      label(extend = "small") { font = notFlippedFont }
+      label(extend = "menuitem-shortcut") { font = notFlippedFont }
+
       visTextField(extend = "default") { font = notFlippedFont }
+      textField(extend = "default") { font = notFlippedFont }
+
       visTextButton(extend = "default") { font = notFlippedFont }
+      visTextButton(extend = "menu-bar") { font = notFlippedFont }
+      visTextButton(extend = "toggle") { font = notFlippedFont }
+      visTextButton(extend = "blue") { font = notFlippedFont }
+
+      textButton(extend = "default") { font = notFlippedFont }
+
+      val newOpenButtonStyle = visImageTextButton(extend = "default") { font = notFlippedFont }
+      visImageTextButton(extend = "menu-bar") { font = notFlippedFont }
+      imageTextButton(extend = "default") { font = notFlippedFont }
+
+      window(extend = "default") { titleFont = boldNotFlippedFont }
+      window(extend = "resizable") { titleFont = boldNotFlippedFont }
+      window(extend = "noborder") { titleFont = boldNotFlippedFont }
+      window(extend = "dialog") { titleFont = boldNotFlippedFont }
+
+      menuItem(extend = "default") { font = notFlippedFont }
+      menu { openButtonStyle = newOpenButtonStyle }
     }
 
     loadingInfo = "sprites"
@@ -186,6 +223,13 @@ class Assets : AssetManager() {
         }
       }
     }
+  }
+
+  fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true): BitmapFont {
+    val boldness = if (bold) "B" else "R"
+    val italicness = if (italic) "I" else ""
+    val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
+    return finishLoadingAsset<BitmapFont>("fonts/UbuntuMono-$boldness$italicness$flippiness.ttf")
   }
 
   fun finishMain() {

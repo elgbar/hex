@@ -6,15 +6,17 @@ import no.elg.hex.hud.ScreenText
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
-abstract class Editor {
-  val name: String =
-      requireNotNull(this::class.simpleName) {
-        "Subclass of ${TeamEditor::class::simpleName} cannot be anonymous"
-      }
+interface Editor {
+  val name: String
+    get() =
+        requireNotNull(this::class.simpleName) {
+          "Subclass of ${Editor::class::simpleName} cannot be anonymous"
+        }
 
-  open val isNOP = false
+  val isNOP
+    get() = false
 
-  open fun edit(hexagon: Hexagon<HexagonData>) {}
+  fun edit(hexagon: Hexagon<HexagonData>)
 
   companion object {
     fun editorText(
@@ -24,5 +26,13 @@ abstract class Editor {
           ScreenText("Disabled", color = Color.RED, bold = bold, italic = italic, next = next)
       else ScreenText(editor.name, color = Color.GOLD, bold = bold, italic = italic, next = next)
     }
+  }
+}
+
+object NOOPEditor : Editor {
+  override val isNOP
+    get() = true
+  override fun edit(hexagon: Hexagon<HexagonData>) {
+    /*NO OP*/
   }
 }

@@ -2,14 +2,11 @@ package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import kotlin.math.abs
-import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.IslandScreen
-import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 
@@ -75,14 +72,6 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
       return true
     }
     return false
-  }
-
-  override fun keyDown(keycode: Int): Boolean {
-    when (keycode) {
-      Keys.ESCAPE -> Hex.screen = LevelSelectScreen
-      else -> return false
-    }
-    return true
   }
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

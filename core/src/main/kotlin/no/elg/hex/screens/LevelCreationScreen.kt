@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.Array as GdxArray
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import com.kotcrab.vis.ui.util.form.FormInputValidator
+import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.CANCEL
+import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.OK
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
@@ -25,6 +27,8 @@ import ktx.actors.onChangeEvent
 import ktx.actors.onClick
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
+import ktx.scene2d.scene2d
+import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
@@ -176,22 +180,26 @@ object LevelCreationScreen : AbstractScreen() {
 
         row()
 
-        horizontalGroup {
-          space(20f)
+        buttonBar {
+          setButton(
+              OK,
+              scene2d.visTextButton("Create island") {
+                disableables.add(this)
 
-          visTextButton("Create island") {
-            disableables.add(this)
+                onClick {
+                  if (this.isDisabled) return@onClick
+                  Gdx.app.debug(
+                      "CREATOR",
+                      "Creating island ${LevelSelectScreen.islandAmount} with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}")
+                  play(LevelSelectScreen.islandAmount, createIsland(false))
+                }
+              })
 
-            onClick {
-              if (this.isDisabled) return@onClick
-              Gdx.app.debug(
-                  "CREATOR",
-                  "Creating island ${LevelSelectScreen.islandAmount} with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}")
-              play(LevelSelectScreen.islandAmount, createIsland(false))
-            }
-          }
+          setButton(
+              CANCEL,
+              scene2d.visTextButton("Cancel") { onClick { Hex.screen = LevelSelectScreen } })
 
-          visTextButton("Cancel") { onClick { Hex.screen = LevelSelectScreen } }
+          createTable().pack()
         }
 
         pack()
