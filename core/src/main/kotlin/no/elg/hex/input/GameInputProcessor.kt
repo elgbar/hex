@@ -23,23 +23,23 @@ import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.island.Hand
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
-class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
+class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen) : InputAdapter() {
 
   var infiniteMoney = Hex.args.cheating
 
   private fun pickUp(island: Island, hexData: HexagonData, territory: Territory) {
     val cursorPiece = hexData.piece
     if (cursorPiece.movable &&
-        cursorPiece is LivingPiece &&
-        !cursorPiece.moved &&
-        hexData.team == island.currentTeam) {
+      cursorPiece is LivingPiece &&
+      !cursorPiece.moved &&
+      hexData.team == island.currentTeam) {
       // We currently don't hold anything in our hand, so pick it up!
       island.inHand = Hand(territory, cursorPiece)
       hexData.setPiece(Empty::class)
@@ -48,11 +48,11 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   private fun placeDown(
-      island: Island,
-      territory: Territory,
-      placeOn: Hexagon<HexagonData>,
-      newPiece: Piece,
-      oldTerritory: Territory?
+    island: Island,
+    territory: Territory,
+    placeOn: Hexagon<HexagonData>,
+    newPiece: Piece,
+    oldTerritory: Territory?
   ) {
     val hexData = island.getData(placeOn)
     if (hexData.team != island.currentTeam && !territory.enemyBorderHexes.contains(placeOn)) {
@@ -63,8 +63,8 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     val oldPiece = hexData.piece
 
     val (newPieceType, moved) = if (oldPiece is LivingPiece &&
-        newPiece is LivingPiece &&
-        hexData.team == territory.team) {
+      newPiece is LivingPiece &&
+      hexData.team == territory.team) {
       // merge cursor piece with held piece
       if (newPiece.canNotMerge(oldPiece)) return // cannot merge
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
@@ -76,7 +76,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     if (newPieceType.isSubclassOf(LivingPiece::class)) {
       if (hexData.team == territory.team && (oldPiece is Capital || oldPiece is Castle)) {
         Gdx.app.debug(
-            "PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
+          "PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
         return
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
         Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
@@ -85,13 +85,13 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
     } else if (Castle::class == newPieceType) {
       if (hexData.team != territory.team) {
         Gdx.app.debug(
-            "PLACE",
-            "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
+          "PLACE",
+          "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
         return
       }
     } else if (Castle::class != newPieceType) {
       throw IllegalStateException(
-          "Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
+        "Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
     }
 
     if (hexData.setPiece(newPieceType)) {
@@ -111,12 +111,12 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   fun click(hexagon: Hexagon<HexagonData>) {
-    val island = islandScreen.island
+    val island = playableIslandScreen.island
     val cursorHexData = island.getData(hexagon)
 
     val oldTerritory = island.selected
     if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) &&
-        cursorHexData.team == island.currentTeam) {
+      cursorHexData.team == island.currentTeam) {
       island.select(hexagon)
     }
     val territory = island.selected
@@ -134,11 +134,11 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
-    with(islandScreen) {
+    if (playableIslandScreen.island.currentTeam != Island.STARTING_TEAM) return false
+    with(playableIslandScreen) {
       when (button) {
         Buttons.LEFT -> {
-          val cursorHex = basicIslandInputProcessor.cursorHex ?: return false
+          val cursorHex = playableIslandScreen.basicIslandInputProcessor.cursorHex ?: return false
           click(cursorHex)
         }
         else -> return false
@@ -148,11 +148,11 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   override fun keyDown(keycode: Int): Boolean {
-    if (islandScreen.island.currentTeam != Island.STARTING_TEAM) return false
+    if (playableIslandScreen.island.currentTeam != Island.STARTING_TEAM) return false
 
     when (keycode) {
-      ENTER -> islandScreen.island.endTurn(this)
-      BACKSPACE, SPACE -> islandScreen.island.inHand = null
+      ENTER -> playableIslandScreen.island.endTurn(this)
+      BACKSPACE, SPACE -> playableIslandScreen.island.inHand = null
       Keys.F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
       else -> {
         val piece = keycodeToPiece(keycode) ?: return false
@@ -163,7 +163,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
   }
 
   fun buyUnit(piece: Piece): Boolean {
-    islandScreen.island.selected?.also {
+    playableIslandScreen.island.selected?.also {
       if (!infiniteMoney) {
         if (!it.capital.canBuy(piece)) {
           return@also
@@ -171,7 +171,7 @@ class GameInputProcessor(private val islandScreen: IslandScreen) : InputAdapter(
         it.capital.balance -= piece.price
       }
       if (piece is LivingPiece) piece.moved = false
-      islandScreen.island.inHand = Hand(it, piece)
+      playableIslandScreen.island.inHand = Hand(it, piece)
     }
     return true
   }

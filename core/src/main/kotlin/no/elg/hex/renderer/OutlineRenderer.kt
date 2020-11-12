@@ -8,13 +8,14 @@ import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author kheba */
-class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, Disposable {
+class OutlineRenderer(private val islandScreen: PreviewIslandScreen) :
+  FrameUpdatable, Disposable {
 
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
@@ -23,13 +24,13 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
     lineRenderer.begin(Filled)
     lineRenderer.projectionMatrix = islandScreen.camera.combined
 
-    val currHex = islandScreen.basicIslandInputProcessor.cursorHex
+    val currHex = islandScreen.cursorHexagon
 
     fun draw(
-        hexes: Iterable<Hexagon<HexagonData>>,
-        color: Color?,
-        alpha: Float,
-        lineWidth: Float = DEFAULT_RECT_LINE_WIDTH
+      hexes: Iterable<Hexagon<HexagonData>>,
+      color: Color?,
+      alpha: Float,
+      lineWidth: Float = DEFAULT_RECT_LINE_WIDTH
     ) {
 
       for (hexagon in hexes) {
@@ -40,9 +41,9 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
         if (data.invisible && !drawEdges) continue
 
         val brightness =
-            HexagonData.BRIGHTNESS +
-                (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED
-                else 0f)
+          HexagonData.BRIGHTNESS +
+            (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED
+            else 0f)
 
         if (drawEdges) {
           lineRenderer.color.set(Color.WHITE)
@@ -55,13 +56,13 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
           // get the next edge this edge is connected to
           val nextPoint = points[(i + 1) % points.size]
           lineRenderer.rectLine(
-              point.coordinateX.toFloat(),
-              point.coordinateY.toFloat(),
-              nextPoint.coordinateX.toFloat(),
-              nextPoint.coordinateY.toFloat(),
-              lineWidth,
-              lineRenderer.color,
-              lineRenderer.color)
+            point.coordinateX.toFloat(),
+            point.coordinateY.toFloat(),
+            nextPoint.coordinateX.toFloat(),
+            nextPoint.coordinateY.toFloat(),
+            lineWidth,
+            lineRenderer.color,
+            lineRenderer.color)
         }
       }
     }
@@ -74,7 +75,7 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
       val hand = islandScreen.island.inHand
       if (hand != null && hand.piece is LivingPiece) {
         val hexes =
-            it.enemyBorderHexes.filter { hex -> islandScreen.island.canAttack(hex, hand.piece) }
+          it.enemyBorderHexes.filter { hex -> islandScreen.island.canAttack(hex, hand.piece) }
         draw(hexes, Color.RED, 1f, 2f)
       }
     }

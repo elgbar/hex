@@ -3,24 +3,18 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import kotlin.math.max
 import no.elg.hex.Hex
-import no.elg.hex.hud.DebugInfoRenderer
-import no.elg.hex.hud.GameInfoRenderer
-import no.elg.hex.input.BasicIslandInputProcessor
-import no.elg.hex.input.GameInputProcessor
+import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.Companion.STARTING_TEAM
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
-import no.elg.hex.util.component7
-import no.elg.hex.util.component8
-import no.elg.hex.util.debug
 import no.elg.hex.util.getData
+import no.elg.hex.util.trace
+import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
-class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = true) :
-    AbstractScreen() {
+open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen() {
 
   private fun calcVisibleGridSize(): DoubleArray {
     val visible = island.hexagons.filterNot { island.getData(it).invisible }
@@ -39,17 +33,12 @@ class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = tru
 
   val visibleGridSize by lazy { calcVisibleGridSize() }
 
-  val inputProcessor by lazy { GameInputProcessor(this) }
-  private val frameUpdatable by lazy { GameInfoRenderer(this, inputProcessor) }
+  private val verticesRenderer by lazy { VerticesRenderer(this) }
+  private val outlineRenderer by lazy { OutlineRenderer(this) }
+  private val spriteRenderer by lazy { SpriteRenderer(this) }
 
-  val basicIslandInputProcessor: BasicIslandInputProcessor by lazy {
-    BasicIslandInputProcessor(this)
-  }
-  private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
-
-  private val verticesRenderer = VerticesRenderer(this)
-  private val outlineRenderer = OutlineRenderer(this)
-  private val spriteRenderer = SpriteRenderer(this)
+  val cursorHexagon: Hexagon<HexagonData>?
+    get() = null
 
   override fun render(delta: Float) {
     camera.update()
@@ -57,13 +46,6 @@ class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = tru
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
-
-    if (renderHud) {
-      if (Hex.debug) {
-        debugRenderer.frameUpdate()
-      }
-      frameUpdatable.frameUpdate()
-    }
   }
 
   override fun resize(width: Int, height: Int) {
@@ -87,7 +69,7 @@ class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = tru
     val widthZoom = (maxX - minX + padding * data.hexagonWidth) / camera.viewportWidth
     val heightZoom = (maxY - minY + padding * data.hexagonHeight) / camera.viewportHeight
 
-    Gdx.app.debug("ISLAND RESIZE") {
+    Gdx.app.trace("ISLAND RESIZE") {
       """
       maxX = $maxX
       minX = $minX
@@ -103,7 +85,7 @@ class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = tru
     
       islandCenterX = $islandCenterX
       islandCenterY = $islandCenterY
-  """.trimIndent()
+      """.trimIndent()
     }
 
     camera.position.x = islandCenterX.toFloat()
@@ -111,27 +93,12 @@ class IslandScreen(val id: Int, val island: Island, val renderHud: Boolean = tru
     camera.zoom = max(widthZoom, heightZoom).toFloat()
   }
 
-  override fun show() {
-    if (!renderHud) {
-      Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
-      Hex.inputMultiplexer.addProcessor(inputProcessor)
-
-      if (island.currentTeam != STARTING_TEAM && inputProcessor is GameInputProcessor) {
-        island.endTurn(inputProcessor as GameInputProcessor)
-      }
-    }
-  }
-
   override fun hide() {
     dispose()
-    island.select(null)
   }
 
   override fun dispose() {
+    island.select(null)
     super.dispose()
-    if (!renderHud) {
-      Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
-      Hex.inputMultiplexer.removeProcessor(inputProcessor)
-    }
   }
 }

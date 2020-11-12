@@ -6,7 +6,7 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
 import kotlin.math.abs
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
 
@@ -15,7 +15,7 @@ import org.hexworks.mixite.core.api.Hexagon
  *
  * @author Elg
  */
-class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputAdapter() {
+class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIslandScreen) : InputAdapter() {
 
   var mouseX: Float = 0f
     private set
@@ -35,7 +35,7 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
   private var lastMouseFrame: Long = -1
 
   val cursorHex: Hexagon<HexagonData>?
-    get() = islandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
+    get() = playableIslandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   /**
    * Update the world mouse position. Will only update if the frame has changed since last called
@@ -45,7 +45,7 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
     unprojectVector.x = Gdx.input.x.toFloat()
     unprojectVector.y = Gdx.input.y.toFloat()
 
-    islandScreen.camera.unproject(unprojectVector)
+    playableIslandScreen.camera.unproject(unprojectVector)
     mouseX = unprojectVector.x
     mouseY = unprojectVector.y
   }
@@ -53,9 +53,9 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable) {
 
-      val (maxX, minX, maxY, minY) = islandScreen.visibleGridSize
+      val (maxX, minX, maxY, minY) = playableIslandScreen.visibleGridSize
 
-      val zoom = islandScreen.camera.zoom
+      val zoom = playableIslandScreen.camera.zoom
       val dx = -Gdx.input.deltaX * zoom
       val dy = -Gdx.input.deltaY * zoom
 
@@ -64,11 +64,11 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
         return false
       }
 
-      islandScreen.camera.translate(dx, dy)
-      islandScreen.camera.position.x =
-          islandScreen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
-      islandScreen.camera.position.y =
-          islandScreen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+      playableIslandScreen.camera.translate(dx, dy)
+      playableIslandScreen.camera.position.x =
+        playableIslandScreen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+      playableIslandScreen.camera.position.y =
+        playableIslandScreen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
       return true
     }
     return false
@@ -91,8 +91,8 @@ class BasicIslandInputProcessor(private val islandScreen: IslandScreen) : InputA
   }
 
   override fun scrolled(amount: Int): Boolean {
-    islandScreen.camera.zoom =
-        (amount * ZOOM_SPEED + islandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    playableIslandScreen.camera.zoom =
+      (amount * ZOOM_SPEED + playableIslandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 

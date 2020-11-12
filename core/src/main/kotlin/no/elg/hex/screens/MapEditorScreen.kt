@@ -28,11 +28,9 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.util.hide
-import no.elg.hex.util.next
 import no.elg.hex.util.nextOrNull
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
-import no.elg.hex.util.plusAssign
 import no.elg.hex.util.previousOrNull
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.saveIsland
@@ -44,7 +42,7 @@ import no.elg.hex.util.toggleShown
 /** @author Elg */
 class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
 
-  private val islandScreen = IslandScreen(id, island, false)
+  private val islandScreen = PlayableIslandScreen(id, island)
   val basicIslandInputProcessor
     get() = islandScreen.basicIslandInputProcessor
 
@@ -60,88 +58,88 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
     quicksave()
     stage.actors {
       val confirmExit =
-          visWindow("Confirm exit") {
-            isMovable = false
-            isModal = true
-            hide()
+        visWindow("Confirm exit") {
+          isMovable = false
+          isModal = true
+          hide()
 
-            visLabel("Do you want to save before exiting?")
-            row()
+          visLabel("Do you want to save before exiting?")
+          row()
 
-            buttonBar {
-              setButton(
-                  ButtonBar.ButtonType.YES,
-                  scene2d.visTextButton("Yes") {
-                    onClick {
-                      if (saveIsland(id, island)) {
-                        Hex.screen = LevelSelectScreen
-                      } else {
-                        this@visWindow.fadeOut()
-                      }
-                    }
-                  })
+          buttonBar {
+            setButton(
+              ButtonBar.ButtonType.YES,
+              scene2d.visTextButton("Yes") {
+                onClick {
+                  if (saveIsland(id, island)) {
+                    Hex.screen = LevelSelectScreen
+                  } else {
+                    this@visWindow.fadeOut()
+                  }
+                }
+              })
 
-              setButton(
-                  ButtonBar.ButtonType.NO,
-                  scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen } })
+            setButton(
+              ButtonBar.ButtonType.NO,
+              scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen } })
 
-              setButton(
-                  ButtonBar.ButtonType.CANCEL,
-                  scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } })
-              createTable().pack()
-            }
-            pack()
-            centerWindow()
+            setButton(
+              ButtonBar.ButtonType.CANCEL,
+              scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } })
+            createTable().pack()
           }
+          pack()
+          centerWindow()
+        }
 
       fun exit() {
         confirmExit.toggleShown(this@MapEditorScreen.stage)
       }
 
       val editors =
-          visWindow("Editors") {
-            addCloseButton()
-            isResizable = true
+        visWindow("Editors") {
+          addCloseButton()
+          isResizable = true
 
-            if (Hex.debug) {
-              debug()
-            }
-            defaults().space(5f)
-
-            fun createEditorButton(name: String, key: Int) {
-              visImageTextButton(name) {
-                onClick { Hex.inputMultiplexer.keyDown(key) }
-                it.fillX()
-                visTextTooltip("Hotkey: ${Keys.toString(key)}")
-              }
-            }
-            createEditorButton("Opaqueness", OPAQUENESS_KEY)
-            row()
-            createEditorButton("Team", TEAM_KEY)
-            row()
-            createEditorButton("Piece", PIECE_KEY)
-            pack()
+          if (Hex.debug) {
+            debug()
           }
+          defaults().space(5f)
+
+          fun createEditorButton(name: String, key: Int) {
+            visImageTextButton(name) {
+              onClick { Hex.inputMultiplexer.keyDown(key) }
+              it.fillX()
+              visTextTooltip("Hotkey: ${Keys.toString(key)}")
+            }
+          }
+          createEditorButton("Opaqueness", OPAQUENESS_KEY)
+          row()
+          createEditorButton("Team", TEAM_KEY)
+          row()
+          createEditorButton("Piece", PIECE_KEY)
+          pack()
+        }
 
       val infoWindow =
-          visWindow("Island editor information") {
-            closeOnEscape()
-            addCloseButton()
-            isModal = true
-            visLabel(
-                """
+        visWindow("Island editor information") {
+          closeOnEscape()
+          addCloseButton()
+          isModal = true
+          visLabel(
+            """
                 Island Validation rules:
    
                 * All visible hexagons must be reachable from all other visible hexagons (ie there can only be one island)
                 * No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
                 * There must be exactly one capital per territory
                 """.trimIndent()) {
-              it.expand().fill()
-            }
-            pack()
-            centerWindow()
-            this.hide()
+            it.expand().fill()
           }
+          pack()
+          centerWindow()
+          this.hide()
+        }
 
       visTable {
         menuBar { cell ->
@@ -200,14 +198,14 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
             menuItem("Next Editor") {
               onInteract(this@MapEditorScreen.stage, Keys.RIGHT) {
                 inputProcessor.editor =
-                    inputProcessor.editors.nextOrNull(inputProcessor.editor) ?: NOOPEditor
+                  inputProcessor.editors.nextOrNull(inputProcessor.editor) ?: NOOPEditor
               }
             }
 
             menuItem("Previous Editor") {
               onInteract(this@MapEditorScreen.stage, Keys.LEFT) {
                 inputProcessor.editor =
-                    inputProcessor.editors.previousOrNull(inputProcessor.editor) ?: NOOPEditor
+                  inputProcessor.editors.previousOrNull(inputProcessor.editor) ?: NOOPEditor
               }
             }
           }

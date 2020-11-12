@@ -18,68 +18,65 @@ import no.elg.hex.hud.ScreenDrawPosition.BOTTOM_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.TOP_CENTER
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.hud.ScreenRenderer.batch
-import no.elg.hex.input.GameInputProcessor
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.PlayableIslandScreen
 
 /** @author Elg */
-class GameInfoRenderer(
-    private val islandScreen: IslandScreen, gameInputProcessor: GameInputProcessor
-) : FrameUpdatable {
+class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) : FrameUpdatable {
 
   override fun frameUpdate() {
-    islandScreen.island.selected?.also { selected ->
+    playableIslandScreen.island.selected?.also { selected ->
       val list =
-          mutableListOf(
-              ScreenText(
-                  "Treasury: ",
-                  next = signColoredText(selected.capital.balance) { "%d".format(it) }),
-              ScreenText(
-                  "Estimated income: ",
-                  next = signColoredText(selected.income) { "%+d".format(it) }))
+        mutableListOf(
+          ScreenText(
+            "Treasury: ",
+            next = signColoredText(selected.capital.balance) { "%d".format(it) }),
+          ScreenText(
+            "Estimated income: ",
+            next = signColoredText(selected.income) { "%+d".format(it) }))
       if (Hex.debug) {
         list +=
-            ScreenText(
-                "Holding: ",
-                next = nullCheckedText(islandScreen.island.inHand, color = Color.YELLOW))
+          ScreenText(
+            "Holding: ",
+            next = nullCheckedText(playableIslandScreen.island.inHand, color = Color.YELLOW))
       }
       ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
     }
 
-    if (islandScreen.inputProcessor.infiniteMoney) {
+    if (playableIslandScreen.inputProcessor.infiniteMoney) {
       ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
     }
 
     ScreenRenderer.drawAll(
-        ScreenText("Turn ${islandScreen.island.turn}", bold = true), position = TOP_CENTER)
+      ScreenText("Turn ${playableIslandScreen.island.turn}", bold = true), position = TOP_CENTER)
 
-    islandScreen.island.inHand?.also { (_, piece) ->
+    playableIslandScreen.island.inHand?.also { (_, piece) ->
       batch.begin()
       val region =
-          when (piece) {
-            is Capital -> Hex.assets.capital
-            is PalmTree -> Hex.assets.palm
-            is PineTree -> Hex.assets.pine
-            is Castle -> Hex.assets.castle
-            is Grave -> Hex.assets.grave
-            is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
-            is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
-            is Knight -> Hex.assets.knight.getKeyFrame(0f)
-            is Baron -> Hex.assets.baron.getKeyFrame(0f)
-            is Empty -> return@also
-          }
+        when (piece) {
+          is Capital -> Hex.assets.capital
+          is PalmTree -> Hex.assets.palm
+          is PineTree -> Hex.assets.pine
+          is Castle -> Hex.assets.castle
+          is Grave -> Hex.assets.grave
+          is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
+          is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
+          is Knight -> Hex.assets.knight.getKeyFrame(0f)
+          is Baron -> Hex.assets.baron.getKeyFrame(0f)
+          is Empty -> return@also
+        }
 
       val height = (Gdx.graphics.height * 0.1f)
       val width = height * (region.packedWidth / region.packedHeight.toFloat())
 
       val handWidth =
-          height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
+        height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
 
       batch.draw(
-          Hex.assets.hand,
-          (Gdx.graphics.width - handWidth / 2f) / 2f,
-          (height + height / 2) / 2f,
-          handWidth,
-          height)
+        Hex.assets.hand,
+        (Gdx.graphics.width - handWidth / 2f) / 2f,
+        (height + height / 2) / 2f,
+        handWidth,
+        height)
       batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
       batch.end()
     }

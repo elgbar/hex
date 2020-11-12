@@ -10,35 +10,36 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.screens.IslandScreen
+import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
 
-class VerticesRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, Disposable {
+class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
+  FrameUpdatable, Disposable {
 
   private val mesh: Mesh =
-      Mesh(
-          true,
-          MAX_VERTS,
-          0,
-          VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
-          VertexAttribute(Usage.ColorPacked, 4, "a_color"))
+    Mesh(
+      true,
+      MAX_VERTS,
+      0,
+      VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
+      VertexAttribute(Usage.ColorPacked, 4, "a_color"))
 
   private val shader: ShaderProgram =
-      {
-        val fragShader: String = Gdx.files.internal(FRAG_SHADER_PATH).readString()
-        val vertShader: String = Gdx.files.internal(VERT_SHADER_PATH).readString()
+    {
+      val fragShader: String = Gdx.files.internal(FRAG_SHADER_PATH).readString()
+      val vertShader: String = Gdx.files.internal(VERT_SHADER_PATH).readString()
 
-        ShaderProgram.pedantic = false
-        val shader = ShaderProgram(vertShader, fragShader)
-        val log = shader.log
-        if (!shader.isCompiled) {
-          throw GdxRuntimeException(log)
-        }
-        if (log != null && log.isNotEmpty()) {
-          Gdx.app.log("Shader Log", log)
-        }
-        shader
-      }()
+      ShaderProgram.pedantic = false
+      val shader = ShaderProgram(vertShader, fragShader)
+      val log = shader.log
+      if (!shader.isCompiled) {
+        throw GdxRuntimeException(log)
+      }
+      if (log != null && log.isNotEmpty()) {
+        Gdx.app.log("Shader Log", log)
+      }
+      shader
+    }()
 
   // The array which holds all the data, interleaved like so:
   //    x, y, r, g, b, a
@@ -54,15 +55,15 @@ class VerticesRenderer(private val islandScreen: IslandScreen) : FrameUpdatable,
     Gdx.gl.glEnable(GL20.GL_BLEND)
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    val currHex = islandScreen.basicIslandInputProcessor.cursorHex
+    val currHex = islandScreen.cursorHexagon
 
     // Render the hexagons
     for (hexagon in islandScreen.island.hexagons) {
       val data: HexagonData = islandScreen.island.getData(hexagon)
       if (data.invisible) continue
       val brightness =
-          HexagonData.BRIGHTNESS +
-              if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f
+        HexagonData.BRIGHTNESS +
+          if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f
       data.type.render(this, data.color, brightness, hexagon)
     }
     flush()
@@ -154,7 +155,7 @@ class VerticesRenderer(private val islandScreen: IslandScreen) : FrameUpdatable,
 
     // The maximum number of triangles our mesh will hold
     private const val MAX_TRIS =
-        6 * 64 // each hexagon has 4 to 6 vertices, and there will be a least 64 hexagons
+      6 * 64 // each hexagon has 4 to 6 vertices, and there will be a least 64 hexagons
 
     // The maximum number of vertices our mesh will hold
     private const val MAX_VERTS = MAX_TRIS * 3

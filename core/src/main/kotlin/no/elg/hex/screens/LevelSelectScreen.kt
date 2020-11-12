@@ -46,10 +46,10 @@ object LevelSelectScreen : AbstractScreen() {
     get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
 
   fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int): FrameBuffer {
-    val islandScreen = IslandScreen(-1, island, false)
+    val islandScreen = PreviewIslandScreen(-1, island)
     islandScreen.resize(previewWidth, previewHeight)
     val buffer =
-        FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
+      FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
     buffer.begin()
     islandScreen.render(0f)
     buffer.end()
@@ -82,7 +82,7 @@ object LevelSelectScreen : AbstractScreen() {
           Hex.assets.load(fileName, Island::class.java)
         }
         islandPreviews.add(
-            renderPreview(Hex.assets.finishLoadingAsset(fileName), previewSize, previewSize))
+          renderPreview(Hex.assets.finishLoadingAsset(fileName), previewSize, previewSize))
       } else {
         break
       }
@@ -109,12 +109,12 @@ object LevelSelectScreen : AbstractScreen() {
     val size: Float = this.previewSize
 
     return Rectangle(
-        padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size)
+      padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size)
   }
 
   private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
     lineRenderer.color =
-        if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
+      if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
     lineRenderer.rect(x, y, width, height)
   }
 
@@ -138,19 +138,19 @@ object LevelSelectScreen : AbstractScreen() {
       val (x, y, width, height) = rect(islandPreviews.size)
 
       lineRenderer.line(
-          x + width / 2f,
-          y + height / 2f + height / 10f,
-          x + width / 2f,
-          y + height / 2f - height / 10f,
-          Color.WHITE,
-          Color.WHITE)
+        x + width / 2f,
+        y + height / 2f + height / 10f,
+        x + width / 2f,
+        y + height / 2f - height / 10f,
+        Color.WHITE,
+        Color.WHITE)
       lineRenderer.line(
-          x + width / 2f + width / 10f,
-          y + height / 2f,
-          x + width / 2f - width / 10f,
-          y + height / 2f,
-          Color.WHITE,
-          Color.WHITE)
+        x + width / 2f + width / 10f,
+        y + height / 2f,
+        x + width / 2f - width / 10f,
+        y + height / 2f,
+        Color.WHITE,
+        Color.WHITE)
       drawBox(x, y, width, height)
     }
 
