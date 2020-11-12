@@ -28,7 +28,7 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
     fun draw(
         hexes: Iterable<Hexagon<HexagonData>>,
         color: Color?,
-        alpha: Float = 1f,
+        alpha: Float,
         lineWidth: Float = DEFAULT_RECT_LINE_WIDTH
     ) {
 
@@ -64,10 +64,10 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
       }
     }
 
-    draw(islandScreen.island.hexagons, null)
+    draw(islandScreen.island.hexagons, null, 0.25f)
 
     islandScreen.island.selected?.also {
-      draw(it.hexagons, Color.WHITE)
+      draw(it.hexagons, Color.WHITE, 1f)
 
       val hand = islandScreen.island.inHand
       if (hand != null && hand.piece is LivingPiece) {
