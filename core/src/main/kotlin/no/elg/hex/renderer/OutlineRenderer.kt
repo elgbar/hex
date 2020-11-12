@@ -44,9 +44,11 @@ class OutlineRenderer(private val islandScreen: IslandScreen) : FrameUpdatable, 
                 (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED
                 else 0f)
 
-        lineRenderer.color =
-            if (drawEdges) Color.WHITE
-            else (color ?: data.color).cpy().mul(brightness, brightness, brightness, alpha)
+        if (drawEdges) {
+          lineRenderer.color.set(Color.WHITE)
+        } else {
+          lineRenderer.color.set(color ?: data.color).mul(brightness, brightness, brightness, alpha)
+        }
 
         for (i in points.indices) {
           val point = points[i]
