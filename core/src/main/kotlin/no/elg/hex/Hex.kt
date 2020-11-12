@@ -38,6 +38,7 @@ object Hex : ApplicationAdapter() {
 
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
+  val scale by lazy { if (args.scale <= 0) Assets.nativeScale else args.scale }
 
   var screen: AbstractScreen = SplashScreen
     set(value) {

@@ -5,7 +5,6 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
-import no.elg.hex.Assets
 import no.elg.hex.Hex
 
 fun main(args: Array<String>) {
@@ -13,13 +12,9 @@ fun main(args: Array<String>) {
 
   val config = LwjglApplicationConfiguration()
 
-  if (Assets.scale > 1) {
-    config.width = 1920
-    config.height = 1080
-  } else {
-    config.width = 1280
-    config.height = 720
-  }
+  val screenSize = java.awt.Toolkit.getDefaultToolkit().screenSize
+  config.width = screenSize.width / 2
+  config.height = screenSize.height / 2
 
   config.backgroundFPS = 10
   config.foregroundFPS = 9999

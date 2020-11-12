@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import kotlin.math.sign
-import no.elg.hex.Assets.Companion.fontSize
 import no.elg.hex.Hex
 import no.elg.hex.api.Resizable
 import no.elg.hex.hud.ScreenDrawPosition.HorizontalPosition.HORIZONTAL_CENTER
@@ -159,7 +158,7 @@ fun booleanText(
 
 object ScreenRenderer : Disposable, Resizable {
 
-  val spacing: Float = fontSize / 2f
+  val spacing: Float by lazy { Hex.assets.fontSize / 2f }
   val batch: SpriteBatch = SpriteBatch()
   private val camera = OrthographicCamera()
 

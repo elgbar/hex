@@ -22,6 +22,7 @@ import com.kotcrab.vis.ui.VisUI.SkinScale.X2
 import ktx.style.label
 import ktx.style.visTextButton
 import ktx.style.visTextField
+import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
@@ -59,9 +60,12 @@ class Assets : AssetManager() {
 
     private const val FONT_SIZE = 20
 
-    val scale: Int = if (java.awt.Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
-
-    val fontSize = FONT_SIZE * scale
+    val nativeScale: Byte =
+        when {
+          java.awt.Toolkit.getDefaultToolkit().screenSize.width >= 3800 -> 3
+          java.awt.Toolkit.getDefaultToolkit().screenSize.width >= 2560 -> 2
+          else -> 1
+        }
   }
 
   val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
@@ -71,6 +75,7 @@ class Assets : AssetManager() {
 
   val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
   val originalSprites: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS) }
+  val fontSize by lazy { FONT_SIZE * scale }
 
   private fun findSprite(regionName: String): AtlasRegion {
     val region =

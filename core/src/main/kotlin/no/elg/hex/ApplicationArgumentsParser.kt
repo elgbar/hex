@@ -1,6 +1,7 @@
 package no.elg.hex
 
 import com.xenomachina.argparser.ArgParser
+import com.xenomachina.argparser.default
 
 /** @author Elg */
 class ApplicationArgumentsParser(parser: ArgParser) {
@@ -14,4 +15,6 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val cheating by parser.flagging("--i-am-a-cheater", help = "Enable cheating")
   val `disable-island-loading` by parser.flagging("Don't load islands")
   val `draw-edges` by parser.flagging("Draw the edge hexagons to assists with debugging")
+
+  val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toByte() }.default { 0 }
 }

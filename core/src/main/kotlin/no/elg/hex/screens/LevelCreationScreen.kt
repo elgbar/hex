@@ -30,7 +30,6 @@ import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import no.elg.hex.Assets
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.STARTING_TEAM
@@ -151,7 +150,7 @@ object LevelCreationScreen : AbstractScreen() {
           spinner =
               spinner("Layout", layoutSpinner) {
                 val minWidth =
-                    Assets.fontSize *
+                    Hex.assets.fontSize *
                         HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
                 cells.get(1)?.minWidth(minWidth)
                 textField.addValidator(validator)
