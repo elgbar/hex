@@ -71,8 +71,8 @@ class Assets : AssetManager() {
 
     val nativeScale: Byte =
         when {
-          java.awt.Toolkit.getDefaultToolkit().screenSize.width >= 3800 -> 3
-          java.awt.Toolkit.getDefaultToolkit().screenSize.width >= 2560 -> 2
+          java.awt.Toolkit.getDefaultToolkit().screenSize.width > 3840 -> 3
+          java.awt.Toolkit.getDefaultToolkit().screenSize.width > 2560 -> 2
           else -> 1
         }
   }
@@ -123,6 +123,7 @@ class Assets : AssetManager() {
   val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
 
   init {
+    Gdx.app.debug("ASSET", "Using ${scale}x scale")
     super.setErrorListener { _, throwable -> throwable.printStackTrace() }
     val resolver = InternalFileHandleResolver()
 
