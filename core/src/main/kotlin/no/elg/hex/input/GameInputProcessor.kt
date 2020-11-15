@@ -7,7 +7,6 @@ import com.badlogic.gdx.Input.Keys.BACKSPACE
 import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.InputAdapter
-import kotlin.reflect.full.isSubclassOf
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -28,6 +27,7 @@ import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.reflect.full.isSubclassOf
 
 /** @author Elg */
 class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen) : InputAdapter() {
@@ -39,7 +39,8 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
     if (cursorPiece.movable &&
       cursorPiece is LivingPiece &&
       !cursorPiece.moved &&
-      hexData.team == island.currentTeam) {
+      hexData.team == island.currentTeam
+    ) {
       // We currently don't hold anything in our hand, so pick it up!
       island.inHand = Hand(territory, cursorPiece)
       hexData.setPiece(Empty::class)
@@ -64,7 +65,8 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
 
     val (newPieceType, moved) = if (oldPiece is LivingPiece &&
       newPiece is LivingPiece &&
-      hexData.team == territory.team) {
+      hexData.team == territory.team
+    ) {
       // merge cursor piece with held piece
       if (newPiece.canNotMerge(oldPiece)) return // cannot merge
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
@@ -76,7 +78,8 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
     if (newPieceType.isSubclassOf(LivingPiece::class)) {
       if (hexData.team == territory.team && (oldPiece is Capital || oldPiece is Castle)) {
         Gdx.app.debug(
-          "PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
+          "PLACE", "Cannot place a living entity of the same team onto a capital or castle piece"
+        )
         return
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
         Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
@@ -86,12 +89,14 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
       if (hexData.team != territory.team) {
         Gdx.app.debug(
           "PLACE",
-          "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
+          "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}"
+        )
         return
       }
     } else if (Castle::class != newPieceType) {
       throw IllegalStateException(
-        "Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
+        "Holding illegal piece '$newPieceType', can only hold living pieces and castle!"
+      )
     }
 
     if (hexData.setPiece(newPieceType)) {
@@ -116,7 +121,8 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
 
     val oldTerritory = island.selected
     if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) &&
-      cursorHexData.team == island.currentTeam) {
+      cursorHexData.team == island.currentTeam
+    ) {
       island.select(hexagon)
     }
     val territory = island.selected

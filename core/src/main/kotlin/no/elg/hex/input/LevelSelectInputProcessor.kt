@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
-import java.lang.Float.max
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
@@ -22,6 +21,7 @@ import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
+import java.lang.Float.max
 
 /** @author Elg */
 object LevelSelectInputProcessor : InputAdapter() {
@@ -64,8 +64,9 @@ object LevelSelectInputProcessor : InputAdapter() {
     val min = screenHeight / 2f
 
     camera.position.y =
-        (oldY + amount * SCROLL_SPEED).coerceIn(
-            min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding))
+      (oldY + amount * SCROLL_SPEED).coerceIn(
+        min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding)
+      )
     LevelSelectScreen.updateCamera()
     return true
   }

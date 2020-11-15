@@ -9,8 +9,9 @@ import no.elg.hex.Hex
 /** @author Elg */
 abstract class StageScreen : AbstractScreen() {
   val stage =
-      Stage(
-          ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
+    Stage(
+      ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
+    )
 
   override fun render(delta: Float) {
     stage.act()

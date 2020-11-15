@@ -13,8 +13,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
 
-class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
-  FrameUpdatable, Disposable {
+class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
 
   private val mesh: Mesh =
     Mesh(
@@ -22,7 +21,8 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
       MAX_VERTS,
       0,
       VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
-      VertexAttribute(Usage.ColorPacked, 4, "a_color"))
+      VertexAttribute(Usage.ColorPacked, 4, "a_color")
+    )
 
   private val shader: ShaderProgram =
     {
@@ -141,8 +141,8 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
   companion object {
     private const val SHADERS_FOLDER = "shaders"
 
-    private const val FRAG_SHADER_PATH = "${SHADERS_FOLDER}/hex.frag.glsl"
-    private const val VERT_SHADER_PATH = "${SHADERS_FOLDER}/hex.vert.glsl"
+    private const val FRAG_SHADER_PATH = "$SHADERS_FOLDER/hex.frag.glsl"
+    private const val VERT_SHADER_PATH = "$SHADERS_FOLDER/hex.vert.glsl"
 
     // Position attribute - (x, y)
     private const val POSITION_COMPONENTS = 2

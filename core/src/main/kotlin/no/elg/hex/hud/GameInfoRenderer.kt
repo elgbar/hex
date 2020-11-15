@@ -29,15 +29,19 @@ class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) :
         mutableListOf(
           ScreenText(
             "Treasury: ",
-            next = signColoredText(selected.capital.balance) { "%d".format(it) }),
+            next = signColoredText(selected.capital.balance) { "%d".format(it) }
+          ),
           ScreenText(
             "Estimated income: ",
-            next = signColoredText(selected.income) { "%+d".format(it) }))
+            next = signColoredText(selected.income) { "%+d".format(it) }
+          )
+        )
       if (Hex.debug) {
         list +=
           ScreenText(
             "Holding: ",
-            next = nullCheckedText(playableIslandScreen.island.inHand, color = Color.YELLOW))
+            next = nullCheckedText(playableIslandScreen.island.inHand, color = Color.YELLOW)
+          )
       }
       ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
     }
@@ -47,7 +51,8 @@ class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) :
     }
 
     ScreenRenderer.drawAll(
-      ScreenText("Turn ${playableIslandScreen.island.turn}", bold = true), position = TOP_CENTER)
+      ScreenText("Turn ${playableIslandScreen.island.turn}", bold = true), position = TOP_CENTER
+    )
 
     playableIslandScreen.island.inHand?.also { (_, piece) ->
       batch.begin()
@@ -76,7 +81,8 @@ class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) :
         (Gdx.graphics.width - handWidth / 2f) / 2f,
         (height + height / 2) / 2f,
         handWidth,
-        height)
+        height
+      )
       batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
       batch.end()
     }

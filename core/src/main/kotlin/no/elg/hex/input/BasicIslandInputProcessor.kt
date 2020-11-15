@@ -4,18 +4,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
-import kotlin.math.abs
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.getHexagon
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.math.abs
 
 /**
  * Handles input event related to the camera and other basic functiuons such as what
  *
  * @author Elg
  */
-class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIslandScreen) : InputAdapter() {
+class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIslandScreen) :
+  InputAdapter() {
 
   var mouseX: Float = 0f
     private set

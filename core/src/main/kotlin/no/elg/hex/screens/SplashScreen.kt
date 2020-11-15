@@ -25,7 +25,7 @@ object SplashScreen : AbstractScreen() {
       batch.begin()
 
       val txt =
-          """
+        """
           |Loading ${Hex.assets.loadingInfo}
           |
           |${"%2.0f".format(Hex.assets.progress * 100)}%
@@ -34,12 +34,13 @@ object SplashScreen : AbstractScreen() {
           """.trimMargin()
 
       layout.setText(
-          Hex.assets.regularFont,
-          txt,
-          Color.WHITE,
-          Gdx.graphics.width.toFloat(),
-          Align.center,
-          true)
+        Hex.assets.regularFont,
+        txt,
+        Color.WHITE,
+        Gdx.graphics.width.toFloat(),
+        Align.center,
+        true
+      )
       Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
       batch.end()
     }

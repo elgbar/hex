@@ -94,7 +94,9 @@ class Assets : AssetManager() {
   }
 
   private fun findAnimation(
-    regionPrefix: String, totalFrames: Int, frameDuration: Float
+    regionPrefix: String,
+    totalFrames: Int,
+    frameDuration: Float
   ): Animation<AtlasRegion> {
     val array = GdxArray<AtlasRegion>()
     for (frame in 0 until totalFrames) {

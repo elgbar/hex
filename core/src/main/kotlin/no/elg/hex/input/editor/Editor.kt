@@ -9,9 +9,9 @@ import org.hexworks.mixite.core.api.Hexagon
 interface Editor {
   val name: String
     get() =
-        requireNotNull(this::class.simpleName) {
-          "Subclass of ${Editor::class::simpleName} cannot be anonymous"
-        }
+      requireNotNull(this::class.simpleName) {
+        "Subclass of ${Editor::class::simpleName} cannot be anonymous"
+      }
 
   val isNOP
     get() = false
@@ -20,10 +20,13 @@ interface Editor {
 
   companion object {
     fun editorText(
-        editor: Editor, bold: Boolean = false, italic: Boolean = false, next: ScreenText? = null
+      editor: Editor,
+      bold: Boolean = false,
+      italic: Boolean = false,
+      next: ScreenText? = null
     ): ScreenText {
       return if (editor.isNOP)
-          ScreenText("Disabled", color = Color.RED, bold = bold, italic = italic, next = next)
+        ScreenText("Disabled", color = Color.RED, bold = bold, italic = italic, next = next)
       else ScreenText(editor.name, color = Color.GOLD, bold = bold, italic = italic, next = next)
     }
   }

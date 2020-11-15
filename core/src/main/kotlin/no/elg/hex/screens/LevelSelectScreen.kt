@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.utils.Array as GdxArray
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
@@ -18,6 +17,7 @@ import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
@@ -82,7 +82,8 @@ object LevelSelectScreen : AbstractScreen() {
           Hex.assets.load(fileName, Island::class.java)
         }
         islandPreviews.add(
-          renderPreview(Hex.assets.finishLoadingAsset(fileName), previewSize, previewSize))
+          renderPreview(Hex.assets.finishLoadingAsset(fileName), previewSize, previewSize)
+        )
       } else {
         break
       }
@@ -109,7 +110,8 @@ object LevelSelectScreen : AbstractScreen() {
     val size: Float = this.previewSize
 
     return Rectangle(
-      padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size)
+      padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size
+    )
   }
 
   private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
@@ -143,14 +145,16 @@ object LevelSelectScreen : AbstractScreen() {
         x + width / 2f,
         y + height / 2f - height / 10f,
         Color.WHITE,
-        Color.WHITE)
+        Color.WHITE
+      )
       lineRenderer.line(
         x + width / 2f + width / 10f,
         y + height / 2f,
         x + width / 2f - width / 10f,
         y + height / 2f,
         Color.WHITE,
-        Color.WHITE)
+        Color.WHITE
+      )
       drawBox(x, y, width, height)
     }
 

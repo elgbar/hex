@@ -10,7 +10,9 @@ import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
 data class Territory(
-    val island: Island, val capital: Capital, val hexagons: Collection<Hexagon<HexagonData>>
+  val island: Island,
+  val capital: Capital,
+  val hexagons: Collection<Hexagon<HexagonData>>
 ) {
 
   val income: Int by lazy { capital.calculateIncome(hexagons, island) }
@@ -20,7 +22,8 @@ data class Territory(
     val enemyHexes = HashSet<Hexagon<HexagonData>>()
     for (hexagon in hexagons) {
       enemyHexes.addAll(
-          island.getNeighbors(hexagon).filter { island.getData(it).team != island.currentTeam })
+        island.getNeighbors(hexagon).filter { island.getData(it).team != island.currentTeam }
+      )
     }
     return@lazy enemyHexes
   }
@@ -39,7 +42,7 @@ data class Territory(
         if (data.piece === capital) foundCapital = true
         require(data.team == team) {
           "Found a hex that does not have the same team as the rest of the hexagons. " +
-              "Expected every team to be on team $team but hex at ${it.cubeCoordinate} is on team ${data.team}"
+            "Expected every team to be on team $team but hex at ${it.cubeCoordinate} is on team ${data.team}"
         }
       }
     }

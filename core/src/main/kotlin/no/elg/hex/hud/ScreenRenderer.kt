@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import kotlin.math.sign
 import no.elg.hex.Hex
 import no.elg.hex.api.Resizable
 import no.elg.hex.hud.ScreenDrawPosition.HorizontalPosition.HORIZONTAL_CENTER
@@ -20,6 +19,7 @@ import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.BOTTOM
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.TOP
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.VERTICAL_CENTER
+import kotlin.math.sign
 
 enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: HorizontalPosition) {
   TOP_LEFT(TOP, LEFT),
@@ -46,47 +46,47 @@ enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: Ho
 }
 
 data class ScreenText(
-    val any: Any,
-    val color: Color = WHITE,
-    val bold: Boolean = false,
-    val italic: Boolean = false,
-    val next: ScreenText? = null
+  val any: Any,
+  val color: Color = WHITE,
+  val bold: Boolean = false,
+  val italic: Boolean = false,
+  val next: ScreenText? = null
 ) {
 
   val text = any.toString()
 
   val font: BitmapFont =
-      when {
-        !bold && !italic -> Hex.assets.regularFont
-        !bold && italic -> Hex.assets.regularItalicFont
-        bold && !italic -> Hex.assets.boldFont
-        bold && italic -> Hex.assets.boldItalicFont
-        else -> error("This should really not happen!")
-      }
+    when {
+      !bold && !italic -> Hex.assets.regularFont
+      !bold && italic -> Hex.assets.regularItalicFont
+      bold && !italic -> Hex.assets.boldFont
+      bold && italic -> Hex.assets.boldItalicFont
+      else -> error("This should really not happen!")
+    }
 }
 
 fun <T> nullCheckedText(
-    value: T?,
-    color: Color = WHITE,
-    bold: Boolean = false,
-    italic: Boolean = false,
-    next: ScreenText? = null,
-    format: (T) -> String = { it.toString() }
+  value: T?,
+  color: Color = WHITE,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
 ) = if (value == null) nullText(next) else ScreenText(format(value), color, bold, italic, next)
 
 fun <T : Number> signColoredText(
-    value: T,
-    bold: Boolean = false,
-    italic: Boolean = false,
-    next: ScreenText? = null,
-    format: (T) -> String = { it.toString() }
+  value: T,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
 ): ScreenText {
   val signColor =
-      when (sign(value.toFloat())) {
-        1f -> GREEN
-        -1f -> RED
-        else -> YELLOW
-      }
+    when (sign(value.toFloat())) {
+      1f -> GREEN
+      -1f -> RED
+      else -> YELLOW
+    }
 
   return ScreenText(format(value), signColor, bold, italic, next)
 }
@@ -98,14 +98,14 @@ fun <T : Number> signColoredText(
  * @param max maximum allowed value of [value], exclusive
  */
 fun <T : Comparable<T>> validatedText(
-    value: T,
-    min: T,
-    max: T,
-    color: Color = WHITE,
-    bold: Boolean = false,
-    italic: Boolean = false,
-    next: ScreenText? = null,
-    format: (T) -> String = { it.toString() }
+  value: T,
+  min: T,
+  max: T,
+  color: Color = WHITE,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
 ): ScreenText {
   return if (value < min || value > max) {
     ScreenText(format(value), color = RED, bold = true, next = next)
@@ -115,46 +115,52 @@ fun <T : Comparable<T>> validatedText(
 }
 
 fun <T : Comparable<T>> variableText(
-    prefix: String,
-    value: T,
-    min: T,
-    max: T,
-    bold: Boolean = false,
-    italic: Boolean = false,
-    next: ScreenText? = null,
-    format: (T) -> String = { it.toString() }
+  prefix: String,
+  value: T,
+  min: T,
+  max: T,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null,
+  format: (T) -> String = { it.toString() }
 ): ScreenText {
   return ScreenText(
-      prefix,
-      color = WHITE,
-      bold = bold,
-      italic = italic,
-      next =
-          validatedText(
-              value,
-              min,
-              max,
-              bold = bold,
-              italic = italic,
-              color = YELLOW,
-              format = format,
-              next = next))
+    prefix,
+    color = WHITE,
+    bold = bold,
+    italic = italic,
+    next =
+      validatedText(
+        value,
+        min,
+        max,
+        bold = bold,
+        italic = italic,
+        color = YELLOW,
+        format = format,
+        next = next
+      )
+  )
 }
 
 fun nullText(next: ScreenText? = null) =
-    ScreenText("null", RED, bold = true, italic = false, next = next)
+  ScreenText("null", RED, bold = true, italic = false, next = next)
 
 fun emptyText() = ScreenText("")
 
 fun booleanText(
-    check: Boolean, bold: Boolean = false, italic: Boolean = false, next: ScreenText? = null
+  check: Boolean,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null
 ) =
-    ScreenText(
-        "%-5s".format(check),
-        bold = bold,
-        italic = italic,
-        color = if (check) GREEN else RED,
-        next = next)
+  ScreenText(
+    "%-5s".format(check),
+    bold = bold,
+    italic = italic,
+    color = if (check) GREEN else RED,
+    next = next
+  )
 
 object ScreenRenderer : Disposable, Resizable {
 
@@ -167,14 +173,16 @@ object ScreenRenderer : Disposable, Resizable {
   }
 
   fun ScreenText.draw(
-      line: Int, position: ScreenDrawPosition = TOP_LEFT, offsetX: Float = spacing
+    line: Int,
+    position: ScreenDrawPosition = TOP_LEFT,
+    offsetX: Float = spacing
   ) {
     val y =
-        when (position.vertical) {
-          TOP -> spacing * line * 2f + spacing
-          BOTTOM -> Gdx.graphics.height - spacing * line * 2f
-          VERTICAL_CENTER -> TODO()
-        }
+      when (position.vertical) {
+        TOP -> spacing * line * 2f + spacing
+        BOTTOM -> Gdx.graphics.height - spacing * line * 2f
+        VERTICAL_CENTER -> TODO()
+      }
 
     fun totalLength(): Float {
       var ctr = 1f

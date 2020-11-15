@@ -23,12 +23,12 @@ object Hex : ApplicationAdapter() {
 
   @JvmStatic
   val mapper =
-      jacksonObjectMapper().also {
-        it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
-      }
+    jacksonObjectMapper().also {
+      it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
+    }
 
   val AA_BUFFER_CLEAR =
-      lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
+    lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
   lateinit var args: ApplicationArgumentsParser
   lateinit var assets: Assets
@@ -58,15 +58,15 @@ object Hex : ApplicationAdapter() {
     }
 
     Gdx.app.logLevel =
-        when {
-          args.silent -> LOG_NONE
-          args.trace -> LOG_TRACE
-          args.debug -> LOG_DEBUG
-          else -> LOG_INFO
-        }
+      when {
+        args.silent -> LOG_NONE
+        args.trace -> LOG_TRACE
+        args.debug -> LOG_DEBUG
+        else -> LOG_INFO
+      }
 
     val backgroundColor: Color =
-        if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62")
+      if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62")
     Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f)
 
     assets = Assets()

@@ -14,8 +14,7 @@ import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author kheba */
-class OutlineRenderer(private val islandScreen: PreviewIslandScreen) :
-  FrameUpdatable, Disposable {
+class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
 
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
@@ -42,8 +41,10 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) :
 
         val brightness =
           HexagonData.BRIGHTNESS +
-            (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED
-            else 0f)
+            (
+              if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED
+              else 0f
+              )
 
         if (drawEdges) {
           lineRenderer.color.set(Color.WHITE)
@@ -62,7 +63,8 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) :
             nextPoint.coordinateY.toFloat(),
             lineWidth,
             lineRenderer.color,
-            lineRenderer.color)
+            lineRenderer.color
+          )
         }
       }
     }

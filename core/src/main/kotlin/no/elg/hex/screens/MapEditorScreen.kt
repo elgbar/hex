@@ -77,15 +77,18 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
                     this@visWindow.fadeOut()
                   }
                 }
-              })
+              }
+            )
 
             setButton(
               ButtonBar.ButtonType.NO,
-              scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen } })
+              scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen } }
+            )
 
             setButton(
               ButtonBar.ButtonType.CANCEL,
-              scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } })
+              scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } }
+            )
             createTable().pack()
           }
           pack()
@@ -133,7 +136,8 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
                 * All visible hexagons must be reachable from all other visible hexagons (ie there can only be one island)
                 * No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
                 * There must be exactly one capital per territory
-                """.trimIndent()) {
+            """.trimIndent()
+          ) {
             it.expand().fill()
           }
           pack()

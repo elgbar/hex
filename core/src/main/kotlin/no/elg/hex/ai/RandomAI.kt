@@ -1,7 +1,6 @@
 package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
-import kotlin.random.Random.Default as random
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -20,6 +19,7 @@ import no.elg.hex.util.getData
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.random.Random.Default as random
 
 /**
  * An AI that does random actions for a random amount of time. All action it can take will have some
@@ -33,14 +33,15 @@ import org.hexworks.mixite.core.api.Hexagon
 class RandomAI(override val team: Team) : AI {
 
   private val buyablePieces =
-      arrayOf(
-          Castle::class,
-          Peasant::class,
-          Spearman::class,
-          Knight::class,
-          Baron::class,
-          Peasant::class,
-          Spearman::class)
+    arrayOf(
+      Castle::class,
+      Peasant::class,
+      Spearman::class,
+      Knight::class,
+      Baron::class,
+      Peasant::class,
+      Spearman::class
+    )
 
   fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
     Gdx.app.trace("RAI-$team", "Picking up a piece")
@@ -51,21 +52,24 @@ class RandomAI(override val team: Team) : AI {
 
     // hexagons we can pick up pieces from
     val pickUpHexes =
-        HashSet<Hexagon<HexagonData>>(
-            territory.hexagons.filter {
-              val piece = territory.island.getData(it).piece
-              piece is LivingPiece && !piece.moved
-            })
+      HashSet<Hexagon<HexagonData>>(
+        territory.hexagons.filter {
+          val piece = territory.island.getData(it).piece
+          piece is LivingPiece && !piece.moved
+        }
+      )
 
     // only buy if there are no more units to move
     if (pickUpHexes.isEmpty()) {
       Gdx.app.trace(
-          "RAI-$team", "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})")
+        "RAI-$team", "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
+      )
       val piece = buyablePieces.filter { territory.capital.canBuy(it) }.randomOrNull()
       if (piece == null) {
         Gdx.app.trace(
-            "RAI-$team",
-            "Cannot afford any pieces in this territory, I only have ${territory.capital.balance}")
+          "RAI-$team",
+          "Cannot afford any pieces in this territory, I only have ${territory.capital.balance}"
+        )
         return false
       }
       Gdx.app.trace("RAI-$team", "Buying the unit ${piece.simpleName} ")
@@ -89,11 +93,12 @@ class RandomAI(override val team: Team) : AI {
     if (handPiece is Castle) {
       // hexagons where we can place castles
       val placableHexes =
-          HashSet<Hexagon<HexagonData>>(
-              territory.hexagons.filter {
-                val piece = territory.island.getData(it).piece
-                !(piece is Castle || piece is Capital || piece is LivingPiece)
-              })
+        HashSet<Hexagon<HexagonData>>(
+          territory.hexagons.filter {
+            val piece = territory.island.getData(it).piece
+            !(piece is Castle || piece is Capital || piece is LivingPiece)
+          }
+        )
 
       val hexagon = placableHexes.randomOrNull() ?: return
       gameInputProcessor.click(hexagon)
@@ -101,15 +106,19 @@ class RandomAI(override val team: Team) : AI {
 
       // hexagon where we can put a living piece
       val attackableHexes =
-          HashSet<Hexagon<HexagonData>>(
-              territory.hexagons.filter {
-                val piece = territory.island.getData(it).piece
-                !((piece is LivingPiece && !piece.canNotMerge(handPiece)) ||
-                    piece is Castle ||
-                    piece is Capital)
-              })
+        HashSet<Hexagon<HexagonData>>(
+          territory.hexagons.filter {
+            val piece = territory.island.getData(it).piece
+            !(
+              (piece is LivingPiece && !piece.canNotMerge(handPiece)) ||
+                piece is Castle ||
+                piece is Capital
+              )
+          }
+        )
       attackableHexes.addAll(
-          territory.enemyBorderHexes.filter { territory.island.canAttack(it, handPiece) })
+        territory.enemyBorderHexes.filter { territory.island.canAttack(it, handPiece) }
+      )
 
       val hexagon = attackableHexes.randomOrNull() ?: return
       gameInputProcessor.click(hexagon)

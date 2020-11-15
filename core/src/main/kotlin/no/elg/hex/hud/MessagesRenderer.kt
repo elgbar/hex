@@ -38,12 +38,12 @@ object MessagesRenderer : FrameUpdatable {
       val (message, timeLeft) = pair
 
       if (timeLeft < FADE_START) {
-            val alpha = timeLeft / FADE_START
-            message.copy(color = message.color.cpy().also { it.a = alpha })
-          } else {
-            message
-          }
-          .draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
+        val alpha = timeLeft / FADE_START
+        message.copy(color = message.color.cpy().also { it.a = alpha })
+      } else {
+        message
+      }
+        .draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
 
       val newTime = timeLeft - Gdx.graphics.rawDeltaTime
       if (newTime > 0f) {

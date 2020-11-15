@@ -21,8 +21,7 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
 
 /** @author Elg */
-class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
-  FrameUpdatable, Disposable {
+class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
 
   private val batch: SpriteBatch = SpriteBatch()
 
@@ -83,7 +82,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
         boundingBox.x.toFloat() + width * (1f - ratio) / 2f,
         boundingBox.y.toFloat(),
         width * ratio,
-        height)
+        height
+      )
     }
 
     batch.end()

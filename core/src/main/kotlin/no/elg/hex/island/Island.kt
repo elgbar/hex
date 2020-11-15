@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlin.math.max
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.elg.hex.Hex
@@ -36,6 +35,7 @@ import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
 import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
+import kotlin.math.max
 
 /** @author Elg */
 class Island(
@@ -119,9 +119,9 @@ class Island(
       //        put(STARTING_TEAM, NotAsRandomAI(STARTING_TEAM, true)) // player
     }
 
-  //////////////
+  // ////////////
   // Gameplay //
-  //////////////
+  // ////////////
 
   fun endTurn(gameInputProcessor: GameInputProcessor) {
     select(null)
@@ -181,7 +181,8 @@ class Island(
       }
       selected = oldSelected
       Gdx.app.trace(
-        "SELECT", "Hex to select does not connect with enough hexagons to be a territory")
+        "SELECT", "Hex to select does not connect with enough hexagons to be a territory"
+      )
       return false
     }
     val team = this.getData(territoryHexes.first()).team
@@ -298,7 +299,8 @@ class Island(
 
     Gdx.app.trace(
       "ISLAND",
-      "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
+      "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance"
+    )
 
     if (contenders.size == 1) return contenders.first()
 
@@ -313,21 +315,22 @@ class Island(
       .map { origin: Hexagon<HexagonData> ->
         val ring = this.calculateRing(origin, greatestDistance)
         origin to
-          ((expectedHexagons - ring.size) // non-existent hexes count as ours
-            +
-            ring.sumByDouble {
-              val data = this.getData(it)
-              (if (data.team == hexTeam) 1.0 else 0.0) +
-                (if (data.invisible) 0.5 else 0.0)
-            })
+          (
+            (expectedHexagons - ring.size) + // non-existent hexes count as ours
+              ring.sumByDouble {
+                val data = this.getData(it)
+                (if (data.team == hexTeam) 1.0 else 0.0) +
+                  (if (data.invisible) 0.5 else 0.0)
+              }
+            )
       }
       .maxBy { it.second }!!
       .first
   }
 
-  ///////////////////
+  // /////////////////
   // Serialization //
-  ///////////////////
+  // /////////////////
 
   /**
    *
@@ -356,7 +359,9 @@ class Island(
           publishMessage(
             ScreenText(
               "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.",
-              Color.RED))
+              Color.RED
+            )
+          )
           valid = false
         }
         continue
@@ -367,13 +372,17 @@ class Island(
         publishMessage(
           ScreenText(
             "There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.",
-            Color.RED))
+            Color.RED
+          )
+        )
         valid = false
       } else if (capitalCount > 1) {
         publishMessage(
           ScreenText(
             "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.",
-            Color.RED))
+            Color.RED
+          )
+        )
         valid = false
       }
     }
@@ -399,7 +408,8 @@ class Island(
     val allVisibleHexagons = hexagons.filterNot { getData(it).invisible }
 
     if (!allVisibleHexagons.containsAll(visibleNeighbors) ||
-      !visibleNeighbors.containsAll(allVisibleHexagons)) {
+      !visibleNeighbors.containsAll(allVisibleHexagons)
+    ) {
       publishError("The visible hexagon grid is not connected.")
       valid = false
     }
@@ -428,9 +438,9 @@ class Island(
     }
   }
 
-  //////////////////////////
+  // ////////////////////////
   // Data Transfer Object //
-  //////////////////////////
+  // ////////////////////////
 
   @get:JsonValue
   private val dto
@@ -439,11 +449,13 @@ class Island(
         grid.gridData.gridWidth,
         grid.gridData.gridHeight,
         grid.gridData.gridLayout,
-        grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to this.getData(it) }.toMap())
+        grid.hexagons.mapTo(HashSet()) { it.cubeCoordinate to this.getData(it) }.toMap()
+      )
 
   private data class IslandDTO(
     val width: Int,
     val height: Int,
     val layout: HexagonalGridLayout,
-    val hexagonData: Map<CubeCoordinate, HexagonData>)
+    val hexagonData: Map<CubeCoordinate, HexagonData>
+  )
 }

@@ -26,8 +26,9 @@ fun Color.dim(percent: Float): Color {
 /** Create a random color */
 fun randomColor(randomizeAlpha: Boolean = false): Color {
   return Color(
-      Random.nextFloat(),
-      Random.nextFloat(),
-      Random.nextFloat(),
-      if (randomizeAlpha) Random.nextFloat() else 1f)
+    Random.nextFloat(),
+    Random.nextFloat(),
+    Random.nextFloat(),
+    if (randomizeAlpha) Random.nextFloat() else 1f
+  )
 }

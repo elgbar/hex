@@ -1,9 +1,6 @@
 package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
-import kotlin.math.abs
-import kotlin.random.Random.Default as random
-import kotlin.reflect.KClass
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -33,6 +30,9 @@ import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.math.abs
+import kotlin.reflect.KClass
+import kotlin.random.Random.Default as random
 
 /**
  * An AI that does semi-random actions for a until it amount of time. All action it can take will
@@ -53,13 +53,14 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
 
   private val buyablePieces =
-      arrayOf(Castle::class, Peasant::class
-          //          Spearman::class,
-          //          Knight::class,
-          //          Baron::class,
-          //          Peasant::class,
-          //          Spearman::class
-          )
+    arrayOf(
+      Castle::class, Peasant::class
+      //          Spearman::class,
+      //          Knight::class,
+      //          Baron::class,
+      //          Peasant::class,
+      //          Spearman::class
+    )
 
   fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
     think { "Picking up a piece" }
@@ -70,22 +71,25 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
 
     // hexagons we can pick up pieces from
     val pickUpHexes =
-        HashSet<Hexagon<HexagonData>>(
-            territory.hexagons.filter {
-              val piece = territory.island.getData(it).piece
-              piece is LivingPiece && !piece.moved && !hexBlacklist.contains(it)
-            })
+      HashSet<Hexagon<HexagonData>>(
+        territory.hexagons.filter {
+          val piece = territory.island.getData(it).piece
+          piece is LivingPiece && !piece.moved && !hexBlacklist.contains(it)
+        }
+      )
 
     // only buy if there are no more units to move
     if (pickUpHexes.isEmpty()) {
       Gdx.app.trace(
-          "NARAI-$team",
-          "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})")
+        "NARAI-$team",
+        "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
+      )
       val piece = buyablePieces.filter { territory.capital.canBuy(it) }.randomOrNull()
       if (piece == null) {
         Gdx.app.trace(
-            "NARAI-$team",
-            "Cannot afford any pieces in this territory, I only have ${territory.capital.balance}")
+          "NARAI-$team",
+          "Cannot afford any pieces in this territory, I only have ${territory.capital.balance}"
+        )
         return false
       }
       think { "Buying the unit ${piece.simpleName} " }
@@ -119,71 +123,72 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
     } else if (handPiece is LivingPiece) {
 
       val treeHexagons =
-          territory.hexagons.filter { territory.island.getData(it).piece is TreePiece }
+        territory.hexagons.filter { territory.island.getData(it).piece is TreePiece }
 
       val hexagon =
-          if (treeHexagons.isNotEmpty()) {
-            think { "There is a piece of tree in my territory, must tear it down!" }
-            treeHexagons.random()
+        if (treeHexagons.isNotEmpty()) {
+          think { "There is a piece of tree in my territory, must tear it down!" }
+          treeHexagons.random()
+        } else {
+          // hexagon where we can put a living piece
+          //        val attackableHexes =
+          //            HashSet<Hexagon<HexagonData>>(
+          //                territory.hexagons.filter {
+          //                  val piece = territory.island.getData(it).piece
+          //                  ((piece is LivingPiece && piece.canMerge(handPiece)) ||
+          //                      piece is Castle ||
+          //                      piece is Capital)
+          //                })
+
+          val attackableHexes =
+            territory.enemyBorderHexes.filter { territory.island.canAttack(it, handPiece) }
+          if (attackableHexes.isNotEmpty()) {
+            think { "I can attack an enemy hexagon with this piece" }
+
+            fun tryAttack(type: KClass<out Piece>): Hexagon<HexagonData>? {
+              val attackableOfType =
+                attackableHexes.filter { type.isInstance(territory.island.getData(it).piece) }
+              if (attackableOfType.isNotEmpty()) {
+                think { "Will attack a ${type.simpleName}" }
+                attackableOfType.random()
+              }
+              think { "Cannot find any ${type.simpleName} to attack" }
+              return null
+            }
+
+            tryAttack(Capital::class)
+              ?: tryAttack(Castle::class) ?: tryAttack(LivingPiece::class)
+              ?: attackableHexes.randomOrNull() ?: return
           } else {
-            // hexagon where we can put a living piece
-            //        val attackableHexes =
-            //            HashSet<Hexagon<HexagonData>>(
-            //                territory.hexagons.filter {
-            //                  val piece = territory.island.getData(it).piece
-            //                  ((piece is LivingPiece && piece.canMerge(handPiece)) ||
-            //                      piece is Castle ||
-            //                      piece is Capital)
-            //                })
+            think { "No territory is attackable" }
 
-            val attackableHexes =
-                territory.enemyBorderHexes.filter { territory.island.canAttack(it, handPiece) }
-            if (attackableHexes.isNotEmpty()) {
-              think { "I can attack an enemy hexagon with this piece" }
+            val graveHexagons =
+              territory.hexagons.filter { territory.island.getData(it).piece is Grave }
 
-              fun tryAttack(type: KClass<out Piece>): Hexagon<HexagonData>? {
-                val attackableOfType =
-                    attackableHexes.filter { type.isInstance(territory.island.getData(it).piece) }
-                if (attackableOfType.isNotEmpty()) {
-                  think { "Will attack a ${type.simpleName}" }
-                  attackableOfType.random()
-                }
-                think { "Cannot find any ${type.simpleName} to attack" }
-                return null
-              }
-
-              tryAttack(Capital::class)
-                  ?: tryAttack(Castle::class) ?: tryAttack(LivingPiece::class)
-                      ?: attackableHexes.randomOrNull() ?: return
+            if (graveHexagons.isNotEmpty()) {
+              think { "But there is a hexagon with a grave, lets clean it up early" }
+              graveHexagons.random()
+            } else if (random.nextFloat() >= 0.15f) {
+              think { "Place the held piece randomly on empty hexagon" }
+              val emptyHex: Hexagon<HexagonData>? =
+                territory
+                  .hexagons
+                  .filter { territory.island.getData(it).piece is Empty }
+                  .randomOrNull()
+              if (emptyHex != null) hexBlacklist.add(emptyHex)
+              emptyHex
             } else {
-              think { "No territory is attackable" }
-
-              val graveHexagons =
-                  territory.hexagons.filter { territory.island.getData(it).piece is Grave }
-
-              if (graveHexagons.isNotEmpty()) {
-                think { "But there is a hexagon with a grave, lets clean it up early" }
-                graveHexagons.random()
-              } else if (random.nextFloat() >= 0.15f) {
-                think { "Place the held piece randomly on empty hexagon" }
-                val emptyHex: Hexagon<HexagonData>? =
-                    territory
-                        .hexagons
-                        .filter { territory.island.getData(it).piece is Empty }
-                        .randomOrNull()
-                if (emptyHex != null) hexBlacklist.add(emptyHex)
-                emptyHex
-              } else {
-                mergeWithLivingTerritoryPiece(handPiece, territory)
-              }
+              mergeWithLivingTerritoryPiece(handPiece, territory)
             }
           }
+        }
       if (hexagon == null) {
         think { "Failed to find any enemy hexagon to attack" }
         return
       }
       think {
-        "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} (which is a ${territory.island.getData(hexagon).piece} of team ${territory.island.getData(hexagon).team})"
+        "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} " +
+          "(which is a ${territory.island.getData(hexagon).piece} of team ${territory.island.getData(hexagon).team})"
       }
       gameInputProcessor.click(hexagon)
     }
@@ -207,16 +212,17 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   }
 
   private fun mergeWithLivingTerritoryPiece(
-      handPiece: LivingPiece, territory: Territory
+    handPiece: LivingPiece,
+    territory: Territory
   ): Hexagon<HexagonData>? {
     think { "Will try to merge piece with another piece" }
     val maxBorderStr =
-        territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.max()
-            ?: NO_STRENGTH
+      territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.max()
+        ?: NO_STRENGTH
 
     think {
       if (maxBorderStr > 0)
-          "The highest level threat on my boarder has the strength of a ${strengthToType(maxBorderStr)::simpleName}"
+        "The highest level threat on my boarder has the strength of a ${strengthToType(maxBorderStr)::simpleName}"
       else "I have vanquished my foes!"
     }
 
@@ -262,24 +268,24 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
     val island = territory.island
     val placeableHexes =
-        territory.hexagons
-            .filter {
-              // all legal hexagons we can place a castle at (which is all empty hexes)
-              island.getData(it).piece is Empty
-            }
-            .associateWith {
-              val neighborStrength =
-                  island.getNeighbors(it).map { neighbor -> island.calculateStrength(neighbor) }
+      territory.hexagons
+        .filter {
+          // all legal hexagons we can place a castle at (which is all empty hexes)
+          island.getData(it).piece is Empty
+        }
+        .associateWith {
+          val neighborStrength =
+            island.getNeighbors(it).map { neighbor -> island.calculateStrength(neighbor) }
 
-              island.calculateStrength(it) +
-                  (neighborStrength.sum().toDouble() / neighborStrength.size)
-            }
+          island.calculateStrength(it) +
+            (neighborStrength.sum().toDouble() / neighborStrength.size)
+        }
 
     // find any hexagon with that is protected the least
     val minStr = placeableHexes.values.min() ?: return null
 
     val leastDefendedHexes =
-        placeableHexes.filter { (_, str) -> str <= minStr }.mapTo(ArrayList()) { it.key }
+      placeableHexes.filter { (_, str) -> str <= minStr }.mapTo(ArrayList()) { it.key }
 
     // shuffle the list to make the selection more uniform
     leastDefendedHexes.shuffle()

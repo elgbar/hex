@@ -1,16 +1,16 @@
 package no.elg.island
 
 import com.badlogic.gdx.files.FileHandle
-import java.io.File
 import no.elg.hex.island.Island
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.io.File
 
 /** @author Elg */
 internal class IslandTest {
 
   private fun getIsFile(filename: String): FileHandle =
-      FileHandle(File("./src/test/resources/$filename"))
+    FileHandle(File("./src/test/resources/$filename"))
 
   @Test
   fun `calculateBestCapitalPlacement() All same color should return center`() {

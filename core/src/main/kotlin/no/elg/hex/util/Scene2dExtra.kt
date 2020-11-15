@@ -62,17 +62,21 @@ operator fun Stage.plusAssign(eventListener: EventListener) {
 
 /** Call listener if a key down event where the keycode is the given key is fired */
 inline fun <T : Actor> T.onKeyDown(
-    keycode: Int, catchEvent: Boolean = false, crossinline listener: T.() -> Unit
+  keycode: Int,
+  catchEvent: Boolean = false,
+  crossinline listener: T.() -> Unit
 ) =
-    onKeyDown(catchEvent) { eventKey ->
-      if (eventKey == keycode) {
-        listener()
-      }
+  onKeyDown(catchEvent) { eventKey ->
+    if (eventKey == keycode) {
+      listener()
     }
+  }
 
 /** Call listener when all keys are pressed and one of them are in the fired onKeyDown event */
 inline fun <T : Actor> T.onAllKeysDownEvent(
-    vararg keycodes: Int, catchEvent: Boolean = false, crossinline listener: T.() -> Unit
+  vararg keycodes: Int,
+  catchEvent: Boolean = false,
+  crossinline listener: T.() -> Unit
 ): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->

@@ -13,9 +13,6 @@ import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.Input.Keys.UP
 import com.badlogic.gdx.Input.Keys.W
 import com.badlogic.gdx.InputAdapter
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.reflect.KClass
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
@@ -28,6 +25,9 @@ import no.elg.hex.screens.MapEditorScreen.Companion.MIN_BRUSH_SIZE
 import no.elg.hex.util.findHexagonsWithinRadius
 import no.elg.hex.util.next
 import no.elg.hex.util.previous
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.reflect.KClass
 
 /** @author Elg */
 class MapEditorInputProcessor(private val mapEditorScreen: MapEditorScreen) : InputAdapter() {
@@ -78,20 +78,20 @@ class MapEditorInputProcessor(private val mapEditorScreen: MapEditorScreen) : In
       W, PAGE_UP, UP -> brushRadius = min(brushRadius + 1, MAX_BRUSH_SIZE)
       S, PAGE_DOWN, DOWN -> brushRadius = max(brushRadius - 1, MIN_BRUSH_SIZE)
       Q ->
-          selectedTeam =
-              Team.values().let {
-                if (isShiftPressed()) it.previous(selectedTeam)!! else it.next(selectedTeam)
-              }
+        selectedTeam =
+          Team.values().let {
+            if (isShiftPressed()) it.previous(selectedTeam)!! else it.next(selectedTeam)
+          }
       A ->
-          selectedPiece =
-              PIECES.let {
-                if (isShiftPressed()) it.previous(selectedPiece)!! else it.next(selectedPiece)
-              }
+        selectedPiece =
+          PIECES.let {
+            if (isShiftPressed()) it.previous(selectedPiece)!! else it.next(selectedPiece)
+          }
       else -> return false
     }
     return true
   }
 
   private fun isShiftPressed(): Boolean =
-      Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
+    Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT)
 }

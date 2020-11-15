@@ -20,6 +20,7 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
     val realPos = "% 5.0f,% 5.0f".format(basicInputHandler.mouseX, basicInputHandler.mouseY)
     val cursorHex = basicInputHandler.cursorHex
     val cursorData = if (cursorHex != null) playableIslandScreen.island.getData(cursorHex) else null
+    val gridData = playableIslandScreen.island.grid.gridData
     drawAll(
       variableText(
         "FPS: ",
@@ -28,32 +29,42 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
         Int.MAX_VALUE,
         format = { "%4d".format(it) },
         next =
-        variableText(
-          " zoom: ",
-          playableIslandScreen.camera.zoom,
-          MIN_ZOOM,
-          MAX_ZOOM,
-          format = { "%.2f".format(it) })),
+          variableText(
+            " zoom: ",
+            playableIslandScreen.camera.zoom,
+            MIN_ZOOM,
+            MAX_ZOOM,
+            format = { "%.2f".format(it) }
+          )
+      ),
       ScreenText(
         "Island is ",
         next =
-        ScreenText(
-          "${playableIslandScreen.island.grid.gridData.gridWidth} x ${playableIslandScreen.island.grid.gridData.gridHeight} ${playableIslandScreen.island.grid.gridData.gridLayout}",
-          color = Color.YELLOW)),
+          ScreenText(
+            "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout}",
+            color = Color.YELLOW
+          )
+      ),
       ScreenText(
         "Current team is ",
-        next = ScreenText(playableIslandScreen.island.currentTeam, color = Color.YELLOW)),
+        next = ScreenText(playableIslandScreen.island.currentTeam, color = Color.YELLOW)
+      ),
       ScreenText(
         "Screen pos (",
-        next = ScreenText(screenPos, color = Color.YELLOW, next = ScreenText(")"))),
+        next = ScreenText(screenPos, color = Color.YELLOW, next = ScreenText(")"))
+      ),
       ScreenText(
-        "Real pos (", next = ScreenText(realPos, color = Color.YELLOW, next = ScreenText(")"))),
+        "Real pos (", next = ScreenText(realPos, color = Color.YELLOW, next = ScreenText(")"))
+      ),
       ScreenText(
         "Pointing at hex ",
         next =
-        nullCheckedText(
-          cursorData,
-          color = Color.YELLOW,
-          format = { "( %2d, % 2d) $it".format(cursorHex?.gridX, cursorHex?.gridZ) })))
+          nullCheckedText(
+            cursorData,
+            color = Color.YELLOW,
+            format = { "( %2d, % 2d) $it".format(cursorHex?.gridX, cursorHex?.gridZ) }
+          )
+      )
+    )
   }
 }

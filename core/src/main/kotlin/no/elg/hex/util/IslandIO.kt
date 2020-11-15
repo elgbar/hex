@@ -10,8 +10,8 @@ import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
-import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.screens.MapEditorScreen
+import no.elg.hex.screens.PlayableIslandScreen
 
 fun getIslandFileName(slot: Int) =
   "${Assets.ISLAND_SAVES_DIR}/island-$slot.${Assets.ISLAND_FILE_ENDING}"
@@ -34,7 +34,8 @@ fun play(id: Int) {
 
 fun play(id: Int, island: Island) {
   Gdx.app.postRunnable {
-    Hex.screen = if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)
+    Hex.screen =
+      if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)
   }
 }
 
@@ -48,7 +49,8 @@ fun saveIsland(id: Int, island: Island): Boolean {
 
   if (file.isDirectory) {
     publishError(
-      "Failed to save island the name '${file.name()}' as the resulting file will be a directory.")
+      "Failed to save island the name '${file.name()}' as the resulting file will be a directory."
+    )
     return false
   }
   return try {

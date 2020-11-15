@@ -1,15 +1,16 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
-import kotlin.reflect.KClass
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.createInstance
+import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.reflect.KClass
 
 const val NO_STRENGTH = 0
 
@@ -28,13 +29,14 @@ fun strengthToType(str: Int): KClass<out LivingPiece> {
     KNIGHT_STRENGTH -> Knight::class
     BARON_STRENGTH -> Baron::class
     else ->
-        error(
-            "Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)")
+      error(
+        "Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)"
+      )
   }
 }
 
 fun mergedType(piece1: LivingPiece, piece2: LivingPiece) =
-    strengthToType(piece1.strength + piece2.strength)
+  strengthToType(piece1.strength + piece2.strength)
 
 enum class CapitalPlacementPreference {
   /**
@@ -51,7 +53,7 @@ enum class CapitalPlacementPreference {
   LAST_RESORT
 }
 
-/// **
+// / **
 // * Only return the pices of the strongest preferences. F.eks if any [STRONGLY] they are always
 // returned. If no [STRONGLY] are presenent but one [LAST_RESORT] and one [WEAKLY] are present only
 // [WEAKLY] will be returned
@@ -92,10 +94,12 @@ sealed class Piece {
    */
   open fun place(onto: HexagonData): Boolean {
     return if (!Hex.args.mapEditor &&
-        (!(onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }))) {
-      Gdx.app.debug(
-          "${this::class.simpleName}-${this::place.name}",
-          "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}")
+      (!(onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }))
+    ) {
+      Gdx.app.debug("${this::class.simpleName}-${this::place.name}") {
+        "Piece ${this::class.simpleName} can only be placed on Empty or " +
+          "${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}"
+      }
       false
     } else {
       true
@@ -111,7 +115,10 @@ sealed class Piece {
    * synced. Only hexagons who's turn it is will be called.
    */
   open fun beginTurn(
-      island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team
+    island: Island,
+    pieceHex: Hexagon<HexagonData>,
+    data: HexagonData,
+    team: Team
   ) {
     // NO-OP
   }
@@ -139,9 +146,9 @@ val PIECES: List<KClass<out Piece>> by lazy {
   return@lazy subclasses
 }
 
-///////////
+// /////////
 // Empty //
-///////////
+// /////////
 
 object Empty : Piece() {
   override val strength: Int = NO_STRENGTH
@@ -153,9 +160,9 @@ object Empty : Piece() {
   override fun place(onto: HexagonData): Boolean = true
 }
 
-////////////////
+// //////////////
 // Stationary //
-////////////////
+// //////////////
 
 sealed class StationaryPiece(final override val data: HexagonData) : Piece() {
 
@@ -199,7 +206,10 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
   }
 
   override fun beginTurn(
-      island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team
+    island: Island,
+    pieceHex: Hexagon<HexagonData>,
+    data: HexagonData,
+    team: Team
   ) {
     val hexagons = island.getTerritoryHexagons(pieceHex)
 
@@ -220,10 +230,10 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
   }
 
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
-      hexagons.sumBy { island.getData(it).piece.cost }
+    hexagons.sumBy { island.getData(it).piece.cost }
 
   fun canBuy(piece: KClass<out Piece>): Boolean =
-      canBuy(piece.createInstance(HexagonData.EDGE_DATA))
+    canBuy(piece.createInstance(HexagonData.EDGE_DATA))
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
@@ -255,9 +265,9 @@ class Grave(data: HexagonData) : StationaryPiece(data) {
   override fun toString(): String = "${this::class.simpleName}(timeToTree: $roundsToTree)"
 }
 
-//////////
+// ////////
 // TREE //
-//////////
+// ////////
 
 sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
 
@@ -269,7 +279,10 @@ sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
   override fun beginTurn(
-      island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team
+    island: Island,
+    pieceHex: Hexagon<HexagonData>,
+    data: HexagonData,
+    team: Team
   ) {
     hasGrown = false
   }
@@ -281,23 +294,23 @@ class PineTree(data: HexagonData) : TreePiece(data) {
 
     // Find all empty neighbor hexes that are empty
     val list =
-        island
-            .getNeighbors(pieceHex)
-            .filter {
-              val piece = island.getData(it).piece
-              piece is Empty && island.treeType(it) == PineTree::class
-            }
-            .shuffled()
+      island
+        .getNeighbors(pieceHex)
+        .filter {
+          val piece = island.getData(it).piece
+          piece is Empty && island.treeType(it) == PineTree::class
+        }
+        .shuffled()
 
     for (hexagon in list) {
       // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to
       // grow
       val otherPines =
-          island.getNeighbors(hexagon).filter {
-            if (it == pieceHex) return@filter false
-            val piece = island.getData(it).piece
-            return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
-          }
+        island.getNeighbors(hexagon).filter {
+          if (it == pieceHex) return@filter false
+          val piece = island.getData(it).piece
+          return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
+        }
       if (otherPines.isNotEmpty()) {
         // Grow a tree between this pine and another pine
         val otherPine = island.getData(otherPines.random()).piece as TreePiece
@@ -319,14 +332,14 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
     if (hasGrown) return
     // Find all empty neighbor hexes that are empty along the cost
     val hex =
-        island
-            .getNeighbors(pieceHex)
-            .filter {
-              val piece = island.getData(it).piece
-              piece is Empty && island.treeType(it) == PalmTree::class
-            }
-            .randomOrNull()
-            ?: return
+      island
+        .getNeighbors(pieceHex)
+        .filter {
+          val piece = island.getData(it).piece
+          piece is Empty && island.treeType(it) == PalmTree::class
+        }
+        .randomOrNull()
+        ?: return
 
     val randomNeighborData = island.getData(hex)
 
@@ -337,9 +350,9 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
   }
 }
 
-////////////
+// //////////
 // LIVING //
-////////////
+// //////////
 
 sealed class LivingPiece(final override val data: HexagonData) : Piece() {
 
@@ -348,7 +361,7 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
   var moved: Boolean = true
 
   override val canBePlacedOn: Array<KClass<out Piece>> =
-      arrayOf(LivingPiece::class, StationaryPiece::class)
+    arrayOf(LivingPiece::class, StationaryPiece::class)
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
     island.getData(hex).setPiece(Grave::class)
