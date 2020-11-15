@@ -26,7 +26,7 @@ object MessagesRenderer : FrameUpdatable {
   }
 
   fun publishMessage(message: ScreenText) {
-    Gdx.app.log("MESSAGE", message.text)
+    Gdx.app.log("MESSAGE", message.wholeText)
     messages.add(0, message to DURATION_SECONDS)
   }
 

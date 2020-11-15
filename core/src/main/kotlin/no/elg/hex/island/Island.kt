@@ -129,7 +129,9 @@ class Island(
     GlobalScope.launch {
       val capitals = hexagons.filter { getData(it).piece is Capital }
       if (capitals.size == 1) {
-        Gdx.app.log("TURN", "Team ${getData(capitals.first()).team} won!")
+        val winner = getData(capitals.first()).team
+        Gdx.app.log("TURN", "Team $winner won!")
+        publishMessage(ScreenText("Team ", next = ScreenText(winner.name, color = winner.color, next = ScreenText(" won!"))))
         return@launch
       }
 

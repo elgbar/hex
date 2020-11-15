@@ -54,7 +54,7 @@ data class ScreenText(
 ) {
 
   val text: String = any.toString()
-  val wholeText: String = text + next?.wholeText
+  val wholeText: String = text + (next?.wholeText ?: "")
 
   val font: BitmapFont =
     when {
@@ -131,16 +131,16 @@ fun <T : Comparable<T>> variableText(
     bold = bold,
     italic = italic,
     next =
-      validatedText(
-        value,
-        min,
-        max,
-        bold = bold,
-        italic = italic,
-        color = YELLOW,
-        format = format,
-        next = next
-      )
+    validatedText(
+      value,
+      min,
+      max,
+      bold = bold,
+      italic = italic,
+      color = YELLOW,
+      format = format,
+      next = next
+    )
   )
 }
 
