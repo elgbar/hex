@@ -15,11 +15,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
-import com.badlogic.gdx.utils.Array as GdxArray
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
-import ktx.scene2d.vis.visImageTextButton
 import ktx.style.imageTextButton
 import ktx.style.label
 import ktx.style.menu
@@ -34,8 +32,10 @@ import ktx.style.window
 import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
+import no.elg.hex.util.defaultDisplayMode
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
 class Assets : AssetManager() {
@@ -69,12 +69,7 @@ class Assets : AssetManager() {
 
     private const val FONT_SIZE = 20
 
-    val nativeScale: Byte =
-        when {
-          java.awt.Toolkit.getDefaultToolkit().screenSize.width > 3840 -> 3
-          java.awt.Toolkit.getDefaultToolkit().screenSize.width > 2560 -> 2
-          else -> 1
-        }
+    val nativeScale: Int = (defaultDisplayMode.width / 1920).coerceAtLeast(1)
   }
 
   val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
@@ -88,18 +83,18 @@ class Assets : AssetManager() {
 
   private fun findSprite(regionName: String): AtlasRegion {
     val region =
-        if (Hex.args.retro) {
-          Hex.assets.originalSprites.findRegion(regionName)
-        } else {
-          Hex.assets.sprites.findRegion(regionName)
-              ?: Hex.assets.originalSprites.findRegion(regionName)
-        }
+      if (Hex.args.retro) {
+        Hex.assets.originalSprites.findRegion(regionName)
+      } else {
+        Hex.assets.sprites.findRegion(regionName)
+          ?: Hex.assets.originalSprites.findRegion(regionName)
+      }
     region.flip(false, true)
     return region
   }
 
   private fun findAnimation(
-      regionPrefix: String, totalFrames: Int, frameDuration: Float
+    regionPrefix: String, totalFrames: Int, frameDuration: Float
   ): Animation<AtlasRegion> {
     val array = GdxArray<AtlasRegion>()
     for (frame in 0 until totalFrames) {

@@ -6,15 +6,15 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
+import no.elg.hex.util.defaultDisplayMode
 
 fun main(args: Array<String>) {
   Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
 
   val config = LwjglApplicationConfiguration()
 
-  val screenSize = java.awt.Toolkit.getDefaultToolkit().screenSize
-  config.width = screenSize.width / 2
-  config.height = screenSize.height / 2
+  config.width = defaultDisplayMode.width / 2
+  config.height = defaultDisplayMode.height / 2
 
   config.backgroundFPS = 10
   config.foregroundFPS = 9999
