@@ -53,7 +53,8 @@ data class ScreenText(
   val next: ScreenText? = null
 ) {
 
-  val text = any.toString()
+  val text: String = any.toString()
+  val wholeText: String = text + next?.wholeText
 
   val font: BitmapFont =
     when {

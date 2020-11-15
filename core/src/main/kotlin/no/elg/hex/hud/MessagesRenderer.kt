@@ -39,7 +39,7 @@ object MessagesRenderer : FrameUpdatable {
 
       if (timeLeft < FADE_START) {
         val alpha = timeLeft / FADE_START
-        message.copy(color = message.color.cpy().also { it.a = alpha })
+        message.copyAndSetAlpha(alpha)
       } else {
         message
       }
@@ -54,5 +54,9 @@ object MessagesRenderer : FrameUpdatable {
 
     messages.clear()
     messages.addAll(newMessages)
+  }
+
+  private fun ScreenText.copyAndSetAlpha(alpha: Float): ScreenText {
+    return copy(color = this.color.cpy().also { it.a = alpha }, next = next?.copyAndSetAlpha(alpha))
   }
 }
