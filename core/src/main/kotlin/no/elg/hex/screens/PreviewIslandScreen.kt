@@ -3,6 +3,8 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
+import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.island.Island
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
@@ -90,7 +92,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
 
     camera.position.x = islandCenterX.toFloat()
     camera.position.y = islandCenterY.toFloat()
-    camera.zoom = max(widthZoom, heightZoom).toFloat()
+    camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
   }
 
   override fun hide() {
