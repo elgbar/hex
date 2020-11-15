@@ -80,16 +80,14 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
 
     // only buy if there are no more units to move
     if (pickUpHexes.isEmpty()) {
-      Gdx.app.trace(
-        "NARAI-$team",
+      think {
         "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
-      )
+      }
       val piece = buyablePieces.filter { territory.capital.canBuy(it) }.randomOrNull()
       if (piece == null) {
-        Gdx.app.trace(
-          "NARAI-$team",
+        think {
           "Cannot afford any pieces in this territory, I only have ${territory.capital.balance}"
-        )
+        }
         return false
       }
       think { "Buying the unit ${piece.simpleName} " }

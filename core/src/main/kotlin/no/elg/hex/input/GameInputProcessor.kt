@@ -26,6 +26,7 @@ import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
 
@@ -45,7 +46,7 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
       island.inHand = Hand(territory, cursorPiece)
       hexData.setPiece(Empty::class)
     }
-    Gdx.app.debug("PLACE", "Hand was null, now it is ${island.inHand}")
+    Gdx.app.trace("PLACE", "Hand was null, now it is ${island.inHand}")
   }
 
   private fun placeDown(
@@ -68,7 +69,7 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
       hexData.team == territory.team
     ) {
       // merge cursor piece with held piece
-      if (newPiece.canNotMerge(oldPiece)) return // cannot merge
+      if (newPiece.canNotMerge(oldPiece)) return
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
       strengthToType(newPiece.strength + oldPiece.strength) to (newPiece.moved || oldPiece.moved)
     } else {
