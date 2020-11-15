@@ -1,8 +1,6 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -216,17 +214,6 @@ object LevelCreationScreen : AbstractScreen() {
     }
   }
 
-  val inputListener =
-    object : InputAdapter() {
-      override fun keyDown(keycode: Int): Boolean {
-        when (keycode) {
-          Keys.ESCAPE -> Hex.screen = LevelSelectScreen
-          else -> return false
-        }
-        return true
-      }
-    }
-
   override fun render(delta: Float) {
     stage.act(delta)
     stage.draw()
@@ -245,12 +232,10 @@ object LevelCreationScreen : AbstractScreen() {
   }
 
   override fun show() {
-    Hex.inputMultiplexer.addProcessor(inputListener)
     Hex.inputMultiplexer.addProcessor(stage)
   }
 
   override fun hide() {
-    Hex.inputMultiplexer.removeProcessor(inputListener)
     Hex.inputMultiplexer.removeProcessor(stage)
   }
 
