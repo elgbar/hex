@@ -1,6 +1,7 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonValue
@@ -171,7 +172,6 @@ class Island(
     selected = null
 
     if (hexagon == null) {
-      Gdx.app.trace("SELECT", "Unselecting currently selected territory")
       return true
     }
 
@@ -437,6 +437,10 @@ class Island(
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)
+    }
+
+    fun deserialize(file: FileHandle): Island {
+      return deserialize(file.readString())
     }
   }
 

@@ -62,7 +62,7 @@ data class ScreenText(
       !bold && italic -> Hex.assets.regularItalicFont
       bold && !italic -> Hex.assets.boldFont
       bold && italic -> Hex.assets.boldItalicFont
-      else -> error("This should really not happen!")
+      else -> error("This should really not happen")
     }
 }
 
@@ -131,16 +131,16 @@ fun <T : Comparable<T>> variableText(
     bold = bold,
     italic = italic,
     next =
-    validatedText(
-      value,
-      min,
-      max,
-      bold = bold,
-      italic = italic,
-      color = YELLOW,
-      format = format,
-      next = next
-    )
+      validatedText(
+        value,
+        min,
+        max,
+        bold = bold,
+        italic = italic,
+        color = YELLOW,
+        format = format,
+        next = next
+      )
   )
 }
 
