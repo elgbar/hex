@@ -30,7 +30,6 @@ import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.random.Random.Default as random
 
@@ -49,7 +48,9 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
     Gdx.app.trace("NARAI-$team", words)
   }
 
-  // list of hexagon not to be picked up
+  /**
+   * list of hexagon not to be picked up, as no action could be done with it, clear every round
+   */
   private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
 
   private val buyablePieces =
@@ -83,11 +84,17 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
       think {
         "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
       }
-      val piece = buyablePieces.filter { territory.capital.canBuy(it) }.randomOrNull()
+      val piece = buyablePieces.filter {
+        val toBuy = it.createHandInstance()
+        // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
+        val newBalance = territory.capital.balance - toBuy.price
+        val newIncome = territory.income + toBuy.income
+
+        newBalance > 0 && shouldCreate(newBalance, newIncome)
+      }.randomOrNull()
+
       if (piece == null) {
-        think {
-          "Cannot afford any pieces in this territory, I only have ${territory.capital.balance}"
-        }
+        think { "Cannot afford any pieces in this territory, I only have ${territory.capital.balance} and an income of ${territory.income}" }
         return false
       }
       think { "Buying the unit ${piece.simpleName} " }
@@ -163,20 +170,23 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
             val graveHexagons =
               territory.hexagons.filter { territory.island.getData(it).piece is Grave }
 
-            if (graveHexagons.isNotEmpty()) {
-              think { "But there is a hexagon with a grave, lets clean it up early" }
-              graveHexagons.random()
-            } else if (random.nextFloat() >= 0.15f) {
-              think { "Place the held piece randomly on empty hexagon" }
-              val emptyHex: Hexagon<HexagonData>? =
-                territory
-                  .hexagons
-                  .filter { territory.island.getData(it).piece is Empty }
-                  .randomOrNull()
-              if (emptyHex != null) hexBlacklist.add(emptyHex)
-              emptyHex
-            } else {
-              mergeWithLivingTerritoryPiece(handPiece, territory)
+            when {
+              graveHexagons.isNotEmpty() -> {
+                think { "But there is a hexagon with a grave, lets clean it up early" }
+                graveHexagons.random()
+              }
+              random.nextFloat() >= 0.15f -> {
+                think { "Place the held piece in the best defensive position" }
+                val emptyHex = calculateBestCastlePlacement(territory)
+                if (emptyHex != null) hexBlacklist.add(emptyHex)
+                emptyHex
+              }
+              else -> {
+                mergeWithLivingTerritoryPiece(handPiece, territory)?.also {
+                  // unblacklist the hexagon as it might now be possible to do something more with this piece
+                  hexBlacklist.remove(it)
+                }
+              }
             }
           }
         }
@@ -215,12 +225,11 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   ): Hexagon<HexagonData>? {
     think { "Will try to merge piece with another piece" }
     val maxBorderStr =
-      territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.max()
+      territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.maxOrNull()
         ?: NO_STRENGTH
 
     think {
-      if (maxBorderStr > 0)
-        "The highest level threat on my boarder has the strength of a ${strengthToType(maxBorderStr)::simpleName}"
+      if (maxBorderStr > 0) "The highest level threat on my boarder has the strength of a ${strengthToType(maxBorderStr).simpleName}"
       else "I have vanquished my foes!"
     }
 
@@ -251,15 +260,16 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
         return@find false
       }
 
-      think { "I can merge handpiece ${handPiece::class.simpleName}" }
+      think { "I can merge hand piece ${handPiece::class.simpleName}" }
 
       val mergedType = mergedType(piece, handPiece).createHandInstance()
 
-      val newIncome = territory.income - piece.cost - handPiece.cost + mergedType.cost
-      think {
-        "New income would be $newIncome I want at least ${mergedType.cost / 2} to accept this merge"
-      }
-      newIncome >= abs(mergedType.cost) / 2
+      // If we have not yet placed the held piece (ie directly merging it) we do not pay upkeep on it
+      val handUpkeep = if (handPiece.data == HexagonData.EDGE_DATA) 0 else handPiece.income
+
+      val newIncome = territory.income - piece.income - handUpkeep + mergedType.income
+      think { "New income would be $newIncome" }
+      shouldCreate(territory.capital.balance, newIncome)
     }
   }
 
@@ -300,5 +310,25 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
   companion object {
     const val MAX_TOTAL_BARONS = 1
     const val MAX_TOTAL_KNIGHTS = 3
+
+    /**
+     * Minimum number of turns we should aim to maintain a piece before bankruptcy.
+     * A higher number means higher risk of a bankruptcy.
+     *
+     * * A value of 0 means we might go bankrupt before beginning next turn
+     * * A value of 1 makes sure we will survive at least till the next turn
+     *
+     * @see shouldCreate
+     */
+    const val PIECE_MAINTAIN_CONTRACT_LENGTH = 2
+
+    /**
+     * If we should buy/merge pieces with the given [projectedBalance] and [projectedIncome]
+     *
+     * @see PIECE_MAINTAIN_CONTRACT_LENGTH
+     */
+    fun shouldCreate(projectedBalance: Int, projectedIncome: Int): Boolean {
+      return projectedBalance + projectedIncome * PIECE_MAINTAIN_CONTRACT_LENGTH >= 0
+    }
   }
 }
