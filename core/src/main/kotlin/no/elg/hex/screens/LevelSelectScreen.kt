@@ -2,6 +2,7 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
@@ -51,6 +52,7 @@ object LevelSelectScreen : AbstractScreen() {
     val buffer =
       FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
     buffer.begin()
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
     islandScreen.render(0f)
     buffer.end()
     islandScreen.dispose()
