@@ -75,8 +75,8 @@ sealed class Piece {
   /** Can this object move once placed */
   abstract val movable: Boolean
 
-  /** How much the territory gain/lose by maintaining this piece */
-  abstract val cost: Int
+  /** How much the territory gain/lose by maintaining this piece*/
+  open val income: Int = 1
 
   open val price: Int
     get() = error("This piece cannot be bought!")
@@ -156,7 +156,6 @@ object Empty : Piece() {
   override val data: HexagonData
     get() = error("Empty Piece is not confined to a Hexagon")
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
-  override val cost: Int = 1
   override fun place(onto: HexagonData): Boolean = true
 }
 
@@ -186,7 +185,6 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
 
   /** How much money this territory currently has */
   var balance: Int = 0
-  override val cost: Int = 1
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Piece::class)
   override val strength = PEASANT_STRENGTH
 
@@ -230,7 +228,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
   }
 
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
-    hexagons.sumBy { island.getData(it).piece.cost }
+    hexagons.sumBy { island.getData(it).piece.income }
 
   fun canBuy(piece: KClass<out Piece>): Boolean =
     canBuy(piece.createInstance(HexagonData.EDGE_DATA))
@@ -242,13 +240,11 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
 
 class Castle(data: HexagonData) : StationaryPiece(data) {
   override val strength = SPEARMAN_STRENGTH
-  override val cost: Int = 1
   override val price: Int = 15
 }
 
 class Grave(data: HexagonData) : StationaryPiece(data) {
   override val strength = NO_STRENGTH
-  override val cost: Int = 1
 
   private var roundsToTree: Byte = 1
 
@@ -275,7 +271,7 @@ sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
 
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = NO_STRENGTH
-  override val cost: Int = 0
+  override val income: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
   override fun beginTurn(
@@ -393,24 +389,24 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
 
 class Peasant(data: HexagonData) : LivingPiece(data) {
   override val strength = PEASANT_STRENGTH
-  override val cost: Int = -1
+  override val income: Int = -1
   override val price: Int = 10
 }
 
 class Spearman(data: HexagonData) : LivingPiece(data) {
   override val strength = SPEARMAN_STRENGTH
-  override val cost: Int = -5
+  override val income: Int = -5
   override val price: Int = 20
 }
 
 class Knight(data: HexagonData) : LivingPiece(data) {
   override val strength = KNIGHT_STRENGTH
-  override val cost: Int = -17
+  override val income: Int = -17
   override val price: Int = 30
 }
 
 class Baron(data: HexagonData) : LivingPiece(data) {
   override val strength = BARON_STRENGTH
-  override val cost: Int = -53
+  override val income: Int = -53
   override val price: Int = 40
 }
