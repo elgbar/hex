@@ -20,7 +20,6 @@ import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
 import ktx.actors.onChange
-import ktx.actors.onChangeEvent
 import ktx.actors.onClick
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
@@ -46,10 +45,7 @@ import com.badlogic.gdx.utils.Array as GdxArray
 /** @author Elg */
 object LevelCreationScreen : AbstractScreen() {
 
-  val stage =
-    Stage(
-      ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
-    )
+  val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
 
   init {
     stage.actors {
@@ -94,11 +90,7 @@ object LevelCreationScreen : AbstractScreen() {
         val validator =
           object : FormInputValidator("Invalid width/height for given layout") {
             override fun validate(input: String?): Boolean {
-              val valid =
-                layoutSpinner.current?.gridLayoutStrategy?.checkParameters(
-                  widthSpinner.value, heightSpinner.value
-                )
-                  ?: true
+              val valid = layoutSpinner.current?.gridLayoutStrategy?.checkParameters(widthSpinner.value, heightSpinner.value) ?: true
 
               for (disableable in disableables) {
                 disableable.isDisabled = !valid
@@ -116,30 +108,42 @@ object LevelCreationScreen : AbstractScreen() {
           heightSpinner.setValue(heightSpinner.value, false)
           layoutSpinner.setCurrent(layoutSpinner.current, false)
 
-          if (layoutSpinner.current.gridLayoutStrategy.checkParameters(
-              widthSpinner.value, heightSpinner.value
-            )
-          ) {
-
+          if (layoutSpinner.current.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
             // force update to imageWidth and imageHeight to make sure we have the correct size
             this@visTable.pack()
 
-            previewBuffer =
-              LevelSelectScreen.renderPreview(
-                createIsland(true),
-                previewImage.imageWidth.toInt(),
-                previewImage.imageHeight.toInt()
-              )
-                .also {
-                  val region = TextureRegion(it.colorBufferTexture)
-                  region.flip(false, true)
-                  previewImage.drawable = TextureRegionDrawable(region)
-                }
+            previewBuffer = LevelSelectScreen.renderPreview(
+              createIsland(true),
+              previewImage.imageWidth.toInt(),
+              previewImage.imageHeight.toInt()
+            ).also {
+              val region = TextureRegion(it.colorBufferTexture)
+              region.flip(false, true)
+              previewImage.drawable = TextureRegionDrawable(region)
+            }
           }
         }
 
         Gdx.app.postRunnable { renderPreview() }
         row()
+
+        var oldWidth = widthSpinner.value
+        var oldHeight = heightSpinner.value
+
+        fun syncValue(changed: IntSpinnerModel, other: IntSpinnerModel, oldValue: Int) {
+          val currentValue = changed.value
+          if (layoutSpinner.current == TRIANGULAR) {
+            other.setValue(currentValue, false)
+          } else if (layoutSpinner.current == HEXAGONAL) {
+            val delta = (currentValue - oldValue).coerceIn(-1, 1)
+            val newValue = currentValue + (currentValue % 2) * delta
+            changed.setValue(newValue, false)
+            other.setValue(currentValue, false)
+          }
+
+          oldWidth = widthSpinner.value
+          oldHeight = heightSpinner.value
+        }
 
         val spinner: Spinner
         horizontalGroup {
@@ -148,11 +152,17 @@ object LevelCreationScreen : AbstractScreen() {
           spinner("Width", widthSpinner) {
             name = WIDTH_SPINNER_NAME
             textField.addValidator(validator)
-            onChangeEvent { renderPreview() }
+            onChange {
+              syncValue(widthSpinner, heightSpinner, oldWidth)
+              renderPreview()
+            }
           }
           spinner("Height", heightSpinner) {
             textField.addValidator(validator)
-            onChangeEvent { renderPreview() }
+            onChange {
+              syncValue(heightSpinner, widthSpinner, oldHeight)
+              renderPreview()
+            }
           }
           spinner =
             spinner("Layout", layoutSpinner) {
@@ -161,7 +171,7 @@ object LevelCreationScreen : AbstractScreen() {
                   HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
               cells.get(1)?.minWidth(minWidth)
               textField.addValidator(validator)
-              onChangeEvent { renderPreview() }
+              onChange { renderPreview() }
 
               layoutSpinner.current = HEXAGONAL
             }
@@ -172,8 +182,7 @@ object LevelCreationScreen : AbstractScreen() {
         fun layoutExplanation(): String =
           when (layoutSpinner.current) {
             RECTANGULAR -> "A rectangular layout has no special rules."
-            HEXAGONAL ->
-              "The hexagonal layout must have equal width and height and it must be odd."
+            HEXAGONAL -> "The hexagonal layout must have equal width and height and it must be odd."
             TRAPEZOID -> "A trapezoid layout has no special rules."
             TRIANGULAR -> "A triangular layout must have equal width and height."
             else -> "Invalid layout: ${layoutSpinner.current}"
