@@ -1,7 +1,6 @@
-package no.elg.island
+package no.elg.hex.island
 
 import com.badlogic.gdx.files.FileHandle
-import no.elg.hex.island.Island
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -14,7 +13,7 @@ internal class IslandTest {
 
   @Test
   fun `calculateBestCapitalPlacement() All same color should return center`() {
-    val loaded = Island.loadIsland(getIsFile("island-all-sun-hexagonal-radius-3.is"))
-    assertTrue(loaded)
+    val loaded = Island.deserialize(getIsFile("island-all-sun-hexagonal-radius-3.is"))
+    assertTrue(loaded.validate())
   }
 }
