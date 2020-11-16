@@ -15,7 +15,14 @@ data class Territory(
   val hexagons: Collection<Hexagon<HexagonData>>
 ) {
 
-  val income: Int by lazy { capital.calculateIncome(hexagons, island) }
+  val income: Int by lazy {
+    var income = capital.calculateIncome(hexagons, island)
+    val hand = island.inHand
+    if (hand?.territory === this) {
+      income += hand.piece.income
+    }
+    income
+  }
 
   /** All enemy hexes that border this territory */
   val enemyBorderHexes: Collection<Hexagon<HexagonData>> by lazy {
