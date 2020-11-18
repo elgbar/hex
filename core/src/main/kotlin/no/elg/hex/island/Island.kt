@@ -110,6 +110,8 @@ class Island(
       field = value
     }
 
+  val currentAI: AI? get() = teamToPlayer[currentTeam]
+
   var currentTeam: Team = STARTING_TEAM
     private set
 
@@ -154,7 +156,7 @@ class Island(
       }
       select(null)
 
-      teamToPlayer[currentTeam]?.also {
+      currentAI?.also {
         it.action(this@Island, gameInputProcessor)
         schedule(0.05f) {
           if (Hex.screen is PreviewIslandScreen) {

@@ -71,14 +71,16 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
 
     draw(islandScreen.island.hexagons, null, 0.25f)
 
-    islandScreen.island.selected?.also {
-      draw(it.hexagons, Color.WHITE, 1f)
+    if (islandScreen.island.currentAI == null) {
+      islandScreen.island.selected?.also {
+        draw(it.hexagons, Color.WHITE, 1f)
 
-      val hand = islandScreen.island.inHand
-      if (hand != null && hand.piece is LivingPiece) {
-        val hexes =
-          it.enemyBorderHexes.filter { hex -> islandScreen.island.canAttack(hex, hand.piece) }
-        draw(hexes, Color.RED, 1f, 2f)
+        val hand = islandScreen.island.inHand
+        if (hand != null && hand.piece is LivingPiece) {
+          val hexes =
+            it.enemyBorderHexes.filter { hex -> islandScreen.island.canAttack(hex, hand.piece) }
+          draw(hexes, Color.RED, 1f, 2f)
+        }
       }
     }
 

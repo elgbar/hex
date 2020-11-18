@@ -30,7 +30,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.addProcessor(inputProcessor)
 
-    if (island.currentTeam != Island.STARTING_TEAM) {
+    if (island.currentAI != null) {
       island.endTurn(inputProcessor)
     }
   }

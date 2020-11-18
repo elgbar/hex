@@ -24,67 +24,70 @@ import no.elg.hex.screens.PlayableIslandScreen
 class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) : FrameUpdatable {
 
   override fun frameUpdate() {
-    playableIslandScreen.island.selected?.also { selected ->
-      val list =
-        mutableListOf(
-          ScreenText(
-            "Treasury: ",
-            next = signColoredText(selected.capital.balance) { "%d".format(it) }
-          ),
-          ScreenText(
-            "Estimated income: ",
-            next = signColoredText(selected.income) { "%+d".format(it) }
-          )
-        )
-      if (Hex.debug) {
-        list +=
-          ScreenText(
-            "Holding: ",
-            next = nullCheckedText(playableIslandScreen.island.inHand, color = Color.YELLOW)
-          )
-      }
-      ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
-    }
-
-    if (playableIslandScreen.inputProcessor.infiniteMoney) {
-      ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
-    }
 
     ScreenRenderer.drawAll(
       ScreenText("Turn ${playableIslandScreen.island.turn}", bold = true), position = TOP_CENTER
     )
+    if (playableIslandScreen.inputProcessor.infiniteMoney) {
+      ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
+    }
 
-    playableIslandScreen.island.inHand?.also { (_, piece) ->
-      batch.begin()
-      val region =
-        when (piece) {
-          is Capital -> Hex.assets.capital
-          is PalmTree -> Hex.assets.palm
-          is PineTree -> Hex.assets.pine
-          is Castle -> Hex.assets.castle
-          is Grave -> Hex.assets.grave
-          is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
-          is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
-          is Knight -> Hex.assets.knight.getKeyFrame(0f)
-          is Baron -> Hex.assets.baron.getKeyFrame(0f)
-          is Empty -> return@also
+    if (playableIslandScreen.island.currentAI == null) {
+
+      playableIslandScreen.island.selected?.also { selected ->
+        val list =
+          mutableListOf(
+            ScreenText(
+              "Treasury: ",
+              next = signColoredText(selected.capital.balance) { "%d".format(it) }
+            ),
+            ScreenText(
+              "Estimated income: ",
+              next = signColoredText(selected.income) { "%+d".format(it) }
+            )
+          )
+        if (Hex.debug) {
+          list +=
+            ScreenText(
+              "Holding: ",
+              next = nullCheckedText(playableIslandScreen.island.inHand, color = Color.YELLOW)
+            )
         }
+        ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
+      }
 
-      val height = (Gdx.graphics.height * 0.1f)
-      val width = height * (region.packedWidth / region.packedHeight.toFloat())
+      playableIslandScreen.island.inHand?.also { (_, piece) ->
+        batch.begin()
+        val region =
+          when (piece) {
+            is Capital -> Hex.assets.capital
+            is PalmTree -> Hex.assets.palm
+            is PineTree -> Hex.assets.pine
+            is Castle -> Hex.assets.castle
+            is Grave -> Hex.assets.grave
+            is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
+            is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
+            is Knight -> Hex.assets.knight.getKeyFrame(0f)
+            is Baron -> Hex.assets.baron.getKeyFrame(0f)
+            is Empty -> return@also
+          }
 
-      val handWidth =
-        height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
+        val height = (Gdx.graphics.height * 0.1f)
+        val width = height * (region.packedWidth / region.packedHeight.toFloat())
 
-      batch.draw(
-        Hex.assets.hand,
-        (Gdx.graphics.width - handWidth / 2f) / 2f,
-        (height + height / 2) / 2f,
-        handWidth,
-        height
-      )
-      batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
-      batch.end()
+        val handWidth =
+          height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
+
+        batch.draw(
+          Hex.assets.hand,
+          (Gdx.graphics.width - handWidth / 2f) / 2f,
+          (height + height / 2) / 2f,
+          handWidth,
+          height
+        )
+        batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
+        batch.end()
+      }
     }
   }
 

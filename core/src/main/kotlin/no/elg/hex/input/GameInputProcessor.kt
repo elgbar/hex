@@ -141,26 +141,25 @@ class GameInputProcessor(private val playableIslandScreen: PlayableIslandScreen)
   }
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (playableIslandScreen.island.currentTeam != Island.STARTING_TEAM) return false
-    with(playableIslandScreen) {
-      when (button) {
-        Buttons.LEFT -> {
-          val cursorHex = playableIslandScreen.basicIslandInputProcessor.cursorHex ?: return false
-          click(cursorHex)
-        }
-        else -> return false
+    if (playableIslandScreen.island.currentAI != null) return false
+    when (button) {
+      Buttons.LEFT -> {
+        val cursorHex = playableIslandScreen.basicIslandInputProcessor.cursorHex ?: return false
+        click(cursorHex)
       }
+      else -> return false
     }
     return true
   }
 
   override fun keyDown(keycode: Int): Boolean {
-    if (playableIslandScreen.island.currentTeam != Island.STARTING_TEAM) return false
+    if (playableIslandScreen.island.currentAI != null) return false
 
     when (keycode) {
       ENTER -> playableIslandScreen.island.endTurn(this)
       BACKSPACE, SPACE -> playableIslandScreen.island.inHand = null
       Keys.F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
+
       else -> {
         val piece = keycodeToPiece(keycode) ?: return false
         return buyUnit(piece)
