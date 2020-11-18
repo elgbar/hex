@@ -155,7 +155,7 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
                 attackableHexes.filter { type.isInstance(territory.island.getData(it).piece) }
               if (attackableOfType.isNotEmpty()) {
                 think { "Will attack a ${type.simpleName}" }
-                attackableOfType.random()
+                return attackableOfType.random()
               }
               think { "Cannot find any ${type.simpleName} to attack" }
               return null
