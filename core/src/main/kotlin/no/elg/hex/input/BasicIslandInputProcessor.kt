@@ -111,7 +111,7 @@ class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIsland
   companion object {
     private const val MIN_MOVE_AMOUNT = 0
 
-    const val MIN_ZOOM = 0.15f
+    const val MIN_ZOOM = 0.10f
     const val MAX_ZOOM = 3.0f
 
     private const val ZOOM_SPEED = 0.1f
