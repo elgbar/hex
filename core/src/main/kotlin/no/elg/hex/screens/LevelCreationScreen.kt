@@ -136,9 +136,9 @@ object LevelCreationScreen : AbstractScreen() {
             other.setValue(currentValue, false)
           } else if (layoutSpinner.current == HEXAGONAL) {
             val delta = (currentValue - oldValue).coerceIn(-1, 1)
-            val newValue = currentValue + (currentValue % 2) * delta
+            val newValue = currentValue + (1 - (currentValue % 2)) * delta
             changed.setValue(newValue, false)
-            other.setValue(currentValue, false)
+            other.setValue(newValue, false)
           }
 
           oldWidth = widthSpinner.value
