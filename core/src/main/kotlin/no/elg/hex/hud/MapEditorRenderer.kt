@@ -3,7 +3,6 @@ package no.elg.hex.hud
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
-import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.input.editor.Editor.Companion.editorText
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
@@ -12,10 +11,7 @@ import no.elg.hex.screens.MapEditorScreen.Companion.MAX_BRUSH_SIZE
 import no.elg.hex.screens.MapEditorScreen.Companion.MIN_BRUSH_SIZE
 
 /** @author Elg */
-class MapEditorRenderer(
-  private val mapEditorScreen: MapEditorScreen,
-  private val mapEditorInputProcessor: MapEditorInputProcessor
-) : FrameUpdatable {
+class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpdatable {
 
   companion object {
     private val title = ScreenText("=== Map editor keys ===", color = Color.SALMON)
@@ -45,12 +41,10 @@ class MapEditorRenderer(
         ScreenText("Ctrl+O to output current island to disk"),
         ScreenText("Ctrl+R to read island from disk")
       )
-
-    val hiddenHelp = arrayOf(title, ScreenText("F1 to show help text"))
   }
 
   override fun frameUpdate() {
-    with(mapEditorInputProcessor) {
+    with(mapEditorScreen) {
       val editorInfo =
         when (editor) {
           is TeamEditor ->
@@ -79,6 +73,7 @@ class MapEditorRenderer(
         }
 
       ScreenRenderer.drawAll(
+        emptyText(),
         ScreenText(
           "Brush radius: ",
           next =
@@ -93,12 +88,6 @@ class MapEditorRenderer(
         editorInfo,
         position = TOP_RIGHT
       )
-
-      //      if (showHelp) {
-      //        ScreenRenderer.drawAll(*shownHelp, position = BOTTOM_LEFT)
-      //      } else {
-      //        ScreenRenderer.drawAll(*hiddenHelp, position = BOTTOM_LEFT)
-      //      }
     }
   }
 }

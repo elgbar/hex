@@ -87,14 +87,13 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpd
     val vertexCount = idx / NUM_COMPONENTS
 
     // start the shader before setting any uniforms
-    shader.begin()
+    shader.bind()
 
     // update the projection matrix so our triangles are rendered in 2D
     shader.setUniformMatrix("u_projTrans", islandScreen.camera.combined)
 
     // render the mesh
     mesh.render(shader, GL20.GL_TRIANGLES, 0, vertexCount)
-    shader.end()
 
     // re-enable depth to reset states to their default
     //        Gdx.gl.glDepthMask(true);

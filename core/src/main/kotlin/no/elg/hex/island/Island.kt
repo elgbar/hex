@@ -78,8 +78,7 @@ class Island(
       }
     }
     for (hexagon in hexagons) {
-      val piece = this.getData(hexagon).piece
-      when (piece) {
+      when (val piece = this.getData(hexagon).piece) {
         is Capital -> piece.balance = START_CAPITAL
         is LivingPiece -> piece.moved = false
         is TreePiece -> piece.hasGrown = false
@@ -328,7 +327,7 @@ class Island(
               }
             )
       }
-      .maxBy { it.second }!!
+      .maxByOrNull { it.second }!!
       .first
   }
 
