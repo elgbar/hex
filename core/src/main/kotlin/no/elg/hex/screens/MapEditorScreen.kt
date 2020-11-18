@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.kotcrab.vis.ui.widget.ButtonBar
@@ -17,10 +18,14 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
+import no.elg.hex.hexagon.PIECES
+import no.elg.hex.hexagon.Piece
+import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.input.MapEditorInputProcessor
+import no.elg.hex.input.editor.Editor
 import no.elg.hex.input.editor.NOOPEditor
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
@@ -28,9 +33,11 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.util.hide
+import no.elg.hex.util.next
 import no.elg.hex.util.nextOrNull
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
+import no.elg.hex.util.previous
 import no.elg.hex.util.previousOrNull
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.saveIsland
@@ -38,6 +45,7 @@ import no.elg.hex.util.separator
 import no.elg.hex.util.serialize
 import no.elg.hex.util.show
 import no.elg.hex.util.toggleShown
+import kotlin.reflect.KClass
 
 /** @author Elg */
 class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
@@ -47,12 +55,39 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
     get() = islandScreen.basicIslandInputProcessor
 
   val inputProcessor = MapEditorInputProcessor(this)
-  private val frameUpdatable = MapEditorRenderer(this, inputProcessor)
+  private val frameUpdatable = MapEditorRenderer(this)
   private var quickSavedIsland: String = ""
 
   private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(this)
   private val teamEditors = TeamEditor.generateTeamEditors(this)
   private val pieceEditors = PieceEditor.generatePieceEditors(this)
+
+  var brushRadius: Int = 1
+    internal set(value) {
+      field = value.coerceIn(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
+    }
+
+  var selectedTeam: Team = Team.values().first()
+    internal set
+
+  var selectedPiece: KClass<out Piece> = PIECES.first()
+    internal set
+
+  var editors: List<Editor> = emptyList()
+    internal set(value) {
+      field = value
+      editor = value.firstOrNull() ?: NOOPEditor
+    }
+
+  var editor: Editor = NOOPEditor
+    internal set(value) {
+      if (value == NOOPEditor || value in editors) {
+        field = value
+      } else {
+        field = NOOPEditor
+        MessagesRenderer.publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
+      }
+    }
 
   init {
     quicksave()
@@ -99,10 +134,10 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
         confirmExit.toggleShown(this@MapEditorScreen.stage)
       }
 
-      val editors =
+      val editorsWindow =
         visWindow("Editors") {
           addCloseButton()
-          isResizable = true
+          isResizable = false
 
           if (Hex.debug) {
             debug()
@@ -131,12 +166,16 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
           isModal = true
           visLabel(
             """
-                Island Validation rules:
-   
-                * All visible hexagons must be reachable from all other visible hexagons (ie there can only be one island)
-                * No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
-                * There must be exactly one capital per territory
-            """.trimIndent()
+              |Tips and Tricks:
+              |* Holding SHIFT will reverse iteration order, unless otherwise stated
+              |
+              |Island Validation rules:
+              |
+              |* All visible hexagons must be reachable from all other visible hexagons 
+              |  (ie there can only be one island)
+              |* No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
+              |* There must be exactly one capital per territory
+            """.trimMargin()
           ) {
             it.expand().fill()
           }
@@ -181,48 +220,79 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
 
             separator()
 
-            menuItem("Opaqueness Editor Type") {
-              onInteract(this@MapEditorScreen.stage, OPAQUENESS_KEY) {
-                inputProcessor.editors = opaquenessEditors
-              }
-            }
-            menuItem("Team Editor Type") {
-              onInteract(this@MapEditorScreen.stage, TEAM_KEY) {
-                inputProcessor.editors = teamEditors
-              }
-            }
-            menuItem("Piece Editor Type") {
-              onInteract(this@MapEditorScreen.stage, PIECE_KEY) {
-                inputProcessor.editors = pieceEditors
-              }
-            }
-
-            separator()
-
             menuItem("Next Editor") {
               onInteract(this@MapEditorScreen.stage, Keys.RIGHT) {
-                inputProcessor.editor =
-                  inputProcessor.editors.nextOrNull(inputProcessor.editor) ?: NOOPEditor
+                editor =
+                  editors.nextOrNull(editor) ?: NOOPEditor
               }
             }
 
             menuItem("Previous Editor") {
               onInteract(this@MapEditorScreen.stage, Keys.LEFT) {
-                inputProcessor.editor =
-                  inputProcessor.editors.previousOrNull(inputProcessor.editor) ?: NOOPEditor
+                editor =
+                  editors.previousOrNull(editor) ?: NOOPEditor
+              }
+            }
+
+            separator()
+
+            menuItem("Increase Brush Size") {
+              onInteract(this@MapEditorScreen.stage, Keys.PAGE_UP) {
+                brushRadius++
+              }
+            }
+            menuItem("Decrease Brush Size") {
+              onInteract(this@MapEditorScreen.stage, Keys.PAGE_DOWN) {
+                brushRadius--
+              }
+            }
+
+            separator()
+
+            menuItem("Editor Type Specific") {
+              onInteract(this@MapEditorScreen.stage, Keys.Q) {
+                if (editor is TeamEditor) {
+                  selectedTeam =
+                    Team.values().let {
+                      if (shiftPressed) it.previous(selectedTeam) else it.next(selectedTeam)
+                    }
+                } else if (editor is PieceEditor) {
+                  selectedPiece =
+                    PIECES.let {
+                      if (shiftPressed) it.previous(selectedPiece) else it.next(selectedPiece)
+                    }
+                }
               }
             }
           }
           menu("Tools") {
             menuItem("Toggle Editor Types") {
               onInteract(this@MapEditorScreen.stage, Keys.F1) {
-                editors.toggleShown(this@MapEditorScreen.stage)
+                editorsWindow.toggleShown(this@MapEditorScreen.stage)
+              }
+            }
+
+            separator()
+
+            menuItem("Opaqueness Editor Type") {
+              onInteract(this@MapEditorScreen.stage, OPAQUENESS_KEY) {
+                editors = opaquenessEditors
+              }
+            }
+            menuItem("Team Editor Type") {
+              onInteract(this@MapEditorScreen.stage, TEAM_KEY) {
+                editors = teamEditors
+              }
+            }
+            menuItem("Piece Editor Type") {
+              onInteract(this@MapEditorScreen.stage, PIECE_KEY) {
+                editors = pieceEditors
               }
             }
           }
 
           menu("Help") {
-            menuItem("Validation") { onClick { infoWindow.show(this@MapEditorScreen.stage) } }
+            menuItem("Information") { onClick { infoWindow.show(this@MapEditorScreen.stage) } }
           }
         }
         setFillParent(true)
@@ -274,5 +344,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
     const val OPAQUENESS_KEY = Keys.O
     const val TEAM_KEY = Keys.T
     const val PIECE_KEY = Keys.P
+
+    private val shiftPressed get() = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)
   }
 }

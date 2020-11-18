@@ -20,7 +20,7 @@ sealed class PieceEditor(val mapEditorScreen: MapEditorScreen) : Editor {
 
   class `Set piece`(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-      mapEditorScreen.island.getData(hexagon).setPiece(mapEditorScreen.inputProcessor.selectedPiece)
+      mapEditorScreen.island.getData(hexagon).setPiece(mapEditorScreen.selectedPiece)
     }
   }
 

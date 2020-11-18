@@ -20,8 +20,7 @@ sealed class TeamEditor(val mapEditorScreen: MapEditorScreen) : Editor {
 
   class `Set team`(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
-
-      mapEditorScreen.island.getData(hexagon).team = mapEditorScreen.inputProcessor.selectedTeam
+      mapEditorScreen.island.getData(hexagon).team = mapEditorScreen.selectedTeam
     }
   }
 
