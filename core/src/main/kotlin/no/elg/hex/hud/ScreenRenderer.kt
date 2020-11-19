@@ -204,8 +204,7 @@ object ScreenRenderer : Disposable, Resizable {
       LEFT -> offsetX to offsetX + spacing * text.length
       HORIZONTAL_CENTER -> {
         require(next == null) { "Horizontal centred text cannot have a next element" }
-        val totalLength = totalLength()
-        totalLength / 2 to 0f
+        (Gdx.graphics.width - wholeText.length * spacing) / 2f to 0f
       }
     }
     font.color = color
