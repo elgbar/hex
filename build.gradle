@@ -1,7 +1,7 @@
 buildscript {
 
   ext {
-    kotlinVersion = "1.4.0"
+    kotlinVersion = "1.4.20"
     appName = "Hex"
     gdxVersion = '1.9.11'
     roboVMVersion = '2.3.8'
@@ -11,7 +11,10 @@ buildscript {
     kiwiVersion = '1.9.1.9.6'
     jacksonVersion = "2.11.1"
     junitVersion = "5.4.2"
-    ktxVersion = "1.9.11-b1"
+    ktxVersion = "1.9.11-b2"
+    kotlinCoroutineVersion = "1.4.1"
+    argparserVersion = "2.0.7"
+    mixiteVersion = "2020.1.0"
   }
 
   repositories {
@@ -84,7 +87,7 @@ tasks.named('wrapper') {
 subprojects {
   dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    api "com.xenomachina:kotlin-argparser:2.0.7"
+    api "com.xenomachina:kotlin-argparser:$argparserVersion"
   }
 }
 
@@ -108,9 +111,10 @@ project(":core") {
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
     api "com.kotcrab.vis:vis-ui:$visVersion"
-    api "com.github.Hexworks.mixite:mixite.core-jvm:2020.1.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8"
+    api "com.github.Hexworks.mixite:mixite.core-jvm:$mixiteVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
 
+    api "io.github.libktx:ktx-app:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
     implementation "io.github.libktx:ktx-style:$ktxVersion"
