@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
@@ -17,6 +18,7 @@ import kotlin.reflect.KClass
 
 @JsonInclude(NON_DEFAULT)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
+@JsonIgnoreProperties("id")
 data class HexagonData(
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works
@@ -82,22 +84,29 @@ data class HexagonData(
     setPiece(PIECES.first { it.qualifiedName == typeName })
   }
 
+  fun copy(): HexagonData {
+    return HexagonData(edge, isOpaque, isPassable).also {
+      it.team = team
+      it.piece = piece.copyTo(this)
+    }
+  }
+
   override fun toString(): String {
     return "team: $team piece: $piece"
   }
 
   companion object {
 
-    // Can move to
     const val BRIGHTNESS = 0.9f
 
-    // mouse hovering over, add this to the current hex under the mouse
+    /**
+     * mouse hovering over, add this to the current hex under the mouse
+     */
     const val SELECTED = 0.1f
 
     private const val EXPECTED_NEIGHBORS = 6
 
-    fun isEdgeHexagon(hex: Hexagon<HexagonData>, island: Island) =
-      island.grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
+    fun Island.isEdgeHexagon(hex: Hexagon<HexagonData>) = grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
 
     val EDGE_DATA = HexagonData(edge = true)
   }

@@ -1,5 +1,6 @@
 package no.elg.hex.island
 
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Piece
 
@@ -7,7 +8,8 @@ import no.elg.hex.hexagon.Piece
 data class Hand(val territory: Territory, val piece: Piece) {
 
   init {
-    require(piece !is LivingPiece || !piece.moved) { "Holding a piece that has already moved!" }
+    require(piece !is LivingPiece || !piece.moved) { "Holding a piece that has already moved" }
+    require(piece != Empty) { "Cannot hold empty piece" }
   }
 
   var holding = true

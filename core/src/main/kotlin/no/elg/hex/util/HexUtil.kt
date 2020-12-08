@@ -26,7 +26,7 @@ import kotlin.reflect.KClass
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
   return hexagon.satelliteData.orElseGet {
-    (if (isEdgeHexagon(hexagon, this)) EDGE_DATA else HexagonData()).also {
+    (if (this.isEdgeHexagon(hexagon)) EDGE_DATA else HexagonData()).also {
       hexagon.setSatelliteData(it)
     }
   }

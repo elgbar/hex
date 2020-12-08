@@ -106,6 +106,8 @@ sealed class Piece {
     }
   }
 
+  abstract fun copyTo(newData: HexagonData): Piece
+
   override fun toString(): String = this::class.simpleName!!
 
   var elapsedAnimationTime = 0f
@@ -114,19 +116,10 @@ sealed class Piece {
    * Called when each team ends it's turn. The [pieceHex], [data], and [team] are guaranteed to be
    * synced. Only hexagons who's turn it is will be called.
    */
-  open fun beginTurn(
-    island: Island,
-    pieceHex: Hexagon<HexagonData>,
-    data: HexagonData,
-    team: Team
-  ) {
-    // NO-OP
-  }
+  open fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) = Unit
 
-  /** Called when all visible hexagons's [beginTurn] has been called */
-  open fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    // NO-OP
-  }
+  /** Called when all visible hexagons' [beginTurn] has been called */
+  open fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) = Unit
 }
 
 val PIECES: List<KClass<out Piece>> by lazy {
@@ -157,15 +150,14 @@ object Empty : Piece() {
     get() = error("Empty Piece is not confined to a Hexagon")
   override val capitalPlacement = CapitalPlacementPreference.STRONGLY
   override fun place(onto: HexagonData): Boolean = true
+  override fun copyTo(newData: HexagonData) = this
 }
 
 // //////////////
 // Stationary //
 // //////////////
 
-sealed class StationaryPiece(final override val data: HexagonData) : Piece() {
-
-  private var placed: Boolean = false
+sealed class StationaryPiece(final override val data: HexagonData, protected var placed: Boolean) : Piece() {
 
   final override val movable: Boolean = false
 
@@ -176,15 +168,11 @@ sealed class StationaryPiece(final override val data: HexagonData) : Piece() {
     return true
   }
 
-  override fun toString(): String {
-    return "${this::class.simpleName}(placed? $placed)"
-  }
+  override fun toString() = "${this::class.simpleName}(placed? $placed)"
 }
 
-class Capital(data: HexagonData) : StationaryPiece(data) {
+class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) : StationaryPiece(data, placed) {
 
-  /** How much money this territory currently has */
-  var balance: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Piece::class)
   override val strength = PEASANT_STRENGTH
 
@@ -217,7 +205,7 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
       return
     }
 
-    require(island.getCapitalOf(hexagons) === this) {
+    require(island.findCapital(hexagons) === this) {
       "Mismatch between this piece and the capital of the territory!"
     }
 
@@ -235,18 +223,24 @@ class Capital(data: HexagonData) : StationaryPiece(data) {
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
+  override fun copyTo(newData: HexagonData): Capital {
+    return Capital(newData, placed, balance)
+  }
+
   override fun toString(): String = "${this::class.simpleName}(balance: $balance)"
 }
 
-class Castle(data: HexagonData) : StationaryPiece(data) {
+class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, placed) {
   override val strength = SPEARMAN_STRENGTH
   override val price: Int = 15
+
+  override fun copyTo(newData: HexagonData): Castle {
+    return Castle(newData, placed)
+  }
 }
 
-class Grave(data: HexagonData) : StationaryPiece(data) {
+class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree: Byte = 1) : StationaryPiece(data, placed) {
   override val strength = NO_STRENGTH
-
-  private var roundsToTree: Byte = 1
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
@@ -258,6 +252,10 @@ class Grave(data: HexagonData) : StationaryPiece(data) {
     island.getData(pieceHex).setPiece(island.treeType(pieceHex))
   }
 
+  override fun copyTo(newData: HexagonData): Grave {
+    return Grave(newData, placed, roundsToTree)
+  }
+
   override fun toString(): String = "${this::class.simpleName}(timeToTree: $roundsToTree)"
 }
 
@@ -265,9 +263,7 @@ class Grave(data: HexagonData) : StationaryPiece(data) {
 // TREE //
 // ////////
 
-sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
-
-  var hasGrown: Boolean = true
+sealed class TreePiece(data: HexagonData, placed: Boolean, var hasGrown: Boolean) : StationaryPiece(data, placed) {
 
   override val capitalPlacement = CapitalPlacementPreference.WEAKLY
   override val strength = NO_STRENGTH
@@ -284,29 +280,24 @@ sealed class TreePiece(data: HexagonData) : StationaryPiece(data) {
   }
 }
 
-class PineTree(data: HexagonData) : TreePiece(data) {
+class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
 
     // Find all empty neighbor hexes that are empty
-    val list =
-      island
-        .getNeighbors(pieceHex)
-        .filter {
-          val piece = island.getData(it).piece
-          piece is Empty && island.treeType(it) == PineTree::class
-        }
-        .shuffled()
+    val list = island.getNeighbors(pieceHex).filter {
+      val piece = island.getData(it).piece
+      piece is Empty && island.treeType(it) == PineTree::class
+    }.shuffled()
 
     for (hexagon in list) {
       // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to
       // grow
-      val otherPines =
-        island.getNeighbors(hexagon).filter {
-          if (it == pieceHex) return@filter false
-          val piece = island.getData(it).piece
-          return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
-        }
+      val otherPines = island.getNeighbors(hexagon).filter {
+        if (it == pieceHex) return@filter false
+        val piece = island.getData(it).piece
+        return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
+      }
       if (otherPines.isNotEmpty()) {
         // Grow a tree between this pine and another pine
         val otherPine = island.getData(otherPines.random()).piece as TreePiece
@@ -320,9 +311,13 @@ class PineTree(data: HexagonData) : TreePiece(data) {
       }
     }
   }
+
+  override fun copyTo(newData: HexagonData): PineTree {
+    return PineTree(newData, placed, hasGrown)
+  }
 }
 
-class PalmTree(data: HexagonData) : TreePiece(data) {
+class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
@@ -344,17 +339,19 @@ class PalmTree(data: HexagonData) : TreePiece(data) {
       hasGrown = true
     }
   }
+
+  override fun copyTo(newData: HexagonData): PalmTree {
+    return PalmTree(newData, placed, hasGrown)
+  }
 }
 
 // //////////
 // LIVING //
 // //////////
 
-sealed class LivingPiece(final override val data: HexagonData) : Piece() {
+sealed class LivingPiece(final override val data: HexagonData, var moved: Boolean) : Piece() {
 
   final override val movable: Boolean = true
-
-  var moved: Boolean = true
 
   override val canBePlacedOn: Array<KClass<out Piece>> =
     arrayOf(LivingPiece::class, StationaryPiece::class)
@@ -387,26 +384,38 @@ sealed class LivingPiece(final override val data: HexagonData) : Piece() {
   override fun toString(): String = "${this::class.simpleName}(moved? $moved)"
 }
 
-class Peasant(data: HexagonData) : LivingPiece(data) {
+class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = PEASANT_STRENGTH
   override val income: Int = -1
   override val price: Int = 10
+  override fun copyTo(newData: HexagonData): Peasant {
+    return Peasant(newData, moved)
+  }
 }
 
-class Spearman(data: HexagonData) : LivingPiece(data) {
+class Spearman(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = SPEARMAN_STRENGTH
   override val income: Int = -5
   override val price: Int = 20
+  override fun copyTo(newData: HexagonData): Spearman {
+    return Spearman(newData, moved)
+  }
 }
 
-class Knight(data: HexagonData) : LivingPiece(data) {
+class Knight(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = KNIGHT_STRENGTH
   override val income: Int = -17
   override val price: Int = 30
+  override fun copyTo(newData: HexagonData): Knight {
+    return Knight(newData, moved)
+  }
 }
 
-class Baron(data: HexagonData) : LivingPiece(data) {
+class Baron(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = BARON_STRENGTH
   override val income: Int = -53
   override val price: Int = 40
+  override fun copyTo(newData: HexagonData): Baron {
+    return Baron(newData, moved)
+  }
 }

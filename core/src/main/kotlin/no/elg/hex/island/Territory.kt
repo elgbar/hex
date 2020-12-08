@@ -6,6 +6,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
@@ -37,10 +38,21 @@ data class Territory(
 
   val team: Team
 
-  init {
-    require(hexagons.size >= MIN_HEX_IN_TERRITORY) {
-      "Too few hexagons in territory must be at least $MIN_HEX_IN_TERRITORY"
+  fun findCapitalCoordinates(): CubeCoordinate {
+    for (hexagon in hexagons) {
+      for (it in hexagons) {
+        val data = island.getData(it)
+        if (data.piece === capital) {
+          return it.cubeCoordinate
+        }
+      }
     }
+    error("Failed to find capital hexagon")
+  }
+
+  init {
+    require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "Too few hexagons in territory must be at least $MIN_HEX_IN_TERRITORY" }
+
     var foundCapital = false
     team = island.getData(hexagons.first()).team
     for (hexagon in hexagons) {

@@ -9,6 +9,7 @@ import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.Grave
+import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
@@ -21,42 +22,35 @@ import no.elg.hex.hud.ScreenRenderer.batch
 import no.elg.hex.screens.PlayableIslandScreen
 
 /** @author Elg */
-class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) : FrameUpdatable {
+class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable {
+
+  private val leftInfo = ArrayList<ScreenText>()
 
   override fun frameUpdate() {
 
     ScreenRenderer.drawAll(
-      ScreenText("Turn ${playableIslandScreen.island.turn}", bold = true), position = TOP_CENTER
+      ScreenText("Turn ${screen.island.turn}", bold = true), position = TOP_CENTER
     )
-    if (playableIslandScreen.inputProcessor.infiniteMoney) {
+    if (screen.inputProcessor.infiniteMoney) {
       ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
     }
 
-    if (playableIslandScreen.island.currentAI == null) {
+    leftInfo.clear()
 
-      playableIslandScreen.island.selected?.also { selected ->
-        val list =
-          mutableListOf(
-            ScreenText(
-              "Treasury: ",
-              next = signColoredText(selected.capital.balance) { "%d".format(it) }
-            ),
-            ScreenText(
-              "Estimated income: ",
-              next = signColoredText(selected.income) { "%+d".format(it) }
-            )
-          )
+    if (screen.island.currentAI == null) {
+
+      screen.island.selected?.also { selected ->
+        leftInfo += ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) })
+        leftInfo += ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) })
         if (Hex.debug) {
-          list +=
-            ScreenText(
-              "Holding: ",
-              next = nullCheckedText(playableIslandScreen.island.inHand, color = Color.YELLOW)
-            )
+          leftInfo += emptyText()
+          leftInfo += ScreenText("Holding: ", next = nullCheckedText(screen.island.inHand, color = Color.YELLOW))
+          leftInfo += ScreenText("Holding edge piece: ", next = booleanText(screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA))
+          leftInfo += emptyText()
         }
-        ScreenRenderer.drawAll(*list.toTypedArray(), position = TOP_RIGHT)
       }
 
-      playableIslandScreen.island.inHand?.also { (_, piece) ->
+      screen.island.inHand?.also { (_, piece) ->
         batch.begin()
         val region =
           when (piece) {
@@ -89,6 +83,12 @@ class GameInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) :
         batch.end()
       }
     }
+
+    if (Hex.debug) {
+      val selected = screen.island.history.historyPointer
+      leftInfo.addAll(screen.island.history.historyNotes.mapIndexed { i, it -> ScreenText(it, color = if (i == selected) Color.YELLOW else Color.WHITE) })
+    }
+    ScreenRenderer.drawAll(*leftInfo.toTypedArray(), position = TOP_RIGHT)
   }
 
   companion object {
