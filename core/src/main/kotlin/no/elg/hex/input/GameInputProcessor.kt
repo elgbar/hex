@@ -30,6 +30,7 @@ import no.elg.hex.util.isKeyPressed
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
+import no.elg.hex.hexagon.HexagonData.Companion
 
 /** @author Elg */
 class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapter() {
@@ -161,8 +162,10 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
       Keys.Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
 
       else -> {
-        val piece = keycodeToPiece(keycode) ?: return false
-        return buyUnit(piece)
+        if (screen.island.inHand == null || screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA) {
+          val piece = keycodeToPiece(keycode) ?: return false
+          return buyUnit(piece)
+        }
       }
     }
     return true
