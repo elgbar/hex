@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
@@ -164,7 +165,7 @@ class Assets : AssetManager() {
     loadingInfo = "VisUI"
 
     if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
-    with(VisUI.getSkin()) {
+    with(VisUI.getSkin() as Skin) {
       val notFlippedFont = getFont(bold = false, italic = false, flip = false)
       val boldNotFlippedFont = getFont(bold = false, italic = false, flip = false)
 
@@ -227,7 +228,7 @@ class Assets : AssetManager() {
     val boldness = if (bold) "B" else "R"
     val italicness = if (italic) "I" else ""
     val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
-    return finishLoadingAsset<BitmapFont>("fonts/UbuntuMono-$boldness$italicness$flippiness.ttf")
+    return finishLoadingAsset("fonts/UbuntuMono-$boldness$italicness$flippiness.ttf")
   }
 
   fun finishMain() {

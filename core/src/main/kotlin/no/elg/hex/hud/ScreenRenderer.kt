@@ -147,7 +147,8 @@ fun <T : Comparable<T>> variableText(
 fun nullText(next: ScreenText? = null) =
   ScreenText("null", RED, bold = true, italic = false, next = next)
 
-fun emptyText() = ScreenText("")
+private val emptyText = ScreenText("")
+fun emptyText() = emptyText
 
 fun booleanText(
   check: Boolean,

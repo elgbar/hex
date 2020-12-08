@@ -53,9 +53,7 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
       try {
         Island.deserialize(json)
       } catch (e: Exception) {
-        MessagesRenderer.publishMessage(
-          ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED)
-        )
+        MessagesRenderer.publishMessage(ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED))
         Gdx.app.debug("LOAD", e.message)
         Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
       }

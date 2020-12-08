@@ -9,18 +9,18 @@ import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.util.findHexagonsWithinRadius
 
 /** @author Elg */
-class MapEditorInputProcessor(private val mapEditorScreen: MapEditorScreen) : InputAdapter() {
+class MapEditorInputProcessor(private val screen: MapEditorScreen) : InputAdapter() {
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
-      val cursorHex = mapEditorScreen.basicIslandInputProcessor.cursorHex ?: return true
+      val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return true
 
       if (isShiftPressed()) {
-        for (hexagon in mapEditorScreen.island.findHexagonsWithinRadius(cursorHex, mapEditorScreen.brushRadius)) {
-          mapEditorScreen.editor.edit(hexagon)
+        for (hexagon in screen.island.findHexagonsWithinRadius(cursorHex, screen.brushRadius)) {
+          screen.editor.edit(hexagon)
         }
       } else {
-        mapEditorScreen.editor.edit(cursorHex)
+        screen.editor.edit(cursorHex)
       }
       return true
     }

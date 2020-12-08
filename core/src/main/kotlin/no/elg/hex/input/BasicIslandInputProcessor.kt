@@ -18,7 +18,7 @@ import kotlin.math.abs
  *
  * @author Elg
  */
-class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIslandScreen) :
+class BasicIslandInputProcessor(private val screen: PlayableIslandScreen) :
   InputAdapter() {
 
   var mouseX: Float = 0f
@@ -39,7 +39,7 @@ class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIsland
   private var lastMouseFrame: Long = -1
 
   val cursorHex: Hexagon<HexagonData>?
-    get() = playableIslandScreen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
+    get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   /**
    * Update the world mouse position. Will only update if the frame has changed since last called
@@ -49,7 +49,7 @@ class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIsland
     unprojectVector.x = Gdx.input.x.toFloat()
     unprojectVector.y = Gdx.input.y.toFloat()
 
-    playableIslandScreen.camera.unproject(unprojectVector)
+    screen.camera.unproject(unprojectVector)
     mouseX = unprojectVector.x
     mouseY = unprojectVector.y
   }
@@ -57,9 +57,9 @@ class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIsland
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable) {
 
-      val (maxX, minX, maxY, minY) = playableIslandScreen.visibleGridSize
+      val (maxX, minX, maxY, minY) = screen.visibleGridSize
 
-      val zoom = playableIslandScreen.camera.zoom
+      val zoom = screen.camera.zoom
       val dx = -Gdx.input.deltaX * zoom
       val dy = -Gdx.input.deltaY * zoom
 
@@ -68,11 +68,9 @@ class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIsland
         return false
       }
 
-      playableIslandScreen.camera.translate(dx, dy)
-      playableIslandScreen.camera.position.x =
-        playableIslandScreen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
-      playableIslandScreen.camera.position.y =
-        playableIslandScreen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+      screen.camera.translate(dx, dy)
+      screen.camera.position.x = screen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+      screen.camera.position.y = screen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
       return true
     }
     return false
@@ -103,8 +101,8 @@ class BasicIslandInputProcessor(private val playableIslandScreen: PlayableIsland
   }
 
   override fun scrolled(amount: Int): Boolean {
-    playableIslandScreen.camera.zoom =
-      (amount * ZOOM_SPEED + playableIslandScreen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    screen.camera.zoom =
+      (amount * ZOOM_SPEED + screen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
     return true
   }
 

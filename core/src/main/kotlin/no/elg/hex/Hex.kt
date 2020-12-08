@@ -65,8 +65,7 @@ object Hex : ApplicationAdapter() {
         else -> LOG_INFO
       }
 
-    val backgroundColor: Color =
-      if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62")
+    val backgroundColor: Color = if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62")
     Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f)
 
     assets = Assets()
