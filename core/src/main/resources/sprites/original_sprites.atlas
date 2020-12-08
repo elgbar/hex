@@ -1,300 +1,300 @@
 
 original_sprites.png
-size: 239,239
+size: 276,276
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 castle
   rotate: false
-  xy: 127, 81
-  size: 30, 37
+  xy: 100, 146
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 0
+  offset: 0, 0
   index: -1
 grave
   rotate: false
-  xy: 153, 2
-  size: 27, 32
+  xy: 2, 102
+  size: 40, 40
   orig: 40, 40
-  offset: 7, 0
+  offset: 0, 0
   index: -1
 hand
   rotate: false
-  xy: 2, 112
-  size: 45, 46
+  xy: 2, 146
+  size: 50, 49
   orig: 50, 49
-  offset: 1, 1
+  offset: 0, 0
   index: -1
 help
   rotate: false
-  xy: 209, 20
-  size: 22, 22
+  xy: 232, 162
+  size: 24, 24
   orig: 24, 24
-  offset: 1, 1
+  offset: 0, 0
   index: -1
 help_selected
   rotate: false
-  xy: 209, 46
-  size: 24, 23
+  xy: 222, 106
+  size: 24, 24
   orig: 24, 24
-  offset: 0, 1
+  offset: 0, 0
   index: -1
 man00
   rotate: false
-  xy: 69, 34
-  size: 22, 38
+  xy: 81, 234
+  size: 40, 40
   orig: 40, 40
-  offset: 9, 0
+  offset: 0, 0
   index: -1
 man01
   rotate: false
-  xy: 161, 80
-  size: 25, 38
+  xy: 169, 190
+  size: 40, 40
   orig: 40, 40
-  offset: 7, 0
+  offset: 0, 0
   index: -1
 man02
   rotate: false
-  xy: 94, 77
-  size: 29, 38
+  xy: 213, 190
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 0
+  offset: 0, 0
   index: -1
 man03
   rotate: false
-  xy: 2, 68
-  size: 29, 40
+  xy: 56, 146
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 0
+  offset: 0, 0
   index: -1
 man04
   rotate: false
-  xy: 81, 197
-  size: 31, 40
+  xy: 46, 102
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 0
+  offset: 0, 0
   index: -1
 man10
   rotate: false
-  xy: 116, 198
-  size: 30, 39
+  xy: 90, 14
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man11
   rotate: false
-  xy: 150, 198
-  size: 30, 39
+  xy: 134, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man12
   rotate: false
-  xy: 184, 198
-  size: 30, 39
+  xy: 178, 102
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man13
   rotate: false
-  xy: 82, 119
-  size: 30, 39
+  xy: 134, 14
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man14
   rotate: false
-  xy: 35, 26
-  size: 30, 39
+  xy: 178, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man20
   rotate: false
-  xy: 126, 36
-  size: 23, 37
+  xy: 81, 190
+  size: 40, 40
   orig: 40, 40
-  offset: 9, 0
+  offset: 0, 0
   index: -1
 man21
   rotate: false
-  xy: 95, 36
-  size: 27, 37
+  xy: 125, 190
+  size: 40, 40
   orig: 40, 40
-  offset: 6, 0
+  offset: 0, 0
   index: -1
 man22
   rotate: false
-  xy: 190, 114
-  size: 30, 38
+  xy: 178, 14
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 man23
   rotate: false
-  xy: 2, 25
-  size: 29, 39
+  xy: 134, 102
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 0
+  offset: 0, 0
   index: -1
 man24
   rotate: false
-  xy: 51, 118
-  size: 27, 40
+  xy: 90, 102
+  size: 40, 40
   orig: 40, 40
-  offset: 6, 0
-  index: -1
-man31
-  rotate: false
-  xy: 192, 156
-  size: 28, 38
-  orig: 40, 40
-  offset: 5, 1
-  index: -1
-man33
-  rotate: false
-  xy: 192, 156
-  size: 28, 38
-  orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man32
   rotate: false
-  xy: 190, 73
-  size: 28, 37
+  xy: 144, 146
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
+  index: -1
+man33
+  rotate: false
+  xy: 2, 14
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man31
+  rotate: false
+  xy: 2, 14
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
   index: -1
 man34
   rotate: false
-  xy: 35, 69
-  size: 28, 39
+  xy: 46, 14
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 man30
   rotate: false
-  xy: 35, 69
-  size: 28, 39
+  xy: 46, 14
+  size: 40, 40
   orig: 40, 40
-  offset: 5, 1
+  offset: 0, 0
   index: -1
 palm
   rotate: false
-  xy: 153, 38
-  size: 24, 38
+  xy: 188, 146
+  size: 40, 40
   orig: 40, 40
-  offset: 7, 0
+  offset: 0, 0
   index: -1
 pine
   rotate: false
-  xy: 67, 76
-  size: 23, 38
+  xy: 213, 234
+  size: 40, 40
   orig: 40, 40
-  offset: 9, 0
+  offset: 0, 0
   index: -1
 settings
   rotate: false
-  xy: 69, 8
-  size: 22, 22
+  xy: 222, 78
+  size: 24, 24
   orig: 24, 24
-  offset: 1, 1
+  offset: 0, 0
   index: -1
 settings_selected
   rotate: false
-  xy: 181, 45
+  xy: 250, 106
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 slay_game_background
   rotate: false
-  xy: 2, 162
+  xy: 2, 199
   size: 75, 75
   orig: 75, 75
   offset: 0, 0
   index: -1
 surrender
   rotate: false
-  xy: 218, 217
-  size: 19, 20
+  xy: 222, 50
+  size: 24, 24
   orig: 24, 24
-  offset: 3, 2
+  offset: 0, 0
   index: -1
 undo
   rotate: false
-  xy: 2, 3
-  size: 22, 18
+  xy: 250, 78
+  size: 24, 24
   orig: 24, 24
-  offset: 1, 3
+  offset: 0, 0
   index: -1
 undo_all
   rotate: false
-  xy: 184, 18
-  size: 21, 23
+  xy: 232, 134
+  size: 24, 24
   orig: 24, 24
-  offset: 2, 0
+  offset: 0, 0
   index: -1
 village
   rotate: false
-  xy: 81, 162
-  size: 33, 31
+  xy: 90, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village3
   rotate: false
-  xy: 118, 160
-  size: 33, 34
+  xy: 125, 234
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village1
   rotate: false
-  xy: 118, 160
-  size: 33, 34
+  xy: 125, 234
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village6
   rotate: false
-  xy: 118, 160
-  size: 33, 34
+  xy: 125, 234
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village4
   rotate: false
-  xy: 155, 160
-  size: 33, 34
+  xy: 2, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village0
   rotate: false
-  xy: 155, 160
-  size: 33, 34
+  xy: 2, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village5
   rotate: false
-  xy: 116, 122
-  size: 33, 34
+  xy: 169, 234
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village7
   rotate: false
-  xy: 153, 122
-  size: 33, 34
+  xy: 46, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
 village2
   rotate: false
-  xy: 153, 122
-  size: 33, 34
+  xy: 46, 58
+  size: 40, 40
   orig: 40, 40
-  offset: 4, 0
+  offset: 0, 0
   index: -1
