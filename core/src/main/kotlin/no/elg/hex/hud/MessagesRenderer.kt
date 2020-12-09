@@ -2,6 +2,8 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import java.util.concurrent.ConcurrentSkipListSet
+import java.util.concurrent.CopyOnWriteArrayList
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.draw
 
@@ -11,7 +13,7 @@ object MessagesRenderer : FrameUpdatable {
   private const val DURATION_SECONDS = 10f
   private const val FADE_START = 0.5f
 
-  private val messages = ArrayList<Pair<ScreenText, Float>>()
+  private val messages = CopyOnWriteArrayList<Pair<ScreenText, Float>>()
 
   fun publishMessage(message: String) {
     publishMessage(ScreenText(message, color = Color.LIGHT_GRAY))
