@@ -139,6 +139,8 @@ val PIECES: List<KClass<out Piece>> by lazy {
   return@lazy subclasses
 }
 
+val PIECES_MAP: Map<String?, KClass<out Piece>> by lazy { PIECES.map { it.qualifiedName to it }.toMap() }
+
 // /////////
 // Empty //
 // /////////

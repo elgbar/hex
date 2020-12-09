@@ -81,7 +81,7 @@ data class HexagonData(
 
   @JsonSetter("pieceType")
   fun setPieceFromTypeName(typeName: String?) {
-    setPiece(PIECES.first { it.qualifiedName == typeName })
+    setPiece(PIECES_MAP[typeName] ?: error("Unknown piece with the name $typeName"))
   }
 
   fun copy(): HexagonData {

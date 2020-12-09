@@ -2,6 +2,7 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
@@ -29,9 +30,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
   override fun frameUpdate() {
 
-    ScreenRenderer.drawAll(
-      ScreenText("Turn ${screen.island.turn}", bold = true), position = TOP_CENTER
-    )
+    ScreenRenderer.drawAll(ScreenText("Turn ${screen.island.turn}", bold = true), position = TOP_CENTER)
     if (screen.inputProcessor.infiniteMoney) {
       ScreenRenderer.drawAll(emptyText(), CHEATING_SCREEN_TEXT, position = TOP_CENTER)
     }
@@ -51,8 +50,8 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         }
       }
 
+      batch.color = WHITE
       batch.begin()
-
 
       fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
         val height = (Gdx.graphics.height * heightPercent)
@@ -83,7 +82,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
           }
 
         val (width, height) = calcSize(region)
-        val handWidth = height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
+        val handWidth = height * (Hex.assets.hand.originalWidth / Hex.assets.hand.originalHeight.toFloat())
 
         batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 2f) / 2f, (height + height / 2) / 2f, handWidth, height)
         batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
@@ -91,10 +90,10 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
       val territory = screen.island.selected
       if (territory != null) {
-        batch.color = if (territory.capital.balance < CASTLE_COST) HALF_TRANSPARENT_FLOAT_BITS else Color.WHITE
+        batch.color = if (territory.capital.balance < CASTLE_COST) HALF_TRANSPARENT_FLOAT_BITS else WHITE
         batch.draw(castle, cWidth / 2f, buyY, cWidth, buyHeight)
 
-        batch.color = if (territory.capital.balance < PEASANT_COST) HALF_TRANSPARENT_FLOAT_BITS else Color.WHITE
+        batch.color = if (territory.capital.balance < PEASANT_COST) HALF_TRANSPARENT_FLOAT_BITS else WHITE
         batch.draw(peasant, cWidth + cWidth / 2f + pWidth / 2f, buyY, pWidth, buyHeight)
       }
       batch.end()
@@ -102,7 +101,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
     if (Hex.debug) {
       val selected = screen.island.history.historyPointer
-      leftInfo.addAll(screen.island.history.historyNotes.mapIndexed { i, it -> ScreenText(it, color = if (i == selected) Color.YELLOW else Color.WHITE) })
+      leftInfo.addAll(screen.island.history.historyNotes.mapIndexed { i, it -> ScreenText(it, color = if (i == selected) Color.YELLOW else WHITE) })
     }
     ScreenRenderer.drawAll(*leftInfo.toTypedArray(), position = TOP_RIGHT)
   }
