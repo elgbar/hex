@@ -60,9 +60,6 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         return width to height
       }
 
-      var drawnCastle = false
-      var drawnPeasant = false
-
       val castle = Hex.assets.castle
       val (cWidth, buyHeight) = calcSize(castle, 0.075f)
       val peasant = Hex.assets.peasant.getKeyFrame(0f)
@@ -70,7 +67,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
       val buyY = Gdx.graphics.height - buyHeight - buyHeight / 3f
 
-      screen.island.inHand?.also { (territory, piece) ->
+      screen.island.inHand?.also { (_, piece) ->
         val region: AtlasRegion =
           when (piece) {
             is Capital -> Hex.assets.capital
@@ -86,41 +83,20 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
           }
 
         val (width, height) = calcSize(region)
+        val handWidth = height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
 
-        val handWidth =
-          height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
-
-        batch.draw(
-          Hex.assets.hand,
-          (Gdx.graphics.width - handWidth / 2f) / 2f,
-          (height + height / 2) / 2f,
-          handWidth,
-          height
-        )
+        batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 2f) / 2f, (height + height / 2) / 2f, handWidth, height)
         batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
-        if (territory.capital.balance <= CASTLE_COST) {
-          drawnCastle = true
-          batch.color.set(1f, 1f, 1f, 0.5f)
-//          batch.color.a = 0.5f
-//          batch.color = batch.color
-          batch.draw(castle, cWidth / 2f, buyY, cWidth, buyHeight)
-        }
-        if (territory.capital.balance <= PEASANT_COST) {
-          drawnPeasant = true
-          batch.color.set(1f, 1f, 1f, 0.5f)
-//          batch.color = batch.color
-          batch.draw(peasant, cWidth + cWidth / 2f + pWidth / 2f, buyY, pWidth, buyHeight)
-        }
       }
-      if (!drawnCastle) {
-        batch.color.a = 1f
+
+      val territory = screen.island.selected
+      if (territory != null) {
+        batch.color = if (territory.capital.balance < CASTLE_COST) HALF_TRANSPARENT_FLOAT_BITS else Color.WHITE
         batch.draw(castle, cWidth / 2f, buyY, cWidth, buyHeight)
-      }
-      if (!drawnPeasant) {
-        batch.color.a = 1f
+
+        batch.color = if (territory.capital.balance < PEASANT_COST) HALF_TRANSPARENT_FLOAT_BITS else Color.WHITE
         batch.draw(peasant, cWidth + cWidth / 2f + pWidth / 2f, buyY, pWidth, buyHeight)
       }
-
       batch.end()
     }
 
@@ -135,5 +111,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     val CHEATING_SCREEN_TEXT = ScreenText("Cheating enabled!", color = Color.GOLD)
     val CASTLE_COST = Castle::class.createHandInstance().price
     val PEASANT_COST = Peasant::class.createHandInstance().price
+
+    val HALF_TRANSPARENT_FLOAT_BITS = Color(1f, 1f, 1f, 0.5f)
   }
 }
