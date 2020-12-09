@@ -40,6 +40,8 @@ abstract class AbstractScreen : ScreenAdapter() {
   fun renderBackground() {
     batch.begin()
 
+    batch.disableBlending()
+
     val bgWidth = Hex.assets.background.packedWidth.toFloat()
     val bgHeight = Hex.assets.background.packedHeight.toFloat()
 
@@ -49,10 +51,11 @@ abstract class AbstractScreen : ScreenAdapter() {
       do {
         batch.draw(Hex.assets.background, offsetX * bgWidth, offsetY * bgHeight)
         offsetX++
-      } while (offsetX < Gdx.graphics.width.toFloat())
+      } while (offsetX < Gdx.graphics.width.toFloat() * camera.zoom)
       offsetY++
-    } while (offsetY < Gdx.graphics.height.toFloat())
+    } while (offsetY < Gdx.graphics.height.toFloat() * camera.zoom)
 
+    batch.enableBlending()
     batch.end()
   }
 }

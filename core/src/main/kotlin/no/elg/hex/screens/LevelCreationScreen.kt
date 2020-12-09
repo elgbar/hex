@@ -230,12 +230,8 @@ object LevelCreationScreen : AbstractScreen() {
     if (Hex.debug) {
       lineRenderer.begin(ShapeType.Line)
       lineRenderer.color = Color.LIGHT_GRAY
-      lineRenderer.line(
-        Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f, Gdx.graphics.height.toFloat()
-      )
-      lineRenderer.line(
-        0f, Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height / 2f
-      )
+      lineRenderer.line(Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f, Gdx.graphics.height.toFloat())
+      lineRenderer.line(0f, Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height / 2f)
       lineRenderer.end()
     }
   }

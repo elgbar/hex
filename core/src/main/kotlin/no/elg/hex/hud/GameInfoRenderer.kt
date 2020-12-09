@@ -2,6 +2,7 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.Baron
@@ -15,11 +16,11 @@ import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
-import no.elg.hex.hud.ScreenDrawPosition.BOTTOM_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.TOP_CENTER
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.hud.ScreenRenderer.batch
 import no.elg.hex.screens.PlayableIslandScreen
+import no.elg.hex.util.createHandInstance
 
 /** @author Elg */
 class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable {
@@ -31,8 +32,8 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     ScreenRenderer.drawAll(
       ScreenText("Turn ${screen.island.turn}", bold = true), position = TOP_CENTER
     )
-    if (screen.inputProcessor.infiniteMoney) {
-      ScreenRenderer.drawAll(CHEATING_SCREEN_TEXT, position = BOTTOM_LEFT)
+    if (playableIslandScreen.inputProcessor.infiniteMoney) {
+      ScreenRenderer.drawAll(emptyText(), CHEATING_SCREEN_TEXT, position = TOP_CENTER)
     }
 
     leftInfo.clear()
@@ -50,9 +51,27 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         }
       }
 
-      screen.island.inHand?.also { (_, piece) ->
-        batch.begin()
-        val region =
+      batch.begin()
+      
+
+      fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
+        val height = (Gdx.graphics.height * heightPercent)
+        val width = height * (region.packedWidth / region.packedHeight.toFloat())
+        return width to height
+      }
+
+      var drawnCastle = false
+      var drawnPeasant = false
+
+      val castle = Hex.assets.castle
+      val (cWidth, buyHeight) = calcSize(castle, 0.075f)
+      val peasant = Hex.assets.peasant.getKeyFrame(0f)
+      val (pWidth, _) = calcSize(peasant, 0.075f)
+
+      val buyY = Gdx.graphics.height - buyHeight - buyHeight / 3f
+
+      playableIslandScreen.island.inHand?.also { (territory, piece) ->
+        val region: AtlasRegion =
           when (piece) {
             is Capital -> Hex.assets.capital
             is PalmTree -> Hex.assets.palm
@@ -66,8 +85,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
             is Empty -> return@also
           }
 
-        val height = (Gdx.graphics.height * 0.1f)
-        val width = height * (region.packedWidth / region.packedHeight.toFloat())
+        val (width, height) = calcSize(region)
 
         val handWidth =
           height * (Hex.assets.hand.packedWidth / Hex.assets.hand.packedHeight.toFloat())
@@ -80,8 +98,30 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
           height
         )
         batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
-        batch.end()
+        if (territory.capital.balance <= CASTLE_COST) {
+          drawnCastle = true
+          batch.color.set(1f, 1f, 1f, 0.5f)
+//          batch.color.a = 0.5f
+//          batch.color = batch.color
+          batch.draw(castle, cWidth / 2f, buyY, cWidth, buyHeight)
+        }
+        if (territory.capital.balance <= PEASANT_COST) {
+          drawnPeasant = true
+          batch.color.set(1f, 1f, 1f, 0.5f)
+//          batch.color = batch.color
+          batch.draw(peasant, cWidth + cWidth / 2f + pWidth / 2f, buyY, pWidth, buyHeight)
+        }
       }
+      if (!drawnCastle) {
+        batch.color.a = 1f
+        batch.draw(castle, cWidth / 2f, buyY, cWidth, buyHeight)
+      }
+      if (!drawnPeasant) {
+        batch.color.a = 1f
+        batch.draw(peasant, cWidth + cWidth / 2f + pWidth / 2f, buyY, pWidth, buyHeight)
+      }
+
+      batch.end()
     }
 
     if (Hex.debug) {
@@ -93,5 +133,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
   companion object {
     val CHEATING_SCREEN_TEXT = ScreenText("Cheating enabled!", color = Color.GOLD)
+    val CASTLE_COST = Castle::class.createHandInstance().price
+    val PEASANT_COST = Peasant::class.createHandInstance().price
   }
 }

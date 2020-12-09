@@ -63,24 +63,24 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
   private val pieceEditors = PieceEditor.generatePieceEditors(this)
 
   var brushRadius: Int = 1
-    internal set(value) {
+    private set(value) {
       field = value.coerceIn(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
     }
 
   var selectedTeam: Team = Team.values().first()
-    internal set
+    private set
 
   var selectedPiece: KClass<out Piece> = PIECES.first()
-    internal set
+    private set
 
   var editors: List<Editor> = emptyList()
-    internal set(value) {
+    private set(value) {
       field = value
       editor = value.firstOrNull() ?: NOOPEditor
     }
 
   var editor: Editor = NOOPEditor
-    internal set(value) {
+    private set(value) {
       if (value == NOOPEditor || value in editors) {
         field = value
       } else {

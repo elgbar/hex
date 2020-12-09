@@ -26,6 +26,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
   private val batch: SpriteBatch = SpriteBatch()
 
   override fun frameUpdate() {
+    
     val currHex = islandScreen.cursorHexagon
     batch.projectionMatrix = islandScreen.camera.combined
     batch.begin()

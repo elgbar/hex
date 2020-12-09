@@ -43,8 +43,10 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     get() = null
 
   override fun render(delta: Float) {
-    camera.update()
+//    updateCamera()
+//    camera.update()
 
+    renderBackground()
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
@@ -93,6 +95,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     camera.position.x = islandCenterX.toFloat()
     camera.position.y = islandCenterY.toFloat()
     camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
+    camera.update()
   }
 
   override fun hide() {

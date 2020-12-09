@@ -42,7 +42,7 @@ import kotlin.random.Random.Default as random
  *
  * @author Elg
  */
-class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) : AI {
+class NotAsRandomAI(override val team: Team) : AI {
 
   private fun think(words: () -> String) {
     Gdx.app.trace("NARAI-$team", words)
@@ -55,12 +55,12 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
 
   private val buyablePieces =
     arrayOf(
-      Castle::class, Peasant::class
-      //          Spearman::class,
-      //          Knight::class,
-      //          Baron::class,
-      //          Peasant::class,
-      //          Spearman::class
+      Castle::class,
+      Peasant::class,
+//      Peasant::class,
+//      Spearman::class,
+//      Knight::class,
+//      Baron::class,
     )
 
   fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
@@ -162,7 +162,8 @@ class NotAsRandomAI(override val team: Team, val printActions: Boolean = false) 
             }
 
             tryAttack(Capital::class)
-              ?: tryAttack(Castle::class) ?: tryAttack(LivingPiece::class)
+              ?: tryAttack(Castle::class)
+              ?: tryAttack(LivingPiece::class)
               ?: attackableHexes.randomOrNull() ?: return
           } else {
             think { "No territory is attackable" }

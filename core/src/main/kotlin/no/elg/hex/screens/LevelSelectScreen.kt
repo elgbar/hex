@@ -53,6 +53,7 @@ object LevelSelectScreen : AbstractScreen() {
       FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
     buffer.begin()
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
+    camera.update()
     islandScreen.render(0f)
     buffer.end()
     islandScreen.dispose()
