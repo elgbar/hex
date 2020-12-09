@@ -46,7 +46,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
 //    updateCamera()
 //    camera.update()
 
-    renderBackground()
+//    renderBackground()
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()

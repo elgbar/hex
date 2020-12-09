@@ -32,7 +32,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     ScreenRenderer.drawAll(
       ScreenText("Turn ${screen.island.turn}", bold = true), position = TOP_CENTER
     )
-    if (playableIslandScreen.inputProcessor.infiniteMoney) {
+    if (screen.inputProcessor.infiniteMoney) {
       ScreenRenderer.drawAll(emptyText(), CHEATING_SCREEN_TEXT, position = TOP_CENTER)
     }
 
@@ -52,7 +52,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
       }
 
       batch.begin()
-      
+
 
       fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
         val height = (Gdx.graphics.height * heightPercent)
@@ -70,7 +70,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
       val buyY = Gdx.graphics.height - buyHeight - buyHeight / 3f
 
-      playableIslandScreen.island.inHand?.also { (territory, piece) ->
+      screen.island.inHand?.also { (territory, piece) ->
         val region: AtlasRegion =
           when (piece) {
             is Capital -> Hex.assets.capital

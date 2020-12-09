@@ -38,8 +38,7 @@ class BasicIslandInputProcessor(private val screen: PlayableIslandScreen) :
   private var draggable = false
   private var lastMouseFrame: Long = -1
 
-  val cursorHex: Hexagon<HexagonData>?
-    get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
+  val cursorHex: Hexagon<HexagonData>? get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   /**
    * Update the world mouse position. Will only update if the frame has changed since last called
@@ -71,6 +70,7 @@ class BasicIslandInputProcessor(private val screen: PlayableIslandScreen) :
       screen.camera.translate(dx, dy)
       screen.camera.position.x = screen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
       screen.camera.position.y = screen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+      screen.camera.update()
       return true
     }
     return false
@@ -101,8 +101,8 @@ class BasicIslandInputProcessor(private val screen: PlayableIslandScreen) :
   }
 
   override fun scrolled(amount: Int): Boolean {
-    screen.camera.zoom =
-      (amount * ZOOM_SPEED + screen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    screen.camera.zoom = (amount * ZOOM_SPEED + screen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    screen.camera.update()
     return true
   }
 
