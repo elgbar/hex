@@ -41,6 +41,7 @@ import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import kotlin.math.max
+import no.elg.hex.util.ensureCapitalStartFunds
 
 /** @author Elg */
 class Island(
@@ -123,14 +124,12 @@ class Island(
       }
     }
     if (initialLoad) {
+      ensureCapitalStartFunds()
       for (hexagon in hexagons) {
         when (val hexPiece = this.getData(hexagon).piece) {
-          is Capital -> hexPiece.balance = START_CAPITAL
           is LivingPiece -> hexPiece.moved = false
           is TreePiece -> hexPiece.hasGrown = false
-          else -> {
-            /* NOP */
-          }
+          else -> Unit
         }
       }
     }
@@ -367,10 +366,7 @@ class Island(
 
     require(contenders.isNotEmpty()) { "No capital contenders found!" }
 
-    Gdx.app.trace(
-      "ISLAND",
-      "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance"
-    )
+    Gdx.app.trace("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
 
     if (contenders.size == 1) return contenders.first()
 
@@ -476,7 +472,7 @@ class Island(
 
     const val MIN_HEX_IN_TERRITORY = 2
 
-    const val START_CAPITAL = 10
+    const val START_CAPITAL_PER_HEX = 5
 
     val STARTING_TEAM = Team.LEAF
 
@@ -520,8 +516,6 @@ class Island(
     companion object {
       internal fun Piece?.createDtoCopy(): Piece? {
         this?.let {
-          println(it)
-          println(it.data === EDGE_DATA)
           return if (it != Empty && it.data === EDGE_DATA) it
           else it.copyTo(it.data.copy())
         }

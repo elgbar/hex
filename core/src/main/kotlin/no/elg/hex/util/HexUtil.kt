@@ -14,7 +14,7 @@ import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.Companion.START_CAPITAL
+import no.elg.hex.island.Island.Companion.START_CAPITAL_PER_HEX
 import no.elg.hex.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
@@ -106,11 +106,17 @@ fun Island.calculateStrength(hexagon: Hexagon<HexagonData>): Int {
 
 fun Island.regenerateCapitals() {
   forEachPieceType<Capital>() { _, data, _ -> data.setPiece(Empty::class) }
-  for (hexagon in hexagons) {
-    select(hexagon)
-  }
+  ensureCapitalStartFunds()
   select(null)
-  forEachPieceType<Capital>() { _, _, piece -> piece.balance = START_CAPITAL }
+}
+
+fun Island.ensureCapitalStartFunds() {
+  for (hexagon in hexagons) {
+    val (_, capital, territoryHexagons) = findTerritory(hexagon) ?: continue
+    if (capital.balance == 0) {
+      capital.balance = capital.calculateStartCapital(territoryHexagons, this)
+    }
+  }
 }
 
 fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean {
@@ -125,8 +131,6 @@ inline fun <reified T : Piece> Island.forEachPieceType(
     if (data.piece is T) action(hexagon, data, data.piece as T)
   }
 }
-
-data class HexagonWithData<out T>(val hexagon: Hexagon<HexagonData>, val data: HexagonData)
 
 fun Iterable<Hexagon<HexagonData>>.withData(
   island: Island,

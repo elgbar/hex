@@ -223,6 +223,10 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
+  fun calculateStartCapital(hexagons: Iterable<Hexagon<HexagonData>>, island: Island): Int {
+    return hexagons.sumBy { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }
+  }
+
   override fun copyTo(newData: HexagonData): Capital {
     return Capital(newData, placed, balance)
   }
