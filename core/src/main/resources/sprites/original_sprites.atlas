@@ -1,299 +1,299 @@
 
 original_sprites.png
-size: 276,276
+size: 276,272
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 castle
   rotate: false
-  xy: 100, 146
+  xy: 188, 142
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 grave
   rotate: false
-  xy: 2, 102
+  xy: 169, 186
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 hand
   rotate: false
-  xy: 2, 146
+  xy: 2, 142
   size: 50, 49
   orig: 50, 49
   offset: 0, 0
   index: -1
 help
   rotate: false
-  xy: 232, 162
+  xy: 222, 74
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 help_selected
   rotate: false
-  xy: 222, 106
+  xy: 232, 130
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 man00
   rotate: false
-  xy: 81, 234
+  xy: 213, 230
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man01
   rotate: false
-  xy: 169, 190
+  xy: 90, 10
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man02
   rotate: false
-  xy: 213, 190
+  xy: 100, 142
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man03
   rotate: false
-  xy: 56, 146
+  xy: 2, 98
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man04
   rotate: false
-  xy: 46, 102
+  xy: 46, 10
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man10
   rotate: false
-  xy: 90, 14
+  xy: 56, 142
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man11
   rotate: false
-  xy: 134, 58
+  xy: 178, 10
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man12
   rotate: false
-  xy: 178, 102
+  xy: 90, 98
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man13
   rotate: false
-  xy: 134, 14
+  xy: 81, 186
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man14
   rotate: false
-  xy: 178, 58
+  xy: 134, 54
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man20
   rotate: false
-  xy: 81, 190
+  xy: 46, 54
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man21
   rotate: false
-  xy: 125, 190
+  xy: 169, 230
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man22
   rotate: false
-  xy: 178, 14
+  xy: 134, 98
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man23
   rotate: false
-  xy: 134, 102
+  xy: 46, 98
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man24
   rotate: false
-  xy: 90, 102
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-man32
-  rotate: false
-  xy: 144, 146
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-man33
-  rotate: false
-  xy: 2, 14
+  xy: 81, 230
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man31
   rotate: false
-  xy: 2, 14
+  xy: 213, 186
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man33
+  rotate: false
+  xy: 213, 186
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man32
+  rotate: false
+  xy: 178, 54
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man34
   rotate: false
-  xy: 46, 14
+  xy: 2, 10
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 man30
   rotate: false
-  xy: 46, 14
+  xy: 2, 10
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 palm
   rotate: false
-  xy: 188, 146
+  xy: 125, 230
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 pine
   rotate: false
-  xy: 213, 234
+  xy: 178, 98
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 settings
   rotate: false
-  xy: 222, 78
+  xy: 250, 102
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 settings_selected
   rotate: false
-  xy: 250, 106
+  xy: 222, 46
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 slay_game_background
   rotate: false
-  xy: 2, 199
+  xy: 2, 195
   size: 75, 75
   orig: 75, 75
   offset: 0, 0
   index: -1
 surrender
   rotate: false
-  xy: 222, 50
+  xy: 250, 74
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 undo
   rotate: false
-  xy: 250, 78
+  xy: 222, 102
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 undo_all
   rotate: false
-  xy: 232, 134
+  xy: 232, 158
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 village
   rotate: false
-  xy: 90, 58
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-village3
-  rotate: false
-  xy: 125, 234
+  xy: 144, 142
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village1
   rotate: false
-  xy: 125, 234
+  xy: 125, 186
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village3
+  rotate: false
+  xy: 125, 186
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village6
   rotate: false
-  xy: 125, 234
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-village4
-  rotate: false
-  xy: 2, 58
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-village0
-  rotate: false
-  xy: 2, 58
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-village5
-  rotate: false
-  xy: 169, 234
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-village7
-  rotate: false
-  xy: 46, 58
+  xy: 125, 186
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village2
   rotate: false
-  xy: 46, 58
+  xy: 134, 10
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village7
+  rotate: false
+  xy: 134, 10
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village4
+  rotate: false
+  xy: 2, 54
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village0
+  rotate: false
+  xy: 2, 54
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+village5
+  rotate: false
+  xy: 90, 54
   size: 40, 40
   orig: 40, 40
   offset: 0, 0

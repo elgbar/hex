@@ -1,111 +1,111 @@
 
 sprites.png
-size: 2749,2749
+size: 2900,2900
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 castle
   rotate: false
-  xy: 2373, 467
-  size: 318, 528
-  orig: 318, 528
+  xy: 2, 31
+  size: 528, 528
+  orig: 528, 528
   offset: 0, 0
   index: -1
 grave
   rotate: false
-  xy: 1986, 495
-  size: 383, 500
-  orig: 383, 500
+  xy: 1060, 2
+  size: 500, 500
+  orig: 500, 500
   offset: 0, 0
   index: -1
 hand
   rotate: false
-  xy: 2, 412
-  size: 1088, 1113
-  orig: 1088, 1113
+  xy: 2, 563
+  size: 1113, 1113
+  orig: 1113, 1113
   offset: 0, 0
   index: -1
 palm
   rotate: false
-  xy: 1603, 473
-  size: 379, 522
-  orig: 379, 522
+  xy: 534, 37
+  size: 522, 522
+  orig: 522, 522
   offset: 0, 0
   index: -1
 pine
   rotate: false
-  xy: 1094, 885
-  size: 443, 640
-  orig: 443, 640
+  xy: 1224, 2258
+  size: 640, 640
+  orig: 640, 640
   offset: 0, 0
   index: -1
 slay_game_background
   rotate: false
-  xy: 2, 1529
+  xy: 2, 1680
   size: 1218, 1218
   orig: 1218, 1218
   offset: 0, 0
   index: -1
 village
   rotate: false
-  xy: 1094, 301
-  size: 505, 580
-  orig: 505, 580
+  xy: 1703, 506
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village0
   rotate: false
-  xy: 1224, 2167
-  size: 505, 580
-  orig: 505, 580
+  xy: 1703, 1090
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village1
   rotate: false
-  xy: 2050, 999
-  size: 505, 580
-  orig: 505, 580
+  xy: 1224, 1674
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village2
   rotate: false
-  xy: 1224, 1583
-  size: 505, 580
-  orig: 505, 580
+  xy: 2287, 1090
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village3
   rotate: false
-  xy: 1733, 2167
-  size: 505, 580
-  orig: 505, 580
+  xy: 1119, 506
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village4
   rotate: false
-  xy: 1733, 1583
-  size: 505, 580
-  orig: 505, 580
+  xy: 1868, 2318
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village5
   rotate: false
-  xy: 2242, 2167
-  size: 505, 580
-  orig: 505, 580
+  xy: 1808, 1674
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village6
   rotate: false
-  xy: 2242, 1583
-  size: 505, 580
-  orig: 505, 580
+  xy: 1119, 1090
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1
 village7
   rotate: false
-  xy: 1541, 999
-  size: 505, 580
-  orig: 505, 580
+  xy: 2287, 506
+  size: 580, 580
+  orig: 580, 580
   offset: 0, 0
   index: -1

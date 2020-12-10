@@ -87,9 +87,10 @@ class Assets : AssetManager() {
       if (Hex.args.retro) {
         Hex.assets.originalSprites.findRegion(regionName)
       } else {
-        Hex.assets.sprites.findRegion(regionName)
-          ?: Hex.assets.originalSprites.findRegion(regionName)
+        Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
       }
+    require(region.originalHeight == region.originalWidth) { "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}" }
+    require(region.packedWidth == region.packedHeight) { "Different packedWidth and packedHeight for region $region, width: ${region.packedWidth}, height ${region.packedHeight}" }
     region.flip(false, true)
     return region
   }
