@@ -1,6 +1,7 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import kotlin.math.max
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
@@ -13,13 +14,13 @@ import no.elg.hex.util.component6
 import no.elg.hex.util.getData
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.math.max
 
 /** @author Elg */
 open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen() {
 
   private fun calcVisibleGridSize(): DoubleArray {
     val visible = island.hexagons.filterNot { island.getData(it).invisible }
+    if (visible.isEmpty()) return doubleArrayOf(.0, .0, .0, .0, .0, .0)
 
     val minX = visible.minOf { it.externalBoundingBox.x }
     val maxX = visible.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
@@ -43,10 +44,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     get() = null
 
   override fun render(delta: Float) {
-//    updateCamera()
-//    camera.update()
-
-//    renderBackground()
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
@@ -55,6 +52,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     val data = island.grid.gridData
+    if (island.hexagons.isEmpty()) return
 
     val (maxX, minX, maxY, minY, maxInvX, maxInvY) = if (Hex.args.mapEditor) calcVisibleGridSize()
     else visibleGridSize

@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName")
+
 package no.elg.hex
 
 import com.xenomachina.argparser.ArgParser
@@ -5,7 +7,7 @@ import com.xenomachina.argparser.default
 
 /** @author Elg */
 class ApplicationArgumentsParser(parser: ArgParser) {
-  val debug by parser.flagging("-d", "--debug", help = "Enable debug overlay and logging")
+  val debug by parser.flagging("-d", "--debug", help = "Enable debug logging")
   val trace by parser.flagging("-t", "--trace", help = "Enable even more logging")
   val silent by parser.flagging(
     "-s", "--silent", help = "Do not print anything to stdout or stderr"
@@ -17,6 +19,7 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val cheating by parser.flagging("--i-am-a-cheater", help = "Enable cheating")
   val `disable-island-loading` by parser.flagging("Don't load islands")
   val `draw-edges` by parser.flagging("Draw the edge hexagons to assists with debugging")
+  val `stage-debug` by parser.flagging("--stage-debug", help = "Enable debug overlay for UI using scene2d")
 
   val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toInt() }.default { 0 }
 }

@@ -26,7 +26,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
   private val batch: SpriteBatch = SpriteBatch()
 
   override fun frameUpdate() {
-    
+
     val currHex = islandScreen.cursorHexagon
     batch.projectionMatrix = islandScreen.camera.combined
     batch.begin()
@@ -35,9 +35,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
       val data = islandScreen.island.getData(hexagon)
       if (data.invisible) continue
 
-      val brightness =
-        HexagonData.BRIGHTNESS +
-          (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)
+      val brightness = HexagonData.BRIGHTNESS + (if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f)
 
       batch.setColor(brightness, brightness, brightness, 1f)
 
@@ -58,9 +56,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
           is Grave -> Hex.assets.grave
           is LivingPiece -> {
 
-            val time =
-              if (data.team == islandScreen.island.currentTeam && islandScreen.island.currentAI == null) piece.updateAnimationTime()
-              else 0f
+            val time = if (data.team == islandScreen.island.currentTeam && islandScreen.island.currentAI == null) piece.updateAnimationTime() else 0f
+
             when (piece) {
               is Peasant -> Hex.assets.peasant
               is Spearman -> Hex.assets.spearman
@@ -71,20 +68,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
           is Empty -> continue@loop
         }
 
-      val ratio = drawable.packedWidth.toFloat() / drawable.packedHeight.toFloat()
-
       val boundingBox = hexagon.internalBoundingBox
-      val height = boundingBox.height.toFloat()
-      val width = boundingBox.width.toFloat()
-
-      // "+ width * (1f - ratio) / 2f" because we need to compensate for the removed width
-      batch.draw(
-        drawable,
-        boundingBox.x.toFloat() + width * (1f - ratio) / 2f,
-        boundingBox.y.toFloat(),
-        width * ratio,
-        height
-      )
+      batch.draw(drawable, boundingBox.x.toFloat(), boundingBox.y.toFloat(), boundingBox.height.toFloat(), boundingBox.width.toFloat())
     }
 
     batch.end()

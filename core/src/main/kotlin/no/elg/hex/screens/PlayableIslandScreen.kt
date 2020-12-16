@@ -40,4 +40,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
   }
+
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    frameUpdatable.resize(width, height)
+  }
 }

@@ -27,8 +27,8 @@ object LevelSelectScreen : AbstractScreen() {
   private const val PREVIEW_PADDING_PERCENT = 0.025f
   private const val MIN_PREVIEW_SIZE = 512
 
-  private val NOT_SELECTED_COLOR = Color.LIGHT_GRAY
-  private val SELECT_COLOR = Color.GREEN
+  val NOT_SELECTED_COLOR = Color.LIGHT_GRAY
+  val SELECT_COLOR = Color.GREEN
 
   private val islandPreviews = GdxArray<FrameBuffer>()
 
@@ -118,8 +118,7 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
-    lineRenderer.color =
-      if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
+    lineRenderer.color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
     lineRenderer.rect(x, y, width, height)
   }
 

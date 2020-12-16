@@ -139,7 +139,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
           addCloseButton()
           isResizable = false
 
-          if (Hex.debug) {
+          if (Hex.args.`stage-debug` || Hex.trace) {
             debug()
           }
           defaults().space(5f)

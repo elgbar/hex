@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.BACKSPACE
 import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.Input.Keys.F12
-import com.badlogic.gdx.Input.Keys.R
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.InputAdapter
 import no.elg.hex.Hex
@@ -32,7 +31,6 @@ import no.elg.hex.util.isKeyPressed
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
-import no.elg.hex.hexagon.HexagonData.Companion
 
 /** @author Elg */
 class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapter() {

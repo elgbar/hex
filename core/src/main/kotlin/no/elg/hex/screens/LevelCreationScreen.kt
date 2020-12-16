@@ -2,25 +2,40 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color.BLACK
+import com.badlogic.gdx.graphics.Color.WHITE
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Pixmap.Blending.None
+import com.badlogic.gdx.graphics.Pixmap.Filter.NearestNeighbour
+import com.badlogic.gdx.graphics.Pixmap.Format.RGB565
+import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import com.kotcrab.vis.ui.util.form.FormInputValidator
 import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.CANCEL
 import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.OK
+import com.kotcrab.vis.ui.widget.VisImage
 import com.kotcrab.vis.ui.widget.VisTable
+import com.kotcrab.vis.ui.widget.VisTextField
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import com.kotcrab.vis.ui.widget.spinner.SimpleFloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
+import kotlin.random.Random
 import ktx.actors.onChange
 import ktx.actors.onClick
+import ktx.scene2d.actor
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.scene2d
@@ -32,8 +47,11 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.Companion.STARTING_TEAM
-import no.elg.hex.util.getData
+import no.elg.hex.island.IslandGeneration
+import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
+import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
+import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_OCTAVES
+import no.elg.hex.island.IslandGeneration.INITIAL_FREQUENCY
 import no.elg.hex.util.play
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
@@ -47,43 +65,61 @@ object LevelCreationScreen : AbstractScreen() {
 
   val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
 
+  const val NOISE_SIZE = 512
+  const val NOISE_SIZE_F = 512f
+
+  init {
+    if (Hex.debug) {
+      batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
+    }
+  }
+
   init {
     stage.actors {
       visTable {
         defaults().pad(20f)
         setFillParent(true)
         setRound(false)
-        if (Hex.debug) {
+        if (Hex.args.`stage-debug` || Hex.trace) {
           debug()
         }
-        val layoutSpinner: ArraySpinnerModel<HexagonalGridLayout> =
-          ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
+        val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
 
-        val widthSpinner = IntSpinnerModel(19, 1, Int.MAX_VALUE)
-        val heightSpinner = IntSpinnerModel(19, 1, Int.MAX_VALUE)
+        // arbitrary initial value
+        val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
+        val heightSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
+        val seedField = VisTextField(Random.nextLong().toString())
 
         var previewBuffer: FrameBuffer? = null
+        val previewBufferNoise: FrameBuffer? = null
+        var pixmap: Pixmap? = null
 
-        fun createIsland(isPreview: Boolean): Island {
-          return Island(widthSpinner.value + 2, heightSpinner.value + 2, layoutSpinner.current)
-            .also {
-              if (isPreview) {
-                for (hexagon in it.hexagons) {
-                  it.getData(hexagon).team = STARTING_TEAM
-                }
-              }
-            }
+        fun createIsland(): Island {
+          return IslandGeneration.generate(seedField.text.hashCode(), widthSpinner.value + 2, heightSpinner.value + 2, layoutSpinner.current)
         }
 
-        val previewSize =
-          (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2)
-            .coerceAtLeast(1024)
+        val previewSize = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
 
-        val previewImage =
-          visImage(Texture(previewSize, previewSize, Pixmap.Format.RGBA8888)) {
-            it.expand()
+        val previewImage: VisImage
+        var previewImageNoise: VisImage? = null
+        visTable { table ->
+          table.fill()
+          table.expand()
+          previewImage = visImage(Texture(previewSize, previewSize, RGBA8888)) {
             it.fill()
+            it.expand()
+            it.center()
           }
+
+          if (Hex.debug) {
+            previewImageNoise = visImage(TextureRegionDrawable(Texture(NOISE_SIZE, NOISE_SIZE, RGB565)), Scaling.fillY) {
+//              this.scaling = none
+              it.fill()
+              it.expand()
+              it.center()
+            }
+          }
+        }
 
         val disableables = mutableListOf<Disableable>()
 
@@ -102,6 +138,7 @@ object LevelCreationScreen : AbstractScreen() {
 
         fun renderPreview() {
           previewBuffer?.dispose()
+
           validator.validateInput(null)
 
           widthSpinner.setValue(widthSpinner.value, false)
@@ -113,7 +150,7 @@ object LevelCreationScreen : AbstractScreen() {
             this@visTable.pack()
 
             previewBuffer = LevelSelectScreen.renderPreview(
-              createIsland(true),
+              createIsland(),
               previewImage.imageWidth.toInt(),
               previewImage.imageHeight.toInt()
             ).also {
@@ -121,6 +158,44 @@ object LevelCreationScreen : AbstractScreen() {
               region.flip(false, true)
               previewImage.drawable = TextureRegionDrawable(region)
             }
+          }
+
+          if (Hex.debug) {
+            previewBufferNoise?.dispose()
+            val size = widthSpinner.value
+
+            if (pixmap == null) {
+              pixmap = Pixmap(size * 2, size * 2, RGB565).also {
+                it.blending = None
+                it.filter = NearestNeighbour
+              }
+            }
+            @Suppress("NAME_SHADOWING")
+            val pixmap = pixmap ?: return
+
+            for (x in -size until size) {
+              for (y in -size until size) {
+                val noise = IslandGeneration.noiseAt(x.toFloat(), y.toFloat(), widthSpinner.value + 2, heightSpinner.value + 2)
+                val color = if (noise <= 1) BLACK else WHITE
+                pixmap.drawPixel(size + x, size + y, color.toIntBits())
+              }
+            }
+
+            val buffer = FrameBuffer(RGBA8888, NOISE_SIZE, NOISE_SIZE, false)
+            buffer.begin()
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+            val a = Texture(pixmap).also {
+              it.setFilter(Nearest, Nearest)
+            }
+
+
+            batch.begin()
+            batch.draw(a, 0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
+            batch.end()
+
+            buffer.end()
+            previewImageNoise!!.drawable = TextureRegionDrawable(buffer.colorBufferTexture)
           }
         }
 
@@ -173,8 +248,85 @@ object LevelCreationScreen : AbstractScreen() {
               textField.addValidator(validator)
               onChange { renderPreview() }
 
-              layoutSpinner.current = HEXAGONAL
+//              layoutSpinner.current = HEXAGONAL
             }
+        }
+
+        row()
+        horizontalGroup {
+          space(20f)
+          spinner(
+            "Frequency",
+            SimpleFloatSpinnerModel(INITIAL_FREQUENCY, 0f, 10f, 0.001f, 3).also {
+              onChange {
+                IslandGeneration.noise.setFrequency(it.value)
+                renderPreview()
+              }
+            }
+          )
+          spinner(
+            "Fractal Octaves",
+            IntSpinnerModel(INITIAL_FRACTAL_OCTAVES, 1, 9, 1).also {
+              onChange {
+                IslandGeneration.noise.setFractalOctaves(it.value)
+                renderPreview()
+              }
+            }
+          )
+          spinner(
+            "Fractal Lacunarity",
+            SimpleFloatSpinnerModel(INITIAL_FRACTAL_LACUNARITY, 0f, 10f, 0.1f).also {
+              onChange {
+                IslandGeneration.noise.setFractalLacunarity(it.value)
+                renderPreview()
+              }
+            }
+          )
+          spinner(
+            "Fractal Gain",
+            SimpleFloatSpinnerModel(INITIAL_FRACTAL_GAIN, 0f, 1f, 0.05f).also {
+              onChange {
+                IslandGeneration.noise.setFractalGain(it.value)
+                renderPreview()
+              }
+            }
+          )
+          spinner(
+            "Amplitude",
+            SimpleFloatSpinnerModel(IslandGeneration.amplitude, -1000f, 1000f, .1f, 2).also {
+              onChange {
+                IslandGeneration.amplitude = it.value
+                renderPreview()
+              }
+            }
+          )
+          spinner(
+            "Offset",
+            SimpleFloatSpinnerModel(IslandGeneration.offset, -1000f, 1000f, .1f, 2).also {
+              onChange {
+                IslandGeneration.offset = it.value
+                renderPreview()
+              }
+            }
+          )
+        }
+        row()
+        horizontalGroup {
+          space(10f)
+          visLabel("Island seed")
+          addActor(
+            actor(seedField) {
+              onChange {
+                renderPreview()
+              }
+            }
+          )
+          visTextButton("Randomize") {
+            onClick {
+              seedField.text = Random.nextLong().toString()
+              renderPreview()
+            }
+          }
         }
 
         row()
@@ -205,7 +357,7 @@ object LevelCreationScreen : AbstractScreen() {
                   "Creating island ${LevelSelectScreen.islandAmount} with a dimension of " +
                     "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}"
                 )
-                play(LevelSelectScreen.islandAmount, createIsland(false))
+                play(LevelSelectScreen.islandAmount, createIsland())
               }
             }
           )
@@ -227,7 +379,7 @@ object LevelCreationScreen : AbstractScreen() {
     stage.act(delta)
     stage.draw()
 
-    if (Hex.debug) {
+    if (Hex.args.`stage-debug` || Hex.trace) {
       lineRenderer.begin(ShapeType.Line)
       lineRenderer.color = Color.LIGHT_GRAY
       lineRenderer.line(Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f, Gdx.graphics.height.toFloat())

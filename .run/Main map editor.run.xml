@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run map editor" type="JetRunConfigurationType">
+  <configuration default="false" name="Debug map editor" type="JetRunConfigurationType">
     <module name="hex.desktop.main" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="--map-editor" />
+    <option name="PROGRAM_PARAMETERS" value="--map-editor --debug" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="PASS_PARENT_ENVS" value="true" />

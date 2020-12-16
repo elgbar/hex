@@ -131,16 +131,16 @@ fun <T : Comparable<T>> variableText(
     bold = bold,
     italic = italic,
     next =
-    validatedText(
-      value,
-      min,
-      max,
-      bold = bold,
-      italic = italic,
-      color = YELLOW,
-      format = format,
-      next = next
-    )
+      validatedText(
+        value,
+        min,
+        max,
+        bold = bold,
+        italic = italic,
+        color = YELLOW,
+        format = format,
+        next = next
+      )
   )
 }
 

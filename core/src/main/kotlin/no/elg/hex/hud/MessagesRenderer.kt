@@ -2,10 +2,9 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import java.util.concurrent.ConcurrentSkipListSet
-import java.util.concurrent.CopyOnWriteArrayList
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.draw
+import java.util.concurrent.CopyOnWriteArrayList
 
 /** @author Elg */
 object MessagesRenderer : FrameUpdatable {

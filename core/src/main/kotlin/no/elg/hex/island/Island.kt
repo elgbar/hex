@@ -27,6 +27,7 @@ import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -41,7 +42,6 @@ import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import kotlin.math.max
-import no.elg.hex.util.ensureCapitalStartFunds
 
 /** @author Elg */
 class Island(

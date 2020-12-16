@@ -60,6 +60,7 @@ class Assets : AssetManager() {
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
     const val ORIGINAL_SPRITES_ATLAS = "sprites/original_sprites.atlas"
+    const val ORIGINAL_SPRITES_ATLAS_2X = "sprites/original_sprites_2x.atlas"
 
     const val BOLD_FONT = "fonts/UbuntuMono-B.ttf"
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
@@ -80,17 +81,22 @@ class Assets : AssetManager() {
 
   val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
   val originalSprites: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS) }
+  val originalSprites2x: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS_2X) }
   val fontSize by lazy { FONT_SIZE * scale }
 
   private fun findSprite(regionName: String): AtlasRegion {
     val region =
       if (Hex.args.retro) {
-        Hex.assets.originalSprites.findRegion(regionName)
+        Hex.assets.originalSprites2x.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
       } else {
         Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
       }
-    require(region.originalHeight == region.originalWidth) { "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}" }
-    require(region.packedWidth == region.packedHeight) { "Different packedWidth and packedHeight for region $region, width: ${region.packedWidth}, height ${region.packedHeight}" }
+    require(region.originalHeight == region.originalWidth) {
+      "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}"
+    }
+    require(region.packedWidth == region.packedHeight) {
+      "Different packedWidth and packedHeight for region $region, width: ${region.packedWidth}, height ${region.packedHeight}"
+    }
     region.flip(false, true)
     return region
   }
@@ -202,7 +208,9 @@ class Assets : AssetManager() {
 
     loadingInfo = "sprites"
 
-    if (!Hex.args.retro) {
+    if (Hex.args.retro) {
+      load(ORIGINAL_SPRITES_ATLAS_2X, TEXTURE_ATLAS)
+    } else {
       load(SPRITE_ATLAS, TEXTURE_ATLAS)
     }
     load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)

@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debug map editor disable-island-loading" type="JetRunConfigurationType">
+  <configuration default="false" name="Debug map editor draw-edges stage-debug" type="JetRunConfigurationType">
     <module name="hex.desktop.main" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="--debug --map-editor --disable-island-loading" />
+    <option name="PROGRAM_PARAMETERS" value="--debug --map-editor --draw-edges --stage-debug" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="PASS_PARENT_ENVS" value="true" />
