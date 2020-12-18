@@ -22,7 +22,7 @@ import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.MapEditorRenderer
-import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.input.editor.Editor
@@ -85,7 +85,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
         field = value
       } else {
         field = NOOPEditor
-        MessagesRenderer.publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
+        publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
       }
     }
 
@@ -196,8 +196,12 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
             }
             menuItem("Reload") {
               onInteract(this@MapEditorScreen.stage, Keys.CONTROL_LEFT, Keys.R) {
-                play(id)
-                publishMessage("Successfully reloaded island $id")
+
+                if (play(id)) {
+                  publishMessage("Successfully reloaded island $id")
+                } else {
+                  publishError("Failed to reload island $id")
+                }
               }
             }
             separator()
@@ -217,6 +221,11 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
                 island.regenerateCapitals()
               }
             }
+//            menuItem("Remove Smaller Islands") {
+//              onInteract(this@MapEditorScreen.stage, Keys.CONTROL_LEFT, Keys.K) {
+//                TODO()
+//              }
+//            }
 
             separator()
 
@@ -306,7 +315,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
 
   fun quickload() {
     if (quickSavedIsland.isEmpty()) {
-      MessagesRenderer.publishError("No quick save found")
+      publishError("No quick save found")
       return
     }
     play(id, Hex.mapper.readValue(quickSavedIsland))

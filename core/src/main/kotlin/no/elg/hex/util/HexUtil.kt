@@ -1,9 +1,5 @@
 package no.elg.hex.util
 
-import java.util.HashSet
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.reflect.KClass
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
@@ -21,6 +17,10 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
+import java.util.HashSet
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.reflect.KClass
 
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {

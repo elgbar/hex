@@ -1,15 +1,16 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
-import kotlin.random.Random
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.Team
 import no.elg.hex.util.getData
 import no.elg.hex.util.noise.FastNoiseLite
 import no.elg.hex.util.noise.FractalType.FBM
 import no.elg.hex.util.noise.NoiseType.OPEN_SIMPLEX_2_S
+import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import org.hexworks.mixite.core.api.Point
+import kotlin.random.Random
 
 /**
  * @author Elg
@@ -18,21 +19,20 @@ object IslandGeneration {
 
   val noise = FastNoiseLite()
 
-  const val INITIAL_FREQUENCY = 0.1f
-  const val INITIAL_FRACTAL_OCTAVES = 3
-  const val INITIAL_FRACTAL_LACUNARITY = 2.0f
-  const val INITIAL_FRACTAL_GAIN = 0.5f
+  const val INITIAL_FREQUENCY = 0.14f
+  const val INITIAL_FRACTAL_OCTAVES = 1
+  const val INITIAL_FRACTAL_LACUNARITY = 2.1f
+  const val INITIAL_FRACTAL_GAIN = 0.7f
 
   /**
    * `a` in a `ax + b` graph
    */
-  var amplitude = 0f
+  var amplitude = 0.07f
 
   /**
    * `b` in a `ax + b` graph
    */
-  var offset = 1f
-
+  var offset = 0.4f
 
   init {
     noise.setNoiseType(OPEN_SIMPLEX_2_S)
@@ -62,7 +62,7 @@ object IslandGeneration {
       val data = island.getData(hexagon)
       if (data.edge) continue
       val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
-      Gdx.app.debug("ISGEN", "${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise")
+      Gdx.app.trace("ISGEN", "${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise")
       if (noise <= 1) {
         data.team = teams.random(random)
         data.setPiece(Empty::class)

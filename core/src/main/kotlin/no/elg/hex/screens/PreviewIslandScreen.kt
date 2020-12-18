@@ -1,7 +1,6 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
-import kotlin.math.max
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
@@ -14,6 +13,7 @@ import no.elg.hex.util.component6
 import no.elg.hex.util.getData
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.math.max
 
 /** @author Elg */
 open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen() {

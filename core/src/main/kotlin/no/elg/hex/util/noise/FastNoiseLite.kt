@@ -337,7 +337,6 @@ class FastNoiseLite {
     when (transformType3D) {
       TransformType3D.IMPROVE_XY_PLANES -> {
 
-
         val xy = x + y
 
         val s2 = xy * (-0.211324865405187).toFloat()
@@ -347,7 +346,6 @@ class FastNoiseLite {
         z += xy * 0.577350269189626.toFloat()
       }
       TransformType3D.IMPROVE_XZ_PLANES -> {
-
 
         val xz = x + z
 
@@ -1407,7 +1405,8 @@ class FastNoiseLite {
         ValCoord(seed, x2, y3),
         ValCoord(seed, x3, y3),
         xs
-      ), ys
+      ),
+      ys
     ) * (1 / (1.5f * 1.5f))
   }
 
@@ -1560,7 +1559,8 @@ class FastNoiseLite {
           xs
         ),
         ys
-      ), zs
+      ),
+      zs
     ) * (1 / (1.5f * 1.5f * 1.5f))
   }
 
@@ -1611,9 +1611,12 @@ class FastNoiseLite {
   }
 
   private fun DoSingleDomainWarp(
-    seed: Int, amp: Float, freq: Float,
+    seed: Int,
+    amp: Float,
+    freq: Float,
     x: Float,
-    y: Float, coord: Vector2FNL
+    y: Float,
+    coord: Vector2FNL
   ) {
     when (domainWarpType) {
       DomainWarpType.OPEN_SIMPLEX_2 -> SingleDomainWarpSimplexGradient(seed, amp * 38.283687591552734375f, freq, x, y, coord, false)
@@ -1624,10 +1627,13 @@ class FastNoiseLite {
 
   // Perlin Noise
   private fun DoSingleDomainWarp(
-    seed: Int, amp: Float, freq: Float,
+    seed: Int,
+    amp: Float,
+    freq: Float,
     x: Float,
     y: Float,
-    z: Float, coord: Vector3FNL
+    z: Float,
+    coord: Vector3FNL
   ) {
     when (domainWarpType) {
       DomainWarpType.OPEN_SIMPLEX_2 -> SingleDomainWarpOpenSimplex2Gradient(seed, amp * 32.69428253173828125f, freq, x, y, z, coord, false)
@@ -1640,7 +1646,6 @@ class FastNoiseLite {
     val seed = seed
     val amp = domainWarpAmp * fractalBounding
     val freq = frequency
-
 
     var xs = coord.x
 
@@ -1666,7 +1671,6 @@ class FastNoiseLite {
     val amp = domainWarpAmp * fractalBounding
     val freq = frequency
 
-
     var xs = coord.x
 
     var ys = coord.y
@@ -1674,7 +1678,6 @@ class FastNoiseLite {
     var zs = coord.z
     when (warpTransformType3D) {
       TransformType3D.IMPROVE_XY_PLANES -> {
-
 
         val xy = xs + ys
 
@@ -1685,7 +1688,6 @@ class FastNoiseLite {
         zs += xy * 0.577350269189626.toFloat()
       }
       TransformType3D.IMPROVE_XZ_PLANES -> {
-
 
         val xz = xs + zs
 
@@ -1752,7 +1754,6 @@ class FastNoiseLite {
       when (warpTransformType3D) {
         TransformType3D.IMPROVE_XY_PLANES -> {
 
-
           val xy = xs + ys
 
           val s2 = xy * (-0.211324865405187).toFloat()
@@ -1762,7 +1763,6 @@ class FastNoiseLite {
           zs += xy * 0.577350269189626.toFloat()
         }
         TransformType3D.IMPROVE_XZ_PLANES -> {
-
 
           val xz = xs + zs
 
@@ -1830,7 +1830,6 @@ class FastNoiseLite {
     when (warpTransformType3D) {
       TransformType3D.IMPROVE_XY_PLANES -> {
 
-
         val xy = xs + ys
 
         val s2 = xy * (-0.211324865405187).toFloat()
@@ -1840,7 +1839,6 @@ class FastNoiseLite {
         zs += xy * 0.577350269189626.toFloat()
       }
       TransformType3D.IMPROVE_XZ_PLANES -> {
-
 
         val xz = xs + zs
 
@@ -1873,9 +1871,12 @@ class FastNoiseLite {
   }
 
   private fun SingleDomainWarpBasicGrid(
-    seed: Int, warpAmp: Float, frequency: Float,
+    seed: Int,
+    warpAmp: Float,
+    frequency: Float,
     x: Float,
-    y: Float, coord: Vector2FNL
+    y: Float,
+    coord: Vector2FNL
   ) {
 
     val xf = x * frequency
@@ -1903,7 +1904,9 @@ class FastNoiseLite {
 
   // Domain Warp Single Wrapper
   private fun SingleDomainWarpBasicGrid(
-    seed: Int, warpAmp: Float, frequency: Float,
+    seed: Int,
+    warpAmp: Float,
+    frequency: Float,
     x: Float,
     y: Float,
     z: Float,
@@ -1957,9 +1960,12 @@ class FastNoiseLite {
 
   // Domain Warp Simplex/OpenSimplex2
   private fun SingleDomainWarpSimplexGradient(
-    seed: Int, warpAmp: Float, frequency: Float,
+    seed: Int,
+    warpAmp: Float,
+    frequency: Float,
     x: Float,
-    y: Float, coord: Vector2FNL,
+    y: Float,
+    coord: Vector2FNL,
     outGradOnly: Boolean
   ) {
     var x = x
@@ -2099,11 +2105,14 @@ class FastNoiseLite {
 
   // Domain Warp Fractal Progressive
   private fun SingleDomainWarpOpenSimplex2Gradient(
-    seed: Int, warpAmp: Float, frequency: Float,
+    seed: Int,
+    warpAmp: Float,
+    frequency: Float,
     x: Float,
     y: Float,
     z: Float,
-    coord: Vector3FNL, outGradOnly: Boolean
+    coord: Vector3FNL,
+    outGradOnly: Boolean
   ) {
     var seed = seed
     var x = x

@@ -46,6 +46,7 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
+import no.elg.hex.island.IslandFiles
 import no.elg.hex.island.IslandGeneration
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
@@ -111,7 +112,7 @@ object LevelCreationScreen : AbstractScreen() {
             it.center()
           }
 
-          if (Hex.debug) {
+          if (Hex.args.`stage-debug`) {
             previewImageNoise = visImage(TextureRegionDrawable(Texture(NOISE_SIZE, NOISE_SIZE, RGB565)), Scaling.fillY) {
 //              this.scaling = none
               it.fill()
@@ -160,7 +161,7 @@ object LevelCreationScreen : AbstractScreen() {
             }
           }
 
-          if (Hex.debug) {
+          if (Hex.args.`stage-debug`) {
             previewBufferNoise?.dispose()
             val size = widthSpinner.value
 
@@ -188,7 +189,6 @@ object LevelCreationScreen : AbstractScreen() {
             val a = Texture(pixmap).also {
               it.setFilter(Nearest, Nearest)
             }
-
 
             batch.begin()
             batch.draw(a, 0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
@@ -257,7 +257,7 @@ object LevelCreationScreen : AbstractScreen() {
           space(20f)
           spinner(
             "Frequency",
-            SimpleFloatSpinnerModel(INITIAL_FREQUENCY, 0f, 10f, 0.001f, 3).also {
+            SimpleFloatSpinnerModel(INITIAL_FREQUENCY, 0f, 10f, 0.01f, 3).also {
               onChange {
                 IslandGeneration.noise.setFrequency(it.value)
                 renderPreview()
@@ -285,6 +285,7 @@ object LevelCreationScreen : AbstractScreen() {
         }
         row()
         horizontalGroup {
+          space(20f)
           spinner(
             "Fractal Octaves",
             IntSpinnerModel(INITIAL_FRACTAL_OCTAVES, 1, 9, 1).also {

@@ -19,7 +19,7 @@ object SplashScreen : AbstractScreen() {
 
   override fun render(delta: Float) {
     if (Hex.assets.mainFinishedLoading && Hex.assets.update()) {
-      Gdx.app.log("SPLASH", "All assets finished loading")
+      Gdx.app.log("SPLASH", "All assets finished loading in ${System.currentTimeMillis() - startTime} ms")
       Hex.screen = LevelSelectScreen
     } else {
       batch.begin()
