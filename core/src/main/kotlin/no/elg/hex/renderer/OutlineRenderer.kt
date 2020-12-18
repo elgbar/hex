@@ -35,7 +35,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       for (hexagon in hexes) {
         val points = hexagon.points
         val data = islandScreen.island.getData(hexagon)
-        val drawEdges = data.edge && Hex.args.`draw-edges`
+        val drawEdges = data.edge && (Hex.args.`draw-edges` || Hex.args.mapEditor)
 
         if (data.invisible && !drawEdges) continue
 
