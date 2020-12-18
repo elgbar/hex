@@ -32,7 +32,6 @@ import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.SimpleFloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
-import kotlin.random.Random
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.scene2d.actor
@@ -58,6 +57,7 @@ import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
 import org.hexworks.mixite.core.api.HexagonalGridLayout.TRAPEZOID
 import org.hexworks.mixite.core.api.HexagonalGridLayout.TRIANGULAR
+import kotlin.random.Random
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
@@ -265,6 +265,27 @@ object LevelCreationScreen : AbstractScreen() {
             }
           )
           spinner(
+            "Amplitude",
+            SimpleFloatSpinnerModel(IslandGeneration.amplitude, -1000f, 1000f, .01f, 3).also {
+              onChange {
+                IslandGeneration.amplitude = it.value
+                renderPreview()
+              }
+            }
+          )
+          spinner(
+            "Offset",
+            SimpleFloatSpinnerModel(IslandGeneration.offset, -1000f, 1000f, .1f, 2).also {
+              onChange {
+                IslandGeneration.offset = it.value
+                renderPreview()
+              }
+            }
+          )
+        }
+        row()
+        horizontalGroup {
+          spinner(
             "Fractal Octaves",
             IntSpinnerModel(INITIAL_FRACTAL_OCTAVES, 1, 9, 1).also {
               onChange {
@@ -287,24 +308,6 @@ object LevelCreationScreen : AbstractScreen() {
             SimpleFloatSpinnerModel(INITIAL_FRACTAL_GAIN, 0f, 1f, 0.05f).also {
               onChange {
                 IslandGeneration.noise.setFractalGain(it.value)
-                renderPreview()
-              }
-            }
-          )
-          spinner(
-            "Amplitude",
-            SimpleFloatSpinnerModel(IslandGeneration.amplitude, -1000f, 1000f, .1f, 2).also {
-              onChange {
-                IslandGeneration.amplitude = it.value
-                renderPreview()
-              }
-            }
-          )
-          spinner(
-            "Offset",
-            SimpleFloatSpinnerModel(IslandGeneration.offset, -1000f, 1000f, .1f, 2).also {
-              onChange {
-                IslandGeneration.offset = it.value
                 renderPreview()
               }
             }
@@ -354,10 +357,10 @@ object LevelCreationScreen : AbstractScreen() {
                 if (this.isDisabled) return@onClick
                 Gdx.app.debug(
                   "CREATOR",
-                  "Creating island ${LevelSelectScreen.islandAmount} with a dimension of " +
+                  "Creating island ${LevelSelectScreen.islandFileNames.size} with a dimension of " +
                     "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}"
                 )
-                play(LevelSelectScreen.islandAmount, createIsland())
+                play(LevelSelectScreen.islandFileNames.size, createIsland())
               }
             }
           )
