@@ -2,6 +2,7 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.drawAll
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
@@ -21,7 +22,8 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
     val cursorHex = basicInputHandler.cursorHex
     val cursorData = if (cursorHex != null) playableIslandScreen.island.getData(cursorHex) else null
     val gridData = playableIslandScreen.island.grid.gridData
-    drawAll(
+
+    val list = mutableListOf(
       variableText(
         "FPS: ",
         Gdx.graphics.framesPerSecond,
@@ -66,5 +68,9 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
           )
       )
     )
+    if (Hex.args.mapEditor) {
+      list.add(0, emptyText())
+    }
+    drawAll(*list.toTypedArray())
   }
 }
