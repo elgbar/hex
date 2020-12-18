@@ -73,21 +73,23 @@ object LevelSelectInputProcessor : InputAdapter() {
   override fun keyDown(keycode: Int): Boolean {
     when (keycode) {
       Keys.FORWARD_DEL, Keys.DEL -> {
-        val index = getHoveringIslandIndex()
-        if (index == INVALID_ISLAND_INDEX) return false
-        Gdx.app.debug("SELECT", "Deleting island $index")
-        val fileName = getIslandFileName(index)
+        if (Hex.args.mapEditor) {
+          val index = getHoveringIslandIndex()
+          if (index == INVALID_ISLAND_INDEX) return false
+          Gdx.app.debug("SELECT", "Deleting island $index")
+          val fileName = getIslandFileName(index)
 
-        if (!Gdx.files.local(fileName).delete()) {
-          publishWarning("Failed to delete island $index")
-        } else {
-          Hex.assets.unload(fileName)
+          if (!Gdx.files.local(fileName).delete()) {
+            publishWarning("Failed to delete island $index")
+          } else {
+            Hex.assets.unload(fileName)
             IslandFiles.islandIds -= index
             LevelSelectScreen.renderPreviews()
-          publishMessage(ScreenText("Deleted island $index", Color.GREEN))
-        }
+            publishMessage(ScreenText("Deleted island $index", Color.GREEN))
+          }
 
-        Hex.screen = LevelSelectScreen
+          Hex.screen = LevelSelectScreen
+        }
       }
       else -> return false
     }
