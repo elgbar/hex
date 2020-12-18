@@ -118,6 +118,8 @@ project(":core") {
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
     implementation "io.github.libktx:ktx-style:$ktxVersion"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
+    implementation "io.github.libktx:ktx-collections:$ktxVersion"
+    implementation "io.github.libktx:ktx-graphics:$ktxVersion"
 
     api "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 

@@ -2,6 +2,7 @@ package no.elg.hex
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
@@ -33,9 +34,9 @@ import ktx.style.window
 import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.island.Island
+import no.elg.hex.island.IslandFiles
 import no.elg.hex.util.defaultDisplayMode
-import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
@@ -84,6 +85,8 @@ class Assets : AssetManager() {
   val originalSprites2x: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS_2X) }
   val fontSize by lazy { FONT_SIZE * scale }
 
+  val resolver: FileHandleResolver
+
   private fun findSprite(regionName: String): AtlasRegion {
     val region =
       if (Hex.args.retro) {
@@ -127,28 +130,28 @@ class Assets : AssetManager() {
   val knight by lazy { findAnimation("man2", 5, 1 / 17f) }
   val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
 
+  private fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true) {
+    val boldness = if (bold) "B" else "R"
+    val italicness = if (italic) "I" else ""
+    val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
+
+    val parameter = FreeTypeFontLoaderParameter()
+    parameter.fontParameters.size = fontSize
+    parameter.fontParameters.minFilter = Linear
+    parameter.fontParameters.flip = flip
+    parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
+    val name = "fonts/UbuntuMono-$boldness$italicness$flippiness.ttf"
+    load(name, BITMAP_FONT, parameter)
+    Gdx.app.debug("ASSET", "loaded font '$name'")
+  }
+
   init {
     Gdx.app.debug("ASSET", "Using ${scale}x scale")
     super.setErrorListener { _, throwable -> throwable.printStackTrace() }
-    val resolver = InternalFileHandleResolver()
+    resolver = InternalFileHandleResolver()
 
     setLoader(BITMAP_FONT, ".ttf", FreetypeFontLoader(resolver))
     setLoader(FREE_TYPE_FONT_GEN, FreeTypeFontGeneratorLoader(resolver))
-
-    fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true) {
-      val boldness = if (bold) "B" else "R"
-      val italicness = if (italic) "I" else ""
-      val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
-
-      val parameter = FreeTypeFontLoaderParameter()
-      parameter.fontParameters.size = fontSize
-      parameter.fontParameters.minFilter = Linear
-      parameter.fontParameters.flip = flip
-      parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
-      val name = "fonts/UbuntuMono-$boldness$italicness$flippiness.ttf"
-      load(name, BITMAP_FONT, parameter)
-      Gdx.app.debug("ASSET", "loaded font '$name'")
-    }
 
     loadFont(bold = false, italic = false)
 
@@ -156,6 +159,9 @@ class Assets : AssetManager() {
 
     // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
     finishLoading()
+  }
+
+  fun loadAssets() {
 
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
 
@@ -217,20 +223,7 @@ class Assets : AssetManager() {
 
     loadingInfo = "islands"
 
-    val oldIslands = GdxArray<Island>()
-    getAll(Island::class.java, oldIslands)
-
-    if (!Hex.args.`disable-island-loading`) {
-      for (slot in 0..Int.MAX_VALUE) {
-        val file = getIslandFile(slot)
-        if (file.exists()) {
-          if (file.isDirectory) continue
-          load(getIslandFileName(slot), Island::class.java)
-        } else {
-          break
-        }
-      }
-    }
+    IslandFiles // find all island files
   }
 
   fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true): BitmapFont {
@@ -241,6 +234,7 @@ class Assets : AssetManager() {
   }
 
   fun finishMain() {
+    Gdx.app.trace("ASSET", "Main finished")
     mainFinishedLoading = true
   }
 }

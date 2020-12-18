@@ -5,14 +5,15 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
+import ktx.collections.minusAssign
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
+import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.LevelSelectScreen.camera
-import no.elg.hex.screens.LevelSelectScreen.islandAmount
 import no.elg.hex.screens.LevelSelectScreen.mouseX
 import no.elg.hex.screens.LevelSelectScreen.mouseY
 import no.elg.hex.util.component1
@@ -30,8 +31,8 @@ object LevelSelectInputProcessor : InputAdapter() {
   private const val INVALID_ISLAND_INDEX = -1
 
   private fun getHoveringIslandIndex(): Int {
-    for (i in 0 until islandAmount) {
-      val (x, y, width, height) = LevelSelectScreen.rect(i)
+    for ((index, i) in IslandFiles.islandIds.withIndex()) {
+      val (x, y, width, height) = LevelSelectScreen.rect(index)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i
       }
@@ -46,7 +47,7 @@ object LevelSelectInputProcessor : InputAdapter() {
         if (index != INVALID_ISLAND_INDEX) {
           play(index)
         } else if (Hex.args.mapEditor) {
-          val (x, y, width, height) = LevelSelectScreen.rect(islandAmount)
+          val (x, y, width, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
           if (mouseX in x..x + width && mouseY in y..y + height) {
             Hex.screen = LevelCreationScreen
           }
@@ -58,15 +59,13 @@ object LevelSelectInputProcessor : InputAdapter() {
   }
 
   override fun scrolled(amount: Int): Boolean {
-    val (_, y, _, height) = LevelSelectScreen.rect(islandAmount)
+    val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = camera.position.y
     val min = screenHeight / 2f
 
-    camera.position.y =
-      (oldY + amount * SCROLL_SPEED).coerceIn(
-        min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding)
-      )
+    camera.position.y = (oldY + amount * SCROLL_SPEED)
+      .coerceIn(min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding))
     LevelSelectScreen.updateCamera()
     return true
   }
@@ -83,6 +82,8 @@ object LevelSelectInputProcessor : InputAdapter() {
           publishWarning("Failed to delete island $index")
         } else {
           Hex.assets.unload(fileName)
+            IslandFiles.islandIds -= index
+            LevelSelectScreen.renderPreviews()
           publishMessage(ScreenText("Deleted island $index", Color.GREEN))
         }
 

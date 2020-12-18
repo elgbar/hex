@@ -53,9 +53,7 @@ object Hex : ApplicationAdapter() {
     }
 
   override fun create() {
-    require(this::args.isInitialized) {
-      "An instance of ApplicationParser must be set before calling create()"
-    }
+    require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
 
     Gdx.app.logLevel =
       when {
@@ -70,6 +68,7 @@ object Hex : ApplicationAdapter() {
 
     assets = Assets()
     screen = SplashScreen
+    assets.loadAssets()
 
     Gdx.input.inputProcessor = inputMultiplexer
 

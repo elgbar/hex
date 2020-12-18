@@ -10,6 +10,7 @@ import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
+import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.screens.PlayableIslandScreen
 
@@ -22,13 +23,15 @@ fun getIslandFile(slot: Int): FileHandle {
   return if (internal.exists()) internal else Gdx.files.local(path)
 }
 
-fun play(id: Int) {
+fun play(id: Int): Boolean {
   val assetId = getIslandFileName(id)
   if (Hex.assets.isLoaded(assetId)) {
-    val island: Island = Hex.assets[assetId] ?: return
+    val island: Island = Hex.assets[assetId] ?: return false
     play(id, island)
+    return true
   } else {
     publishWarning("Tried to play island $id, but no such island is loaded")
+    return false
   }
 }
 
@@ -47,15 +50,17 @@ fun saveIsland(id: Int, island: Island): Boolean {
     return false
   }
 
+  val existed = file.exists()
   if (file.isDirectory) {
-    publishError(
-      "Failed to save island the name '${file.name()}' as the resulting file will be a directory."
-    )
+    publishError("Failed to save island the name '${file.name()}' as the resulting file will be a directory.")
     return false
   }
   return try {
     file.writeString(island.serialize(), false)
     publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
+    if (!existed) {
+      IslandFiles.fullFilesSearch()
+    }
     true
   } catch (e: Throwable) {
     publishMessage(ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))

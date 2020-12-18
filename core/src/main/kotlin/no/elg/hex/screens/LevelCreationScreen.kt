@@ -355,12 +355,12 @@ object LevelCreationScreen : AbstractScreen() {
 
               onClick {
                 if (this.isDisabled) return@onClick
+                val nextId = IslandFiles.nextIslandId
                 Gdx.app.debug(
                   "CREATOR",
-                  "Creating island ${LevelSelectScreen.islandFileNames.size} with a dimension of " +
-                    "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}"
+                  "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}"
                 )
-                play(LevelSelectScreen.islandFileNames.size, createIsland())
+                play(nextId, createIsland())
               }
             }
           )
