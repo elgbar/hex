@@ -1,8 +1,6 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
-import ktx.collections.GdxArray
-import ktx.collections.plusAssign
 import no.elg.hex.Hex
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
@@ -19,7 +17,7 @@ object IslandFiles {
   /**
    * Islands in order
    */
-  val islandIds = GdxArray<Int>()
+  val islandIds = ArrayList<Int>()
 
   init {
     fullFilesSearch()
@@ -27,7 +25,7 @@ object IslandFiles {
 
   val nextIslandId: Int
     get() {
-      if (islandIds.isEmpty) return 0
+      if (islandIds.isEmpty()) return 0
       val firstExisting =
         islandIds.filterIndexed { index, i -> index + 1 != islandIds.size && islandIds[index + 1] != i + 1 }.firstOrNull() ?: (islandIds.size - 1)
       return firstExisting + 1
@@ -49,10 +47,9 @@ object IslandFiles {
         Gdx.app.trace(TAG, "Found island $fileName")
         nonExistentFilesInRow = 0
 
-        if (!Hex.assets.isLoaded(fileName, Island::class.java)) {
+        if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded(fileName, Island::class.java)) {
           Hex.assets.load(fileName, Island::class.java)
         }
-
         islandIds += slot
       } else {
 

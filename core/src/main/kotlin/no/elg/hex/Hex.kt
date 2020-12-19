@@ -39,6 +39,7 @@ object Hex : ApplicationAdapter() {
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
   val scale by lazy { if (args.scale <= 0) Assets.nativeScale else args.scale }
+  private val backgroundColor: Color by lazy { if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62") }
 
   var screen: AbstractScreen = SplashScreen
     set(value) {
@@ -63,8 +64,7 @@ object Hex : ApplicationAdapter() {
         else -> LOG_INFO
       }
 
-    val backgroundColor: Color = if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62")
-    Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f)
+    setClearColorAlpha(1f)
 
     assets = Assets()
     screen = SplashScreen
@@ -89,5 +89,9 @@ object Hex : ApplicationAdapter() {
 
   override fun dispose() {
     VisUI.dispose()
+  }
+
+  fun setClearColorAlpha(alpha: Float) {
+    Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, alpha)
   }
 }

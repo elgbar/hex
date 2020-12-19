@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP_PINGPONG
@@ -53,10 +54,12 @@ class Assets : AssetManager() {
     private val TEXTURE_ATLAS = TextureAtlas::class.java
     private val MUSIC = Music::class.java
     private val SOUND = Sound::class.java
+    private val PNG = PixmapIO.PNG::class.java
     private val BITMAP_FONT = BitmapFont::class.java
     private val FREE_TYPE_FONT_GEN = FreeTypeFontGenerator::class.java
 
     const val ISLAND_SAVES_DIR = "islands"
+    const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
     const val ISLAND_FILE_ENDING = "is"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"

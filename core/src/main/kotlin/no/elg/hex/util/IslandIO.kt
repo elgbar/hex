@@ -3,7 +3,9 @@ package no.elg.hex.util
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
-import no.elg.hex.Assets
+import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
+import no.elg.hex.Assets.Companion.ISLAND_PREVIEWS_DIR
+import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
@@ -14,25 +16,31 @@ import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.screens.PlayableIslandScreen
 
-fun getIslandFileName(slot: Int) =
-  "${Assets.ISLAND_SAVES_DIR}/island-$slot.${Assets.ISLAND_FILE_ENDING}"
+fun getIslandFileName(slot: Int, preview: Boolean = false): String {
+  return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$slot.${if (preview) "png" else ISLAND_FILE_ENDING}"
+}
 
-fun getIslandFile(slot: Int): FileHandle {
-  val path = getIslandFileName(slot)
-  val internal = Gdx.files.internal(path)
-  return if (internal.exists()) internal else Gdx.files.local(path)
+fun getIslandFile(slot: Int, preview: Boolean = false): FileHandle {
+  val path = getIslandFileName(slot, preview)
+  val local = Gdx.files.local(path)
+  return if (local.exists()) local else Gdx.files.internal(path)
 }
 
 fun play(id: Int): Boolean {
   val assetId = getIslandFileName(id)
-  if (Hex.assets.isLoaded(assetId)) {
-    val island: Island = Hex.assets[assetId] ?: return false
-    play(id, island)
-    return true
+  val island: Island = if (Hex.assets.isLoaded(assetId)) {
+    Hex.assets[assetId] ?: return false
   } else {
-    publishWarning("Tried to play island $id, but no such island is loaded")
-    return false
+    val islandFile = getIslandFile(id)
+    if (!islandFile.exists()) {
+      publishWarning("Tried to play island $id, but no such island is loaded")
+      return false
+    }
+    Hex.assets.load(assetId, Island::class.java)
+    Hex.assets.finishLoadingAsset(assetId)
   }
+  play(id, island)
+  return true
 }
 
 fun play(id: Int, island: Island) {

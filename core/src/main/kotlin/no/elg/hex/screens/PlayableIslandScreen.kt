@@ -47,4 +47,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     super.resize(width, height)
     frameUpdatable.resize(width, height)
   }
+
+  override fun hide() {
+    super.hide()
+    LevelSelectScreen.updateSelectPreview(id, false)
+  }
 }
