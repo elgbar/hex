@@ -7,6 +7,7 @@ import com.kotcrab.vis.ui.widget.ButtonBar
 import ktx.actors.onClick
 import ktx.scene2d.actors
 import ktx.scene2d.scene2d
+import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
@@ -88,11 +89,12 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
         publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
       }
     }
+  val confirmExit: KVisWindow
 
   init {
     quicksave()
     stage.actors {
-      val confirmExit =
+      confirmExit =
         visWindow("Confirm exit") {
           isMovable = false
           isModal = true
@@ -344,6 +346,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     islandScreen.resize(width, height)
+    confirmExit.centerWindow()
   }
 
   companion object {
