@@ -155,7 +155,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
     if (screen.island.currentAI != null) return false
 
     when (keycode) {
-      ENTER -> screen.island.endTurn(this)
+      ENTER -> screen.endTurn()
       BACKSPACE, SPACE -> screen.island.inHand = null
       Keys.F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
       Keys.Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()

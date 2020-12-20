@@ -31,5 +31,4 @@ A simple turn based strategy game aiming to clone Slay.
 * Add minimap
 * Add relative strength bar
 * local multiplayer
-* End turn confirmation
 * Add undo all button

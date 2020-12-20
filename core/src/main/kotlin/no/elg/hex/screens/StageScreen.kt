@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.viewport.ScalingViewport
 import no.elg.hex.Hex
 
 /** @author Elg */
-abstract class StageScreen : AbstractScreen() {
+open class StageScreen : AbstractScreen() {
 
   val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
 
