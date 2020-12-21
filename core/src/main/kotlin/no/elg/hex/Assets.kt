@@ -135,6 +135,7 @@ class Assets : AssetManager() {
 
   val surrender by lazy { findSprite("surrender") }
   val undo by lazy { findSprite("undo") }
+  val redo by lazy { findSprite("redo") }
   val undoAll by lazy { findSprite("undo_all") }
   val settings by lazy { findSprite("settings") }
   val settingsDown by lazy { findSprite("settings_selected") }

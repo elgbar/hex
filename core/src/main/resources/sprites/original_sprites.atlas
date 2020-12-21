@@ -27,7 +27,7 @@ hand
   index: -1
 help
   rotate: false
-  xy: 222, 90
+  xy: 222, 62
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -69,7 +69,7 @@ man03
   index: -1
 man04
   rotate: false
-  xy: 46, 57
+  xy: 46, 13
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
@@ -181,7 +181,7 @@ man30
   index: -1
 palm
   rotate: false
-  xy: 125, 234
+  xy: 2, 57
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
@@ -193,16 +193,23 @@ pine
   orig: 40, 40
   offset: 0, 0
   index: -1
-settings
+redo
   rotate: false
   xy: 178, 2
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
+settings
+  rotate: false
+  xy: 222, 90
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
 settings_selected
   rotate: false
-  xy: 222, 62
+  xy: 250, 62
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -279,21 +286,21 @@ village7
   index: -1
 village4
   rotate: false
-  xy: 2, 57
+  xy: 125, 234
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village0
   rotate: false
-  xy: 2, 57
+  xy: 125, 234
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village5
   rotate: false
-  xy: 46, 13
+  xy: 46, 57
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
