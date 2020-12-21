@@ -133,6 +133,14 @@ class Assets : AssetManager() {
   val knight by lazy { findAnimation("man2", 5, 1 / 17f) }
   val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
 
+  val surrender by lazy { findSprite("surrender") }
+  val undo by lazy { findSprite("undo") }
+  val undoAll by lazy { findSprite("undo_all") }
+  val settings by lazy { findSprite("settings") }
+  val settingsDown by lazy { findSprite("settings_selected") }
+  val help by lazy { findSprite("help") }
+  val helpDown by lazy { findSprite("help_selected") }
+
   private fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true) {
     val boldness = if (bold) "B" else "R"
     val italicness = if (italic) "I" else ""
