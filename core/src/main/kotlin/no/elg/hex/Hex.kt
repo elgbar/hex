@@ -5,6 +5,7 @@ import com.badlogic.gdx.Application.LOG_INFO
 import com.badlogic.gdx.Application.LOG_NONE
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
@@ -71,6 +72,7 @@ object Hex : ApplicationAdapter() {
     assets.loadAssets()
 
     Gdx.input.inputProcessor = inputMultiplexer
+    Gdx.input.setCatchKey(Keys.BACK, true)
 
     // must be last
     assets.finishMain()

@@ -7,6 +7,8 @@ import com.badlogic.gdx.Input.Keys.BACKSPACE
 import com.badlogic.gdx.Input.Keys.ENTER
 import com.badlogic.gdx.Input.Keys.F12
 import com.badlogic.gdx.Input.Keys.SPACE
+import com.badlogic.gdx.Input.Keys.Y
+import com.badlogic.gdx.Input.Keys.Z
 import com.badlogic.gdx.InputAdapter
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Baron
@@ -157,9 +159,9 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
     when (keycode) {
       ENTER -> screen.endTurn()
       BACKSPACE, SPACE -> screen.island.inHand = null
-      Keys.F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
-      Keys.Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
-      Keys.Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
+      F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
+      Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
+      Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
 
       else -> {
         if (screen.island.inHand == null || screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA) {
