@@ -49,13 +49,10 @@ import no.elg.hex.util.toggleShown
 import kotlin.reflect.KClass
 
 /** @author Elg */
-class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
+class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  private val islandScreen = PlayableIslandScreen(id, island)
-  val basicIslandInputProcessor
-    get() = islandScreen.basicIslandInputProcessor
-
-  val inputProcessor = MapEditorInputProcessor(this)
+  val stage = StageScreen()
+  val mapInputProcessor = MapEditorInputProcessor(this)
   private val frameUpdatable = MapEditorRenderer(this)
   private var quickSavedIsland: String = ""
 
@@ -93,7 +90,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
 
   init {
     quicksave()
-    stage.actors {
+    stage.stage.actors {
       confirmExit =
         visWindow("Confirm exit") {
           isMovable = false
@@ -133,7 +130,8 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
         }
 
       fun exit() {
-        confirmExit.toggleShown(this@MapEditorScreen.stage)
+        confirmExit.centerWindow()
+        confirmExit.toggleShown(stage)
       }
 
       val editorsWindow =
@@ -192,12 +190,12 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
 
           menu("Island") {
             menuItem("Save") {
-              onInteract(this@MapEditorScreen.stage, Keys.CONTROL_LEFT, Keys.S) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.S) {
                 saveIsland(id, island)
               }
             }
             menuItem("Reload") {
-              onInteract(this@MapEditorScreen.stage, Keys.CONTROL_LEFT, Keys.R) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.R) {
 
                 if (play(id)) {
                   publishMessage("Successfully reloaded island $id")
@@ -208,23 +206,23 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
             }
             separator()
             menuItem("Quick save") {
-              onInteract(this@MapEditorScreen.stage, Keys.F5) { quicksave() }
+              onInteract(this@MapEditorScreen.stage.stage, Keys.F5) { quicksave() }
             }
             menuItem("Quick Load") {
-              onInteract(this@MapEditorScreen.stage, Keys.F9) { quickload() }
+              onInteract(this@MapEditorScreen.stage.stage, Keys.F9) { quickload() }
             }
             separator()
-            menuItem("Exit") { onInteract(this@MapEditorScreen.stage, Keys.ESCAPE) { exit() } }
+            menuItem("Exit") { onInteract(this@MapEditorScreen.stage.stage, Keys.ESCAPE) { exit() } }
           }
 
           menu("Edit") {
             menuItem("Regenerate Capitals") {
-              onInteract(this@MapEditorScreen.stage, Keys.CONTROL_LEFT, Keys.C) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.C) {
                 island.regenerateCapitals()
               }
             }
 //            menuItem("Remove Smaller Islands") {
-//              onInteract(this@MapEditorScreen.stage, Keys.CONTROL_LEFT, Keys.K) {
+//              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.K) {
 //                TODO()
 //              }
 //            }
@@ -232,14 +230,14 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
             separator()
 
             menuItem("Next Editor") {
-              onInteract(this@MapEditorScreen.stage, Keys.RIGHT) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.RIGHT) {
                 editor =
                   editors.nextOrNull(editor) ?: NOOPEditor
               }
             }
 
             menuItem("Previous Editor") {
-              onInteract(this@MapEditorScreen.stage, Keys.LEFT) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.LEFT) {
                 editor =
                   editors.previousOrNull(editor) ?: NOOPEditor
               }
@@ -248,12 +246,12 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
             separator()
 
             menuItem("Increase Brush Size") {
-              onInteract(this@MapEditorScreen.stage, Keys.PAGE_UP) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.PAGE_UP) {
                 brushRadius++
               }
             }
             menuItem("Decrease Brush Size") {
-              onInteract(this@MapEditorScreen.stage, Keys.PAGE_DOWN) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.PAGE_DOWN) {
                 brushRadius--
               }
             }
@@ -261,7 +259,7 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
             separator()
 
             menuItem("Editor Type Specific") {
-              onInteract(this@MapEditorScreen.stage, Keys.Q) {
+              onInteract(this@MapEditorScreen.stage.stage, Keys.Q) {
                 if (editor is TeamEditor) {
                   selectedTeam =
                     Team.values().let {
@@ -278,32 +276,32 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
           }
           menu("Tools") {
             menuItem("Toggle Editor Types") {
-              onInteract(this@MapEditorScreen.stage, Keys.F1) {
-                editorsWindow.toggleShown(this@MapEditorScreen.stage)
+              onInteract(this@MapEditorScreen.stage.stage, Keys.F1) {
+                editorsWindow.toggleShown(this@MapEditorScreen.stage.stage)
               }
             }
 
             separator()
 
             menuItem("Opaqueness Editor Type") {
-              onInteract(this@MapEditorScreen.stage, OPAQUENESS_KEY) {
+              onInteract(this@MapEditorScreen.stage.stage, OPAQUENESS_KEY) {
                 editors = opaquenessEditors
               }
             }
             menuItem("Team Editor Type") {
-              onInteract(this@MapEditorScreen.stage, TEAM_KEY) {
+              onInteract(this@MapEditorScreen.stage.stage, TEAM_KEY) {
                 editors = teamEditors
               }
             }
             menuItem("Piece Editor Type") {
-              onInteract(this@MapEditorScreen.stage, PIECE_KEY) {
+              onInteract(this@MapEditorScreen.stage.stage, PIECE_KEY) {
                 editors = pieceEditors
               }
             }
           }
 
           menu("Help") {
-            menuItem("Information") { onClick { infoWindow.show(this@MapEditorScreen.stage) } }
+            menuItem("Information") { onClick { infoWindow.show(this@MapEditorScreen.stage.stage) } }
           }
         }
         setFillParent(true)
@@ -324,28 +322,24 @@ class MapEditorScreen(val id: Int, val island: Island) : StageScreen() {
   }
 
   override fun render(delta: Float) {
-    islandScreen.render(delta)
     frameUpdatable.frameUpdate()
     super.render(delta)
   }
 
   override fun show() {
     super.show()
-    Hex.inputMultiplexer.addProcessor(stage)
-    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
-    Hex.inputMultiplexer.addProcessor(inputProcessor)
+    stage.show()
+    Hex.inputMultiplexer.addProcessor(mapInputProcessor)
   }
 
   override fun hide() {
     super.hide()
-    Hex.inputMultiplexer.removeProcessor(stage)
-    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
-    Hex.inputMultiplexer.removeProcessor(inputProcessor)
+    stage.hide()
+    Hex.inputMultiplexer.removeProcessor(mapInputProcessor)
   }
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
-    islandScreen.resize(width, height)
     confirmExit.centerWindow()
   }
 

@@ -3,6 +3,7 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.island.Island
@@ -17,6 +18,8 @@ import kotlin.math.max
 
 /** @author Elg */
 open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen() {
+
+  val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
   private fun calcVisibleGridSize(): DoubleArray {
     val visible = island.hexagons.filterNot { island.getData(it).invisible }
@@ -97,11 +100,11 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   }
 
   override fun hide() {
-    dispose()
+    island.select(null)
+    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
   }
 
-  override fun dispose() {
-    island.select(null)
-    super.dispose()
+  override fun show() {
+    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
   }
 }

@@ -16,7 +16,6 @@ import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
-import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.util.createHandInstance
@@ -25,10 +24,7 @@ import no.elg.hex.util.getData
 /** @author Elg */
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  private val stage = StageScreen()
-  val basicIslandInputProcessor: BasicIslandInputProcessor by lazy {
-    BasicIslandInputProcessor(this)
-  }
+  val stage = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
@@ -38,6 +34,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   init {
     stage.stage.actors {
+      if (Hex.args.`stage-debug` || Hex.trace) {
+        stage.isDebugAll = true
+      }
       confirmEndTurn = visWindow("Confirm End Turn") {
         isMovable = false
         isModal = true
@@ -107,8 +106,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   override fun show() {
+    super.show()
     stage.show()
-    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.addProcessor(inputProcessor)
 
     if (island.currentAI != null) {
@@ -119,7 +118,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   override fun hide() {
     super.hide()
     stage.hide()
-    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
     LevelSelectScreen.updateSelectPreview(id, false)
   }
