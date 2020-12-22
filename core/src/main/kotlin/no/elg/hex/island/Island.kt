@@ -220,7 +220,7 @@ class Island(
   fun surrender() {
     history.clear()
     Hex.screen = LevelSelectScreen
-    //only restore state after surrender to make sure the preview is last known state
+    // only restore state after surrender to make sure the preview is last known state
     restoreState(initialState.copy())
     Gdx.app.log("ISLAND", "Player surrendered on turn $turn")
   }

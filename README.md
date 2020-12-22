@@ -14,7 +14,7 @@ A simple turn based strategy game aiming to clone Slay.
 | peasant   | Least powerful movable piece, can only only take over unprotected land                                 |
 | spearman  | Slightly more powerful movable piece, can only take over unprotected land, capitals, and kill peasants |
 | knight    | Even more powerful movable piece, can take over castles, and everything a spearman can                 |
-| baron     | The most powerful piece in the game, can kill every piece (including other barons)                      |
+| baron     | The most powerful piece in the game, can kill every piece (including other barons)                     |
 | pine      | A type of tree that grows everywhere                                                                   |
 | palm      | A type of tree that grows along the coast                                                              |
 | tree      | Collective word for `pine` and `palm`                                                                  |
@@ -22,13 +22,10 @@ A simple turn based strategy game aiming to clone Slay.
 ## TODO
 
 * Allow splash screen to be used to show the game is loading something other than the intro
-  * Allow to specify what the next screen will be
-  * Used when loading island (when loading lazily)
-* Fix on screen buying of units
-* Add surrender button
+    * Allow to specify what the next screen will be
+    * Used when loading island (when loading lazily)
 * Remember state of islands between sessions
 * Add help page
 * Add minimap
 * Add relative strength bar
 * local multiplayer
-* Add undo all button

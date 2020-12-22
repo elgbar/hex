@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
@@ -25,10 +24,7 @@ import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hud.ScreenDrawPosition.TOP_CENTER
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
-import no.elg.hex.screens.LevelSelectScreen.NOT_SELECTED_COLOR
-import no.elg.hex.screens.LevelSelectScreen.SELECT_COLOR
 import no.elg.hex.screens.PlayableIslandScreen
-import no.elg.hex.util.createHandInstance
 
 /** @author Elg */
 class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable {
@@ -96,40 +92,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 4f) / 2f, (height + height / 2) / 2f, handWidth, height)
         batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
       }
-
-      val territory = screen.island.selected
-      if (territory != null) {
-        val castle = Hex.assets.castle
-        val (cWidth, buyHeight) = calcSize(castle, 0.075f)
-        val peasant = Hex.assets.peasant.getKeyFrame(0f)
-        val (pWidth, _) = calcSize(peasant, 0.075f)
-
-        val buyY = Gdx.graphics.height - buyHeight - buyHeight / 3f
-
-        val cX = cWidth / 2f
-        batch.color = if (territory.capital.balance < CASTLE_COST) HALF_TRANSPARENT_COLOR else WHITE
-        batch.draw(castle, cX, buyY, cWidth, buyHeight)
-
-        val pX = cWidth + cWidth / 2f + pWidth / 2f
-        batch.color = if (territory.capital.balance < PEASANT_COST) HALF_TRANSPARENT_COLOR else WHITE
-        batch.draw(peasant, pX, buyY, pWidth, buyHeight)
-        batch.end()
-        if (Hex.debug) {
-          unprojectVector.x = Gdx.input.x.toFloat()
-          unprojectVector.y = Gdx.input.y.toFloat()
-
-          camera.unproject(unprojectVector)
-
-          shapeRenderer.begin(Line)
-          shapeRenderer.color = if (mouseX in cX..cX + cWidth && mouseY in buyY..buyY + buyHeight) SELECT_COLOR else NOT_SELECTED_COLOR
-          shapeRenderer.rect(cX, buyY, cWidth, buyHeight)
-
-          shapeRenderer.color = if (mouseX in pX..pX + pWidth && mouseY in buyY..buyY + buyHeight) SELECT_COLOR else NOT_SELECTED_COLOR
-          shapeRenderer.rect(pX, buyY, pWidth, buyHeight)
-          shapeRenderer.end()
-        }
-      } else
-        batch.end()
+      batch.end()
     }
 
     if (Hex.debug) {
@@ -147,9 +110,5 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
   companion object {
     val CHEATING_SCREEN_TEXT = ScreenText("Cheating enabled!", color = Color.GOLD)
-    val CASTLE_COST = Castle::class.createHandInstance().price
-    val PEASANT_COST = Peasant::class.createHandInstance().price
-
-    val HALF_TRANSPARENT_COLOR = Color(1f, 1f, 1f, 0.5f)
   }
 }
