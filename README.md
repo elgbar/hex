@@ -2,9 +2,9 @@
 
 A simple turn based strategy game aiming to clone Slay.
 
-## Glossary
+## Glossaries
 
-| Prase     | Meaning                                                                                                |
+| Glossary  | Explanation                                                                                                |
 | :-------- | :----------------------------------------------------------------------------------------------------- |
 | Team      | A player or computer                                                                                   |
 | Territory | Two or more hexes of the same team                                                                     |
@@ -22,10 +22,22 @@ A simple turn based strategy game aiming to clone Slay.
 ## TODO
 
 * Allow splash screen to be used to show the game is loading something other than the intro
-    * Allow to specify what the next screen will be
-    * Used when loading island (when loading lazily)
+  * Allow to specify what the next screen will be
+  * Used when loading island (when loading lazily)
 * Remember state of islands between sessions
 * Add help page
 * Add minimap
 * Add relative strength bar
 * local multiplayer
+* Let AI surrender when it is clear that the player is winning
+* Add settings
+  * disable end turn warning
+  * disable surrender warning
+* Hold to march
+  * Double click/long click to move all units to around the hexagon pressed
+  * disable hold to march setting
+* Sounds
+* Fix grave piece
+  * Graves behaves differently for the AI than the player
+  * It works correctly for players
+  * Does not work for AI (it stays too long)
