@@ -4,7 +4,7 @@ A simple turn based strategy game aiming to clone Slay.
 
 ## Glossaries
 
-| Glossary  | Explanation                                                                                                |
+| Glossary  | Explanation                                                                                            |
 | :-------- | :----------------------------------------------------------------------------------------------------- |
 | Team      | A player or computer                                                                                   |
 | Territory | Two or more hexes of the same team                                                                     |
@@ -41,3 +41,4 @@ A simple turn based strategy game aiming to clone Slay.
   * Graves behaves differently for the AI than the player
   * It works correctly for players
   * Does not work for AI (it stays too long)
+* Spamming end turn button too quickly will cause bugs with history and sometimes crashes the game
