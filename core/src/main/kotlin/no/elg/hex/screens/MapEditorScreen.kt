@@ -322,8 +322,9 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   }
 
   override fun render(delta: Float) {
-    frameUpdatable.frameUpdate()
     super.render(delta)
+    frameUpdatable.frameUpdate()
+    stage.render(delta)
   }
 
   override fun show() {
