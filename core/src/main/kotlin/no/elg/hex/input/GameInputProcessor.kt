@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.BACKSPACE
-import com.badlogic.gdx.Input.Keys.ENTER
+import com.badlogic.gdx.Input.Keys.F11
 import com.badlogic.gdx.Input.Keys.F12
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.Input.Keys.Y
@@ -30,6 +30,8 @@ import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isKeyPressed
+import no.elg.hex.util.show
+import no.elg.hex.util.toggleShown
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
@@ -115,6 +117,17 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
 
         // reselect territory to update it's values
         island.select(placeOn)
+
+        val capitals = island.hexagons.map { island.getData(it) }.filter { it.piece is Capital }
+        island.currentAI
+        if (capitals.count() == 1) {
+          screen.updateWinningTurn()
+          if (island.isCurrentTeamHuman()) {
+            screen.youWon.show(screen.stageScreen.stage)
+          } else {
+            screen.youLost.show(screen.stageScreen.stage)
+          }
+        }
       }
     }
   }
@@ -157,9 +170,9 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
     if (screen.island.currentAI != null) return false
 
     when (keycode) {
-      ENTER -> screen.endTurn()
       BACKSPACE, SPACE -> screen.island.inHand = null
       F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
+      F11 -> if (Hex.debug) screen.acceptAISurrender.toggleShown(screen.stageScreen.stage)
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
+import com.kotcrab.vis.ui.widget.VisWindow
 import no.elg.hex.Hex
 
 /** @author Elg */
@@ -29,5 +30,10 @@ open class StageScreen : AbstractScreen() {
     camera.setToOrtho(false)
     stage.viewport.setWorldSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     stage.viewport.setScreenSize(Gdx.graphics.width, Gdx.graphics.height)
+    for (actor in stage.actors) {
+      if (actor is VisWindow) {
+        actor.centerWindow()
+      }
+    }
   }
 }

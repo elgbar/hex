@@ -165,6 +165,9 @@ class Island(
       //        put(STARTING_TEAM, NotAsRandomAI(STARTING_TEAM, true)) // player
     }
 
+  fun isCurrentTeamAI() = currentAI != null
+  fun isCurrentTeamHuman() = currentAI == null
+
   // ////////////
   // Gameplay //
   // ////////////
@@ -217,11 +220,15 @@ class Island(
     }
   }
 
+  fun restoreInitialState() {
+    restoreState(initialState.copy())
+  }
+
   fun surrender() {
     history.clear()
     Hex.screen = LevelSelectScreen
     // only restore state after surrender to make sure the preview is last known state
-    restoreState(initialState.copy())
+    restoreInitialState()
     Gdx.app.log("ISLAND", "Player surrendered on turn $turn")
   }
 

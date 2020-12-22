@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.kotcrab.vis.ui.widget.ButtonBar
+import ktx.actors.isShown
+import ktx.actors.minusAssign
 import ktx.actors.onClick
 import ktx.scene2d.actors
 import ktx.scene2d.scene2d
@@ -51,14 +53,17 @@ import kotlin.reflect.KClass
 /** @author Elg */
 class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  val stage = StageScreen()
-  val mapInputProcessor = MapEditorInputProcessor(this)
+  private val stageScreen = StageScreen()
+  private val mapInputProcessor = MapEditorInputProcessor(this)
   private val frameUpdatable = MapEditorRenderer(this)
   private var quickSavedIsland: String = ""
 
   private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(this)
   private val teamEditors = TeamEditor.generateTeamEditors(this)
   private val pieceEditors = PieceEditor.generatePieceEditors(this)
+
+  private val editorsWindow: KVisWindow
+  private val confirmExit: KVisWindow
 
   var brushRadius: Int = 1
     private set(value) {
@@ -86,11 +91,14 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
         publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
       }
     }
-  val confirmExit: KVisWindow
 
   init {
     quicksave()
-    stage.stage.actors {
+    stageScreen.stage.actors {
+      if (Hex.args.`stage-debug` || Hex.trace) {
+        stage.isDebugAll = true
+      }
+
       confirmExit =
         visWindow("Confirm exit") {
           isMovable = false
@@ -134,7 +142,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
         confirmExit.toggleShown(stage)
       }
 
-      val editorsWindow =
+      editorsWindow =
         visWindow("Editors") {
           addCloseButton()
           isResizable = false
@@ -190,12 +198,12 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
 
           menu("Island") {
             menuItem("Save") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.S) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.S) {
                 saveIsland(id, island)
               }
             }
             menuItem("Reload") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.R) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.R) {
 
                 if (play(id)) {
                   publishMessage("Successfully reloaded island $id")
@@ -206,18 +214,18 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
             }
             separator()
             menuItem("Quick save") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.F5) { quicksave() }
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F5) { quicksave() }
             }
             menuItem("Quick Load") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.F9) { quickload() }
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F9) { quickload() }
             }
             separator()
-            menuItem("Exit") { onInteract(this@MapEditorScreen.stage.stage, Keys.ESCAPE) { exit() } }
+            menuItem("Exit") { onInteract(this@MapEditorScreen.stageScreen.stage, Keys.ESCAPE) { exit() } }
           }
 
           menu("Edit") {
             menuItem("Regenerate Capitals") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.C) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.C) {
                 island.regenerateCapitals()
               }
             }
@@ -230,14 +238,14 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
             separator()
 
             menuItem("Next Editor") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.RIGHT) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.RIGHT) {
                 editor =
                   editors.nextOrNull(editor) ?: NOOPEditor
               }
             }
 
             menuItem("Previous Editor") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.LEFT) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.LEFT) {
                 editor =
                   editors.previousOrNull(editor) ?: NOOPEditor
               }
@@ -246,12 +254,12 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
             separator()
 
             menuItem("Increase Brush Size") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.PAGE_UP) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.PAGE_UP) {
                 brushRadius++
               }
             }
             menuItem("Decrease Brush Size") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.PAGE_DOWN) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.PAGE_DOWN) {
                 brushRadius--
               }
             }
@@ -259,7 +267,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
             separator()
 
             menuItem("Editor Type Specific") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.Q) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.Q) {
                 if (editor is TeamEditor) {
                   selectedTeam =
                     Team.values().let {
@@ -276,32 +284,32 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
           }
           menu("Tools") {
             menuItem("Toggle Editor Types") {
-              onInteract(this@MapEditorScreen.stage.stage, Keys.F1) {
-                editorsWindow.toggleShown(this@MapEditorScreen.stage.stage)
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F1) {
+                editorsWindow.toggleShown(this@MapEditorScreen.stageScreen.stage)
               }
             }
 
             separator()
 
             menuItem("Opaqueness Editor Type") {
-              onInteract(this@MapEditorScreen.stage.stage, OPAQUENESS_KEY) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, OPAQUENESS_KEY) {
                 editors = opaquenessEditors
               }
             }
             menuItem("Team Editor Type") {
-              onInteract(this@MapEditorScreen.stage.stage, TEAM_KEY) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, TEAM_KEY) {
                 editors = teamEditors
               }
             }
             menuItem("Piece Editor Type") {
-              onInteract(this@MapEditorScreen.stage.stage, PIECE_KEY) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, PIECE_KEY) {
                 editors = pieceEditors
               }
             }
           }
 
           menu("Help") {
-            menuItem("Information") { onClick { infoWindow.show(this@MapEditorScreen.stage.stage) } }
+            menuItem("Information") { onClick { infoWindow.show(this@MapEditorScreen.stageScreen.stage) } }
           }
         }
         setFillParent(true)
@@ -324,24 +332,31 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   override fun render(delta: Float) {
     super.render(delta)
     frameUpdatable.frameUpdate()
-    stage.render(delta)
+    stageScreen.render(delta)
   }
 
   override fun show() {
     super.show()
-    stage.show()
+    stageScreen.show()
     Hex.inputMultiplexer.addProcessor(mapInputProcessor)
   }
 
   override fun hide() {
     super.hide()
-    stage.hide()
+    stageScreen.hide()
     Hex.inputMultiplexer.removeProcessor(mapInputProcessor)
   }
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
-    confirmExit.centerWindow()
+    val editorsShown = editorsWindow.isShown()
+    if (editorsShown) {
+      stageScreen.stage -= editorsWindow
+    }
+    stageScreen.resize(width, height)
+    if (editorsShown) {
+      editorsWindow.show(stageScreen.stage, false, 0f)
+    }
   }
 
   companion object {

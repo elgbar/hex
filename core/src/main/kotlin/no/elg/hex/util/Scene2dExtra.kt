@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.kotcrab.vis.ui.widget.MenuItem
 import com.kotcrab.vis.ui.widget.PopupMenu
 import com.kotcrab.vis.ui.widget.Separator
 import com.kotcrab.vis.ui.widget.VisWindow
+import com.kotcrab.vis.ui.widget.VisWindow.FADE_TIME
 import ktx.actors.isShown
-import ktx.actors.onClick
+import ktx.actors.onChange
 import ktx.actors.onKeyDown
 import ktx.scene2d.Scene2dDsl
 
@@ -26,33 +28,37 @@ fun PopupMenu.separator() {
  * Call [interaction] when either the user clicks on the menu item or when pressing all the given
  * keys.
  */
-fun MenuItem.onInteract(stage: Stage, vararg keyShortcut: Int, interaction: () -> Unit) {
+fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, interaction: Button.() -> Unit) {
   if (keyShortcut.isNotEmpty()) {
-    setShortcut(*keyShortcut)
-    stage += onAllKeysDownEvent(*keyShortcut, catchEvent = true) { interaction() }
+    if (this is MenuItem) {
+      setShortcut(*keyShortcut)
+    }
+    stage += onAllKeysDownEvent(*keyShortcut, catchEvent = true, listener = interaction)
   }
-
-  onClick { interaction() }
+  onChange(interaction)
 }
 
 /** Add and fade in this window if it is is not [isShown] */
-fun VisWindow.show(stage: Stage) {
+fun VisWindow.show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
   if (!isShown()) {
-    stage.addActor(fadeIn())
+    stage.addActor(fadeIn(fadeTime))
+    if (center) {
+      centerWindow()
+    }
   }
 }
 
-/** Alias for [VisWindow.fadeOut] with a fadeout duration of `0f` */
-fun VisWindow.hide() {
-  fadeOut(0f)
+/** Alias for [VisWindow.fadeOut] with a default fadeout duration of `0f` */
+fun VisWindow.hide(fadeTime: Float = 0f) {
+  fadeOut(fadeTime)
 }
 
 /** Toggle if this window is shown or not */
-fun VisWindow.toggleShown(stage: Stage) {
+fun VisWindow.toggleShown(stage: Stage, center: Boolean = true) {
   if (!isShown()) {
-    stage.addActor(fadeIn())
+    show(stage, center)
   } else {
-    fadeOut()
+    hide()
   }
 }
 

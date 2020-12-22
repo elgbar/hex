@@ -15,6 +15,10 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -48,7 +52,7 @@ object LevelSelectScreen : AbstractScreen() {
 
   val rendereredPreviewSize get() = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
 
-  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, surrender: Boolean = false): FrameBuffer {
+  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, modifier: PreviewModifier = NOTHING): FrameBuffer {
     val islandScreen = PreviewIslandScreen(-1, island)
     islandScreen.resize(previewWidth, previewHeight)
     val buffer =
@@ -60,17 +64,30 @@ object LevelSelectScreen : AbstractScreen() {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
     camera.update()
     islandScreen.render(0f)
-    if (surrender) {
-      batch.begin()
+    if (modifier != NOTHING) {
+
       val widthOffset = camera.viewportWidth / 6
       val heightOffset = camera.viewportHeight / 6
-      batch.draw(
-        Hex.assets.surrender,
-        widthOffset,
-        heightOffset,
-        camera.viewportWidth - widthOffset * 2,
-        camera.viewportHeight - heightOffset * 2
-      )
+      batch.begin()
+
+      when (modifier) {
+        SURRENDER -> batch.draw(
+          Hex.assets.surrender,
+          widthOffset,
+          heightOffset,
+          camera.viewportWidth - widthOffset * 2,
+          camera.viewportHeight - heightOffset * 2
+        )
+        LOST -> batch.draw(
+          Hex.assets.grave,
+          widthOffset,
+          heightOffset,
+          camera.viewportWidth - widthOffset * 2,
+          camera.viewportHeight - heightOffset * 2
+        )
+        WON -> Hex.assets.boldFont.draw(batch, "${island.turn}", widthOffset, heightOffset)
+        else -> error("Unknown/illegal preview modifier: $modifier")
+      }
       batch.end()
     }
     Hex.setClearColorAlpha(1f)
@@ -104,7 +121,7 @@ object LevelSelectScreen : AbstractScreen() {
     }
   }
 
-  fun updateSelectPreview(slot: Int, save: Boolean, surrender: Boolean = false) {
+  fun updateSelectPreview(slot: Int, save: Boolean, modifier: PreviewModifier = NOTHING) {
     val index = IslandFiles.islandIds.indexOf(slot)
     if (index == -1) {
       publishWarning("Failed to find file index of island with a slot at $slot")
@@ -118,7 +135,7 @@ object LevelSelectScreen : AbstractScreen() {
     }
     val island = Hex.assets.finishLoadingAsset<Island>(islandFileName)
 
-    val preview = renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, surrender)
+    val preview = renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, modifier)
     if (save) {
       val islandPreviewFile = getIslandFile(slot, true)
       preview.takeScreenshot(islandPreviewFile)
@@ -200,5 +217,12 @@ object LevelSelectScreen : AbstractScreen() {
       buffer.second.dispose()
     }
     islandPreviews.clear()
+  }
+
+  enum class PreviewModifier {
+    NOTHING,
+    SURRENDER,
+    WON,
+    LOST
   }
 }

@@ -1,17 +1,15 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Value
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.widget.ButtonBar
 import com.kotcrab.vis.ui.widget.VisWindow
-import ktx.actors.isShown
-import ktx.actors.onChange
-import ktx.actors.onChangeEvent
 import ktx.actors.onClick
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -19,6 +17,7 @@ import ktx.scene2d.horizontalGroup
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.vis.KVisImageButton
+import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visLabel
@@ -28,6 +27,7 @@ import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
@@ -37,14 +37,20 @@ import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
-import no.elg.hex.util.toggleShown
+import no.elg.hex.util.onInteract
+import no.elg.hex.util.show
 
 /** @author Elg */
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  val stage = StageScreen()
+  val stageScreen = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
@@ -52,17 +58,24 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   private val confirmEndTurn: VisWindow
   private val confirmSurrender: VisWindow
-  private val disableChecker: MutableMap<KVisImageButton, (Territory?) -> Boolean> = mutableMapOf()
+  internal val acceptAISurrender: VisWindow
+  internal val youWon: VisWindow
+  internal val youLost: VisWindow
 
-  private var surredered = false
+  private val disableChecker: MutableMap<KVisImageButton, (Territory?) -> Boolean> = mutableMapOf()
+  private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
+
+  private var modifier = NOTHING
+  private var confirmEndTurnSetting = true
 
   init {
-    stage.stage.actors {
+    stageScreen.stage.actors {
       if (Hex.args.`stage-debug` || Hex.trace) {
         stage.isDebugAll = true
       }
+
       @Scene2dDsl
-      fun confirmWindow(title: String, text: String, whenConfirmed: () -> Unit): VisWindow {
+      fun confirmWindow(title: String, text: String, whenConfirmed: KVisWindow.() -> Unit): VisWindow {
         return this.visWindow(title) {
           isMovable = false
           isModal = true
@@ -76,7 +89,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               ButtonBar.ButtonType.YES,
               scene2d.visTextButton("Yes") {
                 onClick {
-                  whenConfirmed()
+                  this@visWindow.whenConfirmed()
                   this@visWindow.fadeOut()
                 }
               }
@@ -96,12 +109,83 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         }
       }
 
+      @Scene2dDsl
+      fun okWindow(title: String, text: () -> String, whenConfirmed: KVisWindow.() -> Unit): VisWindow {
+        return visWindow(title) {
+          isMovable = false
+          isModal = true
+          hide()
+          val label = visLabel(text())
+
+          labelUpdater[this] = {
+            label.setText(text())
+            pack()
+            centerWindow()
+          }
+
+          row()
+
+          fadeIn()
+
+          buttonBar {
+            setButton(
+              ButtonBar.ButtonType.OK,
+              scene2d.visTextButton("OK") {
+                onClick {
+                  this@visWindow.whenConfirmed()
+                  this@visWindow.fadeOut()
+                }
+              }
+            )
+            createTable().pack()
+          }
+          pack()
+          centerWindow()
+          fadeOut(0f)
+        }
+      }
+
+      fun endGame(modifier: PreviewModifier): KVisWindow.() -> Unit = {
+        island.history.disable()
+        island.history.clear()
+        this@PlayableIslandScreen.modifier = modifier
+        Hex.screen = LevelSelectScreen
+        island.restoreInitialState()
+      }
+
+      youWon = okWindow("You Won!", { "Congratulations! You won in ${island.turn} turns." }, endGame(WON))
+      youLost = okWindow("You Lost", { "Too bad! You lost in ${island.turn} turns." }, endGame(LOST))
+
       confirmEndTurn = confirmWindow("Confirm End Turn", "Are you sure you want to end your turn?") {
         island.endTurn(inputProcessor)
       }
+
       confirmSurrender = confirmWindow("Confirm Surrender", "Are you sure you want to surrender?") {
-        surredered = true
+        modifier = SURRENDER
         island.surrender()
+      }
+
+      acceptAISurrender = confirmWindow("Accept AI Surrender", "The AI want to surrender, do you accept?") {
+        island.history.disable()
+        island.history.clear()
+
+        for (hexagon in island.hexagons) {
+          val data = island.getData(hexagon)
+          if (data.team == island.currentTeam) {
+            continue
+          }
+          data.team = island.currentTeam
+          data.setPiece(Empty::class)
+        }
+
+        island.select(null)
+        island.select(
+          island.hexagons.first {
+            !island.getData(it).invisible
+          }
+        )
+        island.select(null)
+        youWon.show(stage)
       }
 
       table {
@@ -121,7 +205,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             down: TextureRegion? = null,
             disabled: TextureRegion? = null,
             disableCheck: ((Territory?) -> Boolean)? = null,
-            onClick: KVisImageButton.(event: ChangeEvent) -> Unit
+            vararg keyShortcut: Int,
+            onClick: Button.() -> Unit
           ) {
 
             fun drawableToTextureRegion(drawable: TextureRegion): Drawable {
@@ -141,7 +226,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               if (disabled != null) {
                 style.disabled = drawableToTextureRegion(disabled)
               }
-              onChangeEvent(onClick)
+              onInteract(stage, *keyShortcut, interaction = onClick)
               if (disableCheck != null) {
                 disableChecker[this] = disableCheck
               }
@@ -153,29 +238,69 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
 
-          button("Buy Castle", Hex.assets.castle, disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE }) {
+          button(
+            tooltip = "Buy Castle",
+            up = Hex.assets.castle,
+            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE },
+            keyShortcut = intArrayOf(Keys.NUM_1)
+          ) {
             inputProcessor.buyUnit(Castle::class.createHandInstance())
           }
-          button("Buy Peasant", Hex.assets.peasant.getKeyFrame(0f), disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE }) {
+
+          button(
+            tooltip = "Buy Peasant",
+            up = Hex.assets.peasant.getKeyFrame(0f),
+            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE },
+            keyShortcut = intArrayOf(Keys.NUM_2)
+          ) {
             inputProcessor.buyUnit(Peasant::class.createHandInstance())
           }
-          button("Undo", Hex.assets.undo, disableCheck = { !island.history.canUndo() }) {
+          button(
+            tooltip = "Undo",
+            up = Hex.assets.undo,
+            disableCheck = { !island.history.canUndo() },
+            keyShortcut = intArrayOf(Keys.NUM_3)
+          ) {
             island.history.undo()
           }
-          button("Undo All", Hex.assets.undoAll, disableCheck = { !island.history.canUndo() }) {
+          button(
+            tooltip = "Undo All",
+            up = Hex.assets.undoAll,
+            disableCheck = { !island.history.canUndo() },
+            keyShortcut = intArrayOf(Keys.NUM_4)
+          ) {
             island.history.undoAll()
           }
-          button("Redo", Hex.assets.redo, disableCheck = { !island.history.canRedo() }) {
+          button(
+            tooltip = "Redo",
+            up = Hex.assets.redo,
+            disableCheck = { !island.history.canRedo() },
+            keyShortcut = intArrayOf(Keys.NUM_5)
+          ) {
             island.history.redo()
           }
-          button("Surrender", Hex.assets.surrender) {
-            confirmSurrender.toggleShown(stage)
+          button(
+            tooltip = "Surrender",
+            up = Hex.assets.surrender,
+            keyShortcut = intArrayOf(Keys.NUM_6)
+          ) {
+            confirmSurrender.show(stage)
           }
           if (Hex.trace) {
-            button("Settings", Hex.assets.settings, Hex.assets.settingsDown) {
+            button(
+              tooltip = "Settings",
+              up = Hex.assets.settings,
+              down = Hex.assets.settingsDown,
+              keyShortcut = intArrayOf(Keys.NUM_7)
+            ) {
             }
           }
-          button("Help", Hex.assets.help, Hex.assets.helpDown) {
+          button(
+            tooltip = "Help",
+            up = Hex.assets.help,
+            down = Hex.assets.helpDown,
+            keyShortcut = intArrayOf(Keys.NUM_8)
+          ) {
             if (distress) {
               distress = false
               Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
@@ -185,7 +310,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
           visTextButton("End Turn") {
-            onChange {
+            onInteract(stage, Keys.ENTER) {
               endTurn()
             }
           }
@@ -194,21 +319,23 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     }
   }
 
+  fun updateWinningTurn() {
+    for ((window, action) in labelUpdater) {
+      window.action()
+    }
+  }
+
   fun endTurn() {
-    if (island.currentAI == null) {
+    if (island.isCurrentTeamHuman() && confirmEndTurnSetting) {
       val minCost = Peasant::class.createHandInstance().price
-      for (
-      data in island.hexagons
+      val hexagons = island.hexagons
         .map { island.getData(it) }
         .filter { it.team == island.currentTeam && (it.piece is LivingPiece || it.piece is Capital) }
-      ) {
+      for (data in hexagons) {
 
         val piece = data.piece
         if ((piece is Capital && piece.balance >= minCost) || (piece is LivingPiece && !piece.moved)) {
-          confirmEndTurn.centerWindow()
-          if (!confirmEndTurn.isShown()) {
-            stage.stage.addActor(confirmEndTurn.fadeIn())
-          }
+          confirmEndTurn.show(stageScreen.stage)
           return
         }
       }
@@ -224,7 +351,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     if (!Hex.args.mapEditor) {
       frameUpdatable.frameUpdate()
     }
-    stage.render(delta)
+    stageScreen.render(delta)
     val territory = island.selected
     for ((button, check) in disableChecker) {
       button.isDisabled = check(territory)
@@ -233,7 +360,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun show() {
     super.show()
-    stage.show()
+    stageScreen.show()
     Hex.inputMultiplexer.addProcessor(inputProcessor)
 
     if (island.currentAI != null) {
@@ -243,22 +370,21 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun hide() {
     super.hide()
-    stage.hide()
+    stageScreen.hide()
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
-    LevelSelectScreen.updateSelectPreview(id, false, surredered)
-    surredered = false
+    LevelSelectScreen.updateSelectPreview(id, false, modifier)
+    modifier = NOTHING
   }
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
-    stage.resize(width, height)
+    stageScreen.resize(width, height)
     frameUpdatable.resize(width, height)
-    confirmEndTurn.centerWindow()
   }
 
   companion object {
     val PEASANT_PRICE = Peasant::class.createHandInstance().price
     val CASTLE_PRICE = Castle::class.createHandInstance().price
-    var distress = true
+    private var distress = true
   }
 }
