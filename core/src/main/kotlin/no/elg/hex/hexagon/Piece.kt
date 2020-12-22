@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.util.connectedHexagons
-import no.elg.hex.util.createInstance
+import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -221,7 +221,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     hexagons.sumBy { island.getData(it).piece.income }
 
   fun canBuy(piece: KClass<out Piece>): Boolean =
-    canBuy(piece.createInstance(HexagonData.EDGE_DATA))
+    canBuy(piece.createHandInstance())
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 

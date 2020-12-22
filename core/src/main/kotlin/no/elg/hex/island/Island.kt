@@ -24,6 +24,7 @@ import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
@@ -141,12 +142,12 @@ class Island(
     }
   }
 
-  val initialState: IslandDto
+  private val initialState: IslandDto
 
   init {
     restoreState(width, height, layout, hexagonData, selectedCoordinate, piece, true)
     history.clear()
-    initialState = dto
+    initialState = createDto().copy()
   }
 
   var selected: Territory? = null
@@ -211,8 +212,17 @@ class Island(
       } else {
         // enable history only when it's a humans turn
         history.enable()
+        history.clear()
       }
     }
+  }
+
+  fun surrender() {
+    history.clear()
+    Hex.screen = LevelSelectScreen
+    //only restore state after surrender to make sure the preview is last known state
+    restoreState(initialState.copy())
+    Gdx.app.log("ISLAND", "Player surrendered on turn $turn")
   }
 
   /** Select the hex under the cursor */
@@ -423,7 +433,10 @@ class Island(
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         if (this.getData(hexagon).piece is Capital) {
           publishMessage(
-            ScreenText("Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.", Color.RED)
+            ScreenText(
+              "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.",
+              Color.RED
+            )
           )
           valid = false
         }
@@ -435,7 +448,12 @@ class Island(
         publishMessage(ScreenText("There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.", Color.RED))
         valid = false
       } else if (capitalCount > 1) {
-        publishMessage(ScreenText("There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.", Color.RED))
+        publishMessage(
+          ScreenText(
+            "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.",
+            Color.RED
+          )
+        )
         valid = false
       }
     }
@@ -489,17 +507,16 @@ class Island(
   // Data Transfer Object //
   // ////////////////////////
 
-  @get:JsonValue
-  internal val dto
-    get() =
-      IslandDto(
-        grid.gridData.gridWidth,
-        grid.gridData.gridHeight,
-        grid.gridData.gridLayout,
-        hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
-        selected?.findCapitalCoordinates(),
-        inHand?.piece?.createDtoCopy()
-      )
+  @JsonValue
+  internal fun createDto() =
+    IslandDto(
+      grid.gridData.gridWidth,
+      grid.gridData.gridHeight,
+      grid.gridData.gridLayout,
+      hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
+      selected?.findCapitalCoordinates(),
+      inHand?.piece?.createDtoCopy()
+    )
 
   data class IslandDto(
     val width: Int,

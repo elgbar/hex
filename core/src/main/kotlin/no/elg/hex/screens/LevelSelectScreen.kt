@@ -48,7 +48,7 @@ object LevelSelectScreen : AbstractScreen() {
 
   val rendereredPreviewSize get() = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
 
-  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, save: Boolean = false): FrameBuffer {
+  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, surrender: Boolean = false): FrameBuffer {
     val islandScreen = PreviewIslandScreen(-1, island)
     islandScreen.resize(previewWidth, previewHeight)
     val buffer =
@@ -60,6 +60,19 @@ object LevelSelectScreen : AbstractScreen() {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
     camera.update()
     islandScreen.render(0f)
+    if (surrender) {
+      batch.begin()
+      val widthOffset = camera.viewportWidth / 6
+      val heightOffset = camera.viewportHeight / 6
+      batch.draw(
+        Hex.assets.surrender,
+        widthOffset,
+        heightOffset,
+        camera.viewportWidth - widthOffset * 2,
+        camera.viewportHeight - heightOffset * 2
+      )
+      batch.end()
+    }
     Hex.setClearColorAlpha(1f)
     buffer.end()
     islandScreen.dispose()
@@ -91,7 +104,7 @@ object LevelSelectScreen : AbstractScreen() {
     }
   }
 
-  fun updateSelectPreview(slot: Int, save: Boolean) {
+  fun updateSelectPreview(slot: Int, save: Boolean, surrender: Boolean = false) {
     val index = IslandFiles.islandIds.indexOf(slot)
     if (index == -1) {
       publishWarning("Failed to find file index of island with a slot at $slot")
@@ -105,7 +118,7 @@ object LevelSelectScreen : AbstractScreen() {
     }
     val island = Hex.assets.finishLoadingAsset<Island>(islandFileName)
 
-    val preview = renderPreview(island, rendereredPreviewSize, rendereredPreviewSize)
+    val preview = renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, surrender)
     if (save) {
       val islandPreviewFile = getIslandFile(slot, true)
       preview.takeScreenshot(islandPreviewFile)

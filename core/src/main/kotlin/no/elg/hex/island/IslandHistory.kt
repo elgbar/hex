@@ -56,8 +56,14 @@ class IslandHistory(val island: Island) {
         }
         historyPointer = 0
       }
-      history.addFirst(island.dto)
+      history.addFirst(island.createDto())
       historyNotes.addFirst(note)
+    }
+  }
+
+  fun undoAll() {
+    for (unused in historyPointer until history.size - 1) {
+      undo()
     }
   }
 
