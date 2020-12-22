@@ -93,7 +93,7 @@ class Assets : AssetManager() {
   private fun findSprite(regionName: String): AtlasRegion {
     val region =
       if (Hex.args.retro) {
-        Hex.assets.originalSprites2x.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
+        Hex.assets.originalSprites.findRegion(regionName)
       } else {
         Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
       }
@@ -226,9 +226,7 @@ class Assets : AssetManager() {
 
     loadingInfo = "sprites"
 
-    if (Hex.args.retro) {
-      load(ORIGINAL_SPRITES_ATLAS_2X, TEXTURE_ATLAS)
-    } else {
+    if (!Hex.args.retro) {
       load(SPRITE_ATLAS, TEXTURE_ATLAS)
     }
     load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
