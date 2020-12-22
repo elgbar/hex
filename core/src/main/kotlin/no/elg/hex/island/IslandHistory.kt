@@ -67,6 +67,9 @@ class IslandHistory(val island: Island) {
     }
   }
 
+  fun canUndo(): Boolean = (historyPointer + 1) in history.indices
+  fun canRedo(): Boolean = (historyPointer - 1) in history.indices
+
   fun undo() {
     val pointer = historyPointer + 1
     if (pointer !in history.indices) {

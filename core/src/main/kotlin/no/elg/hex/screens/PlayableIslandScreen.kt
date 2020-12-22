@@ -1,6 +1,7 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
@@ -22,6 +23,7 @@ import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
+import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
@@ -31,6 +33,7 @@ import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -113,6 +116,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
           @Scene2dDsl
           fun button(
+            tooltip: String,
             up: TextureRegion,
             down: TextureRegion? = null,
             disabled: TextureRegion? = null,
@@ -127,6 +131,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
 
             visImageButton {
+
+              visTextTooltip(tooltip)
               style.imageUp = drawableToTextureRegion(up)
 
               if (down != null) {
@@ -147,34 +153,34 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
 
-          button(Hex.assets.castle, disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE }) {
+          button("Buy Castle", Hex.assets.castle, disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE }) {
             inputProcessor.buyUnit(Castle::class.createHandInstance())
           }
-          button(Hex.assets.peasant.getKeyFrame(0f), disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE }) {
+          button("Buy Peasant", Hex.assets.peasant.getKeyFrame(0f), disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE }) {
             inputProcessor.buyUnit(Peasant::class.createHandInstance())
           }
-          button(Hex.assets.undo) {
+          button("Undo", Hex.assets.undo, disableCheck = { !island.history.canUndo() }) {
             island.history.undo()
           }
-          button(Hex.assets.undoAll) {
+          button("Undo All", Hex.assets.undoAll, disableCheck = { !island.history.canUndo() }) {
             island.history.undoAll()
           }
-          button(Hex.assets.redo) {
+          button("Redo", Hex.assets.redo, disableCheck = { !island.history.canRedo() }) {
             island.history.redo()
           }
-          button(Hex.assets.surrender) {
+          button("Surrender", Hex.assets.surrender) {
             confirmSurrender.toggleShown(stage)
           }
           if (Hex.trace) {
-            button(Hex.assets.settings, Hex.assets.settingsDown) {
+            button("Settings", Hex.assets.settings, Hex.assets.settingsDown) {
             }
           }
-          button(Hex.assets.help, Hex.assets.helpDown) {
+          button("Help", Hex.assets.help, Hex.assets.helpDown) {
             if (distress) {
               distress = false
               Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
               if (Hex.args.cheating) {
-                MessagesRenderer.publishMessage("You're asking for help when cheating!? No a very good cheater are you?")
+                MessagesRenderer.publishMessage(ScreenText("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD))
               }
             }
           }
@@ -192,9 +198,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     if (island.currentAI == null) {
       val minCost = Peasant::class.createHandInstance().price
       for (
-        data in island.hexagons
-          .map { island.getData(it) }
-          .filter { it.team == island.currentTeam && (it.piece is LivingPiece || it.piece is Capital) }
+      data in island.hexagons
+        .map { island.getData(it) }
+        .filter { it.team == island.currentTeam && (it.piece is LivingPiece || it.piece is Capital) }
       ) {
 
         val piece = data.piece
