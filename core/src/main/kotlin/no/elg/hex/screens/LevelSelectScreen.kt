@@ -137,7 +137,7 @@ object LevelSelectScreen : AbstractScreen() {
 
     val preview = renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, modifier)
     if (save) {
-      val islandPreviewFile = getIslandFile(slot, true)
+      val islandPreviewFile = getIslandFile(slot, preview = true, allowInternal = false)
       preview.takeScreenshot(islandPreviewFile)
     }
     if (index == islandPreviews.size) {
