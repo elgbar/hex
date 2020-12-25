@@ -342,6 +342,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
     super.hide()
     stageScreen.hide()
     Hex.inputMultiplexer.removeProcessor(mapInputProcessor)
+    LevelSelectScreen.updateSelectPreview(id, true)
   }
 
   override fun resize(width: Int, height: Int) {
