@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
@@ -124,7 +125,7 @@ object SettingsScreen : StageScreen() {
           addSetting(property as KMutableProperty1<Settings, Any>)
         }
         visTextButton("Back") {
-          onInteract(stage) {
+          onInteract(stage, intArrayOf(Keys.ESCAPE), intArrayOf(Keys.BACK)) {
             backToPreviousScreen()
           }
         }
