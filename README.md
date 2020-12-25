@@ -30,9 +30,6 @@ A simple turn based strategy game aiming to clone Slay.
 * Add relative strength bar
 * local multiplayer
 * Let AI surrender when it is clear that the player is winning
-* Add settings
-  * disable end turn warning
-  * disable surrender warning
 * Hold to march
   * Double click/long click to move all units to around the hexagon pressed
   * disable hold to march setting
