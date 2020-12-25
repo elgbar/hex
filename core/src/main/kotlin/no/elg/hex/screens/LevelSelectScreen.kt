@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
@@ -30,6 +31,8 @@ import no.elg.hex.util.takeScreenshot
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
 
+  private var fontSize: Int = Hex.assets.fontSize
+
   private const val PREVIEWS_PER_ROW = 5
   private const val PREVIEW_PADDING_PERCENT = 0.025f
   private const val MIN_PREVIEW_SIZE = 512
@@ -39,6 +42,8 @@ object LevelSelectScreen : AbstractScreen() {
 
   private val islandPreviews = Array<Pair<FrameBuffer?, Texture>>()
   private val unprojectVector = Vector3()
+
+  private var winFont: BitmapFont? = null
 
   val mouseX
     get() = unprojectVector.x
@@ -85,7 +90,19 @@ object LevelSelectScreen : AbstractScreen() {
           camera.viewportWidth - widthOffset * 2,
           camera.viewportHeight - heightOffset * 2
         )
-        WON -> Hex.assets.boldFont.draw(batch, "${island.turn}", widthOffset, heightOffset)
+        WON -> {
+          val text = "${island.turn}"
+          val font = Hex.assets.getFont(bold = false, italic = false, flip = true, fontSize = fontSize)
+          if (winFont == null) {
+            winFont = font
+          }
+          font.draw(
+            batch,
+            text,
+            (camera.viewportWidth - (text.length * font.spaceXadvance) / 2f) / 2f,
+            (camera.viewportHeight - font.lineHeight) / 2f
+          )
+        }
         else -> error("Unknown/illegal preview modifier: $modifier")
       }
       batch.end()
@@ -208,6 +225,12 @@ object LevelSelectScreen : AbstractScreen() {
     }
 
     lineRenderer.end()
+  }
+
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    fontSize = camera.viewportWidth.toInt() / 5
+    Hex.assets.loadFont(bold = false, italic = false, flip = true, fontSize = fontSize)
   }
 
   override fun dispose() {
