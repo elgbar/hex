@@ -370,9 +370,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   override fun show() {
-    super.show()
     stageScreen.show()
     Hex.inputMultiplexer.addProcessor(inputProcessor)
+    super.show()
 
     if (island.currentAI != null) {
       island.endTurn(inputProcessor)
@@ -380,8 +380,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   override fun hide() {
-    super.hide()
     stageScreen.hide()
+    super.hide()
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
     LevelSelectScreen.updateSelectPreview(id, false, modifier)
     modifier = NOTHING
