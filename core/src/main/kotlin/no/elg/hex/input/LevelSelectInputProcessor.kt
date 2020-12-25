@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
-import ktx.collections.minusAssign
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
@@ -58,13 +57,13 @@ object LevelSelectInputProcessor : InputAdapter() {
     return true
   }
 
-  override fun scrolled(amount: Int): Boolean {
+  override fun scrolled(amountX: Float, amountY: Float): Boolean {
     val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = camera.position.y
     val min = screenHeight / 2f
 
-    camera.position.y = (oldY + amount * SCROLL_SPEED)
+    camera.position.y = (oldY + amountY * SCROLL_SPEED)
       .coerceIn(min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding))
     LevelSelectScreen.updateCamera()
     return true
