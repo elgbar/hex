@@ -114,7 +114,6 @@ object LevelCreationScreen : AbstractScreen() {
 
           if (Hex.args.`stage-debug`) {
             previewImageNoise = visImage(TextureRegionDrawable(Texture(NOISE_SIZE, NOISE_SIZE, RGB565)), Scaling.fillY) {
-//              this.scaling = none
               it.fill()
               it.expand()
               it.center()

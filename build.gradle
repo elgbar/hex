@@ -98,7 +98,6 @@ project(":desktop") {
     api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
   }
 }
 
@@ -121,10 +120,14 @@ project(":core") {
     implementation "io.github.libktx:ktx-collections:$ktxVersion"
     implementation "io.github.libktx:ktx-graphics:$ktxVersion"
 
+    api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+
     api "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 
     testApi "org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion"
     testApi("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testApi "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    testApi "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
   }
 }

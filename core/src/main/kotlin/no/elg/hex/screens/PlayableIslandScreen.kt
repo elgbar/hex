@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.widget.ButtonBar
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.onClick
+import ktx.scene2d.KHorizontalGroup
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
@@ -25,6 +26,7 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
@@ -62,11 +64,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   internal val youWon: VisWindow
   internal val youLost: VisWindow
 
+  private val buttonGroup: KHorizontalGroup
+
   private val disableChecker: MutableMap<KVisImageButton, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
   private var modifier = NOTHING
-  private var confirmEndTurnSetting = true
 
   init {
     stageScreen.stage.actors {
@@ -161,8 +164,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       }
 
       confirmSurrender = confirmWindow("Confirm Surrender", "Are you sure you want to surrender?") {
-        modifier = SURRENDER
-        island.surrender()
+        surrender()
       }
 
       acceptAISurrender = confirmWindow("Accept AI Surrender", "The AI want to surrender, do you accept?") {
@@ -192,8 +194,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
         setFillParent(true)
         bottom()
-        horizontalGroup {
-          bottom()
+        buttonGroup = horizontalGroup {
+          left()
           expand()
           space(20f)
           pad(20f)
@@ -284,7 +286,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             up = Hex.assets.surrender,
             keyShortcut = intArrayOf(Keys.NUM_6)
           ) {
-            confirmSurrender.show(stage)
+            if (Settings.confirmSurrender) {
+              confirmSurrender.show(stage)
+            } else {
+              surrender()
+            }
           }
           if (Hex.trace) {
             button(
@@ -292,20 +298,20 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               up = Hex.assets.settings,
               down = Hex.assets.settingsDown,
               keyShortcut = intArrayOf(Keys.NUM_7)
+            ) {}
+
+            button(
+              tooltip = "Help",
+              up = Hex.assets.help,
+              down = Hex.assets.helpDown,
+              keyShortcut = intArrayOf(Keys.NUM_8)
             ) {
-            }
-          }
-          button(
-            tooltip = "Help",
-            up = Hex.assets.help,
-            down = Hex.assets.helpDown,
-            keyShortcut = intArrayOf(Keys.NUM_8)
-          ) {
-            if (distress) {
-              distress = false
-              Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
-              if (Hex.args.cheating) {
-                MessagesRenderer.publishMessage(ScreenText("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD))
+              if (distress) {
+                distress = false
+                Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
+                if (Hex.args.cheating) {
+                  MessagesRenderer.publishMessage(ScreenText("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD))
+                }
               }
             }
           }
@@ -319,6 +325,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     }
   }
 
+  private fun surrender() {
+    modifier = SURRENDER
+    island.surrender()
+  }
+
   fun updateWinningTurn() {
     for ((window, action) in labelUpdater) {
       window.action()
@@ -326,7 +337,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   fun endTurn() {
-    if (island.isCurrentTeamHuman() && confirmEndTurnSetting) {
+    if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
       val minCost = Peasant::class.createHandInstance().price
       val hexagons = island.hexagons
         .map { island.getData(it) }
