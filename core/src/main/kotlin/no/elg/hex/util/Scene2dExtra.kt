@@ -24,18 +24,28 @@ fun PopupMenu.separator() {
   add(Separator("menu")).fill().expand().row()
 }
 
+@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
+fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, interaction: Button.() -> Unit) {
+  this.onInteract(stage = stage, keyShortcuts = arrayOf(keyShortcut), interaction = interaction)
+}
+
 /**
  * Call [interaction] when either the user clicks on the menu item or when pressing all the given
  * keys.
  */
-fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, interaction: Button.() -> Unit) {
-  if (keyShortcut.isNotEmpty()) {
-    if (this is MenuItem) {
-      setShortcut(*keyShortcut)
-    }
-    stage += onAllKeysDownEvent(*keyShortcut, catchEvent = true, listener = interaction)
-  }
+fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, interaction: Button.() -> Unit) {
   onChange(interaction)
+
+  if (keyShortcuts.isNotEmpty()) {
+    if (this is MenuItem) {
+      val first = keyShortcuts.firstOrNull { it.isNotEmpty() } ?: return
+      setShortcut(*first)
+    }
+    for (keyShortcut in keyShortcuts) {
+      if (keyShortcut.isEmpty()) continue
+      stage += onAllKeysDownEvent(*keyShortcut, catchEvent = false, listener = interaction)
+    }
+  }
 }
 
 /** Add and fade in this window if it is is not [isShown] */
