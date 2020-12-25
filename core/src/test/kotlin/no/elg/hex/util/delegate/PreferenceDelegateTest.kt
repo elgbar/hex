@@ -33,7 +33,6 @@ internal class PreferenceDelegateTest {
     var longPref by PreferenceDelegate<Long>(1L)
     var stringPref by PreferenceDelegate<String>("yteye")
     var charPref by PreferenceDelegate<Char>('y')
-
   }
 
   @Test
@@ -48,7 +47,6 @@ internal class PreferenceDelegateTest {
     println(TestSettings.boolPref)
     println(TestSettings.stringPref)
     println(TestSettings.charPref)
-
 
     TestSettings.bytePref = 3
     TestSettings.doublePref = -14.0

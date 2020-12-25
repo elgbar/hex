@@ -95,9 +95,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   init {
     quicksave()
     stageScreen.stage.actors {
-      if (Hex.args.`stage-debug` || Hex.trace) {
-        stage.isDebugAll = true
-      }
 
       confirmExit =
         visWindow("Confirm exit") {

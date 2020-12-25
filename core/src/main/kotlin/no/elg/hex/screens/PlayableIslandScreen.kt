@@ -50,6 +50,7 @@ import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
 
 /** @author Elg */
+@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
   val stageScreen = StageScreen()
@@ -73,9 +74,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   init {
     stageScreen.stage.actors {
-      if (Hex.args.`stage-debug` || Hex.trace) {
-        stage.isDebugAll = true
-      }
 
       @Scene2dDsl
       fun confirmWindow(title: String, text: String, whenConfirmed: KVisWindow.() -> Unit): VisWindow {
@@ -292,14 +290,16 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               surrender()
             }
           }
-          if (Hex.trace) {
-            button(
-              tooltip = "Settings",
-              up = Hex.assets.settings,
-              down = Hex.assets.settingsDown,
-              keyShortcut = intArrayOf(Keys.NUM_7)
-            ) {}
+          button(
+            tooltip = "Settings",
+            up = Hex.assets.settings,
+            down = Hex.assets.settingsDown,
+            keyShortcut = intArrayOf(Keys.NUM_7)
+          ) {
+            Hex.screen = SettingsScreen
+          }
 
+          if (Hex.trace) {
             button(
               tooltip = "Help",
               up = Hex.assets.help,

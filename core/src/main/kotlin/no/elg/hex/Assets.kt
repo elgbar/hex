@@ -28,6 +28,7 @@ import ktx.style.menuItem
 import ktx.style.set
 import ktx.style.textButton
 import ktx.style.textField
+import ktx.style.visCheckBox
 import ktx.style.visImageTextButton
 import ktx.style.visTextButton
 import ktx.style.visTextField
@@ -70,8 +71,6 @@ class Assets : AssetManager() {
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
     const val REGULAR_FONT = "fonts/UbuntuMono-R.ttf"
     const val REGULAR_ITALIC_FONT = "fonts/UbuntuMono-RI.ttf"
-
-    const val NOT_FLIPED_SUFFIX = "-NF"
 
     private const val FONT_SIZE = 20
 
@@ -142,17 +141,16 @@ class Assets : AssetManager() {
   val help by lazy { findSprite("help") }
   val helpDown by lazy { findSprite("help_selected") }
 
-  private fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true) {
+  fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize) {
     val boldness = if (bold) "B" else "R"
     val italicness = if (italic) "I" else ""
-    val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
 
     val parameter = FreeTypeFontLoaderParameter()
     parameter.fontParameters.size = fontSize
     parameter.fontParameters.minFilter = Linear
     parameter.fontParameters.flip = flip
     parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
-    val name = "fonts/UbuntuMono-$boldness$italicness$flippiness.ttf"
+    val name = fontName(bold, italic, flip, fontSize)
     load(name, BITMAP_FONT, parameter)
     Gdx.app.debug("ASSET", "loaded font '$name'")
   }
@@ -209,6 +207,8 @@ class Assets : AssetManager() {
       visTextButton(extend = "toggle") { font = notFlippedFont }
       visTextButton(extend = "blue") { font = notFlippedFont }
 
+      visCheckBox(extend = "default") { font = notFlippedFont }
+
       textButton(extend = "default") { font = notFlippedFont }
 
       val newOpenButtonStyle = visImageTextButton(extend = "default") { font = notFlippedFont }
@@ -236,11 +236,16 @@ class Assets : AssetManager() {
     IslandFiles // find all island files
   }
 
-  fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true): BitmapFont {
+  fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
+    return finishLoadingAsset(fontName(bold, italic, flip, fontSize))
+  }
+
+  private fun fontName(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): String {
     val boldness = if (bold) "B" else "R"
     val italicness = if (italic) "I" else ""
-    val flippiness = if (flip) "" else NOT_FLIPED_SUFFIX
-    return finishLoadingAsset("fonts/UbuntuMono-$boldness$italicness$flippiness.ttf")
+    val flippiness = if (flip) "" else "-NF"
+    val sizeiness = if (fontSize != this.fontSize) "-s$fontSize" else ""
+    return "fonts/UbuntuMono-$boldness$italicness$flippiness$sizeiness.ttf"
   }
 
   fun finishMain() {
