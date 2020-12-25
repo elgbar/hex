@@ -45,6 +45,9 @@ object LevelSelectScreen : AbstractScreen() {
 
   private var winFont: BitmapFont? = null
 
+  var renderingPreview: Boolean = false
+    private set
+
   val mouseX
     get() = unprojectVector.x
   val mouseY
@@ -60,11 +63,10 @@ object LevelSelectScreen : AbstractScreen() {
   fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, modifier: PreviewModifier = NOTHING): FrameBuffer {
     val islandScreen = PreviewIslandScreen(-1, island)
     islandScreen.resize(previewWidth, previewHeight)
-    val buffer =
-      FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
+    val buffer = FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
     buffer.begin()
+    renderingPreview = true
     Hex.setClearColorAlpha(0f)
-//    Gdx.gl.glBlendColor(0f, 0f, 0f, 0f)
     Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
     camera.update()
@@ -108,6 +110,8 @@ object LevelSelectScreen : AbstractScreen() {
       batch.end()
     }
     Hex.setClearColorAlpha(1f)
+
+    renderingPreview = false
     buffer.end()
     islandScreen.dispose()
     return buffer
