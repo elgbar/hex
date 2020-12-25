@@ -13,7 +13,7 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : InputAdapte
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {
-      val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return true
+      val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
 
       if (isShiftPressed()) {
         for (hexagon in screen.island.findHexagonsWithinRadius(cursorHex, screen.brushRadius)) {

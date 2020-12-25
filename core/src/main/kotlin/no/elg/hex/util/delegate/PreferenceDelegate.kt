@@ -51,7 +51,6 @@ class PreferenceDelegate<T : Any>(private val initialValue: T) {
     preferences.flush()
   }
 
-
   companion object {
     private val preferences: Preferences by lazy {
       val name = this::class.qualifiedName
@@ -59,5 +58,4 @@ class PreferenceDelegate<T : Any>(private val initialValue: T) {
       Gdx.app.getPreferences(name)
     }
   }
-
 }
