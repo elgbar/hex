@@ -107,4 +107,11 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   override fun show() {
     Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
   }
+
+  override fun dispose() {
+    super.dispose()
+    verticesRenderer.dispose()
+    outlineRenderer.dispose()
+    spriteRenderer.dispose()
+  }
 }

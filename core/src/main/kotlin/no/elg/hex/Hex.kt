@@ -90,7 +90,11 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun dispose() {
-    VisUI.dispose()
+    try {
+      VisUI.dispose()
+      screen.dispose()
+      assets.dispose()
+    } catch (e: Exception) {}
   }
 
   fun setClearColorAlpha(alpha: Float) {

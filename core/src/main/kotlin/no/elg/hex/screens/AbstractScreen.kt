@@ -58,4 +58,13 @@ abstract class AbstractScreen : ScreenAdapter() {
     batch.enableBlending()
     batch.end()
   }
+
+  override fun hide() {
+    dispose()
+  }
+
+  override fun dispose() {
+    if (::batch.isLazyInitialized) batch.dispose()
+    if (::lineRenderer.isLazyInitialized) lineRenderer.dispose()
+  }
 }

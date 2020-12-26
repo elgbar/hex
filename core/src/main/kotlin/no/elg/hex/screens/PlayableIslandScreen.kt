@@ -389,6 +389,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     frameUpdatable.resize(width, height)
   }
 
+  override fun dispose() {
+    super.dispose()
+    stageScreen.dispose()
+  }
+
   companion object {
     val PEASANT_PRICE = Peasant::class.createHandInstance().price
     val CASTLE_PRICE = Castle::class.createHandInstance().price

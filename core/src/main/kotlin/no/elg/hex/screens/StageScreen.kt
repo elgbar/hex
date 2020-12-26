@@ -65,4 +65,9 @@ open class StageScreen : AbstractScreen() {
       }
     }
   }
+
+  override fun dispose() {
+    super.dispose()
+    stage.dispose()
+  }
 }

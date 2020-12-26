@@ -357,6 +357,11 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
     }
   }
 
+  override fun dispose() {
+    super.dispose()
+    stageScreen.dispose()
+  }
+
   companion object {
     const val MAX_BRUSH_SIZE = 10
     const val MIN_BRUSH_SIZE = 1
