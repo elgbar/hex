@@ -56,14 +56,16 @@ data class ScreenText(
   val text: String = any.toString()
   val wholeText: String = text + (next?.wholeText ?: "")
 
-  val font: BitmapFont =
+  val font: BitmapFont by lazy {
     when {
+      !Hex.assetsAvailable -> BitmapFont(true)
       !bold && !italic -> Hex.assets.regularFont
       !bold && italic -> Hex.assets.regularItalicFont
       bold && !italic -> Hex.assets.boldFont
       bold && italic -> Hex.assets.boldItalicFont
       else -> error("This should really not happen")
     }
+  }
 }
 
 fun <T> nullCheckedText(
@@ -166,7 +168,7 @@ fun booleanText(
 
 object ScreenRenderer : Disposable, Resizable {
 
-  val spacing: Float by lazy { Hex.assets.fontSize / 2f }
+  val spacing: Float by lazy { if (Hex.assetsAvailable) Hex.assets.fontSize / 2f else 20f }
   val batch: SpriteBatch = SpriteBatch()
   private val camera = OrthographicCamera()
 

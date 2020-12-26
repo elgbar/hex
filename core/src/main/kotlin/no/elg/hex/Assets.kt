@@ -1,5 +1,6 @@
 package no.elg.hex
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
@@ -35,9 +36,10 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
-import no.elg.hex.util.defaultDisplayMode
+import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -74,13 +76,24 @@ class Assets : AssetManager() {
 
     private const val FONT_SIZE = 20
 
-    val nativeScale: Int = (defaultDisplayMode.width / 1920).coerceAtLeast(1)
+    private val FALLBACK_FONT by lazy {
+      BitmapFont(false)
+    }
+
+    val nativeScale: Int by lazy {
+      val width = if (Gdx.app.type == Application.ApplicationType.Desktop) {
+        defaultDisplayWidth
+      } else {
+        Gdx.graphics.backBufferWidth
+      }
+      (width / 1920).coerceAtLeast(1)
+    }
   }
 
+  val regularFont: BitmapFont by lazy { if (isLoaded(REGULAR_FONT))get(REGULAR_FONT) else FALLBACK_FONT }
+  val regularItalicFont: BitmapFont by lazy { get(REGULAR_ITALIC_FONT) }
   val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
   val boldItalicFont: BitmapFont by lazy { get(BOLD_ITALIC_FONT) }
-  val regularFont: BitmapFont by lazy { get(REGULAR_FONT) }
-  val regularItalicFont: BitmapFont by lazy { get(REGULAR_ITALIC_FONT) }
 
   val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
   val originalSprites: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS) }
@@ -151,13 +164,21 @@ class Assets : AssetManager() {
     parameter.fontParameters.flip = flip
     parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
     val name = fontName(bold, italic, flip, fontSize)
-    load(name, BITMAP_FONT, parameter)
-    Gdx.app.debug("ASSET", "loaded font '$name'")
+
+    Gdx.app.debug("ASSET", "loading font '$name'")
+    if (fileHandleResolver.resolve(parameter.fontFileName).exists()) {
+      load(name, BITMAP_FONT, parameter)
+    } else {
+      Gdx.app.log("ASSET", "Failed to find font file for '$name'")
+    }
   }
 
   init {
     Gdx.app.debug("ASSET", "Using ${scale}x scale")
-    super.setErrorListener { _, throwable -> throwable.printStackTrace() }
+    super.setErrorListener { asset, throwable ->
+      MessagesRenderer.publishError("Failed to load ${asset.type.simpleName} asset ${asset.fileName}")
+      throwable.printStackTrace()
+    }
     resolver = InternalFileHandleResolver()
 
     setLoader(BITMAP_FONT, ".ttf", FreetypeFontLoader(resolver))

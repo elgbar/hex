@@ -19,6 +19,7 @@ import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.LOG_TRACE
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
+import java.lang.Exception
 
 object Hex : ApplicationAdapter() {
 
@@ -34,6 +35,8 @@ object Hex : ApplicationAdapter() {
   lateinit var args: ApplicationArgumentsParser
   lateinit var assets: Assets
     private set
+
+  val assetsAvailable: Boolean get() = Hex::assets.isInitialized
 
   val inputMultiplexer = InputMultiplexer()
 
@@ -55,33 +58,46 @@ object Hex : ApplicationAdapter() {
     }
 
   override fun create() {
-    require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
+    try {
+      require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
 
-    Gdx.app.logLevel =
-      when {
-        args.silent -> LOG_NONE
-        args.trace -> LOG_TRACE
-        args.debug -> LOG_DEBUG
-        else -> LOG_INFO
-      }
+      Gdx.app.logLevel =
+        when {
+          args.silent -> LOG_NONE
+          args.trace -> LOG_TRACE
+          args.debug -> LOG_DEBUG
+          else -> LOG_INFO
+        }
 
-    setClearColorAlpha(1f)
+      Gdx.app.debug("SYS", "App backend ${Gdx.app.type}")
+      Gdx.app.debug("SYS", "Max pointers ${Gdx.input.maxPointers}")
 
-    assets = Assets()
-    screen = SplashScreen
-    assets.loadAssets()
+      setClearColorAlpha(1f)
 
-    Gdx.input.inputProcessor = inputMultiplexer
-    Gdx.input.setCatchKey(Keys.BACK, true)
+      assets = Assets()
+      screen = SplashScreen
+      assets.loadAssets()
 
-    // must be last
-    assets.finishMain()
+      Gdx.input.inputProcessor = inputMultiplexer
+      Gdx.input.setCatchKey(Keys.BACK, true)
+
+      // must be last
+      assets.finishMain()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      MessagesRenderer.publishError("Threw when loaded: $e", 600f)
+    }
   }
 
   override fun render() {
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
-    screen.render(Gdx.graphics.deltaTime)
-    MessagesRenderer.frameUpdate()
+    try {
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+      screen.render(Gdx.graphics.deltaTime)
+      MessagesRenderer.frameUpdate()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      MessagesRenderer.publishError("Threw when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
+    }
   }
 
   override fun resize(width: Int, height: Int) {

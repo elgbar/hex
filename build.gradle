@@ -1,7 +1,7 @@
 buildscript {
 
   ext {
-    kotlinVersion = "1.4.20"
+    kotlinVersion = "1.4.21"
     appName = "Hex"
     gdxVersion = '1.9.12'
     roboVMVersion = '2.3.8'
@@ -14,6 +14,7 @@ buildscript {
     kotlinCoroutineVersion = "1.4.1"
     argparserVersion = "2.0.7"
     mixiteVersion = "2020.1.0"
+    roboVMVersion = '2.3.11'
   }
 
   repositories {
@@ -27,11 +28,20 @@ buildscript {
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:5.1.1"
+    classpath 'com.android.tools.build:gradle:4.1.1'
+  }
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+
+  kotlinOptions {
+    jvmTarget = '1.8'
   }
 }
 
 subprojects {
-  apply plugin: "kotlin"
   apply plugin: "idea"
   apply plugin: "com.diffplug.spotless"
 
@@ -47,12 +57,9 @@ subprojects {
     maven { url 'https://jitpack.io' }
   }
 
-  [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "1.8"
-  [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+  //[compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "1.8"
+  // [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-  test {
-    useJUnitPlatform()
-  }
 
   spotless {
     kotlin {
@@ -83,14 +90,38 @@ tasks.named('wrapper') {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-subprojects {
+
+project(":android") {
+  apply plugin: "com.android.application"
+  apply plugin: 'kotlin-android'
+
+  configurations { natives }
+
   dependencies {
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    api "com.xenomachina:kotlin-argparser:$argparserVersion"
+    implementation project(":core")
+    api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+
   }
 }
 
 project(":desktop") {
+
   apply plugin: "kotlin"
 
   dependencies {
@@ -99,12 +130,20 @@ project(":desktop") {
     api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
   }
+
+  test {
+    useJUnitPlatform()
+  }
 }
 
 project(":core") {
+
   apply plugin: "kotlin"
 
   dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    api "com.xenomachina:kotlin-argparser:$argparserVersion"
+
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
