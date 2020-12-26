@@ -46,6 +46,7 @@ import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
+import no.elg.hex.util.hide
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
 
@@ -115,7 +116,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         return visWindow(title) {
           isMovable = false
           isModal = true
-          hide()
+          this.hide()
           val label = visLabel(text())
 
           labelUpdater[this] = {
@@ -198,6 +199,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           space(20f)
           pad(20f)
 
+          val size = Value.percentWidth(0.1f, this@table)
+
           @Scene2dDsl
           fun button(
             tooltip: String,
@@ -231,7 +234,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
               background = null
               isTransform = true
-              val size = Value.percentWidth(0.1f, this@table)
               imageCell.size(size)
             }
           }
@@ -314,6 +316,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
           visTextButton("End Turn") {
+            labelCell.height(size)
+            labelCell.minWidth(size)
+            disableChecker[this] = { island.isCurrentTeamAI() }
             onInteract(stage, Keys.ENTER) {
               endTurn()
             }
