@@ -177,7 +177,7 @@ fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
     coordinate.gridZ + NEIGHBORS[index][NEIGHBOR_Z_INDEX]
   )
 
-fun Island.findHexagonsWithinRadius(
+fun Island.calculateHexagonsWithinRadius(
   hexagon: Hexagon<HexagonData>,
   radius: Int,
   includeThis: Boolean = true
@@ -201,9 +201,9 @@ fun Island.calculateRing(hexagon: Hexagon<HexagonData>, radius: Int): Set<Hexago
   for (i in 0 until 6) {
     for (j in 0 until radius) {
       currentCoordinate = getNeighborCoordinateByIndex(currentCoordinate, i)
-      val hexagon = grid.getByCubeCoordinate(currentCoordinate)
-      if (hexagon.isPresent && !getData(hexagon.get()).edge) {
-        result.add(hexagon.get())
+      val hex = grid.getByCubeCoordinate(currentCoordinate)
+      if (hex.isPresent && !getData(hex.get()).edge) {
+        result.add(hex.get())
       }
     }
   }

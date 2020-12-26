@@ -6,7 +6,7 @@ import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
 import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
 import com.badlogic.gdx.InputAdapter
 import no.elg.hex.screens.MapEditorScreen
-import no.elg.hex.util.findHexagonsWithinRadius
+import no.elg.hex.util.calculateHexagonsWithinRadius
 
 /** @author Elg */
 class MapEditorInputProcessor(private val screen: MapEditorScreen) : InputAdapter() {
@@ -16,7 +16,7 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : InputAdapte
       val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
 
       if (isShiftPressed()) {
-        for (hexagon in screen.island.findHexagonsWithinRadius(cursorHex, screen.brushRadius)) {
+        for (hexagon in screen.island.calculateHexagonsWithinRadius(cursorHex, screen.brushRadius)) {
           screen.editor.edit(hexagon)
         }
       } else {
