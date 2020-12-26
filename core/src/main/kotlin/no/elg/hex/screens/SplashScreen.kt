@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.utils.Align
+import ktx.graphics.use
 import no.elg.hex.Hex
 
 /** @author Elg */
@@ -18,14 +19,13 @@ object SplashScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-    if (Hex.assets.mainFinishedLoading && Hex.assets.update()) {
-      Gdx.app.log("SPLASH", "All assets finished loading in ${System.currentTimeMillis() - startTime} ms")
+    if (Hex.assets.mainFinishedLoading && Hex.assets.update(5)) {
       Hex.screen = LevelSelectScreen
+      Gdx.app.log("SPLASH", "All assets finished loading in ${System.currentTimeMillis() - startTime} ms")
     } else {
-      batch.begin()
-
-      val txt =
-        """
+      batch.use {
+        val txt =
+          """
           |Loading ${Hex.assets.loadingInfo}
           |
           |${"%2.0f".format(Hex.assets.progress * 100)}%
@@ -33,16 +33,16 @@ object SplashScreen : AbstractScreen() {
           |${System.currentTimeMillis() - startTime} ms
           """.trimMargin()
 
-      layout.setText(
-        Hex.assets.regularFont,
-        txt,
-        Color.WHITE,
-        Gdx.graphics.width.toFloat(),
-        Align.center,
-        true
-      )
-      Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
-      batch.end()
+        layout.setText(
+          Hex.assets.regularFont,
+          txt,
+          Color.WHITE,
+          Gdx.graphics.width.toFloat(),
+          Align.center,
+          true
+        )
+        Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
+      }
     }
   }
 }

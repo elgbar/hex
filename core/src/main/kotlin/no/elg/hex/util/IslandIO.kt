@@ -13,8 +13,7 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
-import no.elg.hex.screens.MapEditorScreen
-import no.elg.hex.screens.PlayableIslandScreen
+import no.elg.hex.screens.SplashIslandScreen
 
 fun getIslandFileName(slot: Int, preview: Boolean = false): String {
   return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$slot.${if (preview) "png" else ISLAND_FILE_ENDING}"
@@ -26,28 +25,12 @@ fun getIslandFile(slot: Int, preview: Boolean = false, allowInternal: Boolean = 
   return if (local.exists()) local else if (allowInternal) Gdx.files.internal(path) else local
 }
 
-fun play(id: Int): Boolean {
-  val assetId = getIslandFileName(id)
-  val island: Island = if (Hex.assets.isLoaded(assetId)) {
-    Hex.assets[assetId] ?: return false
-  } else {
-    val islandFile = getIslandFile(id)
-    if (!islandFile.exists()) {
-      publishWarning("Tried to play island $id, but no such island is loaded")
-      return false
-    }
-    Hex.assets.load(assetId, Island::class.java)
-    Hex.assets.finishLoadingAsset(assetId)
+fun play(id: Int, island: Island? = null): Boolean {
+  if(SplashIslandScreen.loading){
+    publishWarning("Already loading an island!")
+    return false
   }
-  play(id, island)
-  return true
-}
-
-fun play(id: Int, island: Island) {
-  Gdx.app.postRunnable {
-    Hex.screen =
-      if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)
-  }
+  return SplashIslandScreen(id, island).loadable
 }
 
 fun saveIsland(id: Int, island: Island): Boolean {
