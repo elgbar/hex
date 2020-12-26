@@ -212,9 +212,13 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
       val iter = pieces.iterator()
 
       val cursorData = screen.island.getData(cursorHex)
+
       if (cursorData.piece is Empty) {
         val piece = iter.next()
-        cursorData.setPiece(piece::class)
+        cursorData.setPiece(piece::class){
+          moved = false
+        }
+        require(cursorData.piece is LivingPiece) { "New piece is not Living Piece" }
       }
 
       var radius = 1
@@ -224,10 +228,12 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
           if (!iter.hasNext()) {
             return true
           }
-          val piece = iter.next()
           val data = screen.island.getData(hex)
           if (data.piece is Empty) {
-            val placed = cursorData.setPiece(piece::class)
+            val piece = iter.next()
+            val placed = data.setPiece(piece::class){
+              moved = false
+            }
             require(placed) { "Failed to place on an empty hexagon" }
           }
         }
@@ -238,7 +244,6 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    Gdx.app.log("gest", "tap x = [$x], y = [$y], count = [$count], button = [$button]")
     if (screen.island.isCurrentTeamAI()) return false
     val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
     click(cursorHex)

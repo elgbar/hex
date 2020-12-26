@@ -46,15 +46,16 @@ data class HexagonData(
    * [pieceType].
    */
   @JsonSetter("pieceType")
-  fun setPiece(pieceType: KClass<out Piece>): Boolean {
+  fun <T: Piece>setPiece(pieceType: KClass<out T>, init: T.() -> Unit = {  }): Boolean {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
-    val pieceToPlace = pieceType.createInstance(this)
+    val pieceToPlace  = pieceType.createInstance(this)
 
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace
       require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) {
-        "Piece's data does not point to this!"
+        "Pieces data does not point to this!"
       }
+      pieceToPlace.init()
       return true
     }
     return false
