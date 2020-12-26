@@ -6,6 +6,7 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true)
   var confirmSurrender by PreferenceDelegate(true)
+  var showFps by PreferenceDelegate(false)
 //  var testString by PreferenceDelegate("ye")
 //  var testChar by PreferenceDelegate('t')
 //  var testInt by PreferenceDelegate(1)

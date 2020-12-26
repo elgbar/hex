@@ -354,9 +354,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun render(delta: Float) {
     super.render(delta)
-    if (Hex.debug) {
-      debugRenderer.frameUpdate()
-    }
+    debugRenderer.frameUpdate()
     if (!Hex.args.mapEditor) {
       frameUpdatable.frameUpdate()
     }
