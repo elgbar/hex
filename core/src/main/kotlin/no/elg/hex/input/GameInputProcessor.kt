@@ -22,6 +22,7 @@ import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.strengthToType
+import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.island.Hand
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -215,7 +216,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
 
       if (cursorData.piece is Empty) {
         val piece = iter.next()
-        cursorData.setPiece(piece::class){
+        cursorData.setPiece(piece::class) {
           moved = false
         }
         require(cursorData.piece is LivingPiece) { "New piece is not Living Piece" }
@@ -231,7 +232,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
           val data = screen.island.getData(hex)
           if (data.piece is Empty) {
             val piece = iter.next()
-            val placed = data.setPiece(piece::class){
+            val placed = data.setPiece(piece::class) {
               moved = false
             }
             require(placed) { "Failed to place on an empty hexagon" }
@@ -251,8 +252,8 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
   }
 
   override fun zoom(initialDistance: Float, distance: Float): Boolean {
-    Gdx.app.log("gest", "zoom initialDistance = [$initialDistance], distance = [$distance]")
-    return screen.basicIslandInputProcessor.scrolled(0f, distance)
+    publishMessage("$initialDistance-$distance ${initialDistance - distance}")
+    return screen.basicIslandInputProcessor.scrolled(0f, initialDistance - distance)
   }
 
   companion object {

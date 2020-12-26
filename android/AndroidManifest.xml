@@ -3,6 +3,7 @@
           package="no.elg.hex">
 
     <application
+            android:fullBackupContent="true"
             android:allowBackup="true"
             android:icon="@drawable/ic_launcher"
             android:appCategory="game"
@@ -11,7 +12,7 @@
         <activity
                 android:name="no.elg.hex.AndroidLauncher"
                 android:label="@string/app_name"
-                android:screenOrientation="portrait"
+                android:screenOrientation="unspecified"
                 android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
