@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.input.GestureDetector
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
@@ -56,6 +57,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   val stageScreen = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
+  val gestureDetector by lazy { GestureDetector(inputProcessor) }
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
@@ -372,6 +374,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun show() {
     stageScreen.show()
+    Hex.inputMultiplexer.addProcessor(gestureDetector)
     Hex.inputMultiplexer.addProcessor(inputProcessor)
     super.show()
 
@@ -383,6 +386,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   override fun hide() {
     stageScreen.hide()
     super.hide()
+    Hex.inputMultiplexer.removeProcessor(gestureDetector)
     Hex.inputMultiplexer.removeProcessor(inputProcessor)
     LevelSelectScreen.updateSelectPreview(id, false, modifier)
     modifier = NOTHING

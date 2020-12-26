@@ -1,7 +1,6 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.BACKSPACE
 import com.badlogic.gdx.Input.Keys.F11
@@ -9,7 +8,8 @@ import com.badlogic.gdx.Input.Keys.F12
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.Input.Keys.Y
 import com.badlogic.gdx.Input.Keys.Z
-import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.input.GestureDetector.GestureAdapter
+import ktx.app.KtxInputAdapter
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -26,6 +26,7 @@ import no.elg.hex.island.Hand
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.screens.PlayableIslandScreen
+import no.elg.hex.util.calculateRing
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -37,7 +38,7 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
 
 /** @author Elg */
-class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapter() {
+class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAdapter, GestureAdapter() {
 
   var infiniteMoney = Hex.args.cheating
 
@@ -154,18 +155,6 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
     }
   }
 
-  override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    if (screen.island.currentAI != null) return false
-    when (button) {
-      Buttons.LEFT -> {
-        val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
-        click(cursorHex)
-      }
-      else -> return false
-    }
-    return true
-  }
-
   override fun keyDown(keycode: Int): Boolean {
     if (screen.island.isCurrentTeamAI()) return false
 
@@ -201,6 +190,64 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
       }
     }
     return true
+  }
+
+  override fun longPress(x: Float, y: Float): Boolean {
+    screen.island.selected?.also { territory ->
+      val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
+      if (cursorHex !in territory.hexagons) return false
+      val pieces = mutableListOf<LivingPiece>()
+      territory.hexagons.map { screen.island.getData(it) }.filter {
+        val piece = it.piece
+        piece is LivingPiece && !piece.moved
+      }.forEach {
+        pieces += it.piece as LivingPiece
+        it.setPiece(Empty::class)
+      }
+      Gdx.app.trace("MARCH", "Marching ${pieces.size} pieces")
+      if (pieces.isEmpty()) return false
+
+      pieces.sortByDescending { it.strength }
+
+      val iter = pieces.iterator()
+
+      val cursorData = screen.island.getData(cursorHex)
+      if (cursorData.piece is Empty) {
+        val piece = iter.next()
+        cursorData.setPiece(piece::class)
+      }
+
+      var radius = 1
+      while (iter.hasNext()) {
+        for (hex in screen.island.calculateRing(cursorHex, radius++)) {
+          if (hex !in territory.hexagons) continue
+          if (!iter.hasNext()) {
+            return true
+          }
+          val piece = iter.next()
+          val data = screen.island.getData(hex)
+          if (data.piece is Empty) {
+            val placed = cursorData.setPiece(piece::class)
+            require(placed) { "Failed to place on an empty hexagon" }
+          }
+        }
+      }
+      return true
+    }
+    return false
+  }
+
+  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
+    Gdx.app.log("gest","tap x = [${x}], y = [${y}], count = [${count}], button = [${button}]")
+    if (screen.island.isCurrentTeamAI()) return false
+    val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
+    click(cursorHex)
+    return true
+  }
+
+  override fun zoom(initialDistance: Float, distance: Float): Boolean {
+    Gdx.app.log("gest","zoom initialDistance = [$initialDistance], distance = [$distance]")
+    return screen.basicIslandInputProcessor.scrolled(0f, distance)
   }
 
   companion object {
