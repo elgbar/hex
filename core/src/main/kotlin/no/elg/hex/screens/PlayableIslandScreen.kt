@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Value
+import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.widget.ButtonBar
@@ -17,7 +18,6 @@ import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
-import ktx.scene2d.vis.KVisImageButton
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.visImageButton
@@ -67,7 +67,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   private val buttonGroup: KHorizontalGroup
 
-  private val disableChecker: MutableMap<KVisImageButton, (Territory?) -> Boolean> = mutableMapOf()
+  private val disableChecker: MutableMap<Disableable, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
   private var modifier = NOTHING
@@ -204,7 +204,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             up: TextureRegion,
             down: TextureRegion? = null,
             disabled: TextureRegion? = null,
-            disableCheck: ((Territory?) -> Boolean)? = null,
+            disableCheck: ((Territory?) -> Boolean) = { island.isCurrentTeamAI() },
             vararg keyShortcut: Int,
             onClick: Button.() -> Unit
           ) {
@@ -227,13 +227,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
                 style.disabled = drawableToTextureRegion(disabled)
               }
               onInteract(stage, *keyShortcut, interaction = onClick)
-              if (disableCheck != null) {
-                disableChecker[this] = disableCheck
-              }
+              disableChecker[this] = disableCheck
 
               background = null
               isTransform = true
-              val size = Value.percentHeight(0.1f, this@table)
+              val size = Value.percentWidth(0.1f, this@table)
               imageCell.size(size)
             }
           }
@@ -241,7 +239,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           button(
             tooltip = "Buy Castle",
             up = Hex.assets.castle,
-            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE },
+            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE && island.isCurrentTeamAI() },
             keyShortcut = intArrayOf(Keys.NUM_1)
           ) {
             inputProcessor.buyUnit(Castle::class.createHandInstance())
@@ -250,7 +248,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           button(
             tooltip = "Buy Peasant",
             up = Hex.assets.peasant.getKeyFrame(0f),
-            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE },
+            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE && island.isCurrentTeamAI() },
             keyShortcut = intArrayOf(Keys.NUM_2)
           ) {
             inputProcessor.buyUnit(Peasant::class.createHandInstance())
@@ -258,7 +256,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           button(
             tooltip = "Undo",
             up = Hex.assets.undo,
-            disableCheck = { !island.history.canUndo() },
+            disableCheck = { !island.history.canUndo() && island.isCurrentTeamAI() },
             keyShortcut = intArrayOf(Keys.NUM_3)
           ) {
             island.history.undo()
@@ -266,7 +264,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           button(
             tooltip = "Undo All",
             up = Hex.assets.undoAll,
-            disableCheck = { !island.history.canUndo() },
+            disableCheck = { !island.history.canUndo() && island.isCurrentTeamAI() },
             keyShortcut = intArrayOf(Keys.NUM_4)
           ) {
             island.history.undoAll()
@@ -274,7 +272,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           button(
             tooltip = "Redo",
             up = Hex.assets.redo,
-            disableCheck = { !island.history.canRedo() },
+            disableCheck = { !island.history.canRedo() && island.isCurrentTeamAI() },
             keyShortcut = intArrayOf(Keys.NUM_5)
           ) {
             island.history.redo()

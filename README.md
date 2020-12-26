@@ -38,4 +38,4 @@ A simple turn based strategy game aiming to clone Slay.
   * Graves behaves differently for the AI than the player
   * It works correctly for players
   * Does not work for AI (it stays too long)
-* Spamming end turn button too quickly will cause bugs with history and sometimes crashes the game
+* Do not end the current AIs turn when exiting and re-entering a level, as this can be exploited

@@ -43,7 +43,14 @@ fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, interaction: 
     }
     for (keyShortcut in keyShortcuts) {
       if (keyShortcut.isEmpty()) continue
-      stage += onAllKeysDownEvent(*keyShortcut, catchEvent = false, listener = interaction)
+      stage += onAllKeysDownEvent(
+        *keyShortcut, catchEvent = false,
+        listener = {
+          if (!isDisabled) {
+            interaction()
+          }
+        }
+      )
     }
   }
 }

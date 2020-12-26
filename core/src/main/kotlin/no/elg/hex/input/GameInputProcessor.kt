@@ -167,7 +167,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : InputAdapte
   }
 
   override fun keyDown(keycode: Int): Boolean {
-    if (screen.island.currentAI != null) return false
+    if (screen.island.isCurrentTeamAI()) return false
 
     when (keycode) {
       BACKSPACE, SPACE -> screen.island.inHand = null
