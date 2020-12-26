@@ -26,7 +26,7 @@ fun getIslandFile(slot: Int, preview: Boolean = false, allowInternal: Boolean = 
 }
 
 fun play(id: Int, island: Island? = null): Boolean {
-  if(SplashIslandScreen.loading){
+  if (SplashIslandScreen.loading) {
     publishWarning("Already loading an island!")
     return false
   }

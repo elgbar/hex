@@ -22,14 +22,13 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
 
   private val layout by lazy { GlyphLayout() }
 
-  companion object{
+  companion object {
     var loading = false
-    private set
+      private set
   }
 
-
   init {
-    require(!loading){ "Two island splash screens should not be active at the same time!"}
+    require(!loading) { "Two island splash screens should not be active at the same time!" }
     loading = true
     val islandFile = getIslandFile(id)
     if (!islandFile.exists()) {

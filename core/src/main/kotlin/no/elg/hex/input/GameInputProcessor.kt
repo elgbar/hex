@@ -238,7 +238,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    Gdx.app.log("gest","tap x = [${x}], y = [${y}], count = [${count}], button = [${button}]")
+    Gdx.app.log("gest", "tap x = [$x], y = [$y], count = [$count], button = [$button]")
     if (screen.island.isCurrentTeamAI()) return false
     val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
     click(cursorHex)
@@ -246,7 +246,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
   }
 
   override fun zoom(initialDistance: Float, distance: Float): Boolean {
-    Gdx.app.log("gest","zoom initialDistance = [$initialDistance], distance = [$distance]")
+    Gdx.app.log("gest", "zoom initialDistance = [$initialDistance], distance = [$distance]")
     return screen.basicIslandInputProcessor.scrolled(0f, distance)
   }
 
