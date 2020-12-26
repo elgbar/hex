@@ -17,19 +17,19 @@ sealed class OpaquenessEditor(val mapEditorScreen: MapEditorScreen) : Editor {
       }
   }
 
-  class `Set opaque`(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
+  class SetOpaque(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).isOpaque = false
     }
   }
 
-  class `Set transparent`(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
+  class SetTransparent(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).isOpaque = true
     }
   }
 
-  class `Toggle opaqueness`(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
+  class ToggleOpaqueness(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       val data = mapEditorScreen.island.getData(hexagon)
       data.isOpaque = !data.isOpaque

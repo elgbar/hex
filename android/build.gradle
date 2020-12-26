@@ -25,7 +25,7 @@ android {
   }
   defaultConfig {
     applicationId "no.elg.hex"
-    minSdkVersion 30
+    minSdkVersion 25
     targetSdkVersion 30
     versionCode 1
     versionName "1.0"

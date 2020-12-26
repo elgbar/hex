@@ -52,9 +52,9 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
               "Selected team: ",
               next =
                 when (editor as TeamEditor) {
-                  is TeamEditor.`Set team` ->
+                  is TeamEditor.SetTeam ->
                     ScreenText(selectedTeam.name, color = Color.YELLOW)
-                  is TeamEditor.`Randomize team` ->
+                  is TeamEditor.RandomizeTeam ->
                     ScreenText("random", color = Color.PURPLE)
                 }
             )
@@ -63,9 +63,9 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
               "Selected piece: ",
               next =
                 when (editor as PieceEditor) {
-                  is PieceEditor.`Set piece` ->
+                  is PieceEditor.SetPiece ->
                     nullCheckedText(selectedPiece.simpleName, color = Color.YELLOW)
-                  is PieceEditor.`Randomize piece` ->
+                  is PieceEditor.RandomizePiece ->
                     ScreenText("random", color = Color.PURPLE)
                 }
             )

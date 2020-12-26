@@ -18,13 +18,13 @@ sealed class TeamEditor(val mapEditorScreen: MapEditorScreen) : Editor {
       }
   }
 
-  class `Set team`(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
+  class SetTeam(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).team = mapEditorScreen.selectedTeam
     }
   }
 
-  class `Randomize team`(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
+  class RandomizeTeam(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).team = Team.values().random()
     }

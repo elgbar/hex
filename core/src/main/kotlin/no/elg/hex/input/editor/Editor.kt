@@ -3,13 +3,14 @@ package no.elg.hex.input.editor
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hud.ScreenText
+import no.elg.hex.util.toTitleCase
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
 interface Editor {
   val name: String
     get() =
-      requireNotNull(this::class.simpleName) {
+      requireNotNull(this::class.simpleName?.toTitleCase()) {
         "Subclass of ${Editor::class::simpleName} cannot be anonymous"
       }
 

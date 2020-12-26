@@ -18,13 +18,13 @@ sealed class PieceEditor(val mapEditorScreen: MapEditorScreen) : Editor {
       }
   }
 
-  class `Set piece`(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
+  class SetPiece(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).setPiece(mapEditorScreen.selectedPiece)
     }
   }
 
-  class `Randomize piece`(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
+  class RandomizePiece(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).setPiece(PIECES.random())
     }
