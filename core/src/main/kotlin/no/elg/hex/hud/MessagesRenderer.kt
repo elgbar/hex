@@ -9,26 +9,26 @@ import java.util.concurrent.CopyOnWriteArrayList
 /** @author Elg */
 object MessagesRenderer : FrameUpdatable {
 
-  private const val DURATION_SECONDS = 10f
+  const val DEFAULT_DURATION_SECONDS = 10f
   private const val FADE_START = 0.5f
 
   private val messages = CopyOnWriteArrayList<Pair<ScreenText, Float>>()
 
-  fun publishMessage(message: String) {
-    publishMessage(ScreenText(message, color = Color.LIGHT_GRAY))
+  fun publishMessage(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
+    publishMessage(ScreenText(message, color = Color.LIGHT_GRAY), durationSeconds)
   }
 
-  fun publishWarning(message: String) {
-    publishMessage(ScreenText(message, color = Color.YELLOW))
+  fun publishWarning(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
+    publishMessage(ScreenText(message, color = Color.YELLOW), durationSeconds)
   }
 
-  fun publishError(message: String) {
-    publishMessage(ScreenText(message, color = Color.RED))
+  fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
+    publishMessage(ScreenText(message, color = Color.RED), durationSeconds)
   }
 
-  fun publishMessage(message: ScreenText) {
+  fun publishMessage(message: ScreenText, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
     Gdx.app.log("MESSAGE", message.wholeText)
-    messages.add(0, message to DURATION_SECONDS)
+    messages.add(0, message to durationSeconds)
   }
 
   override fun frameUpdate() {
