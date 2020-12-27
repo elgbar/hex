@@ -22,7 +22,7 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
     list += variableText(
       "FPS: ",
       Gdx.graphics.framesPerSecond,
-      30,
+      10,
       Int.MAX_VALUE,
       format = { "%4d".format(it) },
       next = if (Hex.debug) {

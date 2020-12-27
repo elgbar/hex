@@ -99,6 +99,10 @@ object Hex : ApplicationAdapter() {
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
       MessagesRenderer.frameUpdate()
+      if (limitFps) {
+        val target = targetFps.coerceAtLeast(2)
+        Thread.sleep((1000 / target - Gdx.graphics.deltaTime).toLong())
+      }
     } catch (e: Throwable) {
       e.printStackTrace()
       MessagesRenderer.publishError("Threw when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
