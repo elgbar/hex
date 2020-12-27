@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.kotcrab.vis.ui.util.OsUtils
 import com.kotcrab.vis.ui.widget.ButtonBar
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.onClick
@@ -87,7 +88,15 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           visLabel(text)
           row()
 
-          buttonBar {
+          val order =
+            when {
+              OsUtils.isWindows() -> ButtonBar.WINDOWS_ORDER
+              OsUtils.isMac() -> ButtonBar.OSX_ORDER
+              else -> ButtonBar.LINUX_ORDER
+            }.replace(" ", "").map { " $it" }.joinToString()
+
+          buttonBar(order = order) {
+
             setButton(
               ButtonBar.ButtonType.YES,
               scene2d.visTextButton("Yes") {
@@ -102,14 +111,13 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               ButtonBar.ButtonType.NO,
               scene2d.visTextButton("No") { onClick { this@visWindow.fadeOut() } }
             )
-            createTable().pack()
           }
-          pack()
           centerWindow()
           onAnyKeysDownEvent(Keys.ESCAPE, Keys.BACK, catchEvent = true) {
             this@visWindow.fadeOut()
           }
           addCloseButton()
+          pack()
           fadeOut(0f)
         }
       }
