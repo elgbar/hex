@@ -23,8 +23,7 @@ object SplashScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-    if (Hex.paused || !Hex::assets.isLateinit) return
-    if (Hex.assets.mainFinishedLoading && Hex.assets.update(5)) {
+    if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.update(5)) {
       if (::nextScreen.isInitialized) {
         refreshAndSetScreen(nextScreen)
       } else {

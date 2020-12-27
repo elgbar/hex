@@ -31,6 +31,7 @@ abstract class AbstractScreen : ScreenAdapter() {
 
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(true, width.toFloat(), height.toFloat())
+    updateCamera()
 
     if (::batch.isLazyInitialized) {
       batch.projectionMatrix = camera.combined

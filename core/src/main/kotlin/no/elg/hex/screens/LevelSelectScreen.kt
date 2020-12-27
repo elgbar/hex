@@ -194,7 +194,6 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-
     projectCoordinates(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
 
     lineRenderer.begin(Line)

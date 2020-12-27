@@ -161,11 +161,8 @@ object SettingsScreen : StageScreen() {
     }
   }
 
-  private fun backToPreviousScreen() {
-    if (Hex.screen !== this) {
-      publishError("Settings screen is not currently being shown")
-      return
-    } else if (!::previousScreen.isInitialized) {
+  fun backToPreviousScreen() {
+    if (!::previousScreen.isInitialized) {
       publishError("Previous screen is not initialized")
       Hex.screen = LevelSelectScreen
       return

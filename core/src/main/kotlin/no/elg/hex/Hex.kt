@@ -23,7 +23,6 @@ import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.LOG_TRACE
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
-import java.lang.Exception
 
 object Hex : ApplicationAdapter() {
 
@@ -67,7 +66,6 @@ object Hex : ApplicationAdapter() {
 
       Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
       value.show()
-      value.render(0f)
       value.resize(Gdx.graphics.width, Gdx.graphics.height)
       field = value
     }
@@ -101,13 +99,16 @@ object Hex : ApplicationAdapter() {
 
   override fun render() {
     try {
+      if (limitFps) {
+        val target = targetFps.coerceAtLeast(2)
+        val sleep = (1000 / target - Gdx.graphics.deltaTime).toLong()
+        if (sleep > 0) {
+          Thread.sleep(sleep)
+        }
+      }
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
       MessagesRenderer.frameUpdate()
-      if (limitFps) {
-        val target = targetFps.coerceAtLeast(2)
-        Thread.sleep((1000 / target - Gdx.graphics.deltaTime).toLong())
-      }
     } catch (e: Throwable) {
       e.printStackTrace()
       MessagesRenderer.publishError("Threw when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
@@ -115,19 +116,13 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun resume() {
-
-
     paused = false
-    setClearColorAlpha(1f)
 
+    setClearColorAlpha(1f)
     assets = Assets()
     screen = SplashScreen
 
     assets.loadAssets()
-
-    if (screen != SplashScreen) {
-      SplashScreen.refreshAndSetScreen(screen)
-    }
 
     // must be last
     assets.finishMain()
@@ -136,6 +131,7 @@ object Hex : ApplicationAdapter() {
   override fun pause() {
     paused = true
     SplashScreen.nextScreen = screen
+    screen = SplashScreen
     assets.dispose()
     inputMultiplexer.clear()
   }
@@ -151,7 +147,9 @@ object Hex : ApplicationAdapter() {
       VisUI.dispose()
       screen.dispose()
       assets.dispose()
-    } catch (e: Exception) {}
+      asyncThread.dispose()
+    } catch (e: Exception) {
+    }
   }
 
   fun setClearColorAlpha(alpha: Float) {
