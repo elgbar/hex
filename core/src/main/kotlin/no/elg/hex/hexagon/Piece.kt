@@ -250,7 +250,7 @@ class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
-  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (roundsToTree > 0) {
       roundsToTree--
       return
