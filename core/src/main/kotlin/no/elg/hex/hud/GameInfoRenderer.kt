@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
@@ -27,7 +28,7 @@ import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.screens.PlayableIslandScreen
 
 /** @author Elg */
-class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable {
+class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable, Disposable {
 
   private val leftInfo = ArrayList<ScreenText>()
   private val unprojectVector = Vector3()
@@ -106,6 +107,11 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     camera.setToOrtho(true)
     batch.projectionMatrix = camera.combined
     shapeRenderer.projectionMatrix = camera.combined
+  }
+
+  override fun dispose() {
+    batch.dispose()
+    shapeRenderer.dispose()
   }
 
   companion object {

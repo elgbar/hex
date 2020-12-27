@@ -400,6 +400,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun dispose() {
     super.dispose()
+    frameUpdatable.dispose()
     stageScreen.dispose()
   }
 
