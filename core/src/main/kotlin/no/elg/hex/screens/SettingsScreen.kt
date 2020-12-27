@@ -46,8 +46,10 @@ object SettingsScreen : StageScreen() {
             Boolean::class -> visCheckBox(name) {
               left()
               isChecked = property.get(Settings) as Boolean
+              setProgrammaticChangeEvents(false)
               onChange {
                 property.set(Settings, isChecked)
+                isChecked = property.get(Settings) as Boolean
               }
             }
             String::class -> horizontalGroup {
@@ -56,10 +58,12 @@ object SettingsScreen : StageScreen() {
               visLabel(name) {
                 style.fontColor = Color.WHITE
               }
-              visTextField() {
+              visTextField {
                 text = property.get(Settings).toString()
+                programmaticChangeEvents = false
                 onChange {
                   property.set(Settings, text)
+                  text = property.get(Settings).toString()
                 }
               }
             }
@@ -71,37 +75,54 @@ object SettingsScreen : StageScreen() {
               visValidatableTextField {
                 text = property.get(Settings).toString()
                 addValidator { it.length <= 1 }
+                programmaticChangeEvents = false
                 onChange {
                   val char = text.lastOrNull() ?: return@onChange
                   if (isInputValid) {
                     property.set(Settings, char)
+                    text = property.get(Settings).toString()
                   }
                 }
               }
             }
             Byte::class -> spinner(name, IntSpinnerModel((property.get(Settings) as Byte).toInt(), Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt())) {
+              isProgrammaticChangeEvents = false
               onChange {
-                property.set(Settings, (model as IntSpinnerModel).value.toByte())
+                val intModel = model as IntSpinnerModel
+                property.set(Settings, intModel.value.toByte())
+                intModel.value = (property.get(Settings) as Byte).toInt()
               }
             }
             Short::class -> spinner(name, IntSpinnerModel((property.get(Settings) as Short).toInt(), Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())) {
+              isProgrammaticChangeEvents = false
               onChange {
-                property.set(Settings, (model as IntSpinnerModel).value.toShort())
+                val intModel = model as IntSpinnerModel
+                property.set(Settings, intModel.value.toShort())
+                intModel.value = (property.get(Settings) as Short).toInt()
               }
             }
             Int::class -> spinner(name, IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
+              isProgrammaticChangeEvents = false
               onChange {
-                property.set(Settings, (model as IntSpinnerModel).value)
+                val intModel = model as IntSpinnerModel
+                property.set(Settings, intModel.value)
+                intModel.value = property.get(Settings) as Int
               }
             }
             Long::class -> spinner(name, IntSpinnerModel((property.get(Settings) as Long).toInt(), Int.MIN_VALUE, Int.MAX_VALUE)) {
+              isProgrammaticChangeEvents = false
               onChange {
-                property.set(Settings, (model as IntSpinnerModel).value.toLong())
+                val intModel = model as IntSpinnerModel
+                property.set(Settings, intModel.value.toLong())
+                intModel.value = (property.get(Settings) as Long).toInt()
               }
             }
             Float::class -> spinner(name, SimpleFloatSpinnerModel(property.get(Settings) as Float, Float.MIN_VALUE, Float.MAX_VALUE, 1f, 1000)) {
+              isProgrammaticChangeEvents = false
               onChange {
-                property.set(Settings, (model as SimpleFloatSpinnerModel).value)
+                val floatModel = model as SimpleFloatSpinnerModel
+                property.set(Settings, floatModel.value)
+                floatModel.value = property.get(Settings) as Float
               }
             }
             Double::class ->
@@ -115,8 +136,11 @@ object SettingsScreen : StageScreen() {
                   1000
                 )
               ) {
+                isProgrammaticChangeEvents = false
                 onChange {
-                  property.set(Settings, (model as FloatSpinnerModel).value.toDouble())
+                  val floatModel = model as FloatSpinnerModel
+                  property.set(Settings, floatModel.value.toDouble())
+                  floatModel.value = (property.get(Settings) as Double).toBigDecimal()
                 }
               }
             else -> error("The class $classifier is not yet supported as a settings")

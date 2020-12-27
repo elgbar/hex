@@ -11,5 +11,5 @@ object Settings {
   var showFps by PreferenceDelegate(false)
 
   var limitFps by PreferenceDelegate(Gdx.app.type == Android)
-  var targetFps by PreferenceDelegate(30)
+  var targetFps by PreferenceDelegate(30) { it <= 0 }
 }

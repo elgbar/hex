@@ -5,7 +5,7 @@ import com.badlogic.gdx.Preferences
 import no.elg.hex.util.trace
 import kotlin.reflect.KProperty
 
-class PreferenceDelegate<T : Any>(private val initialValue: T) {
+class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (T) -> Boolean = { false }) {
 
   init {
     require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char) {
@@ -36,6 +36,11 @@ class PreferenceDelegate<T : Any>(private val initialValue: T) {
 
   operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
     val propertyName = property.name
+    if (invalidate(value)) {
+      Gdx.app.trace("PREF", "Will not set $propertyName to $value as it is invalid")
+      return
+    }
+
     when (initialValue) {
       is Boolean -> preferences.putBoolean(propertyName, value as Boolean)
       is Int -> preferences.putInteger(propertyName, value as Int)
@@ -54,7 +59,7 @@ class PreferenceDelegate<T : Any>(private val initialValue: T) {
   companion object {
     private val preferences: Preferences by lazy {
       val name = this::class.qualifiedName
-      Gdx.app.trace("PREF DEL", "Using preference name $name")
+      Gdx.app.trace("PREFS", "Using preference name $name")
       Gdx.app.getPreferences(name)
     }
   }
