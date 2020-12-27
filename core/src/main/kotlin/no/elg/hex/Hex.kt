@@ -50,6 +50,11 @@ object Hex : ApplicationAdapter() {
       val old = field
       Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
       old.hide()
+
+      // clean up any mess the previous screen have made
+      inputMultiplexer.clear()
+      Gdx.input.setOnscreenKeyboardVisible(false)
+
       Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
       value.show()
       value.render(0f)
