@@ -9,6 +9,7 @@ class AndroidLauncher : AndroidApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        val args = arrayOf<String>("--trace")
         val args = arrayOf<String>()
 
         Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)

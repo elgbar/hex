@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import no.elg.hex.Hex
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.NotAsRandomAI
@@ -33,7 +35,6 @@ import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.next
-import no.elg.hex.util.schedule
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -63,6 +64,8 @@ class Island(
 
   /** Prefer this over calling [grid.hexagons] as this has better performance */
   val hexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
+
+  private val jobs = ArrayList<Job>()
 
   var inHand: Hand? = null
     set(value) {
@@ -177,7 +180,8 @@ class Island(
     history.clear()
     select(null)
 
-    GlobalScope.launch {
+    KtxAsync.launch(Hex.asyncThread) {
+
       val capitals = hexagons.filter { getData(it).piece is Capital }
       if (capitals.size == 1) {
         val winner = getData(capitals.first()).team
@@ -203,14 +207,18 @@ class Island(
         }
       }
       select(null)
+      beginTurn(gameInputProcessor)
+    }
+  }
 
+  fun beginTurn(gameInputProcessor: GameInputProcessor) {
+    KtxAsync.launch(Hex.asyncThread) {
       val cai = currentAI
       if (cai != null) {
         cai.action(this@Island, gameInputProcessor)
-        schedule(0.05f) {
-          if (Hex.screen is PreviewIslandScreen) {
-            endTurn(gameInputProcessor)
-          }
+        delay(50)
+        if (Hex.screen is PreviewIslandScreen) {
+          endTurn(gameInputProcessor)
         }
       } else {
         // enable history only when it's a humans turn

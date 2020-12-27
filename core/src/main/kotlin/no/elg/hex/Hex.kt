@@ -11,6 +11,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
+import ktx.async.KtxAsync
+import ktx.async.newSingleThreadAsyncContext
+import no.elg.hex.Settings.limitFps
+import no.elg.hex.Settings.targetFps
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
@@ -36,13 +40,19 @@ object Hex : ApplicationAdapter() {
   lateinit var assets: Assets
     private set
 
+  var paused = false
+    private set
+
   val assetsAvailable: Boolean get() = Hex::assets.isInitialized
 
   val inputMultiplexer = InputMultiplexer()
+  val asyncThread = newSingleThreadAsyncContext()
 
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
-  val scale by lazy { if (args.scale <= 0) Assets.nativeScale else args.scale }
+  val scale by lazy {
+    if (args.scale <= 0) Assets.nativeScale else args.scale
+  }
   private val backgroundColor: Color by lazy { if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62") }
 
   var screen: AbstractScreen = SplashScreen
@@ -63,6 +73,8 @@ object Hex : ApplicationAdapter() {
     }
 
   override fun create() {
+    paused = false
+    Gdx.app
     try {
       require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
 
@@ -74,20 +86,13 @@ object Hex : ApplicationAdapter() {
           else -> LOG_INFO
         }
 
+      KtxAsync.initiate()
       Gdx.app.debug("SYS", "App backend ${Gdx.app.type}")
       Gdx.app.debug("SYS", "Max pointers ${Gdx.input.maxPointers}")
 
-      setClearColorAlpha(1f)
-
-      assets = Assets()
-      screen = SplashScreen
-      assets.loadAssets()
-
       Gdx.input.inputProcessor = inputMultiplexer
       Gdx.input.setCatchKey(Keys.BACK, true)
-
-      // must be last
-      assets.finishMain()
+      resume()
     } catch (e: Throwable) {
       e.printStackTrace()
       MessagesRenderer.publishError("Threw when loaded: $e", 600f)
@@ -109,12 +114,39 @@ object Hex : ApplicationAdapter() {
     }
   }
 
+  override fun resume() {
+
+
+    paused = false
+    setClearColorAlpha(1f)
+
+    assets = Assets()
+    screen = SplashScreen
+
+    assets.loadAssets()
+
+    if (screen != SplashScreen) {
+      SplashScreen.refreshAndSetScreen(screen)
+    }
+
+    // must be last
+    assets.finishMain()
+  }
+
+  override fun pause() {
+    paused = true
+    SplashScreen.nextScreen = screen
+    assets.dispose()
+    inputMultiplexer.clear()
+  }
+
   override fun resize(width: Int, height: Int) {
     ScreenRenderer.resize(width, height)
     screen.resize(width, height)
   }
 
   override fun dispose() {
+    paused = true
     try {
       VisUI.dispose()
       screen.dispose()
