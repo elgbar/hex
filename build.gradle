@@ -7,14 +7,13 @@ buildscript {
     roboVMVersion = '2.3.8'
     ashleyVersion = '1.7.3'
     aiVersion = '1.8.2'
-    visVersion = '1.4.6'
+    visVersion = '1.4.8'
     jacksonVersion = "2.12.0"
     junitVersion = "5.4.2"
     ktxVersion = "1.9.12-b1"
-    kotlinCoroutineVersion = "1.4.1"
+    kotlinCoroutineVersion = "1.4.2"
     argparserVersion = "2.0.7"
     mixiteVersion = "2020.1.0"
-    roboVMVersion = '2.3.11'
   }
 
   repositories {
@@ -27,7 +26,7 @@ buildscript {
   }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:5.1.1"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:5.6.1"
     classpath 'com.android.tools.build:gradle:4.1.1'
   }
 }
@@ -158,6 +157,7 @@ project(":core") {
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
     implementation "io.github.libktx:ktx-collections:$ktxVersion"
     implementation "io.github.libktx:ktx-graphics:$ktxVersion"
+    implementation "io.github.libktx:ktx-async:$ktxVersion"
 
     api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
