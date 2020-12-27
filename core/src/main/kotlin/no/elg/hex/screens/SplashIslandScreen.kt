@@ -39,10 +39,20 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
         Hex.assets.load(assetId, Island::class.java)
       }
       Gdx.app.postRunnable {
-        Hex.screen = this
+        val isl = island
+        loading = false
+        Hex.screen = if (isl != null) {
+          dispose()
+          createIslandScreen(isl)
+        } else {
+          this
+        }
       }
     }
   }
+
+  private fun createIslandScreen(island: Island) =
+    if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)
 
   override fun render(delta: Float) {
 
@@ -54,7 +64,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
 
     island?.also {
       loading = false
-      Hex.screen = if (Hex.args.mapEditor) MapEditorScreen(id, it) else PlayableIslandScreen(id, it)
+      Hex.screen = createIslandScreen(it)
       Gdx.app.log("IS SPLASH", "Loaded island $id in ${System.currentTimeMillis() - startTime} ms")
       return
     }
