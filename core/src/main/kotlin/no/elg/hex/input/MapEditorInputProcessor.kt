@@ -4,12 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys.SHIFT_LEFT
 import com.badlogic.gdx.Input.Keys.SHIFT_RIGHT
-import com.badlogic.gdx.InputAdapter
 import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.util.calculateHexagonsWithinRadius
 
 /** @author Elg */
-class MapEditorInputProcessor(private val screen: MapEditorScreen) : InputAdapter() {
+class MapEditorInputProcessor(private val screen: MapEditorScreen) : AbstractInput() {
 
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     if (button == Buttons.LEFT) {

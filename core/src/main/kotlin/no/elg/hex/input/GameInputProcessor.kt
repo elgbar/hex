@@ -8,8 +8,6 @@ import com.badlogic.gdx.Input.Keys.F12
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.Input.Keys.Y
 import com.badlogic.gdx.Input.Keys.Z
-import com.badlogic.gdx.input.GestureDetector.GestureAdapter
-import ktx.app.KtxInputAdapter
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -22,7 +20,6 @@ import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.strengthToType
-import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.island.Hand
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -39,7 +36,7 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
 
 /** @author Elg */
-class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAdapter, GestureAdapter() {
+class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInput(true) {
 
   var infiniteMoney = Hex.args.cheating
 
@@ -249,11 +246,6 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : KtxInputAda
     val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
     click(cursorHex)
     return true
-  }
-
-  override fun zoom(initialDistance: Float, distance: Float): Boolean {
-    publishMessage("$initialDistance-$distance ${initialDistance - distance}")
-    return screen.basicIslandInputProcessor.scrolled(0f, initialDistance - distance)
   }
 
   companion object {

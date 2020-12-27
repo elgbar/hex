@@ -378,14 +378,6 @@ object LevelCreationScreen : StageScreen() {
     }
   }
 
-  override fun show() {
-    Hex.inputMultiplexer.addProcessor(stage)
-  }
-
-  override fun hide() {
-    Hex.inputMultiplexer.removeProcessor(stage)
-  }
-
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     val visTable = stage.actors.first() as VisTable
@@ -395,5 +387,7 @@ object LevelCreationScreen : StageScreen() {
     visTable.pack()
   }
 
-  const val WIDTH_SPINNER_NAME = "width"
+  override fun hide() = Unit
+
+  private const val WIDTH_SPINNER_NAME = "width"
 }

@@ -14,6 +14,9 @@ abstract class AbstractScreen : ScreenAdapter() {
   protected val batch: SpriteBatch by lazy { SpriteBatch() }
   protected val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
 
+  var isDisposed = false
+    private set
+
   val camera: OrthographicCamera by lazy {
     OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
   }
@@ -60,11 +63,15 @@ abstract class AbstractScreen : ScreenAdapter() {
   }
 
   override fun hide() {
-    dispose()
+    try {
+      dispose()
+    } catch (e: Exception) {
+    }
   }
 
   override fun dispose() {
     if (::batch.isLazyInitialized) batch.dispose()
     if (::lineRenderer.isLazyInitialized) lineRenderer.dispose()
+    isDisposed = true
   }
 }

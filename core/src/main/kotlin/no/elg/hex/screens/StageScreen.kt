@@ -50,10 +50,6 @@ open class StageScreen : AbstractScreen() {
     Hex.inputMultiplexer.addProcessor(stage)
   }
 
-  override fun hide() {
-    Hex.inputMultiplexer.removeProcessor(stage)
-  }
-
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     camera.setToOrtho(false)

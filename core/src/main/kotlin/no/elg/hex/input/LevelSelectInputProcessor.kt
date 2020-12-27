@@ -3,7 +3,6 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
@@ -24,7 +23,7 @@ import no.elg.hex.util.play
 import java.lang.Float.max
 
 /** @author Elg */
-object LevelSelectInputProcessor : InputAdapter() {
+object LevelSelectInputProcessor : AbstractInput(true) {
 
   private const val SCROLL_SPEED = 40f
   private const val INVALID_ISLAND_INDEX = -1
@@ -42,6 +41,7 @@ object LevelSelectInputProcessor : InputAdapter() {
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     when (button) {
       Buttons.LEFT -> {
+        LevelSelectScreen.projectCoordinates(screenX.toFloat(), screenY.toFloat())
         val index = getHoveringIslandIndex()
         if (index != INVALID_ISLAND_INDEX) {
           play(index)
@@ -93,5 +93,9 @@ object LevelSelectInputProcessor : InputAdapter() {
       else -> return false
     }
     return true
+  }
+
+  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+    return super.touchDragged(screenX, screenY, pointer)
   }
 }

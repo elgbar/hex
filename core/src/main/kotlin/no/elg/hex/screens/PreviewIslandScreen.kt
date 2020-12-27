@@ -1,6 +1,5 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor
@@ -12,7 +11,6 @@ import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.getData
-import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 
@@ -74,41 +72,19 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     val widthZoom = (maxX - minX + padding * data.hexagonWidth) / camera.viewportWidth
     val heightZoom = (maxY - minY + padding * data.hexagonHeight) / camera.viewportHeight
 
-    Gdx.app.trace("ISLAND RESIZE") {
-      """
-      maxX = $maxX
-      minX = $minX
-      maxY = $maxY
-      minY = $minY
-      maxInvX = $maxInvX
-      maxInvY = $maxInvY
-      minInX = 0.0
-      minInY = 0.0
-  
-      gridWidthOffset = $gridWidthOffset
-      gridHeightOffset = $gridHeightOffset
-    
-      islandCenterX = $islandCenterX
-      islandCenterY = $islandCenterY
-      """.trimIndent()
-    }
-
     camera.position.x = islandCenterX.toFloat()
     camera.position.y = islandCenterY.toFloat()
     camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
     camera.update()
   }
 
-  override fun hide() {
-    island.select(null)
-    Hex.inputMultiplexer.removeProcessor(basicIslandInputProcessor)
-  }
-
   override fun show() {
-    Hex.inputMultiplexer.addProcessor(basicIslandInputProcessor)
+    basicIslandInputProcessor.show()
   }
 
   override fun dispose() {
+    island.select(null)
+
     super.dispose()
     verticesRenderer.dispose()
     outlineRenderer.dispose()

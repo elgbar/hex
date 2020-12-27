@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
@@ -17,6 +18,8 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visValidatableTextField
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.hud.MessagesRenderer.publishError
+import no.elg.hex.screens.SplashScreen.refreshAndSetScreen
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.toTitleCase
 import kotlin.reflect.KMutableProperty1
@@ -34,6 +37,7 @@ object SettingsScreen : StageScreen() {
         left()
         fill()
         grow()
+
         @Scene2dDsl
         fun addSetting(property: KMutableProperty1<Settings, Any>) {
           val name = property.name.toTitleCase()
@@ -134,14 +138,27 @@ object SettingsScreen : StageScreen() {
   }
 
   private fun backToPreviousScreen() {
-    require(Hex.screen === this) { "Settings screen is not currently being shown" }
-    require(::previousScreen.isInitialized) { "Previous screen is not initialized" }
-    Hex.screen = previousScreen
+    if (Hex.screen !== this) {
+      publishError("Settings screen is not currently being shown")
+      return
+    } else if (!::previousScreen.isInitialized) {
+      publishError("Previous screen is not initialized")
+      Hex.screen = LevelSelectScreen
+      return
+    }
+
+    refreshAndSetScreen(previousScreen)
   }
 
   override fun show() {
     super.show()
     previousScreen = Hex.screen
-    require(previousScreen !== this) { "Previous screen cannot be this" }
+    Gdx.app.debug("SETTINGS", "Previous screen is ${previousScreen::class.simpleName}")
+    if (previousScreen === this) {
+      publishError("Previous screen cannot be this Setting screen")
+      return
+    }
   }
+
+  override fun hide() = Unit
 }

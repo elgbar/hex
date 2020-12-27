@@ -31,7 +31,7 @@ import no.elg.hex.util.takeScreenshot
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
 
-  private var fontSize: Int = Hex.assets.fontSize
+  private var fontSize: Int = 20
 
   private const val PREVIEWS_PER_ROW = 5
   private const val PREVIEW_PADDING_PERCENT = 0.025f
@@ -59,6 +59,13 @@ object LevelSelectScreen : AbstractScreen() {
     get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
 
   val rendereredPreviewSize get() = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
+
+  fun projectCoordinates(inputX: Float, inputY: Float) {
+    unprojectVector.x = inputX
+    unprojectVector.y = inputY
+
+    camera.unproject(unprojectVector)
+  }
 
   fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, modifier: PreviewModifier = NOTHING): FrameBuffer {
     val islandScreen = PreviewIslandScreen(-1, island)
@@ -172,10 +179,6 @@ object LevelSelectScreen : AbstractScreen() {
     Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
   }
 
-  override fun hide() {
-    Hex.inputMultiplexer.removeProcessor(LevelSelectInputProcessor)
-  }
-
   fun rect(index: Int): Rectangle {
     val gridX = index % PREVIEWS_PER_ROW
     val gridY = index / PREVIEWS_PER_ROW
@@ -192,10 +195,7 @@ object LevelSelectScreen : AbstractScreen() {
 
   override fun render(delta: Float) {
 
-    unprojectVector.x = Gdx.input.x.toFloat()
-    unprojectVector.y = Gdx.input.y.toFloat()
-
-    camera.unproject(unprojectVector)
+    projectCoordinates(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
 
     lineRenderer.begin(Line)
     batch.begin()
@@ -237,8 +237,11 @@ object LevelSelectScreen : AbstractScreen() {
     Hex.assets.loadFont(bold = false, italic = false, flip = true, fontSize = fontSize)
   }
 
+  override fun hide() = Unit
+
   override fun dispose() {
     super.dispose()
+    Hex.inputMultiplexer.removeProcessor(LevelSelectInputProcessor)
     for (buffer in islandPreviews) {
       buffer.first?.dispose()
       buffer.second.dispose()
