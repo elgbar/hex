@@ -57,17 +57,19 @@ object SplashScreen : AbstractScreen() {
   override fun hide() = Unit
 
   fun refreshAndSetScreen(screen: AbstractScreen) {
-    if (!screen.isDisposed) {
+
+    if (screen is SettingsScreen) {
+      screen.backToPreviousScreen()
+    } else if (!screen.isDisposed) {
       Hex.screen = screen
       return
     } else if (screen is PreviewIslandScreen) {
-      if (screen is PlayableIslandScreen || screen is MapEditorScreen) {
-        play(screen.id, screen.island)
-        return
-      }
+      play(screen.id, screen.island)
+    } else if (screen is SplashIslandScreen) {
+      play(screen.id)
+    } else {
+      MessagesRenderer.publishError("Don't know how to restore the previous screen ${screen::class.simpleName}")
+      Hex.screen = LevelSelectScreen
     }
-
-    MessagesRenderer.publishError("Don't know how to restore the previous screen ${screen::class.simpleName}")
-    Hex.screen = LevelSelectScreen
   }
 }
