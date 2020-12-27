@@ -1,6 +1,7 @@
 package no.elg.hex
 
-import com.badlogic.gdx.Application
+import com.badlogic.gdx.Application.ApplicationType.Android
+import com.badlogic.gdx.Application.ApplicationType.Desktop
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
@@ -81,12 +82,13 @@ class Assets : AssetManager() {
     }
 
     val nativeScale: Int by lazy {
-      val width = if (Gdx.app.type == Application.ApplicationType.Desktop) {
-        defaultDisplayWidth
-      } else {
-        Gdx.graphics.backBufferWidth
+      val size = when (Gdx.app.type) {
+        Desktop -> defaultDisplayWidth
+        Android -> Gdx.graphics.backBufferHeight * 2
+        else -> Gdx.graphics.backBufferWidth
       }
-      (width / 1920).coerceAtLeast(1)
+      Gdx.app.debug("SCALE", "Screen size: $size")
+      (size / 1920).coerceAtLeast(1)
     }
   }
 
@@ -100,7 +102,8 @@ class Assets : AssetManager() {
   val originalSprites2x: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS_2X) }
   val fontSize by lazy { FONT_SIZE * scale }
 
-  val resolver: FileHandleResolver
+  lateinit var resolver: FileHandleResolver
+    private set
 
   private fun findSprite(regionName: String): AtlasRegion {
     val region =
@@ -208,7 +211,9 @@ class Assets : AssetManager() {
 
     loadingInfo = "VisUI"
 
-    if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
+    if (!VisUI.isLoaded()) {
+      if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
+    }
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = getFont(bold = false, italic = false, flip = false)
       val boldNotFlippedFont = getFont(bold = false, italic = false, flip = false)
