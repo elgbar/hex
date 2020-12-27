@@ -13,6 +13,7 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.SplashIslandScreen
 
 fun getIslandFileName(slot: Int, preview: Boolean = false): String {
@@ -48,6 +49,7 @@ fun saveIsland(id: Int, island: Island): Boolean {
   }
   return try {
     file.writeString(island.serialize(), false)
+    LevelSelectScreen.updateSelectPreview(id, true)
     publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
     if (!existed) {
       IslandFiles.fullFilesSearch()
