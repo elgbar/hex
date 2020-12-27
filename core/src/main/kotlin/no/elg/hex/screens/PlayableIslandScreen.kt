@@ -47,6 +47,7 @@ import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.hide
+import no.elg.hex.util.onAnyKeysDownEvent
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
 
@@ -105,7 +106,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
           pack()
           centerWindow()
-          closeOnEscape()
+          onAnyKeysDownEvent(Keys.ESCAPE, Keys.BACK, catchEvent = true) {
+            this@visWindow.fadeOut()
+          }
           addCloseButton()
           fadeOut(0f)
         }

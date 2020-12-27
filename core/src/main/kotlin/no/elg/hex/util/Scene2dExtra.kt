@@ -87,23 +87,40 @@ operator fun Stage.plusAssign(eventListener: EventListener) {
 inline fun <T : Actor> T.onKeyDown(
   keycode: Int,
   catchEvent: Boolean = false,
+  onlyWhenShown: Boolean = false,
   crossinline listener: T.() -> Unit
 ) =
   onKeyDown(catchEvent) { eventKey ->
-    if (eventKey == keycode) {
+    if (eventKey == keycode && (!onlyWhenShown || isShown())) {
       listener()
     }
   }
 
-/** Call listener when all keys are pressed and one of them are in the fired onKeyDown event */
+/** Call listener when all of the given keys are pressed and one of them are in the fired onKeyDown event */
 inline fun <T : Actor> T.onAllKeysDownEvent(
   vararg keycodes: Int,
   catchEvent: Boolean = false,
+  onlyWhenShown: Boolean = false,
   crossinline listener: T.() -> Unit
 ): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
-    if (eventKey in keycodes && keycodes.all { it == eventKey || Gdx.input.isKeyPressed(it) }) {
+    if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all { it == eventKey || Gdx.input.isKeyPressed(it) }) {
+      listener()
+    }
+  }
+}
+
+/** Call listener when any of the given keys are pressed */
+inline fun <T : Actor> T.onAnyKeysDownEvent(
+  vararg keycodes: Int,
+  catchEvent: Boolean = false,
+  onlyWhenShown: Boolean = false,
+  crossinline listener: T.() -> Unit
+): EventListener {
+  require(keycodes.isNotEmpty()) { "At least one key must be given" }
+  return this.onKeyDown(catchEvent) { eventKey ->
+    if ((!onlyWhenShown || isShown()) && eventKey in keycodes) {
       listener()
     }
   }
