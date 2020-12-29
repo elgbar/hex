@@ -15,6 +15,7 @@ import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import no.elg.hex.Settings.limitFps
 import no.elg.hex.Settings.targetFps
+import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
@@ -90,6 +91,11 @@ object Hex : ApplicationAdapter() {
 
       Gdx.input.inputProcessor = inputMultiplexer
       Gdx.input.setCatchKey(Keys.BACK, true)
+
+      if (args.profile) {
+        GLProfilerRenderer.enable()
+      }
+
       resume()
     } catch (e: Throwable) {
       e.printStackTrace()
@@ -109,6 +115,7 @@ object Hex : ApplicationAdapter() {
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
       MessagesRenderer.frameUpdate()
+      GLProfilerRenderer.frameUpdate()
     } catch (e: Throwable) {
       e.printStackTrace()
       MessagesRenderer.publishError("Threw when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
