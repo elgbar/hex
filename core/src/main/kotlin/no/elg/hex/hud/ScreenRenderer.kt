@@ -179,13 +179,14 @@ object ScreenRenderer : Disposable, Resizable {
   fun ScreenText.draw(
     line: Int,
     position: ScreenDrawPosition = TOP_LEFT,
-    offsetX: Float = spacing
+    offsetX: Float = spacing,
+    lines: Int = 1,
   ) {
     val y =
       when (position.vertical) {
         TOP -> spacing * line * 2f + spacing
         BOTTOM -> Gdx.graphics.height - spacing * line * 2f
-        VERTICAL_CENTER -> TODO()
+        VERTICAL_CENTER -> Gdx.graphics.height / 2 - spacing * (line - lines / 2) * 2f
       }
 
     fun totalLength(): Float {
@@ -211,20 +212,20 @@ object ScreenRenderer : Disposable, Resizable {
     }
     font.color = color
     font.draw(batch, text, x, y)
-    next?.draw(line, position, nextOffsetX)
+    next?.draw(line, position, nextOffsetX, lines)
   }
 
   /** Draw all given text on different lines */
   fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP_LEFT) {
 
-    if (position.vertical == BOTTOM) {
+    if (position.vertical !== TOP) {
       screenTexts.reverse()
     }
     val offset = if (position.vertical == TOP) 0 else 1
 
     begin()
     for ((line, screenText) in screenTexts.withIndex()) {
-      screenText.draw(line + offset, position)
+      screenText.draw(line + offset, position, lines = screenTexts.size)
     }
     end()
   }
