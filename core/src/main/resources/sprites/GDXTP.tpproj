@@ -32,7 +32,7 @@ limitMemory=false
 useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:nearest}]
-inputFiles=[{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation/flag.png,type:Ignore}]
+inputFiles=[{path:slay,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation/flag.png,type:Ignore}]
 
 
 ---

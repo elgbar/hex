@@ -25,6 +25,160 @@ hand
   orig: 1113, 1113
   offset: 0, 0
   index: -1
+help
+  rotate: false
+  xy: 2540, 2830
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+help_selected
+  rotate: false
+  xy: 1652, 434
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+man00
+  rotate: false
+  xy: 1564, 418
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man01
+  rotate: false
+  xy: 2496, 2814
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man02
+  rotate: false
+  xy: 1564, 374
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man03
+  rotate: false
+  xy: 1060, 519
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man04
+  rotate: false
+  xy: 1956, 2274
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man10
+  rotate: false
+  xy: 2452, 2814
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man11
+  rotate: false
+  xy: 1608, 374
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man12
+  rotate: false
+  xy: 1652, 462
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man13
+  rotate: false
+  xy: 1608, 462
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man14
+  rotate: false
+  xy: 2540, 2858
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man20
+  rotate: false
+  xy: 1608, 418
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man21
+  rotate: false
+  xy: 1868, 2274
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man22
+  rotate: false
+  xy: 2452, 2770
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man23
+  rotate: false
+  xy: 2496, 2858
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man24
+  rotate: false
+  xy: 1564, 462
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man31
+  rotate: false
+  xy: 1912, 2274
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man33
+  rotate: false
+  xy: 1912, 2274
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man32
+  rotate: false
+  xy: 1564, 330
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man34
+  rotate: false
+  xy: 2452, 2858
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+man30
+  rotate: false
+  xy: 2452, 2858
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
 palm
   rotate: false
   xy: 534, 37
@@ -39,11 +193,53 @@ pine
   orig: 640, 640
   offset: 0, 0
   index: -1
+redo
+  rotate: false
+  xy: 2000, 2290
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+settings
+  rotate: false
+  xy: 2452, 2742
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+settings_selected
+  rotate: false
+  xy: 2584, 2874
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
 slay_game_background
   rotate: false
   xy: 2, 1680
   size: 1218, 1218
   orig: 1218, 1218
+  offset: 0, 0
+  index: -1
+surrender
+  rotate: false
+  xy: 2496, 2786
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+undo
+  rotate: false
+  xy: 1696, 478
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+undo_all
+  rotate: false
+  xy: 2, 3
+  size: 24, 24
+  orig: 24, 24
   offset: 0, 0
   index: -1
 village
