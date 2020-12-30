@@ -9,5 +9,5 @@ object Settings {
 
   var showFps by PreferenceDelegate(false)
   var limitFps by PreferenceDelegate(false)
-  var targetFps by PreferenceDelegate(30) { it <= 0 }
+  var targetFps by PreferenceDelegate(30) { it < 5 }
 }

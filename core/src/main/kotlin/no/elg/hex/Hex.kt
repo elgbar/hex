@@ -106,12 +106,14 @@ object Hex : ApplicationAdapter() {
   override fun render() {
     try {
       if (limitFps) {
-        val target = targetFps.coerceAtLeast(2)
-        val sleep = (1000 / target - Gdx.graphics.deltaTime).toLong()
-        if (sleep > 0) {
-          Thread.sleep(sleep)
+        val sleep = (1000 / targetFps - Gdx.graphics.deltaTime).toLong()
+        val endTime: Long = TimeUtils.millis() + sleep
+        while (true) {
+          if (TimeUtils.millis() > endTime) break
+          Thread.yield()
         }
       }
+
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
       MessagesRenderer.frameUpdate()
