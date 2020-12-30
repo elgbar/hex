@@ -35,6 +35,8 @@ import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
+import no.elg.hex.util.findIslands
+import no.elg.hex.util.getData
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
 import no.elg.hex.util.nextOrNull
@@ -226,11 +228,18 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
                 island.regenerateCapitals()
               }
             }
-//            menuItem("Remove Smaller Islands") {
-//              onInteract(this@MapEditorScreen.stage.stage, Keys.CONTROL_LEFT, Keys.K) {
-//                TODO()
-//              }
-//            }
+            menuItem("Remove Smaller Islands") {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.K) {
+                val islands = island.findIslands()
+                val maxIsland = islands.maxByOrNull { it.size } ?: return@onInteract
+                for (islandland in islands) {
+                  if (islandland === maxIsland) continue
+                  for (hexagon in islandland) {
+                    island.getData(hexagon).isOpaque = true
+                  }
+                }
+              }
+            }
 
             separator()
 

@@ -49,19 +49,22 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
 }
 
 /** @return All visible hexagons connected to the start hexagon of the same team */
-fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>> {
-  return connectedHexagons(hexagon, this.getData(hexagon).team, HashSet(), this)
+fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.getData(hexagon).team): Set<Hexagon<HexagonData>> {
+  return connectedHexagons(hexagon, team, HashSet(), this)
 }
 
+/**
+ * @param team The team to test, if null all teams are cheked
+ */
 private fun connectedHexagons(
   center: Hexagon<HexagonData>,
-  team: Team,
+  team: Team?,
   visited: MutableSet<Hexagon<HexagonData>>,
   island: Island
 ): Set<Hexagon<HexagonData>> {
   val data = island.getData(center)
   // only check a hexagon if they have the same color and haven't been visited
-  if (visited.contains(center) || data.team != team || data.invisible) {
+  if (visited.contains(center) || (team != null && data.team != team) || data.invisible) {
     return visited
   }
 
@@ -107,6 +110,21 @@ fun Island.regenerateCapitals() {
   forEachPieceType<Capital> { _, data, _ -> data.setPiece(Empty::class) }
   ensureCapitalStartFunds()
   select(null)
+}
+
+fun Island.findIslands(): Set<Set<Hexagon<HexagonData>>> {
+  val checkedHexagons = HashSet<Hexagon<HexagonData>>()
+  val islands = HashSet<Set<Hexagon<HexagonData>>>()
+
+  for (hexagon in hexagons) {
+    if (hexagon in checkedHexagons || this.getData(hexagon).invisible) continue
+
+    val connectedHexes = this.connectedHexagons(hexagon, team = null)
+    checkedHexagons.addAll(connectedHexes)
+
+    islands.add(connectedHexes)
+  }
+  return islands
 }
 
 fun Island.ensureCapitalStartFunds() {
