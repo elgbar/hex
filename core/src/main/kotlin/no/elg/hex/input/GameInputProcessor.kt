@@ -157,7 +157,13 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     if (screen.island.isCurrentTeamAI()) return false
 
     when (keycode) {
-      BACKSPACE, SPACE -> screen.island.inHand = null
+      BACKSPACE, SPACE -> {
+        if (screen.island.inHand != null) {
+          screen.island.inHand = null
+        } else {
+          screen.island.select(null)
+        }
+      }
       F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
       F11 -> if (Hex.debug) screen.acceptAISurrender.toggleShown(screen.stageScreen.stage)
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
