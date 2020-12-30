@@ -217,7 +217,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F9) { quickload() }
             }
             separator()
-            menuItem("Exit") { onInteract(this@MapEditorScreen.stageScreen.stage, Keys.ESCAPE) { exit() } }
+            menuItem("Exit") { onInteract(this@MapEditorScreen.stageScreen.stage, Keys.ESCAPE, catchEvent = true) { exit() } }
           }
 
           menu("Edit") {
