@@ -67,9 +67,7 @@ object LevelCreationScreen : StageScreen() {
     if (Hex.debug) {
       batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
     }
-  }
 
-  init {
     rootTable {
 
       val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
@@ -186,7 +184,6 @@ object LevelCreationScreen : StageScreen() {
         }
       }
 
-      Gdx.app.postRunnable { renderPreview() }
       row()
 
       var oldWidth = widthSpinner.value
