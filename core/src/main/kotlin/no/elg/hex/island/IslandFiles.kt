@@ -41,7 +41,7 @@ object IslandFiles {
       if (file.exists()) {
         if (file.isDirectory) continue
         if (nonExistentFilesInRow > 0) {
-          Gdx.app.debug(TAG, "Missing the islands ${(slot - nonExistentFilesInRow..slot).map { getIslandFileName(it) }}")
+          Gdx.app.debug(TAG, "Missing the islands ${(slot - nonExistentFilesInRow until slot).map { getIslandFileName(it) }}")
         }
         val fileName = getIslandFileName(slot)
         Gdx.app.trace(TAG, "Found island $fileName")
