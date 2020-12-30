@@ -18,6 +18,7 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
 import java.lang.Float.max
@@ -43,6 +44,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
       Buttons.LEFT -> {
         LevelSelectScreen.projectCoordinates(screenX.toFloat(), screenY.toFloat())
         val index = getHoveringIslandIndex()
+        Gdx.app.debug("SELECT", "Clicked on index $index")
         if (index != INVALID_ISLAND_INDEX) {
           play(index)
         } else if (Hex.args.mapEditor) {
@@ -77,25 +79,28 @@ object LevelSelectInputProcessor : AbstractInput(true) {
           if (index == INVALID_ISLAND_INDEX) return false
           Gdx.app.debug("SELECT", "Deleting island $index")
           val fileName = getIslandFileName(index)
+          val filePreview = getIslandFile(index, preview = true, allowInternal = false)
 
-          if (!Gdx.files.local(fileName).delete()) {
+          val file = Gdx.files.local(fileName)
+          if (!file.delete()) {
             publishWarning("Failed to delete island $index")
           } else {
+            // wait for file to synced with disk to make sure it appears as deleted when running file search
+            while (file.exists()) {
+              Thread.yield()
+            }
+
+            filePreview.delete()
             Hex.assets.unload(fileName)
-            IslandFiles.islandIds -= index
+            IslandFiles.fullFilesSearch()
             LevelSelectScreen.renderPreviews()
             publishMessage(ScreenText("Deleted island $index", Color.GREEN))
           }
-
           Hex.screen = LevelSelectScreen
         }
       }
       else -> return false
     }
     return true
-  }
-
-  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    return super.touchDragged(screenX, screenY, pointer)
   }
 }
