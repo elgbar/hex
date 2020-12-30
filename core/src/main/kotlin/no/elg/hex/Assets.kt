@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
@@ -92,7 +93,7 @@ class Assets : AssetManager() {
     }
   }
 
-  val regularFont: BitmapFont by lazy { if (isLoaded(REGULAR_FONT))get(REGULAR_FONT) else FALLBACK_FONT }
+  val regularFont: BitmapFont by lazy { if (isLoaded(REGULAR_FONT)) get(REGULAR_FONT) else FALLBACK_FONT }
   val regularItalicFont: BitmapFont by lazy { get(REGULAR_ITALIC_FONT) }
   val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
   val boldItalicFont: BitmapFont by lazy { get(BOLD_ITALIC_FONT) }
@@ -102,16 +103,16 @@ class Assets : AssetManager() {
   val originalSprites2x: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS_2X) }
   val fontSize by lazy { FONT_SIZE * scale }
 
-  lateinit var resolver: FileHandleResolver
-    private set
+  val resolver: FileHandleResolver
 
   private fun findSprite(regionName: String): AtlasRegion {
-    val region =
-      if (Hex.args.retro) {
-        Hex.assets.originalSprites.findRegion(regionName)
-      } else {
-        Hex.assets.sprites.findRegion(regionName) ?: Hex.assets.originalSprites.findRegion(regionName)
-      }
+    val textureAtlas = if (Hex.args.retro) Hex.assets.originalSprites else Hex.assets.sprites
+    val region: AtlasRegion = try {
+      textureAtlas.findRegion(regionName)
+    } catch (e: GdxRuntimeException) {
+      throw IllegalArgumentException("Failed to find loaded sprite $regionName")
+    } ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${textureAtlas.regions.map { it.name }}")
+
     require(region.originalHeight == region.originalWidth) {
       "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}"
     }
@@ -254,8 +255,9 @@ class Assets : AssetManager() {
 
     if (!Hex.args.retro) {
       load(SPRITE_ATLAS, TEXTURE_ATLAS)
+    } else {
+      load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
     }
-    load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
 
     loadingInfo = "islands"
 
