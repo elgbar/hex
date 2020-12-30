@@ -135,6 +135,7 @@ object LevelSelectScreen : AbstractScreen() {
       }
       return
     }
+    disposePreviews()
 
     for (slot in IslandFiles.islandIds) {
       val islandPreviewFile = getIslandFile(slot, true)
@@ -240,6 +241,10 @@ object LevelSelectScreen : AbstractScreen() {
 
   override fun dispose() {
     super.dispose()
+    disposePreviews()
+  }
+
+  private fun disposePreviews() {
     for (buffer in islandPreviews) {
       buffer.first?.dispose()
       buffer.second.dispose()
