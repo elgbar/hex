@@ -23,8 +23,8 @@ object SplashScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-    if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.update(5)) {
-      if (::nextScreen.isInitialized) {
+    if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.update(25)) {
+      if (::nextScreen.isInitialized && nextScreen !== this) {
         refreshAndSetScreen(nextScreen)
       } else {
         Hex.screen = LevelSelectScreen
