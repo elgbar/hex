@@ -48,6 +48,7 @@ import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
+import no.elg.hex.util.canAttack
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.hide
@@ -140,8 +141,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
 
           row()
-
-          fadeIn()
 
           buttonBar {
             setButton(
@@ -360,16 +359,30 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   fun endTurn() {
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
       val minCost = Peasant::class.createHandInstance().price
-      val hexagons = island.hexagons
-        .map { island.getData(it) }
-        .filter { it.team == island.currentTeam && (it.piece is LivingPiece || it.piece is Capital) }
-      for (data in hexagons) {
 
+      for (hexagon in island.hexagons) {
+        val data = island.getData(hexagon)
         val piece = data.piece
-        if ((piece is Capital && piece.balance >= minCost) || (piece is LivingPiece && !piece.moved)) {
-          confirmEndTurn.show(stageScreen.stage)
-          return
+        if (data.team != island.currentTeam || (piece is Capital && piece.balance >= minCost)) continue
+        else if (piece is LivingPiece) {
+          if (piece.moved) continue
+          val territory = island.findTerritory(hexagon) ?: error("Piece $piece has not moved and is in not in a territory")
+          if (territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) } &&
+            territory.capital.balance < PEASANT_PRICE &&
+            territory.hexagons.none {
+              val terrPiece = island.getData(it).piece
+              if (terrPiece === piece) false
+              else terrPiece is LivingPiece && piece.canMerge(terrPiece)
+            }
+          ) {
+            // The current piece is able to move, but not attack any territory, nor buy any new pieces to merge with
+            continue
+          }
+        } else {
+          continue
         }
+        confirmEndTurn.show(stageScreen.stage)
+        return
       }
     }
     island.endTurn(inputProcessor)
