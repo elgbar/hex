@@ -24,6 +24,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import ktx.style.imageTextButton
 import ktx.style.label
 import ktx.style.menu
@@ -62,6 +64,9 @@ class Assets : AssetManager() {
     private val PNG = PixmapIO.PNG::class.java
     private val BITMAP_FONT = BitmapFont::class.java
     private val FREE_TYPE_FONT_GEN = FreeTypeFontGenerator::class.java
+
+    private const val MIN_ISLAND =
+      """{"width":3,"height":3,"layout":"HEXAGONAL","hexagonData":{"1,1":{"@id":1,"team":"STONE"},"1,0":{"@id":2,"edge":true,"isOpaque":true,"isPassable":false,"team":"SUN"},"2,1":2,"2,0":2,"0,2":2,"0,1":2,"1,2":2},"selectedCoordinate":null,"piece":null}"""
 
     const val ISLAND_SAVES_DIR = "islands"
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
@@ -199,6 +204,10 @@ class Assets : AssetManager() {
   fun loadAssets() {
 
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
+
+    KtxAsync.launch(Hex.asyncThread) {
+      Island.deserialize(MIN_ISLAND)
+    }
 
     loadingInfo = "fonts"
     // rest of the fonts
