@@ -22,6 +22,9 @@ const val KNIGHT_STRENGTH = 3
 
 const val BARON_STRENGTH = 4
 
+const val CASTLE_PRICE = 15
+const val PEASANT_PRICE = 10
+
 fun strengthToType(str: Int): KClass<out LivingPiece> {
   return when (str) {
     PEASANT_STRENGTH -> Peasant::class
@@ -220,8 +223,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
     hexagons.sumBy { island.getData(it).piece.income }
 
-  fun canBuy(piece: KClass<out Piece>): Boolean =
-    canBuy(piece.createHandInstance())
+  fun canBuy(piece: KClass<out Piece>): Boolean = canBuy(piece.createHandInstance())
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
@@ -238,7 +240,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
 
 class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, placed) {
   override val strength = SPEARMAN_STRENGTH
-  override val price: Int = 15
+  override val price: Int = CASTLE_PRICE
 
   override fun copyTo(newData: HexagonData): Castle {
     return Castle(newData, placed)
@@ -393,7 +395,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
 class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = PEASANT_STRENGTH
   override val income: Int = -1
-  override val price: Int = 10
+  override val price: Int = PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Peasant {
     return Peasant(newData, moved)
   }
