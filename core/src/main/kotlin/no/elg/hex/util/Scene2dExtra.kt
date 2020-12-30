@@ -25,15 +25,30 @@ fun PopupMenu.separator() {
 }
 
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, interaction: Button.() -> Unit) {
-  this.onInteract(stage = stage, keyShortcuts = arrayOf(keyShortcut), interaction = interaction)
+fun Button.onInteract(
+  stage: Stage,
+  vararg keyShortcut: Int,
+  catchEvent: Boolean = false,
+  interaction: Button.() -> Unit
+) {
+  this.onInteract(
+    stage = stage,
+    keyShortcuts = arrayOf(keyShortcut),
+    catchEvent = catchEvent,
+    interaction = interaction
+  )
 }
 
 /**
  * Call [interaction] when either the user clicks on the menu item or when pressing all the given
  * keys.
  */
-fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, interaction: Button.() -> Unit) {
+fun Button.onInteract(
+  stage: Stage,
+  vararg keyShortcuts: IntArray,
+  catchEvent: Boolean = false,
+  interaction: Button.() -> Unit
+) {
   onChange(interaction)
 
   if (keyShortcuts.isNotEmpty()) {
@@ -44,7 +59,7 @@ fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, interaction: 
     for (keyShortcut in keyShortcuts) {
       if (keyShortcut.isEmpty()) continue
       stage += onAllKeysDownEvent(
-        *keyShortcut, catchEvent = false,
+        *keyShortcut, catchEvent = catchEvent,
         listener = {
           if (!isDisabled) {
             interaction()
