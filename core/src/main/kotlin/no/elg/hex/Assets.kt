@@ -289,4 +289,10 @@ class Assets : AssetManager() {
     Gdx.app.trace("ASSET", "Main finished")
     mainFinishedLoading = true
   }
+
+  override fun unload(fileName: String?) {
+    if (isLoaded(fileName)) {
+      super.unload(fileName)
+    }
+  }
 }
