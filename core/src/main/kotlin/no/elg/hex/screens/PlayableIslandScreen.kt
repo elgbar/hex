@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.util.OsUtils
 import com.kotcrab.vis.ui.widget.ButtonBar
 import com.kotcrab.vis.ui.widget.VisWindow
+import ktx.actors.isShown
 import ktx.actors.onClick
 import ktx.scene2d.KHorizontalGroup
 import ktx.scene2d.Scene2dDsl
@@ -28,10 +29,12 @@ import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.hexagon.CASTLE_PRICE
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.LivingPiece
+import no.elg.hex.hexagon.PEASANT_PRICE
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
@@ -212,13 +215,17 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
           val size = Value.percentWidth(0.09f, this@table)
 
+          val disableInteract: (Territory?) -> Boolean = {
+            island.isCurrentTeamAI() || youWon.isShown() || youLost.isShown() || acceptAISurrender.isShown() || confirmEndTurn.isShown() || confirmSurrender.isShown()
+          }
+
           @Scene2dDsl
-          fun button(
+          fun interactButton(
             tooltip: String,
             up: TextureRegion,
             down: TextureRegion? = null,
             disabled: TextureRegion? = null,
-            disableCheck: ((Territory?) -> Boolean) = { island.isCurrentTeamAI() },
+            disableCheck: ((Territory?) -> Boolean) = disableInteract,
             vararg keyShortcut: Int,
             onClick: Button.() -> Unit
           ) {
@@ -249,48 +256,48 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
 
-          button(
+          interactButton(
             tooltip = "Buy Castle",
             up = Hex.assets.castle,
-            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE && island.isCurrentTeamAI() },
+            disableCheck = { (it?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(it) },
             keyShortcut = intArrayOf(Keys.NUM_1)
           ) {
             inputProcessor.buyUnit(Castle::class.createHandInstance())
           }
 
-          button(
+          interactButton(
             tooltip = "Buy Peasant",
             up = Hex.assets.peasant.getKeyFrame(0f),
-            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE && island.isCurrentTeamAI() },
+            disableCheck = { (it?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(it) },
             keyShortcut = intArrayOf(Keys.NUM_2)
           ) {
             inputProcessor.buyUnit(Peasant::class.createHandInstance())
           }
-          button(
+          interactButton(
             tooltip = "Undo",
             up = Hex.assets.undo,
-            disableCheck = { !island.history.canUndo() && island.isCurrentTeamAI() },
+            disableCheck = { !island.history.canUndo() || disableInteract(it) },
             keyShortcut = intArrayOf(Keys.NUM_3)
           ) {
             island.history.undo()
           }
-          button(
+          interactButton(
             tooltip = "Undo All",
             up = Hex.assets.undoAll,
-            disableCheck = { !island.history.canUndo() && island.isCurrentTeamAI() },
+            disableCheck = { !island.history.canUndo() || disableInteract(it) },
             keyShortcut = intArrayOf(Keys.NUM_4)
           ) {
             island.history.undoAll()
           }
-          button(
+          interactButton(
             tooltip = "Redo",
             up = Hex.assets.redo,
-            disableCheck = { !island.history.canRedo() && island.isCurrentTeamAI() },
+            disableCheck = { !island.history.canRedo() || disableInteract(it) },
             keyShortcut = intArrayOf(Keys.NUM_5)
           ) {
             island.history.redo()
           }
-          button(
+          interactButton(
             tooltip = "Surrender",
             up = Hex.assets.surrender,
             keyShortcut = intArrayOf(Keys.NUM_6)
@@ -301,7 +308,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               surrender()
             }
           }
-          button(
+          interactButton(
             tooltip = "Settings",
             up = Hex.assets.settings,
             down = Hex.assets.settingsDown,
@@ -311,7 +318,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
 
           if (Hex.trace) {
-            button(
+            interactButton(
               tooltip = "Help",
               up = Hex.assets.help,
               down = Hex.assets.helpDown,
@@ -329,7 +336,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           visTextButton("End Turn") {
             labelCell.height(size)
             labelCell.minWidth(size)
-            disableChecker[this] = { island.isCurrentTeamAI() }
+            disableChecker[this] = { disableInteract(null) }
             onInteract(stage, Keys.ENTER) {
               endTurn()
             }
@@ -344,7 +351,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     island.surrender()
   }
 
-  fun updateWinningTurn() {
+  fun gameEnded() {
     for ((window, action) in labelUpdater) {
       window.action()
     }
@@ -407,8 +414,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   companion object {
-    val PEASANT_PRICE = Peasant::class.createHandInstance().price
-    val CASTLE_PRICE = Castle::class.createHandInstance().price
     private var distress = true
   }
 }

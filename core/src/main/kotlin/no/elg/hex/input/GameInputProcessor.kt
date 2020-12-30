@@ -120,7 +120,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
         val capitals = island.hexagons.map { island.getData(it) }.filter { it.piece is Capital }
         island.currentAI
         if (capitals.count() == 1) {
-          screen.updateWinningTurn()
+          screen.gameEnded()
           if (island.isCurrentTeamHuman()) {
             screen.youWon.show(screen.stageScreen.stage)
           } else {
