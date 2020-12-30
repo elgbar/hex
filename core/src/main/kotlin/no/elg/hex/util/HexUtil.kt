@@ -98,13 +98,13 @@ fun Island.calculateStrength(hexagon: Hexagon<HexagonData>): Int {
       .map { getData(it) }
       .filter { it.team == team }
       .map { it.piece.strength }
-      .max()
+      .maxOrNull()
       ?: 0
   return max(data.piece.strength, neighborStrength)
 }
 
 fun Island.regenerateCapitals() {
-  forEachPieceType<Capital>() { _, data, _ -> data.setPiece(Empty::class) }
+  forEachPieceType<Capital> { _, data, _ -> data.setPiece(Empty::class) }
   ensureCapitalStartFunds()
   select(null)
 }

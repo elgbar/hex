@@ -542,7 +542,14 @@ class Island(
     val piece: Piece? = null,
   ) {
     fun copy(): IslandDto {
-      return IslandDto(width, height, layout, hexagonData.mapValues { it.value.copy() }, selectedCoordinate, piece?.createDtoCopy())
+      return IslandDto(
+        width,
+        height,
+        layout,
+        hexagonData.mapValues { (_, data) -> data.copy() },
+        selectedCoordinate,
+        piece?.createDtoCopy()
+      )
     }
 
     companion object {

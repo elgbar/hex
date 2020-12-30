@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.TimeUtils
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
@@ -42,7 +43,10 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
     island = null
     val json: String =
       try {
-        requireNotNull(file.readString())
+        val readStart = TimeUtils.millis()
+        requireNotNull(file.readString()).also {
+          Gdx.app.debug("ISLAND LOADING", "Reading file took ${TimeUtils.timeSinceMillis(readStart)} ms")
+        }
       } catch (e: Exception) {
         MessagesRenderer.publishMessage(
           ScreenText("Failed to load island the name '${file.name()}'", color = Color.RED)
@@ -51,10 +55,13 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
       }
     island =
       try {
-        Island.deserialize(json)
+        val deserializeStart = TimeUtils.millis()
+        Island.deserialize(json).also {
+          Gdx.app.debug("ISLAND LOADING", "Deserialize file took ${TimeUtils.timeSinceMillis(deserializeStart)} ms")
+        }
       } catch (e: Exception) {
         MessagesRenderer.publishMessage(ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED))
-        Gdx.app.debug("LOAD", e.message)
+        Gdx.app.debug("ISLAND LOADING", e.message)
         Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
       }
   }
