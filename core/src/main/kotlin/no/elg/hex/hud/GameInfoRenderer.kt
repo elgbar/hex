@@ -30,16 +30,11 @@ import no.elg.hex.screens.PlayableIslandScreen
 /** @author Elg */
 class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable, Disposable {
 
-  private val leftInfo = ArrayList<ScreenText>()
+  private val rightInfo = ArrayList<ScreenText>()
   private val unprojectVector = Vector3()
   private val batch: SpriteBatch = SpriteBatch()
   private val shapeRenderer = ShapeRenderer()
   private val camera = OrthographicCamera()
-
-  private val mouseX
-    get() = unprojectVector.x
-  private val mouseY
-    get() = unprojectVector.y
 
   override fun frameUpdate() {
 
@@ -48,18 +43,19 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
       ScreenRenderer.drawAll(emptyText(), CHEATING_SCREEN_TEXT, position = TOP_CENTER)
     }
 
-    leftInfo.clear()
+    rightInfo.clear()
 
     if (screen.island.currentAI == null) {
 
       screen.island.selected?.also { selected ->
-        leftInfo += ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) })
-        leftInfo += ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) })
+        rightInfo += emptyText()
+        rightInfo += ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) })
+        rightInfo += ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) })
         if (Hex.debug) {
-          leftInfo += emptyText()
-          leftInfo += ScreenText("Holding: ", next = nullCheckedText(screen.island.inHand, color = Color.YELLOW))
-          leftInfo += ScreenText("Holding edge piece: ", next = booleanText(screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA))
-          leftInfo += emptyText()
+          rightInfo += emptyText()
+          rightInfo += ScreenText("Holding: ", next = nullCheckedText(screen.island.inHand, color = Color.YELLOW))
+          rightInfo += ScreenText("Holding edge piece: ", next = booleanText(screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA))
+          rightInfo += emptyText()
         }
       }
 
@@ -98,9 +94,9 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
     if (Hex.debug) {
       val selected = screen.island.history.historyPointer
-      leftInfo.addAll(screen.island.history.historyNotes.mapIndexed { i, it -> ScreenText(it, color = if (i == selected) Color.YELLOW else WHITE) })
+      rightInfo.addAll(screen.island.history.historyNotes.mapIndexed { i, it -> ScreenText(it, color = if (i == selected) Color.YELLOW else WHITE) })
     }
-    ScreenRenderer.drawAll(*leftInfo.toTypedArray(), position = TOP_RIGHT)
+    ScreenRenderer.drawAll(*rightInfo.toTypedArray(), position = TOP_RIGHT)
   }
 
   override fun resize(width: Int, height: Int) {

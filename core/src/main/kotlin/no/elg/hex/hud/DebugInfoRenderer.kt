@@ -19,6 +19,7 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
 
     val list = ArrayList<ScreenText>()
 
+    list += emptyText()
     list += variableText(
       "FPS: ",
       Gdx.graphics.framesPerSecond,
@@ -76,9 +77,6 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
             )
         )
       )
-      if (Hex.args.mapEditor) {
-        list.add(0, emptyText())
-      }
     }
     drawAll(*list.toTypedArray())
   }
