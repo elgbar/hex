@@ -9,8 +9,10 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.utils.TimeUtils
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
+import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import no.elg.hex.Settings.limitFps
@@ -37,7 +39,13 @@ object Hex : ApplicationAdapter() {
     lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
   lateinit var args: ApplicationArgumentsParser
+
+  @Suppress("LibGDXStaticResource")
   lateinit var assets: Assets
+    private set
+
+  @Suppress("LibGDXStaticResource")
+  lateinit var asyncThread: AsyncExecutorDispatcher
     private set
 
   var paused = false
@@ -46,7 +54,6 @@ object Hex : ApplicationAdapter() {
   val assetsAvailable: Boolean get() = Hex::assets.isInitialized
 
   val inputMultiplexer = InputMultiplexer()
-  val asyncThread = newSingleThreadAsyncContext()
 
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
@@ -128,8 +135,10 @@ object Hex : ApplicationAdapter() {
 
   override fun resume() {
     paused = false
-
     setClearColorAlpha(1f)
+
+    asyncThread = newSingleThreadAsyncContext()
+
     assets = Assets()
     screen = SplashScreen
 
@@ -143,7 +152,9 @@ object Hex : ApplicationAdapter() {
     paused = true
     SplashScreen.nextScreen = screen
     screen = SplashScreen
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     assets.dispose()
+    asyncThread.dispose()
     inputMultiplexer.clear()
   }
 
@@ -158,7 +169,6 @@ object Hex : ApplicationAdapter() {
       VisUI.dispose()
       screen.dispose()
       assets.dispose()
-      asyncThread.dispose()
     } catch (e: Exception) {
     }
   }
