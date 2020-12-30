@@ -31,19 +31,20 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
     require(!loading) { "Two island splash screens should not be active at the same time!" }
     loading = true
     val islandFile = getIslandFile(id)
-    if (!islandFile.exists()) {
+    val initIsland = island
+    if (initIsland == null && !islandFile.exists()) {
       MessagesRenderer.publishWarning("Tried to play island $id, but no such island is loaded")
+      loading = false
       loadable = false
     } else {
       if (!Hex.assets.isLoaded(assetId)) {
         Hex.assets.load(assetId, Island::class.java)
       }
       Gdx.app.postRunnable {
-        val isl = island
         loading = false
-        Hex.screen = if (isl != null) {
+        Hex.screen = if (initIsland != null) {
           dispose()
-          createIslandScreen(isl)
+          createIslandScreen(initIsland)
         } else {
           this
         }

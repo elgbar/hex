@@ -35,12 +35,12 @@ fun play(id: Int, island: Island? = null): Boolean {
 }
 
 fun saveIsland(id: Int, island: Island): Boolean {
-  val file = Gdx.files.local(getIslandFileName(id))
 
   if (!island.validate()) {
     publishError("Island failed validation")
     return false
   }
+  val file = getIslandFile(id, allowInternal = false)
 
   val existed = file.exists()
   if (file.isDirectory) {
@@ -49,11 +49,11 @@ fun saveIsland(id: Int, island: Island): Boolean {
   }
   return try {
     file.writeString(island.serialize(), false)
-    LevelSelectScreen.updateSelectPreview(id, true)
     publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
     if (!existed) {
       IslandFiles.fullFilesSearch()
     }
+    LevelSelectScreen.updateSelectPreview(id, true)
     true
   } catch (e: Throwable) {
     publishMessage(ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))
