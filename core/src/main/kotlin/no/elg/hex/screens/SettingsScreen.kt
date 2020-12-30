@@ -32,9 +32,10 @@ object SettingsScreen : StageScreen() {
   init {
     rootTable {
 
+      pad(40f)
+      top()
       verticalGroup {
         space(20f)
-        left()
         fill()
         grow()
 
