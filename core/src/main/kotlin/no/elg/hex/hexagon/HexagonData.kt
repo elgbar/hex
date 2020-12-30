@@ -35,7 +35,7 @@ data class HexagonData(
 ) : DefaultSatelliteData() {
 
   @JsonInclude(ALWAYS)
-  var team: Team = Team.values().random()
+  var team: Team = if (edge) Team.SUN else Team.values().random()
 
   @JsonIgnore
   var piece: Piece = Empty
@@ -86,6 +86,7 @@ data class HexagonData(
   }
 
   fun copy(): HexagonData {
+    if (edge) return this
     return HexagonData(edge, isOpaque, isPassable).also {
       it.team = team
       it.piece = piece.copyTo(this)
