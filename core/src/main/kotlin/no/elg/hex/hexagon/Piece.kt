@@ -380,6 +380,10 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
     return this.strength + with.strength > BARON_STRENGTH
   }
 
+  fun canMerge(with: LivingPiece): Boolean {
+    return !canNotMerge(with)
+  }
+
   fun updateAnimationTime(): Float {
     if (moved) {
       elapsedAnimationTime = 0f

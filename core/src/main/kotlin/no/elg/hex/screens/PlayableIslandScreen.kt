@@ -199,6 +199,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
         )
         island.select(null)
+        gameEnded()
         youWon.show(stage)
       }
 

@@ -52,19 +52,12 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpd
   private var idx = 0
 
   override fun frameUpdate() {
-    Gdx.gl.glEnable(GL20.GL_BLEND)
-    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-
-    val currHex = islandScreen.cursorHexagon
 
     // Render the hexagons
     for (hexagon in islandScreen.island.hexagons) {
       val data: HexagonData = islandScreen.island.getData(hexagon)
       if (data.invisible) continue
-      val brightness =
-        HexagonData.BRIGHTNESS +
-          if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED else 0f
-      data.type.render(this, data.color, brightness, hexagon)
+      data.type.render(this, data.color, hexagon)
     }
     flush()
   }

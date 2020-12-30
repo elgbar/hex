@@ -60,7 +60,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
       island = Hex.assets[assetId] ?: error("Asset is loaded but nothing was returned!")
     }
 
-    Hex.assets.update(5)
+    Hex.assets.update(25)
 
     island?.also {
       loading = false

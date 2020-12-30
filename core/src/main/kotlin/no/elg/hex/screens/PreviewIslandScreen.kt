@@ -75,7 +75,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     camera.position.x = islandCenterX.toFloat()
     camera.position.y = islandCenterY.toFloat()
     camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
-    camera.update()
+    updateCamera()
   }
 
   override fun show() {

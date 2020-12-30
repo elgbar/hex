@@ -169,7 +169,7 @@ fun booleanText(
 object ScreenRenderer : Disposable, Resizable {
 
   val spacing: Float by lazy { if (Hex.assetsAvailable) Hex.assets.fontSize / 2f else 20f }
-  val batch: SpriteBatch = SpriteBatch()
+  private val batch: SpriteBatch = SpriteBatch()
   private val camera = OrthographicCamera()
 
   init {

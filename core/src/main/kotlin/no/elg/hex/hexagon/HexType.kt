@@ -144,8 +144,8 @@ enum class HexType(private vararg val surfaces: Surface) {
   fun render(
     verticesRenderer: VerticesRenderer,
     color: Color,
-    brightness: Float,
-    hexagon: Hexagon<HexagonData>
+    hexagon: Hexagon<HexagonData>,
+    brightness: Float = 1f
   ) {
 
     for ((i, element) in hexagon.vertices.withIndex()) {

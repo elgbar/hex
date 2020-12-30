@@ -33,12 +33,12 @@ object LevelSelectScreen : AbstractScreen() {
 
   private var fontSize: Int = 20
 
-  private const val PREVIEWS_PER_ROW = 5
+  private const val PREVIEWS_PER_ROW = 4
   private const val PREVIEW_PADDING_PERCENT = 0.025f
   private const val MIN_PREVIEW_SIZE = 512
 
-  val NOT_SELECTED_COLOR = Color.LIGHT_GRAY
-  val SELECT_COLOR = Color.GREEN
+  private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
+  private val SELECT_COLOR: Color = Color.GREEN
 
   private val islandPreviews = Array<Pair<FrameBuffer?, Texture>>()
   private val unprojectVector = Vector3()
@@ -175,10 +175,6 @@ object LevelSelectScreen : AbstractScreen() {
     }
   }
 
-  override fun show() {
-    Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
-  }
-
   fun rect(index: Int): Rectangle {
     val gridX = index % PREVIEWS_PER_ROW
     val gridY = index / PREVIEWS_PER_ROW
@@ -236,11 +232,14 @@ object LevelSelectScreen : AbstractScreen() {
     Hex.assets.loadFont(bold = false, italic = false, flip = true, fontSize = fontSize)
   }
 
+  override fun show() {
+    Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
+  }
+
   override fun hide() = Unit
 
   override fun dispose() {
     super.dispose()
-    Hex.inputMultiplexer.removeProcessor(LevelSelectInputProcessor)
     for (buffer in islandPreviews) {
       buffer.first?.dispose()
       buffer.second.dispose()

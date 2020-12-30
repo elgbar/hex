@@ -6,12 +6,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import no.elg.hex.Hex
-import no.elg.hex.util.isLazyInitialized
 
 /** @author Elg */
 abstract class AbstractScreen : ScreenAdapter() {
 
-  protected val batch: SpriteBatch by lazy { SpriteBatch() }
+  val batch: SpriteBatch by lazy { SpriteBatch() }
   protected val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
 
   var isDisposed = false
@@ -32,13 +31,6 @@ abstract class AbstractScreen : ScreenAdapter() {
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(true, width.toFloat(), height.toFloat())
     updateCamera()
-
-    if (::batch.isLazyInitialized) {
-      batch.projectionMatrix = camera.combined
-    }
-    if (::lineRenderer.isLazyInitialized) {
-      lineRenderer.projectionMatrix = camera.combined
-    }
   }
 
   fun renderBackground() {
@@ -71,8 +63,8 @@ abstract class AbstractScreen : ScreenAdapter() {
   }
 
   override fun dispose() {
-    if (::batch.isLazyInitialized) batch.dispose()
-    if (::lineRenderer.isLazyInitialized) lineRenderer.dispose()
+    batch.dispose()
+    lineRenderer.dispose()
     isDisposed = true
   }
 }
