@@ -121,6 +121,8 @@ object Hex : ApplicationAdapter() {
     } catch (e: Throwable) {
       e.printStackTrace()
       MessagesRenderer.publishError("Threw when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
+      dispose()
+      create()
     }
   }
 
