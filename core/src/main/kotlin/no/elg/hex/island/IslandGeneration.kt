@@ -60,12 +60,12 @@ object IslandGeneration {
 
     for (hexagon in island.hexagons) {
       val data = island.getData(hexagon)
+      data.setPiece(Empty::class)
       if (data.edge) continue
       val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
       Gdx.app.trace("ISGEN", "${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise")
       if (noise <= 1) {
         data.team = teams.random(random)
-        data.setPiece(Empty::class)
       } else {
         data.isOpaque = true
       }
