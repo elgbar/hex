@@ -58,7 +58,7 @@ object SplashScreen : AbstractScreen() {
 
   fun refreshAndSetScreen(screen: AbstractScreen) {
 
-    if (screen is SettingsScreen) {
+    if (screen is OverlayScreen) {
       screen.backToPreviousScreen()
     } else if (!screen.isDisposed) {
       Hex.screen = screen

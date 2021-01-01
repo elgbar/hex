@@ -1,7 +1,5 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
@@ -13,21 +11,14 @@ import ktx.scene2d.verticalGroup
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visLabel
-import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visValidatableTextField
-import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.hud.MessagesRenderer.publishError
-import no.elg.hex.screens.SplashScreen.refreshAndSetScreen
-import no.elg.hex.util.onInteract
 import no.elg.hex.util.toTitleCase
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.declaredMemberProperties
 
-object SettingsScreen : StageScreen() {
-
-  private lateinit var previousScreen: AbstractScreen
+object SettingsScreen : OverlayScreen() {
 
   init {
     rootTable {
@@ -153,32 +144,8 @@ object SettingsScreen : StageScreen() {
           @Suppress("UNCHECKED_CAST")
           addSetting(property as KMutableProperty1<Settings, Any>)
         }
-        visTextButton("Back") {
-          onInteract(stage, intArrayOf(Keys.ESCAPE), intArrayOf(Keys.BACK)) {
-            backToPreviousScreen()
-          }
-        }
+        addBackButton()
       }
-    }
-  }
-
-  fun backToPreviousScreen() {
-    if (!::previousScreen.isInitialized) {
-      publishError("Previous screen is not initialized")
-      Hex.screen = LevelSelectScreen
-      return
-    }
-
-    refreshAndSetScreen(previousScreen)
-  }
-
-  override fun show() {
-    super.show()
-    previousScreen = Hex.screen
-    Gdx.app.debug("SETTINGS", "Previous screen is ${previousScreen::class.simpleName}")
-    if (previousScreen === this) {
-      publishError("Previous screen cannot be this Setting screen")
-      return
     }
   }
 

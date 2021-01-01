@@ -15,15 +15,17 @@ import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 
 /** @author Elg */
-open class StageScreen : AbstractScreen() {
+open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen() {
 
   val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
-  val rootTable: KVisTable
+  lateinit var rootTable: KVisTable
+    private set
 
   @Scene2dDsl
   @OptIn(ExperimentalContracts::class)
   inline fun rootTable(init: (@Scene2dDsl KVisTable).() -> Unit) {
     contract { callsInPlace(init, EXACTLY_ONCE) }
+    require(useRootTable) { "Root table not enabled" }
     rootTable.init()
   }
 
@@ -31,12 +33,14 @@ open class StageScreen : AbstractScreen() {
     if (Hex.args.`stage-debug` || Hex.trace) {
       stage.isDebugAll = true
     }
-    stage.actors {
-      rootTable = visTable {
-        defaults().pad(20f)
-        defaults().space(20f)
-        setFillParent(true)
-        setRound(false)
+    if (useRootTable) {
+      stage.actors {
+        rootTable = visTable {
+          defaults().pad(20f)
+          defaults().space(20f)
+          setFillParent(true)
+          setRound(false)
+        }
       }
     }
   }
@@ -55,6 +59,7 @@ open class StageScreen : AbstractScreen() {
     camera.setToOrtho(false)
     stage.viewport.setWorldSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     stage.viewport.setScreenSize(Gdx.graphics.width, Gdx.graphics.height)
+    camera.update()
     for (actor in stage.actors) {
       if (actor is VisWindow) {
         actor.centerWindow()

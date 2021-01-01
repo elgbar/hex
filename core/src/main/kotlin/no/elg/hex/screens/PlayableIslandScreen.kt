@@ -213,10 +213,15 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           space(20f)
           pad(20f)
 
-          val size = Value.percentWidth(0.09f, this@table)
+          val size = Value.percentWidth(0.08f, this@table)
 
           val disableInteract: (Territory?) -> Boolean = {
-            island.isCurrentTeamAI() || youWon.isShown() || youLost.isShown() || acceptAISurrender.isShown() || confirmEndTurn.isShown() || confirmSurrender.isShown()
+            island.isCurrentTeamAI()
+              || youWon.isShown()
+              || youLost.isShown()
+              || acceptAISurrender.isShown()
+              || confirmEndTurn.isShown()
+              || confirmSurrender.isShown()
           }
 
           @Scene2dDsl
@@ -264,7 +269,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           ) {
             inputProcessor.buyUnit(Peasant::class.createHandInstance())
           }
-          
+
           interactButton(
             tooltip = "Buy Castle",
             up = Hex.assets.castle,
@@ -318,22 +323,22 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             Hex.screen = SettingsScreen
           }
 
-          if (Hex.trace) {
-            interactButton(
-              tooltip = "Help",
-              up = Hex.assets.help,
-              down = Hex.assets.helpDown,
-              keyShortcut = intArrayOf(Keys.NUM_8)
-            ) {
-              if (distress) {
-                distress = false
-                Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
-                if (Hex.args.cheating) {
-                  MessagesRenderer.publishMessage(ScreenText("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD))
-                }
+          interactButton(
+            tooltip = "Help",
+            up = Hex.assets.help,
+            down = Hex.assets.helpDown,
+            keyShortcut = intArrayOf(Keys.NUM_8)
+          ) {
+            if (distress) {
+              distress = false
+              Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
+              if (Hex.args.cheating) {
+                MessagesRenderer.publishMessage(ScreenText("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD))
               }
             }
+            Hex.screen = TutorialScreen
           }
+
           visTextButton("End Turn") {
             labelCell.height(size)
             labelCell.minWidth(size)
