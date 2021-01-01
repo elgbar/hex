@@ -257,6 +257,15 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
 
           interactButton(
+            tooltip = "Buy Peasant",
+            up = Hex.assets.peasant.getKeyFrame(0f),
+            disableCheck = { (it?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(it) },
+            keyShortcut = intArrayOf(Keys.NUM_2)
+          ) {
+            inputProcessor.buyUnit(Peasant::class.createHandInstance())
+          }
+          
+          interactButton(
             tooltip = "Buy Castle",
             up = Hex.assets.castle,
             disableCheck = { (it?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(it) },
@@ -265,14 +274,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             inputProcessor.buyUnit(Castle::class.createHandInstance())
           }
 
-          interactButton(
-            tooltip = "Buy Peasant",
-            up = Hex.assets.peasant.getKeyFrame(0f),
-            disableCheck = { (it?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(it) },
-            keyShortcut = intArrayOf(Keys.NUM_2)
-          ) {
-            inputProcessor.buyUnit(Peasant::class.createHandInstance())
-          }
           interactButton(
             tooltip = "Undo",
             up = Hex.assets.undo,
