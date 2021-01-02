@@ -27,7 +27,7 @@ import no.elg.hex.island.Territory
 import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.canAttack
-import no.elg.hex.util.createHandInstance
+import no.elg.hex.util.createInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isKeyPressed
@@ -42,7 +42,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
   var infiniteMoney = Hex.args.cheating
 
-  private fun pickUp(island: Island, hexData: HexagonData, territory: Territory) {
+  private fun pickUp(island: Island, hexData: HexagonData, territory: Territory): Boolean {
     val cursorPiece = hexData.piece
     if (cursorPiece.movable &&
       cursorPiece is LivingPiece &&
@@ -55,7 +55,9 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
         hexData.setPiece(Empty::class)
       }
       Gdx.app.trace("PLACE", "Hand was null, now it is ${island.hand}")
+      return true
     }
+    return false
   }
 
   private fun placeDown(
@@ -63,11 +65,11 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     territory: Territory,
     placeOn: Hexagon<HexagonData>,
     newPiece: Piece,
-  ) {
+  ): Boolean {
     val hexData = island.getData(placeOn)
     if (hexData.team != island.currentTeam && !territory.enemyBorderHexes.contains(placeOn)) {
       Gdx.app.debug("PLACE", "Tried to place piece on enemy hex outside border hexes")
-      return
+      return false
     }
 
     val oldPiece = hexData.piece
@@ -77,7 +79,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
       hexData.team == territory.team
     ) {
       // merge cursor piece with held piece
-      if (newPiece.canNotMerge(oldPiece)) return
+      if (newPiece.canNotMerge(oldPiece)) return true
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
       strengthToType(newPiece.strength + oldPiece.strength) to (newPiece.moved || oldPiece.moved)
     } else {
@@ -87,15 +89,15 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     if (newPieceType.isSubclassOf(LivingPiece::class)) {
       if (hexData.team == territory.team && (oldPiece is Capital || oldPiece is Castle)) {
         Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
-        return
+        return true
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
         Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
-        return
+        return true
       }
     } else if (Castle::class == newPieceType) {
       if (hexData.team != territory.team) {
         Gdx.app.debug("PLACE", "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
-        return
+        return true
       }
     } else if (Castle::class != newPieceType) {
       throw IllegalStateException("Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
@@ -131,9 +133,14 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
         }
       }
     }
+    return true
   }
 
-  fun click(hexagon: Hexagon<HexagonData>) {
+  /**
+   * @param hexagon The hexagon the player clicked
+   * @param longPress If the click was a long press, always false when AI is clicking
+   */
+  fun click(hexagon: Hexagon<HexagonData>, longPress: Boolean = false): Boolean {
     val island = screen.island
     val cursorHexData = island.getData(hexagon)
 
@@ -144,14 +151,14 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     val territory = island.selected
     if (territory == null) {
       Gdx.app.debug("PLACE", "Territory is still null after selecting it")
-      return
+      return false
     }
 
     val hand = island.hand
-    if (hand == null) {
-      pickUp(island, cursorHexData, territory)
-    } else {
-      placeDown(island, territory, hexagon, hand.piece)
+    return when {
+      longPress -> march(hexagon)
+      hand == null -> pickUp(island, cursorHexData, territory)
+      else -> placeDown(island, territory, hexagon, hand.piece)
     }
   }
 
@@ -185,9 +192,10 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     screen.island.selected?.also { territory ->
 
       val hand = screen.island.hand
-      if (hand != null && piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class) {
-        // Cannot merge and the pieces are identical, do nothing
-        // example is trying to buy castle while holding castle
+      if (hand != null && (piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class
+          || piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece))
+      ) {
+        // If we cannot merge or the pieces are identical we should not be able to buy new pieces
         return@also
       }
 
@@ -229,10 +237,9 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     return true
   }
 
-  override fun longPress(x: Float, y: Float): Boolean {
+  private fun march(hexagon: Hexagon<HexagonData>): Boolean {
     screen.island.selected?.also { territory ->
-      val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
-      if (cursorHex !in territory.hexagons) return false
+      if (hexagon !in territory.hexagons) return false
       val pieces = mutableListOf<LivingPiece>()
       territory.hexagons.map { screen.island.getData(it) }.filter {
         val piece = it.piece
@@ -248,15 +255,15 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
       val iter = pieces.iterator()
 
-      val cursorData = screen.island.getData(cursorHex)
+      val cursorData = screen.island.getData(hexagon)
 
-      if (cursorData.piece is Empty) {
-        val piece = iter.next()
-        cursorData.setPiece(piece::class) {
-          moved = false
+        if (cursorData.piece is Empty) {
+          val piece = iter.next()
+          cursorData.setPiece(piece::class) {
+            moved = false
+          }
+          require(cursorData.piece is LivingPiece) { "New piece is not Living Piece" }
         }
-        require(cursorData.piece is LivingPiece) { "New piece is not Living Piece" }
-      }
 
       var radius = 1
       while (iter.hasNext()) {
@@ -267,25 +274,27 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
           }
           val data = screen.island.getData(hex)
           if (data.piece is Empty) {
-            val piece = iter.next()
-            val placed = data.setPiece(piece::class) {
-              moved = false
+              val piece = iter.next()
+              val placed = data.setPiece(piece::class) {
+                moved = false
+              }
+              require(placed) { "Failed to place on an empty hexagon" }
             }
-            require(placed) { "Failed to place on an empty hexagon" }
           }
         }
-      }
       return true
     }
     return false
   }
 
-  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
+  private fun click(longPress: Boolean): Boolean {
     if (screen.island.isCurrentTeamAI()) return false
     val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
-    click(cursorHex)
-    return true
+    return click(cursorHex, longPress)
   }
+
+  override fun longPress(x: Float, y: Float): Boolean = click(true)
+  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean = click(false)
 
   companion object {
     fun keycodeToPiece(keycode: Int): Piece? {
