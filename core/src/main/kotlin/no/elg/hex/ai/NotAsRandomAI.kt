@@ -65,8 +65,8 @@ class NotAsRandomAI(override val team: Team) : AI {
 
   fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
     think { "Picking up a piece" }
-    if (territory.island.inHand?.piece != null) {
-      think { "Already holding a piece! (${territory.island.inHand?.piece})" }
+    if (territory.island.hand?.piece != null) {
+      think { "Already holding a piece! (${territory.island.hand?.piece})" }
       return true
     }
 
@@ -104,13 +104,13 @@ class NotAsRandomAI(override val team: Team) : AI {
       think { "There is something to pick up in the current territory!" }
       gameInputProcessor.click(pickUpHexes.random())
     }
-    think { "I am now holding ${territory.island.inHand?.piece}" }
+    think { "I am now holding ${territory.island.hand?.piece}" }
     return true
   }
 
   fun place(territory: Territory, gameInputProcessor: GameInputProcessor) {
 
-    val handPiece = territory.island.inHand?.piece
+    val handPiece = territory.island.hand?.piece
     think { "Placing held piece $handPiece" }
     if (handPiece == null) {
       think { "Not holding any piece!" }

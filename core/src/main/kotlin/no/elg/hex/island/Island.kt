@@ -65,9 +65,8 @@ class Island(
   /** Prefer this over calling [grid.hexagons] as this has better performance */
   val hexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
 
-  private val jobs = ArrayList<Job>()
+  var hand: Hand? = null
 
-  var inHand: Hand? = null
     set(value) {
       field?.apply {
         if (holding) {
@@ -141,7 +140,7 @@ class Island(
     select(grid.getByCubeCoordinate(selectedCoordinate))
     val territory = selected
     if (piece != null && territory != null) {
-      inHand = Hand(territory, piece)
+      hand = Hand(territory, piece)
     }
   }
 
@@ -243,7 +242,7 @@ class Island(
   /** Select the hex under the cursor */
   fun select(hexagon: Hexagon<HexagonData>?): Boolean {
     val oldSelected = selected
-    inHand = null
+    hand = null
     selected = null
 
     Gdx.app.trace("SELECT", "Selecting hexagon ${hexagon?.cubeCoordinate}")
@@ -530,7 +529,7 @@ class Island(
       grid.gridData.gridLayout,
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       selected?.findCapitalCoordinates(),
-      inHand?.piece?.createDtoCopy()
+      hand?.piece?.createDtoCopy()
     )
 
   data class IslandDto(

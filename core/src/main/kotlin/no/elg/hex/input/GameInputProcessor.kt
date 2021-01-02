@@ -49,10 +49,10 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     ) {
       // We currently don't hold anything in our hand, so pick it up!
       island.history.remember("Pickup piece") {
-        island.inHand = Hand(territory, cursorPiece)
+        island.hand = Hand(territory, cursorPiece)
         hexData.setPiece(Empty::class)
       }
-      Gdx.app.trace("PLACE", "Hand was null, now it is ${island.inHand}")
+      Gdx.app.trace("PLACE", "Hand was null, now it is ${island.hand}")
     }
   }
 
@@ -114,7 +114,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
           island.findTerritory(neighbor)
         }
 
-        // reselect territory to update it's values
+        // reselect territory to update its values
         island.select(placeOn)
 
         val capitals = island.hexagons.map { island.getData(it) }.filter { it.piece is Capital }
@@ -145,11 +145,11 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
       return
     }
 
-    val hand = island.inHand
+    val hand = island.hand
     if (hand == null) {
       pickUp(island, cursorHexData, territory)
     } else {
-      placeDown(island, territory, hexagon, hand.piece, oldTerritory)
+      placeDown(island, territory, hexagon, hand.piece)
     }
   }
 
@@ -158,8 +158,8 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
     when (keycode) {
       BACKSPACE, SPACE -> {
-        if (screen.island.inHand != null) {
-          screen.island.inHand = null
+        if (screen.island.hand != null) {
+          screen.island.hand = null
         } else {
           screen.island.select(null)
         }
@@ -170,7 +170,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
 
       else -> {
-        if (screen.island.inHand == null || screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA) {
+        if (screen.island.hand == null || screen.island.hand?.piece?.data === EDGE_DATA) {
           val piece = keycodeToPiece(keycode) ?: return false
           return buyUnit(piece)
         }

@@ -18,7 +18,7 @@ data class Territory(
 
   val income: Int by lazy {
     var income = capital.calculateIncome(hexagons, island)
-    val hand = island.inHand
+    val hand = island.hand
     if (hand?.territory === this) {
       income += hand.piece.income
     }

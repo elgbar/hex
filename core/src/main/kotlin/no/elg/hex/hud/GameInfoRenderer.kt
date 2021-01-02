@@ -53,8 +53,8 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         rightInfo += ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) })
         if (Hex.debug) {
           rightInfo += emptyText()
-          rightInfo += ScreenText("Holding: ", next = nullCheckedText(screen.island.inHand, color = Color.YELLOW))
-          rightInfo += ScreenText("Holding edge piece: ", next = booleanText(screen.island.inHand?.piece?.data === HexagonData.EDGE_DATA))
+          rightInfo += ScreenText("Holding: ", next = nullCheckedText(screen.island.hand, color = Color.YELLOW))
+          rightInfo += ScreenText("Holding edge piece: ", next = booleanText(screen.island.hand?.piece?.data === HexagonData.EDGE_DATA))
           rightInfo += emptyText()
         }
       }
@@ -68,7 +68,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         return width to height
       }
 
-      screen.island.inHand?.also { (_, piece) ->
+      screen.island.hand?.also { (_, piece) ->
         val region: AtlasRegion =
           when (piece) {
             is Capital -> Hex.assets.capital
