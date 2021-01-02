@@ -61,38 +61,36 @@ class IslandHistory(val island: Island) {
     }
   }
 
-  fun undoAll() {
-    for (unused in historyPointer until history.size - 1) {
-      undo()
-    }
-  }
-
   fun canUndo(): Boolean = (historyPointer + 1) in history.indices
   fun canRedo(): Boolean = (historyPointer - 1) in history.indices
 
+
   fun undo() {
-    val pointer = historyPointer + 1
-    if (pointer !in history.indices) {
-      Gdx.app.debug("HISTORY", "Nothing left to undo")
-      return
-    }
-    Gdx.app.debug("HISTORY", "Undo ${historyNotes[pointer - 1]}")
-    historyPointer++
-    rememberEnabled = false
-    island.restoreState(history[pointer].copy())
-    rememberEnabled = true
+    `do`(historyPointer + 1, "un")
   }
 
   fun redo() {
-    val pointer = historyPointer - 1
+    `do`(historyPointer - 1, "re")
+  }
+
+  fun undoAll() {
+    `do`(history.size - 1, "un")
+  }
+
+  fun redoAll() {
+    `do`(0, "re")
+  }
+
+  private fun `do`(pointer: Int, prefix: String) {
     if (pointer !in history.indices) {
-      Gdx.app.debug("HISTORY", "Nothing left to redo")
+      Gdx.app.debug("HISTORY", "Nothing left to ${prefix}do")
       return
     }
-    Gdx.app.debug("HISTORY", "Redo ${historyNotes[pointer + 1]}")
-    historyPointer--
+    Gdx.app.debug("HISTORY", "${prefix}do ${historyNotes[historyPointer]}")
+    historyPointer = pointer
+    val wasRemembering = rememberEnabled
     rememberEnabled = false
     island.restoreState(history[pointer].copy())
-    rememberEnabled = true
+    rememberEnabled = wasRemembering
   }
 }
