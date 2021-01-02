@@ -7,7 +7,15 @@ import no.elg.hex.Hex
 
 abstract class AbstractInput(private val useGesture: Boolean = false) : KtxInputAdapter, GestureDetector.GestureListener {
 
-  private val detector by lazy { GestureDetector(this) }
+  private val detector by lazy {
+    GestureDetector(
+      20f,
+      0.4f,
+      0.8f,
+      Float.MAX_VALUE,
+      this
+    )
+  }
 
   fun show() {
     Hex.inputMultiplexer.addProcessor(this)
