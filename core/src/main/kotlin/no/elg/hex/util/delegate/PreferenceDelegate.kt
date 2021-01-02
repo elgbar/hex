@@ -11,13 +11,15 @@ class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (
     require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char) {
       "Type must either be a Number, String, Char, or a Boolean. The given type us ${initialValue::class.simpleName}"
     }
+    require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
   }
 
   @Suppress("UNCHECKED_CAST")
   operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
     val propertyName = property.name
     if (preferences.contains(propertyName)) {
-      return when (initialValue) {
+
+      val value = when (initialValue) {
         is Boolean -> preferences.getBoolean(propertyName, initialValue as Boolean)
         is Int -> preferences.getInteger(propertyName, initialValue as Int)
         is Float -> preferences.getFloat(propertyName, initialValue as Float)
@@ -30,6 +32,12 @@ class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (
         is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
         else -> error("Nullable types are not allowed")
       } as T
+
+      if (invalidate(value)) {
+        Gdx.app.log("PREF", "Invalid preference value ($value) found for '$propertyName', restoring initial value ($initialValue)")
+        setValue(thisRef, property, initialValue)
+        return initialValue
+      }
     }
     return initialValue
   }
