@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.profiling.GLProfiler
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hud.ScreenDrawPosition.CENTER_RIGHT
+import no.elg.hex.hud.ScreenDrawPosition.CENTER_LEFT
 
 object GLProfilerRenderer : FrameUpdatable, Disposable {
 
@@ -22,7 +22,7 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
         variableText("Texture Bindings ", profiler.textureBindings, 0, 20),
         variableText("Avg vertex count ", profiler.vertexCount.average, 0f, 1000f, format = FLOAT_FORMAT),
         variableText("GL Errors ", Gdx.gl.glGetError(), 0, 1),
-        position = CENTER_RIGHT
+        position = CENTER_LEFT
       )
       profiler.reset()
     }
