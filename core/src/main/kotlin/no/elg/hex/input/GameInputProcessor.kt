@@ -198,33 +198,30 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
         territory.capital.balance -= piece.price
       }
 
-      screen.island.history.remember("Buying piece") {
-        if (piece is LivingPiece) piece.moved = false
-        if (hand != null &&
-          piece is LivingPiece &&
-          hand.piece is LivingPiece &&
-          piece.canMerge(hand.piece)
-        ) {
+      if (piece is LivingPiece) piece.moved = false
+      if (hand != null &&
+        piece is LivingPiece &&
+        hand.piece is LivingPiece
+      ) {
+        require(piece.canMerge(hand.piece))
 
+        screen.island.history.remember("Buying piece") {
           val newType = strengthToType(hand.piece.strength + piece.strength)
           Gdx.app.debug("BUY", "Bought ${piece::class.simpleName} while holding ${hand.piece::class.simpleName}")
 
           val data = hand.piece.data
 
+          hand.refund = false
           hand.dispose()
           screen.island.hand = null
 
-          val newPiece2 = if (!data.edge) {
-            require(data.setPiece(newType))
-            data.piece as LivingPiece
-          } else {
-            newType.createHandInstance()
-          }
-          newPiece2.moved = false
+          val newPiece = newType.createInstance(data)
+          newPiece.moved = false
 
-          screen.island.hand = Hand(territory, newPiece2)
-          data.setPiece(Empty::class)
-        } else {
+          screen.island.hand = Hand(territory, newPiece)
+        }
+      } else {
+        screen.island.history.remember("Buying piece") {
           screen.island.hand = Hand(territory, piece)
         }
       }

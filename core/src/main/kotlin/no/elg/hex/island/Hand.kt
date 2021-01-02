@@ -18,13 +18,16 @@ data class Hand(
   }
 
   var currentHand = true
+  var refund = true
 
   override fun dispose() {
     require(currentHand) { "Hand already disposed " }
     currentHand = false
     if (piece.data === HexagonData.EDGE_DATA) {
-      // refund when placing it back
-      territory.capital.balance += piece.price
+      if (refund) {
+        // refund when placing it back
+        territory.capital.balance += piece.price
+      }
     } else {
       val placed = piece.data.setPiece(piece::class)
       require(placed) { "Failed to place old hand piece back to where it was" }
