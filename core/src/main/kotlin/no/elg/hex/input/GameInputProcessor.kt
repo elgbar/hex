@@ -257,6 +257,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
       val cursorData = screen.island.getData(hexagon)
 
+      screen.island.history.remember("March") {
         if (cursorData.piece is Empty) {
           val piece = iter.next()
           cursorData.setPiece(piece::class) {
@@ -265,15 +266,15 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
           require(cursorData.piece is LivingPiece) { "New piece is not Living Piece" }
         }
 
-      var radius = 1
-      while (iter.hasNext()) {
-        for (hex in screen.island.calculateRing(cursorHex, radius++)) {
-          if (hex !in territory.hexagons) continue
-          if (!iter.hasNext()) {
-            return true
-          }
-          val data = screen.island.getData(hex)
-          if (data.piece is Empty) {
+        var radius = 1
+        while (iter.hasNext()) {
+          for (hex in screen.island.calculateRing(hexagon, radius++)) {
+            if (hex !in territory.hexagons) continue
+            if (!iter.hasNext()) {
+              return@remember
+            }
+            val data = screen.island.getData(hex)
+            if (data.piece is Empty) {
               val piece = iter.next()
               val placed = data.setPiece(piece::class) {
                 moved = false
@@ -282,6 +283,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
             }
           }
         }
+      }
       return true
     }
     return false
