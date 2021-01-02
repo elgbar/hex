@@ -45,7 +45,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   val cursorHexagon: Hexagon<HexagonData>?
     get() = null
 
-
   override fun render(delta: Float) {
     camera.resetHdpi()
     verticesRenderer.frameUpdate()

@@ -64,7 +64,6 @@ class IslandHistory(val island: Island) {
   fun canUndo(): Boolean = (historyPointer + 1) in history.indices
   fun canRedo(): Boolean = (historyPointer - 1) in history.indices
 
-
   fun undo() {
     `do`(historyPointer + 1, "un")
   }
