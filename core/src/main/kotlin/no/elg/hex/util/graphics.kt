@@ -1,9 +1,11 @@
 package no.elg.hex.util
 
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import ktx.graphics.use
@@ -21,3 +23,5 @@ fun FrameBuffer.takeScreenshot(fileHandle: FileHandle) {
     screenshotImage.dispose()
   }
 }
+
+fun Camera.resetHdpi() = HdpiUtils.glViewport(0, 0, viewportWidth.toInt(), viewportHeight.toInt())

@@ -11,6 +11,7 @@ import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.getData
+import no.elg.hex.util.resetHdpi
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 
@@ -44,7 +45,9 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   val cursorHexagon: Hexagon<HexagonData>?
     get() = null
 
+
   override fun render(delta: Float) {
+    camera.resetHdpi()
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()

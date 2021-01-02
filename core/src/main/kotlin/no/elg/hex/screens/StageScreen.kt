@@ -1,6 +1,7 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
@@ -46,6 +47,9 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   }
 
   override fun render(delta: Float) {
+    with(stage.viewport) {
+      HdpiUtils.glViewport(screenX, screenY, screenWidth, screenHeight)
+    }
     stage.act()
     stage.draw()
   }
@@ -57,7 +61,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     stage.viewport.update(width, height, true)
-    camera.update()
+    updateCamera()
 
     for (actor in stage.actors) {
       if (actor is VisWindow) {

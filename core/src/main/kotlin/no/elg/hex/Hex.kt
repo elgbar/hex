@@ -24,6 +24,7 @@ import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.LOG_TRACE
+import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 
@@ -123,6 +124,7 @@ object Hex : ApplicationAdapter() {
 
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
+      ScreenRenderer.camera.resetHdpi()
       MessagesRenderer.frameUpdate()
       GLProfilerRenderer.frameUpdate()
     } catch (e: Throwable) {

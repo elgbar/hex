@@ -133,16 +133,16 @@ fun <T : Comparable<T>> variableText(
     bold = bold,
     italic = italic,
     next =
-      validatedText(
-        value,
-        min,
-        max,
-        bold = bold,
-        italic = italic,
-        color = YELLOW,
-        format = format,
-        next = next
-      )
+    validatedText(
+      value,
+      min,
+      max,
+      bold = bold,
+      italic = italic,
+      color = YELLOW,
+      format = format,
+      next = next
+    )
   )
 }
 
@@ -170,7 +170,7 @@ object ScreenRenderer : Disposable, Resizable {
 
   val spacing: Float by lazy { if (Hex.assetsAvailable) Hex.assets.fontSize / 2f else 20f }
   private val batch: SpriteBatch = SpriteBatch()
-  private val camera = OrthographicCamera()
+  internal val camera = OrthographicCamera()
 
   init {
     resize(Gdx.graphics.width, Gdx.graphics.height)
