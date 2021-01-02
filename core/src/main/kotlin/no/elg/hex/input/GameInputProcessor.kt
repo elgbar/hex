@@ -124,9 +124,9 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
         if (capitals.count() == 1) {
           screen.gameEnded()
           if (island.isCurrentTeamHuman()) {
-            screen.youWon.show(screen.stageScreen.stage)
+            screen.youWon.show(screen.stage)
           } else {
-            screen.youLost.show(screen.stageScreen.stage)
+            screen.youLost.show(screen.stage)
           }
         }
       }
@@ -167,7 +167,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
         }
       }
       F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
-      F11 -> if (Hex.debug) screen.acceptAISurrender.toggleShown(screen.stageScreen.stage)
+      F11 -> if (Hex.debug) screen.acceptAISurrender.toggleShown(screen.stage)
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
 

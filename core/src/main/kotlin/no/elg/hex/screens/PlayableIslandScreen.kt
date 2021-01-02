@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
@@ -60,7 +61,7 @@ import no.elg.hex.util.show
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  val stageScreen = StageScreen()
+  private val stageScreen = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
@@ -78,6 +79,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
   private var modifier = NOTHING
+
+  val stage: Stage get() = stageScreen.stage
 
   init {
     stageScreen.stage.actors {
