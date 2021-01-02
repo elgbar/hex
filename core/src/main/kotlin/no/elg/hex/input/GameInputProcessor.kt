@@ -14,6 +14,7 @@ import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Peasant
@@ -26,6 +27,7 @@ import no.elg.hex.island.Territory
 import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.canAttack
+import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isKeyPressed
@@ -61,7 +63,6 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
     territory: Territory,
     placeOn: Hexagon<HexagonData>,
     newPiece: Piece,
-    oldTerritory: Territory?
   ) {
     val hexData = island.getData(placeOn)
     if (hexData.team != island.currentTeam && !territory.enemyBorderHexes.contains(placeOn)) {
@@ -100,11 +101,12 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
       throw IllegalStateException("Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
     }
 
-    island.history.remember("Placing piece") {
-      if (hexData.setPiece(newPieceType)) {
-
+    if (hexData.setPiece(newPieceType)) {
+      island.history.remember("Placing piece") {
         hexData.team = territory.team
-        island.inHand?.holding = oldTerritory != territory
+
+        island.hand?.currentHand = false
+
         val updatedPiece = hexData.piece
         if (updatedPiece is LivingPiece) {
           updatedPiece.moved = moved
@@ -181,6 +183,14 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
   fun buyUnit(piece: Piece): Boolean {
     screen.island.selected?.also { territory ->
+
+      val hand = screen.island.hand
+      if (hand != null && piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class) {
+        // Cannot merge and the pieces are identical, do nothing
+        // example is trying to buy castle while holding castle
+        return@also
+      }
+
       if (!infiniteMoney) {
         if (!territory.capital.canBuy(piece)) {
           return@also
@@ -190,7 +200,33 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
       screen.island.history.remember("Buying piece") {
         if (piece is LivingPiece) piece.moved = false
-        screen.island.inHand = Hand(territory, piece)
+        if (hand != null &&
+          piece is LivingPiece &&
+          hand.piece is LivingPiece &&
+          piece.canMerge(hand.piece)
+        ) {
+
+          val newType = strengthToType(hand.piece.strength + piece.strength)
+          Gdx.app.debug("BUY", "Bought ${piece::class.simpleName} while holding ${hand.piece::class.simpleName}")
+
+          val data = hand.piece.data
+
+          hand.dispose()
+          screen.island.hand = null
+
+          val newPiece2 = if (!data.edge) {
+            require(data.setPiece(newType))
+            data.piece as LivingPiece
+          } else {
+            newType.createHandInstance()
+          }
+          newPiece2.moved = false
+
+          screen.island.hand = Hand(territory, newPiece2)
+          data.setPiece(Empty::class)
+        } else {
+          screen.island.hand = Hand(territory, piece)
+        }
       }
     }
     return true
@@ -257,11 +293,11 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
   companion object {
     fun keycodeToPiece(keycode: Int): Piece? {
       return when (keycode) {
-        Keys.F1 -> Castle(HexagonData.EDGE_DATA)
-        Keys.F2 -> Peasant(HexagonData.EDGE_DATA)
-        Keys.F3 -> Spearman(HexagonData.EDGE_DATA)
-        Keys.F4 -> Knight(HexagonData.EDGE_DATA)
-        Keys.F5 -> Baron(HexagonData.EDGE_DATA)
+        Keys.F1 -> Castle(EDGE_DATA)
+        Keys.F2 -> Peasant(EDGE_DATA)
+        Keys.F3 -> Spearman(EDGE_DATA)
+        Keys.F4 -> Knight(EDGE_DATA)
+        Keys.F5 -> Baron(EDGE_DATA)
         else -> return null
       }
     }

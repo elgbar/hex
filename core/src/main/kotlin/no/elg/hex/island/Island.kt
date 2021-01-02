@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
@@ -66,27 +65,20 @@ class Island(
   val hexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
 
   var hand: Hand? = null
-
     set(value) {
       field?.apply {
-        if (holding) {
-          if (piece.data === EDGE_DATA) {
-            // refund when placing it back
-            territory.capital.balance += piece.price
-          } else if (piece.data.setPiece(piece::class)) {
-            // restore the piece to its last placed location
-            val newPiece = piece.data.piece
-            if (newPiece is LivingPiece) {
-              newPiece.moved = false
-            }
-          }
-          holding = false
+        if (currentHand) {
+          dispose()
         }
       }
       if (field != value) {
         field = value
         history.remember("Switch piece")
       }
+    }
+    get() {
+      require(field?.currentHand ?: true) { "Current hand has been disposed" }
+      return field
     }
 
   internal fun restoreState(dto: IslandDto) {
