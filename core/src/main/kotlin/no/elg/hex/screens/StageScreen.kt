@@ -15,7 +15,7 @@ import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 
 /** @author Elg */
-open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen() {
+open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false) {
 
   val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
   lateinit var rootTable: KVisTable
@@ -56,10 +56,9 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen() {
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
-    camera.setToOrtho(false)
-    stage.viewport.setWorldSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-    stage.viewport.setScreenSize(Gdx.graphics.width, Gdx.graphics.height)
+    stage.viewport.update(width, height, true)
     camera.update()
+
     for (actor in stage.actors) {
       if (actor is VisWindow) {
         actor.centerWindow()

@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import no.elg.hex.Hex
 
 /** @author Elg */
-abstract class AbstractScreen : ScreenAdapter() {
+abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
 
   val batch: SpriteBatch by lazy { SpriteBatch() }
   protected val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
@@ -29,7 +29,7 @@ abstract class AbstractScreen : ScreenAdapter() {
   }
 
   override fun resize(width: Int, height: Int) {
-    camera.setToOrtho(true, width.toFloat(), height.toFloat())
+    camera.setToOrtho(yDown, width.toFloat(), height.toFloat())
     updateCamera()
   }
 
