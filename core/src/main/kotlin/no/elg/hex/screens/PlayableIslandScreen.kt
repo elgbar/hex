@@ -216,12 +216,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           val size = Value.percentWidth(0.08f, this@table)
 
           val disableInteract: (Territory?) -> Boolean = {
-            island.isCurrentTeamAI()
-              || youWon.isShown()
-              || youLost.isShown()
-              || acceptAISurrender.isShown()
-              || confirmEndTurn.isShown()
-              || confirmSurrender.isShown()
+            island.isCurrentTeamAI() ||
+              youWon.isShown() ||
+              youLost.isShown() ||
+              acceptAISurrender.isShown() ||
+              confirmEndTurn.isShown() ||
+              confirmSurrender.isShown()
           }
 
           @Scene2dDsl

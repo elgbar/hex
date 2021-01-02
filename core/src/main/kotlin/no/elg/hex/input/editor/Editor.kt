@@ -36,6 +36,7 @@ interface Editor {
 object NOOPEditor : Editor {
   override val isNOP
     get() = true
+
   override fun edit(hexagon: Hexagon<HexagonData>) {
     /*NO OP*/
   }
