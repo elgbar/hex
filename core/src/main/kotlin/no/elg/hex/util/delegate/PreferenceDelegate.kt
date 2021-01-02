@@ -14,11 +14,14 @@ class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (
     require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
   }
 
+  private var currentValue: T? = null
+
   @Suppress("UNCHECKED_CAST")
   operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    currentValue?.also { return it }
+
     val propertyName = property.name
     if (preferences.contains(propertyName)) {
-
       val value = when (initialValue) {
         is Boolean -> preferences.getBoolean(propertyName, initialValue as Boolean)
         is Int -> preferences.getInteger(propertyName, initialValue as Int)
@@ -33,11 +36,13 @@ class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (
         else -> error("Nullable types are not allowed")
       } as T
 
-      if (invalidate(value)) {
-        Gdx.app.log("PREF", "Invalid preference value ($value) found for '$propertyName', restoring initial value ($initialValue)")
-        setValue(thisRef, property, initialValue)
-        return initialValue
+      if (!invalidate(value)) {
+        currentValue = value
+        return value
       }
+
+      Gdx.app.log("PREF", "Invalid preference value ($value) found for '$propertyName', restoring initial value ($initialValue)")
+      setValue(thisRef, property, initialValue)
     }
     return initialValue
   }
@@ -59,8 +64,9 @@ class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (
       is Char -> preferences.putInteger(propertyName, (value as Char).toInt())
       is Short -> preferences.putInteger(propertyName, (value as Short).toInt())
       is Double -> preferences.putFloat(propertyName, (value as Double).toFloat())
-      else -> error("The type ${initialValue::class.simpleName} types are not allowed")
+      else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
     }
+    currentValue = value
     preferences.flush()
   }
 
