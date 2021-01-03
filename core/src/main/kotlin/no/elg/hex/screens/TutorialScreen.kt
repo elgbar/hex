@@ -8,7 +8,6 @@ import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.container
-import ktx.scene2d.scene2d
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visScrollPane
 import ktx.scene2d.vis.visTable
@@ -17,8 +16,7 @@ class TutorialScreen : OverlayScreen(false) {
 
   init {
     stage.actors {
-
-      val a = scene2d.visTable(defaultSpacing = true) {
+      val a = this@actors.visTable(defaultSpacing = true) {
         top()
         left()
         pad(Value.percentWidth(0.01f, this@visTable))
@@ -105,7 +103,7 @@ class TutorialScreen : OverlayScreen(false) {
       visScrollPane {
         setFillParent(true)
         setFlickScroll(true)
-        fadeScrollBars = true
+        fadeScrollBars = false
         setScrollFocus(true)
         actor = a
       }
