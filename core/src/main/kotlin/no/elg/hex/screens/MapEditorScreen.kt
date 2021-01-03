@@ -2,7 +2,6 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.kotcrab.vis.ui.widget.ButtonBar
 import ktx.actors.isShown
 import ktx.actors.minusAssign
@@ -35,6 +34,7 @@ import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
+import no.elg.hex.island.Island.IslandDto
 import no.elg.hex.util.findIslands
 import no.elg.hex.util.getData
 import no.elg.hex.util.hide
@@ -47,7 +47,6 @@ import no.elg.hex.util.previousOrNull
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.saveIsland
 import no.elg.hex.util.separator
-import no.elg.hex.util.serialize
 import no.elg.hex.util.show
 import no.elg.hex.util.toggleShown
 import kotlin.reflect.KClass
@@ -58,7 +57,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   private val stageScreen = StageScreen()
   private val mapInputProcessor = MapEditorInputProcessor(this)
   private val frameUpdatable = MapEditorRenderer(this)
-  private var quickSavedIsland: String = ""
+  private lateinit var quickSavedIsland: IslandDto
 
   private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(this)
   private val teamEditors = TeamEditor.generateTeamEditors(this)
@@ -324,15 +323,15 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   }
 
   fun quicksave() {
-    quickSavedIsland = island.serialize()
+    quickSavedIsland = island.createDto()
   }
 
   fun quickload() {
-    if (quickSavedIsland.isEmpty()) {
+    if (!::quickSavedIsland.isInitialized) {
       publishError("No quick save found")
       return
     }
-    play(id, Hex.mapper.readValue(quickSavedIsland))
+    island.restoreState(quickSavedIsland)
   }
 
   override fun render(delta: Float) {
