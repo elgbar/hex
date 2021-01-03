@@ -3,12 +3,13 @@ package no.elg.hex.hud
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Color.WHITE
+import com.badlogic.gdx.graphics.Color.YELLOW
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
+import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
@@ -17,7 +18,7 @@ import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.Grave
-import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Peasant
@@ -30,37 +31,64 @@ import no.elg.hex.screens.PlayableIslandScreen
 /** @author Elg */
 class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable, Disposable {
 
-  private val rightInfo = ArrayList<ScreenText>()
-  private val unprojectVector = Vector3()
-  private val batch: SpriteBatch = SpriteBatch()
+  private val batch = SpriteBatch()
   private val shapeRenderer = ShapeRenderer()
   private val camera = OrthographicCamera()
 
-  override fun frameUpdate() {
+  private val topCenter: Array<ScreenText> = arrayOf(
+    VariableScreenText({ "Turn ${screen.island.turn}" }),
+    IfScreenText {
+      if (screen.inputProcessor.infiniteMoney) {
+        StaticScreenText("Cheating enabled!", color = Color.GOLD)
+      } else {
+        emptyText()
+      }
+    }
+  )
+  private val topRight: Array<ScreenText>
 
-    ScreenRenderer.drawAll(ScreenText("Turn ${screen.island.turn}", bold = true), position = TOP_CENTER)
-    if (screen.inputProcessor.infiniteMoney) {
-      ScreenRenderer.drawAll(emptyText(), CHEATING_SCREEN_TEXT, position = TOP_CENTER)
+  init {
+
+    val unknownText = StaticScreenText("???", color = YELLOW)
+    val treasuryText = IfScreenText {
+      if (screen.island.selected != null) {
+        StaticScreenText(
+          "Treasury: ",
+          next = signColoredText(screen.island.selected!!.capital::balance) { "%d".format(it) }
+        )
+      } else emptyText()
     }
 
-    rightInfo.clear()
+    val incomeText = IfScreenText {
+      if (screen.island.selected != null) StaticScreenText(
+        "Estimated income: ",
+        next = signColoredText(screen.island.selected!!::income) { "%+d".format(it) }
+      ) else emptyText()
+    }
 
-    if (screen.island.currentAI == null) {
+    topRight = if (Hex.debug) {
+      arrayOf(
+        emptyText(),
+        treasuryText,
+        incomeText,
+        emptyText(),
+        StaticScreenText("Holding: ", next = nullCheckedText(screen.island::hand, color = YELLOW)),
+        StaticScreenText("Holding the edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data === EDGE_DATA })),
+        StaticScreenText("Held is edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data?.edge == true })),
+        emptyText(),
+      )
+    } else {
+      arrayOf(
+        emptyText(),
+        treasuryText,
+        incomeText,
+      )
+    }
+  }
 
-      screen.island.selected?.also { selected ->
-        rightInfo += emptyText()
-        rightInfo += ScreenText("Treasury: ", next = signColoredText(selected.capital.balance) { "%d".format(it) })
-        rightInfo += ScreenText("Estimated income: ", next = signColoredText(selected.income) { "%+d".format(it) })
-        if (Hex.debug) {
-          rightInfo += emptyText()
-          rightInfo += ScreenText("Holding: ", next = nullCheckedText(screen.island.hand, color = Color.YELLOW))
-          rightInfo += ScreenText("Holding edge piece: ", next = booleanText(screen.island.hand?.piece?.data === HexagonData.EDGE_DATA))
-          rightInfo += emptyText()
-        }
-      }
-
-      batch.color = WHITE
-      batch.begin()
+  override fun frameUpdate() {
+    batch.color = WHITE
+    batch.use { batch ->
 
       fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
         val height = (Gdx.graphics.height * heightPercent)
@@ -89,14 +117,34 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 4f) / 2f, (height + height / 2) / 2f, handWidth, height)
         batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
       }
-      batch.end()
     }
 
+    ScreenRenderer.drawAll(*topCenter, position = TOP_CENTER)
+
     if (Hex.debug) {
-      val selected = screen.island.history.historyPointer
-      rightInfo.addAll(screen.island.history.historyNotes.mapIndexed { i, it -> ScreenText(it, color = if (i == selected) Color.YELLOW else WHITE) })
+
+      // due to the dynamic nature of history the array must be created each time
+
+      val history = screen.island.history
+      val centerRight = Array(topRight.size + history.historyNotes.size) { i ->
+        if (i < topRight.size) {
+          topRight[i]
+        } else {
+          val historyIndex = i - topRight.size
+          staticTextPool.obtain().also { sst ->
+            sst.text = history.historyNotes[historyIndex]
+            sst.color = if (historyIndex == screen.island.history.historyPointer) YELLOW else WHITE
+          }
+        }
+      }
+      ScreenRenderer.drawAll(*centerRight, position = TOP_RIGHT)
+      for (i in topRight.size until (topRight.size + history.historyNotes.size)) {
+        staticTextPool.free(centerRight[i] as StaticScreenText)
+      }
+    } else {
+      ScreenRenderer.drawAll(*topRight, position = TOP_RIGHT)
     }
-    ScreenRenderer.drawAll(*rightInfo.toTypedArray(), position = TOP_RIGHT)
+    if (screen.island.isCurrentTeamAI()) return
   }
 
   override fun resize(width: Int, height: Int) {
@@ -108,9 +156,5 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   override fun dispose() {
     batch.dispose()
     shapeRenderer.dispose()
-  }
-
-  companion object {
-    val CHEATING_SCREEN_TEXT = ScreenText("Cheating enabled!", color = Color.GOLD)
   }
 }

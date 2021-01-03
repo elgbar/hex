@@ -40,7 +40,6 @@ import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.hud.MessagesRenderer
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -336,7 +335,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               distress = false
               Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
               if (Hex.args.cheating) {
-                MessagesRenderer.publishMessage(ScreenText("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD))
+                MessagesRenderer.publishMessage("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD)
               }
             }
             Hex.screen = TutorialScreen

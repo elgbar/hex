@@ -158,6 +158,7 @@ project(":core") {
     implementation "io.github.libktx:ktx-collections:$ktxVersion"
     implementation "io.github.libktx:ktx-graphics:$ktxVersion"
     implementation "io.github.libktx:ktx-async:$ktxVersion"
+    implementation "io.github.libktx:ktx-assets:$ktxVersion"
 
     api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 

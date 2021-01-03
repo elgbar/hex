@@ -2,7 +2,6 @@ package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -22,7 +21,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
-import no.elg.hex.hud.ScreenText
+import no.elg.hex.hud.StaticScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.LevelSelectScreen
@@ -193,7 +192,7 @@ class Island(
       if (capitals.size == 1) {
         val winner = getData(capitals.first()).team
         Gdx.app.log("TURN", "Team $winner won!")
-        publishMessage(ScreenText("Team ", next = ScreenText(winner.name, color = winner.color, next = ScreenText(" won!"))))
+        publishMessage(StaticScreenText("Team ", next = StaticScreenText(winner.name, color = winner.color, next = StaticScreenText(" won!"))))
         return@launch
       }
 
@@ -454,12 +453,7 @@ class Island(
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         if (this.getData(hexagon).piece is Capital) {
-          publishMessage(
-            ScreenText(
-              "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.",
-              Color.RED
-            )
-          )
+          publishError("Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
           valid = false
         }
         continue
@@ -467,15 +461,10 @@ class Island(
 
       val capitalCount = connectedHexes.count { this.getData(it).piece is Capital }
       if (capitalCount < 1) {
-        publishMessage(ScreenText("There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.", Color.RED))
+        publishError("There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
         valid = false
       } else if (capitalCount > 1) {
-        publishMessage(
-          ScreenText(
-            "There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.",
-            Color.RED
-          )
-        )
+        publishError("There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
         valid = false
       }
     }

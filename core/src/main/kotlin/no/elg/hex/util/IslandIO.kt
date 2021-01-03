@@ -10,7 +10,6 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelSelectScreen
@@ -49,14 +48,14 @@ fun saveIsland(id: Int, island: Island): Boolean {
   }
   return try {
     file.writeString(island.serialize(), false)
-    publishMessage(ScreenText("Successfully saved island '${file.name()}'", color = Color.GREEN))
+    publishMessage("Successfully saved island '${file.name()}'", color = Color.GREEN)
     if (!existed) {
       IslandFiles.fullFilesSearch()
     }
     LevelSelectScreen.updateSelectPreview(id, true)
     true
   } catch (e: Throwable) {
-    publishMessage(ScreenText("Failed to saved island '${file.name()}'", color = Color.RED))
+    publishError("Failed to saved island '${file.name()}'")
     e.printStackTrace()
     false
   }

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
@@ -94,7 +93,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
             Hex.assets.unload(fileName)
             IslandFiles.fullFilesSearch()
             LevelSelectScreen.renderPreviews()
-            publishMessage(ScreenText("Deleted island $index", Color.GREEN))
+            publishMessage("Deleted island $index", color = Color.GREEN)
           }
           Hex.screen = LevelSelectScreen
         }

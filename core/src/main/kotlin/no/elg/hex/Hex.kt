@@ -138,6 +138,7 @@ object Hex : ApplicationAdapter() {
   override fun resume() {
     paused = false
     setClearColorAlpha(1f)
+    ScreenRenderer.resume()
 
     asyncThread = newSingleThreadAsyncContext()
 
@@ -157,6 +158,7 @@ object Hex : ApplicationAdapter() {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     assets.dispose()
     asyncThread.dispose()
+    ScreenRenderer.dispose()
     inputMultiplexer.clear()
   }
 
@@ -168,6 +170,7 @@ object Hex : ApplicationAdapter() {
   override fun dispose() {
     paused = true
     try {
+      pause()
       VisUI.dispose()
       screen.dispose()
       assets.dispose()

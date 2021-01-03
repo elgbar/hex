@@ -69,6 +69,6 @@ data class Territory(
   }
 
   override fun toString(): String {
-    return "Territory of team ${capital.data.team}"
+    return "Territory of team ${capital.data.team}@${findCapitalCoordinates().let { it.gridX to it.gridZ }}"
   }
 }

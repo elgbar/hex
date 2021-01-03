@@ -2,6 +2,9 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color.LIGHT_GRAY
+import com.badlogic.gdx.graphics.Color.RED
+import com.badlogic.gdx.graphics.Color.YELLOW
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.draw
 import java.util.concurrent.CopyOnWriteArrayList
@@ -14,16 +17,19 @@ object MessagesRenderer : FrameUpdatable {
 
   private val messages = CopyOnWriteArrayList<Pair<ScreenText, Float>>()
 
-  fun publishMessage(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
-    publishMessage(ScreenText(message, color = Color.LIGHT_GRAY), durationSeconds)
+  fun publishMessage(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS, color: Color = LIGHT_GRAY) {
+    val sst = staticTextPool.obtain()
+    sst.text = message
+    sst.color = color
+    publishMessage(sst, durationSeconds)
   }
 
   fun publishWarning(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
-    publishMessage(ScreenText(message, color = Color.YELLOW), durationSeconds)
+    publishMessage(message, durationSeconds, YELLOW)
   }
 
   fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
-    publishMessage(ScreenText(message, color = Color.RED), durationSeconds)
+    publishMessage(message, durationSeconds, RED)
   }
 
   fun publishMessage(message: ScreenText, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
@@ -32,6 +38,7 @@ object MessagesRenderer : FrameUpdatable {
   }
 
   override fun frameUpdate() {
+    if (messages.isEmpty()) return
     val newMessages = ArrayList<Pair<ScreenText, Float>>()
 
     ScreenRenderer.begin()
@@ -40,15 +47,16 @@ object MessagesRenderer : FrameUpdatable {
 
       if (timeLeft < FADE_START) {
         val alpha = timeLeft / FADE_START
-        message.copyAndSetAlpha(alpha)
+        message.setAlpha(alpha)
       } else {
         message
-      }
-        .draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
+      }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
 
-      val newTime = timeLeft - Gdx.graphics.rawDeltaTime
+      val newTime = timeLeft - Gdx.graphics.deltaTime
       if (newTime > 0f) {
         newMessages.add(message to newTime)
+      } else if (message is StaticScreenText) {
+        staticTextPool.free(message)
       }
     }
     ScreenRenderer.end()
@@ -57,7 +65,8 @@ object MessagesRenderer : FrameUpdatable {
     messages.addAll(newMessages)
   }
 
-  private fun ScreenText.copyAndSetAlpha(alpha: Float): ScreenText {
-    return copy(color = this.color.cpy().also { it.a = alpha }, next = next?.copyAndSetAlpha(alpha))
+  private fun ScreenText.setAlpha(alpha: Float): ScreenText {
+    color = this.color.cpy().also { it.a = alpha }
+    return this
   }
 }

@@ -8,23 +8,22 @@ import no.elg.hex.hud.ScreenDrawPosition.CENTER_LEFT
 
 object GLProfilerRenderer : FrameUpdatable, Disposable {
 
-  private val FLOAT_FORMAT: (Float) -> String = { "%.2f".format(it) }
-
   private val profiler = GLProfiler(Gdx.graphics)
+  private val texts = arrayOf(
+    variableText("GL calls ", profiler::getCalls, 0, 450),
+    variableText("GL Draw calls ", profiler::getDrawCalls, 0, 30),
+    variableText("GL Shader Switches ", profiler::getShaderSwitches, 0, 10),
+    variableText("GL Texture Bindings ", profiler::getTextureBindings, 0, 20),
+    variableText("GL Avg vertex count ", profiler.vertexCount::average, 0f, 1000f, format = { "%.2f".format(it) }),
+    variableText("GL Errors ", Gdx.gl::glGetError, 0, 1),
+    variableText("Screen Renderer Batches ", ScreenRenderer::draws, 0, 4),
+  )
 
   override fun frameUpdate() {
     if (profiler.isEnabled) {
-
-      ScreenRenderer.drawAll(
-        variableText("GL calls ", profiler.calls, 0, 450),
-        variableText("Draw calls ", profiler.drawCalls, 0, 30),
-        variableText("Shader Switches ", profiler.shaderSwitches, 0, 10),
-        variableText("Texture Bindings ", profiler.textureBindings, 0, 20),
-        variableText("Avg vertex count ", profiler.vertexCount.average, 0f, 1000f, format = FLOAT_FORMAT),
-        variableText("GL Errors ", Gdx.gl.glGetError(), 0, 1),
-        position = CENTER_LEFT
-      )
+      ScreenRenderer.drawAll(*texts, position = CENTER_LEFT)
       profiler.reset()
+      ScreenRenderer.resetDraws()
     }
   }
 

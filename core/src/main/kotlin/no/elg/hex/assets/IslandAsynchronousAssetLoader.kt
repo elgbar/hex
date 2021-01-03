@@ -5,10 +5,8 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.TimeUtils
 import no.elg.hex.hud.MessagesRenderer
-import no.elg.hex.hud.ScreenText
 import no.elg.hex.island.Island
 import no.elg.hex.util.regenerateCapitals
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
@@ -48,9 +46,7 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
           Gdx.app.debug("ISLAND LOADING", "Reading file took ${TimeUtils.timeSinceMillis(readStart)} ms")
         }
       } catch (e: Exception) {
-        MessagesRenderer.publishMessage(
-          ScreenText("Failed to load island the name '${file.name()}'", color = Color.RED)
-        )
+        MessagesRenderer.publishError("Failed to load island the name '${file.name()}'")
         "invalid island json"
       }
     island =
@@ -60,7 +56,7 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
           Gdx.app.debug("ISLAND LOADING", "Deserialize file took ${TimeUtils.timeSinceMillis(deserializeStart)} ms")
         }
       } catch (e: Exception) {
-        MessagesRenderer.publishMessage(ScreenText("Invalid island save data for island '${file.name()}'", color = Color.RED))
+        MessagesRenderer.publishError("Invalid island save data for island '${file.name()}'")
         Gdx.app.debug("ISLAND LOADING", e.message)
         Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
       }
