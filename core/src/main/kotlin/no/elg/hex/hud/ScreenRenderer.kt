@@ -56,7 +56,7 @@ sealed class ScreenText(
 
   abstract val text: String
 
-  val wholeText: String get() = text + next?.wholeText
+  val wholeText: String get() = text + (next?.wholeText ?: "")
 
   val font: BitmapFont
     get() =
