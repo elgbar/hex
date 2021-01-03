@@ -37,7 +37,7 @@ object IslandFiles {
 
     var nonExistentFilesInRow = 0
     for (slot in 0..Int.MAX_VALUE) {
-      val file = getIslandFile(slot)
+      val file = getIslandFile(slot, allowInternal = !Hex.args.mapEditor)
       if (file.exists()) {
         if (file.isDirectory) continue
         if (nonExistentFilesInRow > 0) {

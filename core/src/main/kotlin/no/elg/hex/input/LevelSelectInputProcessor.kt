@@ -77,20 +77,24 @@ object LevelSelectInputProcessor : AbstractInput(true) {
           val index = getHoveringIslandIndex()
           if (index == INVALID_ISLAND_INDEX) return false
           Gdx.app.debug("SELECT", "Deleting island $index")
-          val fileName = getIslandFileName(index)
+          val file = getIslandFile(index, preview = false, allowInternal = false)
           val filePreview = getIslandFile(index, preview = true, allowInternal = false)
 
-          val file = Gdx.files.local(fileName)
           if (!file.delete()) {
             publishWarning("Failed to delete island $index")
           } else {
+            val previewDel = filePreview.delete()
             // wait for file to synced with disk to make sure it appears as deleted when running file search
             while (file.exists()) {
               Thread.yield()
             }
 
-            filePreview.delete()
-            Hex.assets.unload(fileName)
+            if (previewDel) {
+              while (filePreview.exists()) {
+                Thread.yield()
+              }
+            }
+            Hex.assets.unload(getIslandFileName(index))
             IslandFiles.fullFilesSearch()
             LevelSelectScreen.renderPreviews()
             publishMessage("Deleted island $index", color = Color.GREEN)
