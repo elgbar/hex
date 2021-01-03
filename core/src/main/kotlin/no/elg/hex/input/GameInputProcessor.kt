@@ -222,7 +222,6 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
           val data = hand.piece.data
 
           hand.refund = false
-          hand.dispose()
           screen.island.hand = null
 
           val newPiece = newType.createInstance(data)
