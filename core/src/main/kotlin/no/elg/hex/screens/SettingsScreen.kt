@@ -18,7 +18,7 @@ import no.elg.hex.util.toTitleCase
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.declaredMemberProperties
 
-object SettingsScreen : OverlayScreen() {
+class SettingsScreen : OverlayScreen() {
 
   init {
     rootTable {
@@ -148,6 +148,4 @@ object SettingsScreen : OverlayScreen() {
       }
     }
   }
-
-  override fun hide() = Unit
 }

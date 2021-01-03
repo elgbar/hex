@@ -22,7 +22,9 @@ import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.screens.AbstractScreen
+import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.SplashScreen
+import no.elg.hex.screens.TutorialScreen
 import no.elg.hex.util.LOG_TRACE
 import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
@@ -55,6 +57,12 @@ object Hex : ApplicationAdapter() {
   val assetsAvailable: Boolean get() = Hex::assets.isInitialized
 
   val inputMultiplexer = InputMultiplexer()
+
+  lateinit var tutorialScreen: TutorialScreen
+    private set
+
+  lateinit var settingsScreen: SettingsScreen
+    private set
 
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
@@ -147,6 +155,9 @@ object Hex : ApplicationAdapter() {
 
     assets.loadAssets()
 
+    tutorialScreen = TutorialScreen()
+    settingsScreen = SettingsScreen()
+
     // must be last
     assets.finishMain()
   }
@@ -155,11 +166,13 @@ object Hex : ApplicationAdapter() {
     paused = true
     SplashScreen.nextScreen = screen
     screen = SplashScreen
+    inputMultiplexer.clear()
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     assets.dispose()
     asyncThread.dispose()
     ScreenRenderer.dispose()
-    inputMultiplexer.clear()
+    settingsScreen.dispose()
+    tutorialScreen.dispose()
   }
 
   override fun resize(width: Int, height: Int) {

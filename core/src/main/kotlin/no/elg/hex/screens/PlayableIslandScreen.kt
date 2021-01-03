@@ -322,7 +322,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             down = Hex.assets.settingsDown,
             keyShortcut = intArrayOf(Keys.NUM_7)
           ) {
-            Hex.screen = SettingsScreen
+            Hex.screen = Hex.settingsScreen
           }
 
           interactButton(
@@ -338,7 +338,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
                 MessagesRenderer.publishMessage("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD)
               }
             }
-            Hex.screen = TutorialScreen
+            Hex.screen = Hex.tutorialScreen
           }
 
           visTextButton("End Turn") {

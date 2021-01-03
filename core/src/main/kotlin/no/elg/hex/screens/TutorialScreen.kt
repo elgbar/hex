@@ -13,7 +13,7 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visScrollPane
 import ktx.scene2d.vis.visTable
 
-object TutorialScreen : OverlayScreen(false) {
+class TutorialScreen : OverlayScreen(false) {
 
   init {
     stage.actors {
@@ -111,6 +111,4 @@ object TutorialScreen : OverlayScreen(false) {
       }
     }
   }
-
-  override fun hide() = Unit
 }
