@@ -1,15 +1,16 @@
 package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.drawAll
-import no.elg.hex.screens.PlayableIslandScreen
+import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
 
 /** @author Elg */
-class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) : FrameUpdatable {
+class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable {
 
   private val lines: Array<ScreenText>
 
@@ -26,18 +27,18 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
 
     if (Hex.debug) {
 
-      val basicInputHandler = playableIslandScreen.basicIslandInputProcessor
+      val basicInputHandler = islandScreen.basicIslandInputProcessor
 
       lines = arrayOf(
         emptyText(),
         fpsText,
         prefixText(
           "Island is ",
-          callable = { playableIslandScreen.island.grid.gridData },
+          callable = { islandScreen.island.grid.gridData },
           format = { gridData -> "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout}" }
         ),
         prefixText(
-          "Current team is ", playableIslandScreen.island::currentTeam
+          "Current team is ", islandScreen.island::currentTeam
         ),
         prefixText(
           "Screen pos (", { "%4d,%4d".format(Gdx.input.x, Gdx.input.y) }, next = StaticScreenText(")")
@@ -48,12 +49,13 @@ class DebugInfoRenderer(private val playableIslandScreen: PlayableIslandScreen) 
         StaticScreenText(
           "Pointing at hex ",
           next =
-            nullCheckedText(
-              callable = basicInputHandler::cursorHex,
-              format = { cursorHex ->
-                "( %2d, % 2d) ${playableIslandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
-              }
-            )
+          nullCheckedText(
+            callable = basicInputHandler::cursorHex,
+            color = Color.YELLOW,
+            format = { cursorHex ->
+              "( %2d, % 2d) ${islandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
+            }
+          )
         )
       )
     } else {

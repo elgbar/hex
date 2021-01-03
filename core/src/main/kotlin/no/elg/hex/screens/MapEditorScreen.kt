@@ -23,6 +23,7 @@ import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
@@ -57,6 +58,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   private val stageScreen = StageScreen()
   private val mapInputProcessor = MapEditorInputProcessor(this)
   private val frameUpdatable = MapEditorRenderer(this)
+  private val debugInfoRenderer = DebugInfoRenderer(this)
   private lateinit var quickSavedIsland: IslandDto
 
   private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(this)
@@ -337,6 +339,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   override fun render(delta: Float) {
     super.render(delta)
     frameUpdatable.frameUpdate()
+    debugInfoRenderer.frameUpdate()
     stageScreen.render(delta)
   }
 

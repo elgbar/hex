@@ -400,9 +400,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   override fun render(delta: Float) {
     super.render(delta)
     debugRenderer.frameUpdate()
-    if (!Hex.args.mapEditor) {
-      frameUpdatable.frameUpdate()
-    }
+    frameUpdatable.frameUpdate()
     stageScreen.render(delta)
     val territory = island.selected
     for ((button, check) in disableChecker) {
