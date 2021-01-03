@@ -3,6 +3,7 @@ package no.elg.hex.island
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Queue
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.delay
@@ -49,9 +50,10 @@ class Island(
   width: Int,
   height: Int,
   layout: HexagonalGridLayout,
-  hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   selectedCoordinate: CubeCoordinate? = null,
-  piece: Piece? = null,
+  @JsonAlias("piece")
+  handPiece: Piece? = null,
+  hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
 ) {
 
   var turn = 1
@@ -85,16 +87,16 @@ class Island(
     }
 
   internal fun restoreState(dto: IslandDto) {
-    restoreState(dto.width, dto.height, dto.layout, dto.hexagonData, dto.selectedCoordinate, dto.handPiece, false)
+    restoreState(dto.width, dto.height, dto.layout, dto.selectedCoordinate, dto.handPiece, dto.hexagonData, false)
   }
 
   private fun restoreState(
     width: Int,
     height: Int,
     layout: HexagonalGridLayout,
-    hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     selectedCoordinate: CubeCoordinate? = null,
     handPiece: Piece? = null,
+    hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     initialLoad: Boolean,
   ) {
     val builder =
@@ -154,7 +156,7 @@ class Island(
   private val initialState: IslandDto
 
   init {
-    restoreState(width, height, layout, hexagonData, selectedCoordinate, piece, true)
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, true)
     history.clear()
     initialState = createDto().copy()
   }
@@ -533,9 +535,9 @@ class Island(
       grid.gridData.gridWidth,
       grid.gridData.gridHeight,
       grid.gridData.gridLayout,
-      hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       coord,
-      hand?.piece?.createDtoCopy()
+      hand?.piece?.createDtoCopy(),
+      hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap()
     )
   }
 
@@ -543,18 +545,18 @@ class Island(
     val width: Int,
     val height: Int,
     val layout: HexagonalGridLayout,
-    val hexagonData: Map<CubeCoordinate, HexagonData>,
     val selectedCoordinate: CubeCoordinate? = null,
     val handPiece: Piece? = null,
+    val hexagonData: Map<CubeCoordinate, HexagonData>,
   ) {
     fun copy(): IslandDto {
       return IslandDto(
         width,
         height,
         layout,
-        hexagonData.mapValues { (_, data) -> data.copy() },
         selectedCoordinate,
-        handPiece?.createDtoCopy()
+        handPiece?.createDtoCopy(),
+        hexagonData.mapValues { (_, data) -> data.copy() }
       )
     }
 
