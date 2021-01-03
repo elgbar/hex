@@ -9,14 +9,14 @@ class AndroidLauncher : AndroidApplication() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-//    val args = arrayOf<String>("--retro")
+//    val args = arrayOf<String>("-e")
     val args = arrayOf<String>()
 
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
 
     val config = AndroidApplicationConfiguration()
-//        config.hideStatusBar = true
-//        config.useImmersiveMode = true
+    config.hideStatusBar = true
+//    config.useImmersiveMode = true
     config.depth = 0
     config.useCompass = false
     config.useAccelerometer = false
