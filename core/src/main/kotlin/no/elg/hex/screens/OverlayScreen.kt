@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
-import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
@@ -20,17 +19,15 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
       Hex.screen = LevelSelectScreen
       return
     }
-
     SplashScreen.refreshAndSetScreen(previousScreen)
   }
 
   @Scene2dDsl
-  protected fun <S> KWidget<S>.addBackButton(init: KVisTextButton.(S) -> Unit = {}) {
+  protected fun <S> KWidget<S>.addBackButton() {
     visTextButton("Back") {
       onInteract(stage, intArrayOf(Keys.ESCAPE), intArrayOf(Keys.BACK)) {
         backToPreviousScreen()
       }
-      init(it)
     }
   }
 
@@ -40,9 +37,9 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
     super.show()
     previousScreen = Hex.screen
     Gdx.app.debug("SETTINGS", "Previous screen is ${previousScreen::class.simpleName}")
-    if (previousScreen === this) {
-      MessagesRenderer.publishError("Previous screen cannot be this Setting screen")
-      return
+    if (previousScreen is OverlayScreen) {
+      previousScreen = LevelSelectScreen
+      MessagesRenderer.publishError("Previous screen cannot be an Overlay screen")
     }
   }
 }
