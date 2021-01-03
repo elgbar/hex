@@ -29,6 +29,7 @@ import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.createInstance
 import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
@@ -77,12 +78,15 @@ class Island(
       }
     }
     get() {
-      require(field?.currentHand ?: true) { "Current hand has been disposed" }
+      if (field?.currentHand == false) {
+        Gdx.app.log("HAND", "Current hand field has been disposed, but not removed!")
+        field = null
+      }
       return field
     }
 
   internal fun restoreState(dto: IslandDto) {
-    restoreState(dto.width, dto.height, dto.layout, dto.hexagonData, dto.selectedCoordinate, dto.piece, false)
+    restoreState(dto.width, dto.height, dto.layout, dto.hexagonData, dto.selectedCoordinate, dto.handPiece, false)
   }
 
   private fun restoreState(
@@ -91,7 +95,7 @@ class Island(
     layout: HexagonalGridLayout,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     selectedCoordinate: CubeCoordinate? = null,
-    piece: Piece? = null,
+    handPiece: Piece? = null,
     initialLoad: Boolean,
   ) {
     val builder =
@@ -129,10 +133,22 @@ class Island(
       }
     }
 
-    select(grid.getByCubeCoordinate(selectedCoordinate))
+    val selectedHex = grid.getByCubeCoordinate(selectedCoordinate)
+    select(selectedHex)
     val territory = selected
-    if (piece != null && territory != null) {
-      hand = Hand(territory, piece)
+    if (handPiece != null && territory != null) {
+      val handData = if (handPiece.data.edge) {
+        EDGE_DATA
+      } else {
+        val newHex = selectedHex ?: error("Failed to find the correct data of hand piece within the territory")
+        getData(newHex)
+      }
+      hand = Hand(
+        territory,
+        handPiece::class.createInstance(handData).also {
+          if (it is LivingPiece) it.moved = false
+        }
+      )
     }
   }
 
@@ -514,15 +530,25 @@ class Island(
   // ////////////////////////
 
   @JsonValue
-  internal fun createDto() =
-    IslandDto(
+  internal fun createDto(): IslandDto {
+    // prefer coordinates of held piece if nothing is held select any hexagon within the selected territory
+    val coord: CubeCoordinate? =
+      (
+        hand?.piece?.data?.let { data ->
+          // slight edge case (pun intended) if we hold a piece that is a hand instance, do not record its coordinates
+          if (data.edge) null else hexagons.find { hex -> getData(hex) === data }
+        } ?: selected?.hexagons?.first()
+        )?.cubeCoordinate
+
+    return IslandDto(
       grid.gridData.gridWidth,
       grid.gridData.gridHeight,
       grid.gridData.gridLayout,
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
-      selected?.findCapitalCoordinates(),
+      coord,
       hand?.piece?.createDtoCopy()
     )
+  }
 
   data class IslandDto(
     val width: Int,
@@ -530,7 +556,7 @@ class Island(
     val layout: HexagonalGridLayout,
     val hexagonData: Map<CubeCoordinate, HexagonData>,
     val selectedCoordinate: CubeCoordinate? = null,
-    val piece: Piece? = null,
+    val handPiece: Piece? = null,
   ) {
     fun copy(): IslandDto {
       return IslandDto(
@@ -539,17 +565,13 @@ class Island(
         layout,
         hexagonData.mapValues { (_, data) -> data.copy() },
         selectedCoordinate,
-        piece?.createDtoCopy()
+        handPiece?.createDtoCopy()
       )
     }
 
     companion object {
       internal fun Piece?.createDtoCopy(): Piece? {
-        this?.let {
-          return if (it != Empty && it.data === EDGE_DATA) it
-          else it.copyTo(it.data.copy())
-        }
-        return null
+        return this?.let { it.copyTo(it.data.copy()) }
       }
     }
   }
