@@ -22,6 +22,7 @@ class AndroidLauncher : AndroidApplication() {
     config.useAccelerometer = false
     config.useGyroscope = false
     config.useRotationVectorSensor = false
+    config.disableAudio = true
     initialize(Hex, config)
   }
 }

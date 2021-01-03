@@ -24,6 +24,8 @@ fun main(args: Array<String>) {
   config.addIcon("icons/icon32.png", Internal)
   config.addIcon("icons/icon128.png", Internal)
 
+  LwjglApplicationConfiguration.disableAudio = true
+
   config.title = "Hex"
   if (Hex.args.mapEditor) {
     config.title += " - Map Editor"
