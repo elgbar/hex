@@ -21,8 +21,6 @@ import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.MessagesRenderer.publishError
-import no.elg.hex.hud.MessagesRenderer.publishMessage
-import no.elg.hex.hud.StaticScreenText
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.LevelSelectScreen
@@ -188,15 +186,11 @@ class Island(
     history.clear()
     select(null)
 
-    KtxAsync.launch(Hex.asyncThread) {
+    if (gameInputProcessor.screen.checkEndedGame()) {
+      return
+    }
 
-      val capitals = hexagons.filter { getData(it).piece is Capital }
-      if (capitals.size == 1) {
-        val winner = getData(capitals.first()).team
-        Gdx.app.log("TURN", "Team $winner won!")
-        publishMessage(StaticScreenText("Team ", next = StaticScreenText(winner.name, color = winner.color, next = StaticScreenText(" won!"))))
-        return@launch
-      }
+    KtxAsync.launch(Hex.asyncThread) {
 
       currentTeam = Team.values().next(currentTeam)
       Gdx.app.debug("TURN", "Starting turn of $currentTeam")

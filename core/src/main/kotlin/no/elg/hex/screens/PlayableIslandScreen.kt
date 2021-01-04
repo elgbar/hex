@@ -69,8 +69,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   private val confirmEndTurn: VisWindow
   private val confirmSurrender: VisWindow
   internal val acceptAISurrender: VisWindow
-  internal val youWon: VisWindow
-  internal val youLost: VisWindow
+  private val youWon: VisWindow
+  private val youLost: VisWindow
 
   private val buttonGroup: KHorizontalGroup
 
@@ -359,10 +359,24 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     island.surrender()
   }
 
-  fun gameEnded() {
+  private fun gameEnded() {
     for ((window, action) in labelUpdater) {
       window.action()
     }
+  }
+
+  fun checkEndedGame(): Boolean {
+    val capitalCount = island.hexagons.count { island.getData(it).piece is Capital }
+    if (capitalCount <= 1) {
+      gameEnded()
+      if (island.isCurrentTeamHuman()) {
+        youWon.show(stage)
+      } else {
+        youLost.show(stage)
+      }
+      return true
+    }
+    return false
   }
 
   fun endTurn() {

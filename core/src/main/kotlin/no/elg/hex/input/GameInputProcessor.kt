@@ -31,14 +31,13 @@ import no.elg.hex.util.createInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isKeyPressed
-import no.elg.hex.util.show
 import no.elg.hex.util.toggleShown
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
 
 /** @author Elg */
-class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInput(true) {
+class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true) {
 
   var infiniteMoney = Hex.args.cheating
 
@@ -120,17 +119,7 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
         // reselect territory to update its values
         island.select(placeOn)
-
-        val capitals = island.hexagons.map { island.getData(it) }.filter { it.piece is Capital }
-        island.currentAI
-        if (capitals.count() == 1) {
-          screen.gameEnded()
-          if (island.isCurrentTeamHuman()) {
-            screen.youWon.show(screen.stage)
-          } else {
-            screen.youLost.show(screen.stage)
-          }
-        }
+        screen.checkEndedGame()
       }
     }
     return true
@@ -193,9 +182,9 @@ class GameInputProcessor(private val screen: PlayableIslandScreen) : AbstractInp
 
       val hand = screen.island.hand
       if (hand != null && (
-        piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
-          piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
-        )
+          piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
+            piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
+          )
       ) {
         // If we cannot merge or the pieces are identical we should not be able to buy new pieces
         return@also
