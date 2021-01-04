@@ -208,6 +208,7 @@ class Assets : AssetManager() {
   fun loadAssets() {
 
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
+    setLoader(Island::class.java, IslandAsynchronousAssetLoader(resolver))
 
     KtxAsync.launch(Hex.asyncThread) {
       Island.deserialize(MIN_ISLAND)

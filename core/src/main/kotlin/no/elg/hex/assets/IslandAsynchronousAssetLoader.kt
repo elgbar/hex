@@ -40,14 +40,18 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
   ) {
     island = null
     val json: String =
-      try {
-        val readStart = TimeUtils.millis()
-        requireNotNull(file.readString()).also {
-          Gdx.app.debug("ISLAND LOADING", "Reading file took ${TimeUtils.timeSinceMillis(readStart)} ms")
+      if (parameter?.fileNameIsIsland == true) {
+        fileName
+      } else {
+        try {
+          val readStart = TimeUtils.millis()
+          requireNotNull(file.readString()).also {
+            Gdx.app.debug("ISLAND LOADING", "Reading file took ${TimeUtils.timeSinceMillis(readStart)} ms")
+          }
+        } catch (e: Exception) {
+          MessagesRenderer.publishError("Failed to load island the name '${file.name()}'")
+          "invalid island json"
         }
-      } catch (e: Exception) {
-        MessagesRenderer.publishError("Failed to load island the name '${file.name()}'")
-        "invalid island json"
       }
     island =
       try {
