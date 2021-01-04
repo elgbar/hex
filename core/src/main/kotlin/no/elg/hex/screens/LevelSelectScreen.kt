@@ -2,15 +2,18 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import ktx.graphics.center
+import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
@@ -31,8 +34,6 @@ import no.elg.hex.util.takeScreenshot
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
 
-  private var fontSize: Int = 20
-
   private const val PREVIEWS_PER_ROW = 4
   private const val PREVIEW_PADDING_PERCENT = 0.025f
   private const val MIN_PREVIEW_SIZE = 512
@@ -42,8 +43,6 @@ object LevelSelectScreen : AbstractScreen() {
 
   private val islandPreviews = Array<Pair<FrameBuffer?, Texture>>()
   private val unprojectVector = Vector3()
-
-  private var winFont: BitmapFont? = null
 
   var renderingPreview: Boolean = false
     private set
@@ -76,17 +75,17 @@ object LevelSelectScreen : AbstractScreen() {
     Hex.setClearColorAlpha(0f)
     Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-    camera.update()
+    updateCamera()
     islandScreen.render(0f)
     if (modifier != NOTHING) {
 
-      val widthOffset = camera.viewportWidth / 6
-      val heightOffset = camera.viewportHeight / 6
-      batch.begin()
-
-      when (modifier) {
-        SURRENDER -> batch.draw(
-          Hex.assets.surrender,
+      camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
+      val widthOffset = camera.viewportWidth / 5
+      val heightOffset = camera.viewportHeight / 5
+      batch.use(camera) {
+        when (modifier) {
+          SURRENDER -> batch.draw(
+            Hex.assets.surrender,
           widthOffset,
           heightOffset,
           camera.viewportWidth - widthOffset * 2,
@@ -98,23 +97,35 @@ object LevelSelectScreen : AbstractScreen() {
           heightOffset,
           camera.viewportWidth - widthOffset * 2,
           camera.viewportHeight - heightOffset * 2
-        )
-        WON -> {
-          val text = "${island.turn}"
-          val font = Hex.assets.getFont(bold = false, italic = false, flip = true, fontSize = fontSize)
-          if (winFont == null) {
-            winFont = font
-          }
-          font.draw(
-            batch,
-            text,
-            (camera.viewportWidth - (text.length * font.spaceXadvance) / 2f) / 2f,
-            (camera.viewportHeight - font.lineHeight) / 2f
           )
+          WON -> {
+            val text = "${island.turn}"
+
+            val font = Hex.assets.regularFont
+
+            camera.setToOrtho(yDown, widthOffset, heightOffset)
+            camera.center(widthOffset, heightOffset)
+
+            batch.projectionMatrix = camera.combined
+
+            println("WINWINWIN")
+            font.color = WHITE
+            font.draw(
+              batch,
+              text,
+              0f,
+              (camera.viewportHeight - font.data.capHeight) / 2f,
+              camera.viewportWidth,
+              Align.center,
+              false
+            )
+
+          }
+          else -> error("Unknown/illegal preview modifier: $modifier")
         }
-        else -> error("Unknown/illegal preview modifier: $modifier")
       }
-      batch.end()
+      camera.setToOrtho(yDown)
+      updateCamera()
     }
     Hex.setClearColorAlpha(1f)
 
@@ -225,12 +236,6 @@ object LevelSelectScreen : AbstractScreen() {
     }
 
     lineRenderer.end()
-  }
-
-  override fun resize(width: Int, height: Int) {
-    super.resize(width, height)
-    fontSize = camera.viewportWidth.toInt() / 5
-    Hex.assets.loadFont(bold = false, italic = false, flip = true, fontSize = fontSize)
   }
 
   override fun show() {
