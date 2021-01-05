@@ -206,7 +206,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
         screen.island.history.remember("Buying piece") {
           val newType = strengthToType(hand.piece.strength + piece.strength)
-          Gdx.app.debug("BUY", "Bought ${piece::class.simpleName} while holding ${hand.piece::class.simpleName}")
+          Gdx.app.trace("BUY") { "Bought ${piece::class.simpleName} while holding ${hand.piece::class.simpleName}" }
 
           val data = hand.piece.data
 
@@ -287,6 +287,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
   override fun longPress(x: Float, y: Float): Boolean = click(true)
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean = click(false)
+
 
   companion object {
     fun keycodeToPiece(keycode: Int): Piece? {

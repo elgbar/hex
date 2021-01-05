@@ -2,6 +2,7 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -54,6 +55,7 @@ import no.elg.hex.util.getData
 import no.elg.hex.util.hide
 import no.elg.hex.util.onAnyKeysDownEvent
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.serialize
 import no.elg.hex.util.show
 
 /** @author Elg */
@@ -164,9 +166,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
       fun endGame(modifier: PreviewModifier): KVisWindow.() -> Unit = {
         island.history.disable()
-        island.history.clear()
         this@PlayableIslandScreen.modifier = modifier
-        Hex.screen = LevelSelectScreen
         island.restoreInitialState()
       }
 
@@ -442,12 +442,37 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     super.dispose()
     frameUpdatable.dispose()
     stageScreen.dispose()
+    if (modifier == NOTHING) {
+      saveProgress()
+    }
 
-    LevelSelectScreen.updateSelectPreview(id, false, modifier)
+    LevelSelectScreen.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
   }
 
+  fun saveProgress() {
+    Gdx.app.debug("IS PROGRESS", "Saving progress of island $id")
+    islandPreferences.putString(getPrefName(id, false), island.serialize())
+    islandPreferences.flush()
+  }
+
+  fun clearProgress() {
+    Gdx.app.debug("IS PROGRESS", "Clearing progress of island $id")
+    islandPreferences.remove(getPrefName(id, false))
+    islandPreferences.remove(getPrefName(id, true))
+    islandPreferences.flush()
+  }
+
   companion object {
+    val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
+
+    fun getProgress(id: Int, preview: Boolean = false): String? {
+      val pref = getPrefName(id, preview)
+      return islandPreferences.getString(pref, null)
+    }
+
+    private fun getPrefName(id: Int, preview: Boolean) = "$id${if (preview) "-preview" else ""}"
+
     private var distress = true
   }
 }

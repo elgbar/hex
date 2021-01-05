@@ -11,6 +11,7 @@ import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.IslandDto
 import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.SplashIslandScreen
@@ -62,3 +63,4 @@ fun saveIsland(id: Int, island: Island): Boolean {
 }
 
 fun Island.serialize(): String = Hex.mapper.writeValueAsString(this)
+fun IslandDto.serialize(): String = Hex.mapper.writeValueAsString(this)

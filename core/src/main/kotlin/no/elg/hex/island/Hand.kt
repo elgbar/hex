@@ -6,6 +6,7 @@ import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Piece
+import no.elg.hex.util.trace
 
 /** @author Elg */
 data class Hand(
@@ -32,7 +33,7 @@ data class Hand(
   override fun dispose() {
     require(currentHand) { "Hand already disposed " }
     currentHand = false
-    Gdx.app.debug("HAND", "Disposing hand $this, refund? $refund")
+    Gdx.app.trace("HAND") { "Disposing hand $this, refund? $refund" }
     if (refund) {
       if (piece.data === HexagonData.EDGE_DATA) {
         // refund when placing it back

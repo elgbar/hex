@@ -4,19 +4,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.utils.Align
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.trace
 
 class SplashIslandScreen(val id: Int, private var island: Island? = null) : AbstractScreen() {
 
   var loadable: Boolean = true
     private set
-
-  private val assetId = getIslandFileName(id)
 
   private var startTime: Long = System.currentTimeMillis()
 
@@ -37,18 +37,24 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
       loading = false
       loadable = false
     } else {
-      if (!Hex.assets.isLoaded(assetId)) {
-        Hex.assets.load(assetId, Island::class.java)
-      }
-      Gdx.app.postRunnable {
-        loading = false
-        Hex.screen = if (initIsland != null) {
-          dispose()
-          createIslandScreen(initIsland)
-        } else {
-          this
+      Hex.screen = if (initIsland != null) {
+        dispose()
+        createIslandScreen(initIsland)
+      } else {
+        KtxAsync.launch(Hex.asyncThread) {
+          val progress = PlayableIslandScreen.getProgress(id)
+          Gdx.app.trace("IS SPLASH") { "progress: $progress" }
+          island = if (!progress.isNullOrBlank()) {
+            Gdx.app.debug("IS SPLASH", "Found progress for island $id")
+            Island.deserialize(progress)
+          } else {
+            Gdx.app.debug("IS SPLASH", "No progress found for island $id")
+            Island.deserialize(getIslandFile(id))
+          }
         }
+        this
       }
+      loading = false
     }
   }
 
@@ -57,37 +63,32 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
 
   override fun render(delta: Float) {
 
-    if (Hex.assets.isLoaded(assetId)) {
-      island = Hex.assets[assetId] ?: error("Asset is loaded but nothing was returned!")
-    }
-
-    Hex.assets.update(25)
-
-    island?.also {
+    val currIsland = island
+    if (currIsland != null) {
       loading = false
-      Hex.screen = createIslandScreen(it)
+      Hex.screen = createIslandScreen(currIsland)
       Gdx.app.log("IS SPLASH", "Loaded island $id in ${System.currentTimeMillis() - startTime} ms")
-      return
-    }
-    batch.use {
-      val txt =
-        """
+    } else {
+      batch.use {
+        val txt =
+          """
           |Loading Island $id
           |
-          |${"%2.0f".format(Hex.assets.progress * 100)}%
+          |0%
           |
           |${System.currentTimeMillis() - startTime} ms
           """.trimMargin()
 
-      layout.setText(
-        Hex.assets.regularFont,
-        txt,
-        Color.WHITE,
-        Gdx.graphics.width.toFloat(),
-        Align.center,
-        true
-      )
-      Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
+        layout.setText(
+          Hex.assets.regularFont,
+          txt,
+          Color.WHITE,
+          Gdx.graphics.width.toFloat(),
+          Align.center,
+          true
+        )
+        Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
+      }
     }
   }
 

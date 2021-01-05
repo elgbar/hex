@@ -24,6 +24,7 @@ import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
@@ -189,6 +190,7 @@ class Island(
     if (gameInputProcessor.screen.checkEndedGame()) {
       return
     }
+    gameInputProcessor.screen.saveProgress()
 
     KtxAsync.launch(Hex.asyncThread) {
 
@@ -231,13 +233,18 @@ class Island(
   }
 
   fun restoreInitialState() {
+    history.clear()
+    Hex.screen.also {
+      if (it is PlayableIslandScreen) {
+        it.clearProgress()
+      }
+    }
+    Hex.screen = LevelSelectScreen
+    // only restore state after surrender to make sure the preview is last known state
     restoreState(initialState.copy())
   }
 
   fun surrender() {
-    history.clear()
-    Hex.screen = LevelSelectScreen
-    // only restore state after surrender to make sure the preview is last known state
     restoreInitialState()
     Gdx.app.log("ISLAND", "Player surrendered on turn $turn")
   }

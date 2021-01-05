@@ -23,12 +23,16 @@ import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
+import no.elg.hex.screens.PlayableIslandScreen.Companion.getProgress
+import no.elg.hex.screens.PlayableIslandScreen.Companion.islandPreferences
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.decodeStringToTexture
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
 
 /** @author Elg */
@@ -86,17 +90,17 @@ object LevelSelectScreen : AbstractScreen() {
         when (modifier) {
           SURRENDER -> batch.draw(
             Hex.assets.surrender,
-          widthOffset,
-          heightOffset,
-          camera.viewportWidth - widthOffset * 2,
-          camera.viewportHeight - heightOffset * 2
-        )
-        LOST -> batch.draw(
-          Hex.assets.grave,
-          widthOffset,
-          heightOffset,
-          camera.viewportWidth - widthOffset * 2,
-          camera.viewportHeight - heightOffset * 2
+            widthOffset,
+            heightOffset,
+            camera.viewportWidth - widthOffset * 2,
+            camera.viewportHeight - heightOffset * 2
+          )
+          LOST -> batch.draw(
+            Hex.assets.grave,
+            widthOffset,
+            heightOffset,
+            camera.viewportWidth - widthOffset * 2,
+            camera.viewportHeight - heightOffset * 2
           )
           WON -> {
             val text = "${island.turn}"
@@ -108,7 +112,6 @@ object LevelSelectScreen : AbstractScreen() {
 
             batch.projectionMatrix = camera.combined
 
-            println("WINWINWIN")
             font.color = WHITE
             font.draw(
               batch,
@@ -150,18 +153,29 @@ object LevelSelectScreen : AbstractScreen() {
 
     for (slot in IslandFiles.islandIds) {
       val islandPreviewFile = getIslandFile(slot, true)
-      if (!Hex.args.`force-update-previews` && islandPreviewFile.exists()) {
-        islandPreviews.add(null to Texture(islandPreviewFile))
-      } else {
-        if (!Hex.args.`force-update-previews`) {
-          publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
-        }
+      if (Hex.args.`force-update-previews`) {
         updateSelectPreview(slot, true)
+        continue
+      }
+
+      val progress = getProgress(slot, true)
+      when {
+        progress != null -> try {
+          islandPreviews.add(null to decodeStringToTexture(progress))
+        } catch (e: Exception) {
+          publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
+          updateSelectPreview(slot, false)
+        }
+        islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
+        else -> {
+          publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
+          updateSelectPreview(slot, true)
+        }
       }
     }
   }
 
-  fun updateSelectPreview(slot: Int, save: Boolean, modifier: PreviewModifier = NOTHING) {
+  fun updateSelectPreview(slot: Int, save: Boolean, modifier: PreviewModifier = NOTHING, island: Island? = null) {
     val index = IslandFiles.islandIds.indexOf(slot)
     if (index == -1) {
       publishWarning("Failed to find file index of island with a slot at $slot")
@@ -173,13 +187,17 @@ object LevelSelectScreen : AbstractScreen() {
     if (!Hex.assets.isLoaded(islandFileName)) {
       Hex.assets.load(islandFileName, Island::class.java)
     }
-    val island = Hex.assets.finishLoadingAsset<Island>(islandFileName)
+    val currIsland = island ?: Hex.assets.finishLoadingAsset(islandFileName)
 
-    val preview = renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, modifier)
+    val preview = renderPreview(currIsland, rendereredPreviewSize, rendereredPreviewSize, modifier)
     if (save) {
       val islandPreviewFile = getIslandFile(slot, preview = true, allowInternal = false)
       preview.takeScreenshot(islandPreviewFile)
     }
+    Gdx.app.debug("IS PREVIEW", "Saving preview of island $slot")
+    islandPreferences.putString("$slot-preview", preview.saveScreenshotAsString())
+    islandPreferences.flush()
+
     if (index == islandPreviews.size) {
       islandPreviews.add(preview to preview.colorBufferTexture)
     } else {
@@ -221,16 +239,16 @@ object LevelSelectScreen : AbstractScreen() {
         y + height / 2f + height / 10f,
         x + width / 2f,
         y + height / 2f - height / 10f,
-        Color.WHITE,
-        Color.WHITE
+        WHITE,
+        WHITE
       )
       lineRenderer.line(
         x + width / 2f + width / 10f,
         y + height / 2f,
         x + width / 2f - width / 10f,
         y + height / 2f,
-        Color.WHITE,
-        Color.WHITE
+        WHITE,
+        WHITE
       )
       drawBox(x, y, width, height)
     }

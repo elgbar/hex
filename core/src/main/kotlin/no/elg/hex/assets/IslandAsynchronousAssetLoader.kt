@@ -61,7 +61,7 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
         }
       } catch (e: Exception) {
         MessagesRenderer.publishError("Invalid island save data for island '${file.name()}'")
-        Gdx.app.debug("ISLAND LOADING", e.message)
+        Gdx.app.log("ISLAND LOADING", e.message)
         Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
       }
   }
