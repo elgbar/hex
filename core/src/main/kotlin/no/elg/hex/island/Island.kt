@@ -24,7 +24,6 @@ import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.LevelSelectScreen
-import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
@@ -235,7 +234,7 @@ class Island(
   fun restoreInitialState() {
     history.clear()
     Hex.screen.also {
-      if (it is PlayableIslandScreen) {
+      if (it is PreviewIslandScreen) {
         it.clearProgress()
       }
     }
@@ -368,39 +367,60 @@ class Island(
     }
 
     // Capitals should be prefer a worse location in favor of overwriting another piece
-    val maxPlacementPreference = hexagons.map { getData(it).piece.capitalPlacement }.minOrNull()!!
+    val maxPlacementPreference = hexagons.minOf { getData(it).piece.capitalPlacement }
     val feasibleHexagons =
       hexagons.filter { getData(it).piece.capitalPlacement <= maxPlacementPreference }
 
     val contenders = HashSet<Hexagon<HexagonData>>(feasibleHexagons.size)
 
-    var greatestDistance = 1
+    // The maximum distance between two hexagons for this grid
+    val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
 
     fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
-      // The maximum distance between two hexagons for this grid
-      val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
 
       for (r in discardIfLessThan..maxRadius) {
-        if (this.calculateRing(hex, r).any { this.getData(it).team != hexTeam }) {
+        if (this.calculateRing(hex, r).any {
+          val data = this.getData(it)
+          data.team != hexTeam && !data.invisible
+        }
+        ) {
           return r
         }
       }
       return -1 // no hexes found we've won!
     }
 
+    var greatestDistance = 1
     for (hex in feasibleHexagons) {
-      val dist = findDistanceToClosestEnemyHex(hex, greatestDistance)
+      val dist = findDistanceToClosestEnemyHex(hex, 1)
       if (dist > greatestDistance) {
         // we have a new greatest distance
         greatestDistance = dist
         contenders.clear()
       }
-      contenders += hex
+      if (dist == greatestDistance) {
+        contenders += hex
+      }
     }
 
     require(contenders.isNotEmpty()) { "No capital contenders found!" }
 
-    Gdx.app.trace("ISLAND", "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance")
+    Gdx.app.trace(
+      "ISLAND",
+      "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance, maxRadius is $maxRadius"
+    )
+    Gdx.app.trace("ISLAND") {
+      "Contenders are ${
+      contenders.map {
+        "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${
+        findDistanceToClosestEnemyHex(
+          it,
+          1
+        )
+        }"
+      }
+      }"
+    }
 
     if (contenders.size == 1) return contenders.first()
 
@@ -411,21 +431,28 @@ class Island(
     // number of hexagons expected to have around the given radius
     val expectedHexagons = 6 * greatestDistance
 
-    return contenders
-      .map { origin: Hexagon<HexagonData> ->
-        val ring = this.calculateRing(origin, greatestDistance)
-        origin to
-          (
-            (expectedHexagons - ring.size) + // non-existent hexes count as ours
-              ring.sumByDouble {
-                val data = this.getData(it)
-                (if (data.team == hexTeam) 1.0 else 0.0) +
-                  (if (data.invisible) 0.5 else 0.0)
-              }
-            )
+    var currBest: Hexagon<HexagonData>? = null
+    var currBestScore = -1.0
+
+    for (origin in contenders) {
+      val ring = this.getNeighbors(origin, onlyVisible = false)
+      val calcScore = ring.sumByDouble {
+        val data = this.getData(it)
+        when {
+          data.team == hexTeam -> 1.0
+          data.invisible -> 0.5
+          else -> 0.0
+        }
       }
-      .maxByOrNull { it.second }!!
-      .first
+      if (calcScore > currBestScore) {
+        currBestScore = calcScore
+        currBest = origin
+      }
+    }
+
+    Gdx.app.trace("ISLAND") { "Best capital found was ${getData(currBest!!)}@${currBest.cubeCoordinate} with a score of $currBestScore" }
+
+    return currBest ?: error("No best!?")
   }
 
   // /////////////////
