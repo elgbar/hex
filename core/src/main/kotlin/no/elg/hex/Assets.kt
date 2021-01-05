@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.badlogic.gdx.utils.TimeUtils
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
@@ -43,6 +44,7 @@ import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
+import no.elg.hex.util.debug
 import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
@@ -188,6 +190,17 @@ class Assets : AssetManager() {
 
   init {
     Gdx.app.debug("ASSET", "Using ${scale}x scale")
+
+    KtxAsync.launch(Hex.asyncThread) {
+      val warmUpStart = TimeUtils.millis()
+      for (i in 1..100) {
+        val deserStart = TimeUtils.millis()
+        Island.deserialize(MIN_ISLAND)
+        Gdx.app.trace("WARMUP") { "Warmup pass $i took ${TimeUtils.timeSinceMillis(deserStart)} ms" }
+      }
+      Gdx.app.debug("WARMUP") { "Island deserialization warmup complete in ${TimeUtils.timeSinceMillis(warmUpStart)} ms" }
+    }
+
     super.setErrorListener { asset, throwable ->
       MessagesRenderer.publishError("Failed to load ${asset.type.simpleName} asset ${asset.fileName}")
       throwable.printStackTrace()
@@ -209,10 +222,6 @@ class Assets : AssetManager() {
 
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
     setLoader(Island::class.java, IslandAsynchronousAssetLoader(resolver))
-
-    KtxAsync.launch(Hex.asyncThread) {
-      Island.deserialize(MIN_ISLAND)
-    }
 
     loadingInfo = "fonts"
     // rest of the fonts

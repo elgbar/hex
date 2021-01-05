@@ -23,8 +23,9 @@ import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
-import no.elg.hex.screens.PlayableIslandScreen.Companion.getProgress
-import no.elg.hex.screens.PlayableIslandScreen.Companion.islandPreferences
+import no.elg.hex.screens.PreviewIslandScreen.Companion.getPrefName
+import no.elg.hex.screens.PreviewIslandScreen.Companion.getProgress
+import no.elg.hex.screens.PreviewIslandScreen.Companion.islandPreferences
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -194,10 +195,13 @@ object LevelSelectScreen : AbstractScreen() {
       val islandPreviewFile = getIslandFile(slot, preview = true, allowInternal = false)
       preview.takeScreenshot(islandPreviewFile)
     }
-    Gdx.app.debug("IS PREVIEW", "Saving preview of island $slot")
-    islandPreferences.putString("$slot-preview", preview.saveScreenshotAsString())
+    if (Hex.args.mapEditor) {
+      islandPreferences.remove(getPrefName(slot, true))
+    } else {
+      Gdx.app.debug("IS PREVIEW", "Saving preview of island $slot")
+      islandPreferences.putString(getPrefName(slot, true), preview.saveScreenshotAsString())
+    }
     islandPreferences.flush()
-
     if (index == islandPreviews.size) {
       islandPreviews.add(preview to preview.colorBufferTexture)
     } else {

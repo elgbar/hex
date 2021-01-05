@@ -42,9 +42,10 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
         createIslandScreen(initIsland)
       } else {
         KtxAsync.launch(Hex.asyncThread) {
-          val progress = PlayableIslandScreen.getProgress(id)
+
+          val progress = PreviewIslandScreen.getProgress(id)
           Gdx.app.trace("IS SPLASH") { "progress: $progress" }
-          island = if (!progress.isNullOrBlank()) {
+          island = if (!Hex.args.mapEditor && !progress.isNullOrBlank()) {
             Gdx.app.debug("IS SPLASH", "Found progress for island $id")
             Island.deserialize(progress)
           } else {

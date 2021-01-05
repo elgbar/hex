@@ -1,5 +1,7 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Preferences
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor
@@ -12,6 +14,7 @@ import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.getData
 import no.elg.hex.util.resetHdpi
+import no.elg.hex.util.serialize
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 
@@ -91,5 +94,29 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     verticesRenderer.dispose()
     outlineRenderer.dispose()
     spriteRenderer.dispose()
+  }
+
+  fun saveProgress() {
+    Gdx.app.debug("IS PROGRESS", "Saving progress of island $id")
+    islandPreferences.putString(getPrefName(id, false), island.serialize())
+    islandPreferences.flush()
+  }
+
+  fun clearProgress() {
+    Gdx.app.debug("IS PROGRESS", "Clearing progress of island $id")
+    islandPreferences.remove(getPrefName(id, false))
+    islandPreferences.remove(getPrefName(id, true))
+    islandPreferences.flush()
+  }
+
+  companion object {
+    val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
+
+    fun getProgress(id: Int, preview: Boolean = false): String? {
+      val pref = getPrefName(id, preview)
+      return islandPreferences.getString(pref, null)
+    }
+
+    fun getPrefName(id: Int, preview: Boolean) = "$id${if (preview) "-preview" else ""}"
   }
 }
