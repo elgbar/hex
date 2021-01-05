@@ -122,7 +122,6 @@ object LevelSelectScreen : AbstractScreen() {
               Align.center,
               false
             )
-
           }
           else -> error("Unknown/illegal preview modifier: $modifier")
         }
@@ -160,12 +159,13 @@ object LevelSelectScreen : AbstractScreen() {
 
       val progress = getProgress(slot, true)
       when {
-        progress != null -> try {
-          islandPreviews.add(null to decodeStringToTexture(progress))
-        } catch (e: Exception) {
-          publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
-          updateSelectPreview(slot, false)
-        }
+        progress != null ->
+          try {
+            islandPreviews.add(null to decodeStringToTexture(progress))
+          } catch (e: Exception) {
+            publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
+            updateSelectPreview(slot, false)
+          }
         islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
         else -> {
           publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")

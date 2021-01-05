@@ -182,9 +182,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
       val hand = screen.island.hand
       if (hand != null && (
-          piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
-            piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
-          )
+        piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
+          piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
+        )
       ) {
         // If we cannot merge or the pieces are identical we should not be able to buy new pieces
         return@also
@@ -287,7 +287,6 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
   override fun longPress(x: Float, y: Float): Boolean = click(true)
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean = click(false)
-
 
   companion object {
     fun keycodeToPiece(keycode: Int): Piece? {

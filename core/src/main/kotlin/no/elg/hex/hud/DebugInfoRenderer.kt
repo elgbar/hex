@@ -49,13 +49,13 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
         StaticScreenText(
           "Pointing at hex ",
           next =
-          nullCheckedText(
-            callable = basicInputHandler::cursorHex,
-            color = Color.YELLOW,
-            format = { cursorHex ->
-              "( %2d, % 2d) ${islandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
-            }
-          )
+            nullCheckedText(
+              callable = basicInputHandler::cursorHex,
+              color = Color.YELLOW,
+              format = { cursorHex ->
+                "( %2d, % 2d) ${islandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
+              }
+            )
         )
       )
     } else {
