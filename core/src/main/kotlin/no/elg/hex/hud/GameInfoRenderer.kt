@@ -35,6 +35,10 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   private val shapeRenderer = ShapeRenderer()
   private val camera = OrthographicCamera()
 
+  init {
+      resize(Gdx.graphics.width,Gdx.graphics.height)
+  }
+
   private val topCenter: Array<ScreenText> = arrayOf(
     VariableScreenText({ "Turn ${screen.island.turn}" }),
     IfScreenText {
@@ -48,8 +52,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   private val topRight: Array<ScreenText>
 
   init {
-
-    val unknownText = StaticScreenText("???", color = YELLOW)
+    
     val treasuryText = IfScreenText {
       if (screen.island.selected != null) {
         StaticScreenText(

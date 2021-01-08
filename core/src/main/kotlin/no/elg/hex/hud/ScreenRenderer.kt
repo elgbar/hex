@@ -287,7 +287,7 @@ object ScreenRenderer : Disposable, Resizable {
 
   @Suppress("LibGDXStaticResource")
   private lateinit var batch: SpriteBatch
-  internal val camera = OrthographicCamera().also { it.setToOrtho(false) }
+  internal val camera = OrthographicCamera().also { it.setToOrtho(true) }
 
   var draws = 0
     private set
