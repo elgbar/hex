@@ -36,7 +36,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   private val camera = OrthographicCamera()
 
   init {
-      resize(Gdx.graphics.width,Gdx.graphics.height)
+    resize(Gdx.graphics.width, Gdx.graphics.height)
   }
 
   private val topCenter: Array<ScreenText> = arrayOf(
@@ -52,7 +52,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   private val topRight: Array<ScreenText>
 
   init {
-    
+
     val treasuryText = IfScreenText {
       if (screen.island.selected != null) {
         StaticScreenText(

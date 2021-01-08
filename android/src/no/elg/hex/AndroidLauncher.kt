@@ -9,7 +9,7 @@ class AndroidLauncher : AndroidApplication() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-//    val args = arrayOf<String>("-e")
+//    val args = arrayOf<String>("--debug")
     val args = arrayOf<String>()
 
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)

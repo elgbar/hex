@@ -12,19 +12,21 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.util.OsUtils
 import com.kotcrab.vis.ui.widget.ButtonBar
+import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
 import ktx.actors.onClick
-import ktx.scene2d.KHorizontalGroup
+import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
-import ktx.scene2d.horizontalGroup
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.buttonBar
+import ktx.scene2d.vis.horizontalCollapsible
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visLabel
+import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
@@ -72,7 +74,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   private val youWon: VisWindow
   private val youLost: VisWindow
 
-  private val buttonGroup: KHorizontalGroup
+  private val buttonGroup: VisTable
 
   private val disableChecker: MutableMap<Disableable, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
@@ -207,11 +209,14 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
         setFillParent(true)
         bottom()
-        buttonGroup = horizontalGroup {
-          left()
-          expand()
-          space(20f)
-          pad(20f)
+        buttonGroup = visTable(true) {
+          it.left()
+          it.bottom()
+
+          it.fillX()
+          it.expandX()
+          it.spaceBottom(it.spaceBottomValue.get() * 2f)
+          it.pad(20f)
 
           val size = Value.percentWidth(0.08f, this@table)
 
@@ -225,7 +230,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
 
           @Scene2dDsl
-          fun interactButton(
+          fun <T> KWidget<T>.interactButton(
             tooltip: String,
             up: TextureRegion,
             down: TextureRegion? = null,
@@ -279,69 +284,81 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             inputProcessor.buyUnit(Castle::class.createHandInstance())
           }
 
-          interactButton(
-            tooltip = "Undo",
-            up = Hex.assets.undo,
-            disableCheck = { !island.history.canUndo() || disableInteract(it) },
-            keyShortcut = intArrayOf(Keys.NUM_3)
-          ) {
-            island.history.undo()
-          }
-          interactButton(
-            tooltip = "Undo All",
-            up = Hex.assets.undoAll,
-            disableCheck = { !island.history.canUndo() || disableInteract(it) },
-            keyShortcut = intArrayOf(Keys.NUM_4)
-          ) {
-            island.history.undoAll()
-          }
-          interactButton(
-            tooltip = "Redo",
-            up = Hex.assets.redo,
-            disableCheck = { !island.history.canRedo() || disableInteract(it) },
-            keyShortcut = intArrayOf(Keys.NUM_5)
-          ) {
-            island.history.redo()
-          }
-          interactButton(
-            tooltip = "Surrender",
-            up = Hex.assets.surrender,
-            keyShortcut = intArrayOf(Keys.NUM_6)
-          ) {
-            if (Settings.confirmSurrender) {
-              confirmSurrender.show(stage)
-            } else {
-              surrender()
-            }
-          }
-          interactButton(
-            tooltip = "Settings",
-            up = Hex.assets.settings,
-            down = Hex.assets.settingsDown,
-            keyShortcut = intArrayOf(Keys.NUM_7)
-          ) {
-            Hex.screen = Hex.settingsScreen
-          }
+          horizontalCollapsible {
 
-          interactButton(
-            tooltip = "Help",
-            up = Hex.assets.help,
-            down = Hex.assets.helpDown,
-            keyShortcut = intArrayOf(Keys.NUM_8)
-          ) {
-            if (distress) {
-              distress = false
-              Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
-              if (Hex.args.cheating) {
-                MessagesRenderer.publishMessage("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD)
+//            setCollapsed(true,false)
+
+            interactButton(
+              tooltip = "Undo",
+              up = Hex.assets.undo,
+              disableCheck = { !island.history.canUndo() || disableInteract(it) },
+              keyShortcut = intArrayOf(Keys.NUM_3)
+            ) {
+              island.history.undo()
+            }
+            interactButton(
+              tooltip = "Redo",
+              up = Hex.assets.redo,
+              disableCheck = { !island.history.canRedo() || disableInteract(it) },
+              keyShortcut = intArrayOf(Keys.NUM_5)
+            ) {
+              island.history.redo()
+            }
+            interactButton(
+              tooltip = "Undo All",
+              up = Hex.assets.undoAll,
+              disableCheck = { !island.history.canUndo() || disableInteract(it) },
+              keyShortcut = intArrayOf(Keys.NUM_4)
+            ) {
+              island.history.undoAll()
+            }
+            interactButton(
+              tooltip = "Surrender",
+              up = Hex.assets.surrender,
+              keyShortcut = intArrayOf(Keys.NUM_6)
+            ) {
+              if (Settings.confirmSurrender) {
+                confirmSurrender.show(stage)
+              } else {
+                surrender()
               }
             }
-            Hex.screen = Hex.tutorialScreen
+            interactButton(
+              tooltip = "Settings",
+              up = Hex.assets.settings,
+              down = Hex.assets.settingsDown,
+              keyShortcut = intArrayOf(Keys.NUM_7)
+            ) {
+              Hex.screen = Hex.settingsScreen
+            }
+
+            interactButton(
+              tooltip = "Help",
+              up = Hex.assets.help,
+              down = Hex.assets.helpDown,
+              keyShortcut = intArrayOf(Keys.NUM_8)
+            ) {
+              if (distress) {
+                distress = false
+                Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
+                if (Hex.args.cheating) {
+                  MessagesRenderer.publishMessage("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD)
+                }
+              }
+              Hex.screen = Hex.tutorialScreen
+            }
           }
 
-          visTextButton("End Turn") {
+          visTextButton("End Turn") { cell ->
+//            cell.fillX()
+//            cell.expandX()
+//            cell.right()
+
             labelCell.height(size)
             labelCell.minWidth(size)
+            labelCell.right()
+//            cell.maxWidth(labelCell.prefWidth + 20)
+
             disableChecker[this] = { disableInteract(null) }
             onInteract(stage, Keys.ENTER) {
               endTurn()
