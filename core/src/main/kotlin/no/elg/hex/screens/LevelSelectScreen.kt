@@ -138,10 +138,6 @@ object LevelSelectScreen : AbstractScreen() {
     return buffer
   }
 
-  init {
-    renderPreviews()
-  }
-
   fun renderPreviews() {
     if (IslandFiles.islandIds.size == 0) {
       if (!Hex.args.`disable-island-loading`) {
@@ -261,10 +257,13 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   override fun show() {
+    renderPreviews()
     LevelSelectInputProcessor.show()
   }
 
-  override fun hide() = Unit
+  override fun hide() {
+    disposePreviews()
+  }
 
   override fun dispose() {
     super.dispose()
