@@ -261,7 +261,7 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   override fun show() {
-    Hex.inputMultiplexer.addProcessor(LevelSelectInputProcessor)
+    LevelSelectInputProcessor.show()
   }
 
   override fun hide() = Unit

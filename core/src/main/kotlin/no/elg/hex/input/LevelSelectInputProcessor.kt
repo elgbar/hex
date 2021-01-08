@@ -1,7 +1,6 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
@@ -25,7 +24,7 @@ import java.lang.Float.max
 /** @author Elg */
 object LevelSelectInputProcessor : AbstractInput(true) {
 
-  private const val SCROLL_SPEED = 40f
+  private const val SCROLL_SPEED = 1f
   private const val INVALID_ISLAND_INDEX = -1
 
   private fun getHoveringIslandIndex(): Int {
@@ -38,19 +37,16 @@ object LevelSelectInputProcessor : AbstractInput(true) {
     return INVALID_ISLAND_INDEX
   }
 
-  override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    when (button) {
-      Buttons.LEFT -> {
-        LevelSelectScreen.projectCoordinates(screenX.toFloat(), screenY.toFloat())
-        val index = getHoveringIslandIndex()
-        Gdx.app.debug("SELECT", "Clicked on index $index")
-        if (index != INVALID_ISLAND_INDEX) {
-          play(index)
-        } else if (Hex.args.mapEditor) {
-          val (x, y, width, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
-          if (mouseX in x..x + width && mouseY in y..y + height) {
-            Hex.screen = LevelCreationScreen
-          }
+  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
+    LevelSelectScreen.projectCoordinates(x, y)
+    val index = getHoveringIslandIndex()
+    Gdx.app.debug("SELECT", "Clicked on index $index")
+    when {
+      index != INVALID_ISLAND_INDEX -> play(index)
+      Hex.args.mapEditor -> {
+        val (ix, iy, width, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
+        if (mouseX in ix..ix + width && mouseY in iy..iy + height) {
+          Hex.screen = LevelCreationScreen
         }
       }
       else -> return false
@@ -58,13 +54,14 @@ object LevelSelectInputProcessor : AbstractInput(true) {
     return true
   }
 
-  override fun scrolled(amountX: Float, amountY: Float): Boolean {
+  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+    val delta = -Gdx.input.getDeltaY(0).toFloat()
     val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = camera.position.y
     val min = screenHeight / 2f
 
-    camera.position.y = (oldY + amountY * SCROLL_SPEED)
+    camera.position.y = (oldY + delta * SCROLL_SPEED)
       .coerceIn(min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding))
     LevelSelectScreen.updateCamera()
     return true
