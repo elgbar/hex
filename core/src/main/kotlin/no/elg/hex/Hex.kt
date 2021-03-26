@@ -69,7 +69,7 @@ object Hex : ApplicationAdapter() {
   val scale by lazy {
     if (args.scale <= 0) Assets.nativeScale else args.scale
   }
-  private val backgroundColor: Color by lazy { if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62") }
+  val backgroundColor: Color by lazy { if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62") }
 
   var screen: AbstractScreen = SplashScreen
     set(value) {
@@ -89,7 +89,7 @@ object Hex : ApplicationAdapter() {
 
   override fun create() {
     paused = false
-    Gdx.app
+
     try {
       require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
 

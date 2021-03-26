@@ -13,11 +13,10 @@ fun main(args: Array<String>) {
 
   val config = LwjglApplicationConfiguration()
 
-  config.width = defaultDisplayMode.width / 2 //  1440/3
-  config.height = defaultDisplayMode.height / 2 // 2900/3
+  config.width = defaultDisplayMode.width / 2
+  config.height = defaultDisplayMode.height / 2
 
-//  config.width = 1440 / 3
-//  config.height = 2900 / 3
+  config.initialBackgroundColor = Hex.backgroundColor
 
   config.backgroundFPS = 10
   config.foregroundFPS = 9999
