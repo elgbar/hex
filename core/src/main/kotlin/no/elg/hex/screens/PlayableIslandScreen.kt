@@ -173,7 +173,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       youWon = okWindow("You Won!", { "Congratulations! You won in ${island.turn} turns." }, endGame(WON))
       youLost = okWindow("You Lost", { "Too bad! You lost in ${island.turn} turns." }, endGame(LOST))
 
-      confirmEndTurn = confirmWindow("Confirm End Turn", "Are you sure you want to end your turn?") {
+      confirmEndTurn = confirmWindow("Confirm End Turn", "There still are actions to perform.\nAre you sure you want to end your turn?") {
         island.endTurn(inputProcessor)
       }
 
@@ -394,31 +394,47 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     return false
   }
 
-  fun endTurn() {
+  private fun endTurn() {
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
+
       val minCost = Peasant::class.createHandInstance().price
 
+      // only display the confirm button if the user have any action to do left
       for (hexagon in island.hexagons) {
         val data = island.getData(hexagon)
         val piece = data.piece
-        if (data.team != island.currentTeam || (piece is Capital && piece.balance >= minCost)) continue
-        else if (piece is LivingPiece) {
-          if (piece.moved) continue
+
+        if (data.team != island.currentTeam) {
+          // not our team
+          continue
+        } else if (piece is Capital) {
+          if (piece.balance < minCost) {
+            // The piece is a capital but cannot afford a peasant
+            continue
+          }
+        } else if (piece is LivingPiece) {
+          if (piece.moved) {
+            // If the piece has moved, it cannot make another move!
+            continue
+          }
+
           val territory = island.findTerritory(hexagon) ?: error("Piece $piece has not moved and is in not in a territory")
-          if (territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) } &&
-            territory.capital.balance < PEASANT_PRICE &&
-            territory.hexagons.none {
-              val terrPiece = island.getData(it).piece
-              if (terrPiece === piece) false
-              else terrPiece is LivingPiece && piece.canMerge(terrPiece)
-            }
-          ) {
+          val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) }
+          val canNotMergeWithOtherPiece = territory.hexagons.none {
+            val terrPiece = island.getData(it).piece
+            if (terrPiece === piece) false //can never merge with self
+            else terrPiece is LivingPiece && piece.canMerge(terrPiece)
+          }
+          if (canNotAttackAnything && canNotMergeWithOtherPiece) {
             // The current piece is able to move, but not attack any territory, nor buy any new pieces to merge with
             continue
           }
         } else {
+          // any other piece should be ignored
           continue
         }
+
+        // We can do an action! Let's warn users of ending their turn
         confirmEndTurn.show(stageScreen.stage)
         return
       }
