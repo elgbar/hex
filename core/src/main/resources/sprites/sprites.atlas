@@ -1,307 +1,87 @@
-
 sprites.png
-size: 2900,2900
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
+size:3869,3612
+repeat:none
 castle
-  rotate: false
-  xy: 2, 31
-  size: 528, 528
-  orig: 528, 528
-  offset: 0, 0
-  index: -1
+bounds:2777,1550,512,512
 grave
-  rotate: false
-  xy: 1060, 2
-  size: 500, 500
-  orig: 500, 500
-  offset: 0, 0
-  index: -1
+bounds:2301,2582,512,512
 hand
-  rotate: false
-  xy: 2, 563
-  size: 1113, 1113
-  orig: 1113, 1113
-  offset: 0, 0
-  index: -1
+bounds:2,2582,1028,1028
 help
-  rotate: false
-  xy: 2540, 2830
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:2323,486,512,512
 help_selected
-  rotate: false
-  xy: 1652, 434
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:1785,2550,512,512
 man00
-  rotate: false
-  xy: 1564, 418
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1745,1461,512,512
 man01
-  rotate: false
-  xy: 2496, 2814
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:3293,1550,512,512
 man02
-  rotate: false
-  xy: 1564, 374
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2261,1518,512,512
 man03
-  rotate: false
-  xy: 1060, 519
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1229,1461,512,512
 man04
-  rotate: false
-  xy: 1956, 2274
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:3333,2582,512,512
 man10
-  rotate: false
-  xy: 2452, 2814
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:609,731,603,603
 man11
-  rotate: false
-  xy: 1608, 374
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2,1959,619,619
 man12
-  rotate: false
-  xy: 1652, 462
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:623,1353,602,602
 man13
-  rotate: false
-  xy: 1608, 462
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2,731,603,603
 man14
-  rotate: false
-  xy: 2540, 2858
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:625,1979,599,599
 man20
-  rotate: false
-  xy: 1608, 418
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1228,2493,553,553
 man21
-  rotate: false
-  xy: 1868, 2274
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1598,3066,544,544
 man22
-  rotate: false
-  xy: 2452, 2770
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1034,3050,560,560
 man23
-  rotate: false
-  xy: 2496, 2858
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1210,134,593,593
 man24
-  rotate: false
-  xy: 1564, 462
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:609,130,597,597
 man31
-  rotate: false
-  xy: 1912, 2274
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2,124,603,603
 man33
-  rotate: false
-  xy: 1912, 2274
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2,124,603,603
 man32
-  rotate: false
-  xy: 1564, 330
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:1216,769,580,580
 man34
-  rotate: false
-  xy: 2452, 2858
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2,1338,617,617
 man30
-  rotate: false
-  xy: 2452, 2858
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
+bounds:2,1338,617,617
 palm
-  rotate: false
-  xy: 534, 37
-  size: 522, 522
-  orig: 522, 522
-  offset: 0, 0
-  index: -1
+bounds:1744,1977,512,512
 pine
-  rotate: false
-  xy: 1224, 2258
-  size: 640, 640
-  orig: 640, 640
-  offset: 0, 0
-  index: -1
+bounds:3348,1034,512,512
 redo
-  rotate: false
-  xy: 2000, 2290
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:2776,2066,512,512
 settings
-  rotate: false
-  xy: 2452, 2742
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:2316,1002,512,512
 settings_selected
-  rotate: false
-  xy: 2584, 2874
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-slay_game_background
-  rotate: false
-  xy: 2, 1680
-  size: 1218, 1218
-  orig: 1218, 1218
-  offset: 0, 0
-  index: -1
+bounds:2839,2,512,512
 surrender
-  rotate: false
-  xy: 2496, 2786
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:2832,1034,512,512
 undo
-  rotate: false
-  xy: 1696, 478
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:1800,945,512,512
 undo_all
-  rotate: false
-  xy: 2, 3
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+bounds:1228,1977,512,512
 village
-  rotate: false
-  xy: 1703, 506
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:3292,2066,512,512
 village0
-  rotate: false
-  xy: 1703, 1090
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:3178,3098,512,512
 village1
-  rotate: false
-  xy: 1224, 1674
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:2260,2034,512,512
 village2
-  rotate: false
-  xy: 2287, 1090
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:2839,518,512,512
 village3
-  rotate: false
-  xy: 1119, 506
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:2817,2582,512,512
 village4
-  rotate: false
-  xy: 1868, 2318
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:2146,3098,512,512
 village5
-  rotate: false
-  xy: 1808, 1674
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:1807,429,512,512
 village6
-  rotate: false
-  xy: 1119, 1090
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:2662,3098,512,512
 village7
-  rotate: false
-  xy: 2287, 506
-  size: 580, 580
-  orig: 580, 580
-  offset: 0, 0
-  index: -1
+bounds:3355,518,512,512

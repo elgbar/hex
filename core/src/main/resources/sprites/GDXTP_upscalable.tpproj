@@ -1,5 +1,5 @@
 name=sprites
-filename=
+filename=original_sprites_2x
 output=.
 
 alias=true
@@ -32,7 +32,7 @@ limitMemory=false
 useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:nearest}]
-inputFiles=[{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation/flag.png,type:Ignore}]
+inputFiles=[{path:recreation/flag.png,type:Ignore},{path:slay_2x,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 
 
 ---
@@ -76,7 +76,7 @@ inputFiles=[{path:slay,type:Input,dirFilePrefix:null,recursive:false,flattenPath
 
 -PROJ-
 
-version=4.9.0
+version=4.10.0
 fileTypeType=png
 fileTypeData={encoding:RGBA8888}
 previewBackgroundColor=ffffffff

@@ -1,8 +1,8 @@
 
 original_sprites.png
-size: 276,276
+size: 276, 276
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 castle
   rotate: false
@@ -27,7 +27,7 @@ hand
   index: -1
 help
   rotate: false
-  xy: 222, 62
+  xy: 250, 90
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -69,7 +69,7 @@ man03
   index: -1
 man04
   rotate: false
-  xy: 46, 13
+  xy: 46, 57
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
@@ -181,7 +181,7 @@ man30
   index: -1
 palm
   rotate: false
-  xy: 2, 57
+  xy: 125, 234
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
@@ -223,7 +223,7 @@ slay_game_background
   index: -1
 surrender
   rotate: false
-  xy: 250, 90
+  xy: 222, 62
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -286,21 +286,21 @@ village7
   index: -1
 village4
   rotate: false
-  xy: 125, 234
+  xy: 2, 57
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village0
   rotate: false
-  xy: 125, 234
+  xy: 2, 57
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 village5
   rotate: false
-  xy: 46, 57
+  xy: 46, 13
   size: 40, 40
   orig: 40, 40
   offset: 0, 0

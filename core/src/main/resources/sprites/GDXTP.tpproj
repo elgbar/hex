@@ -26,7 +26,7 @@ wrapX=ClampToEdge
 wrapY=ClampToEdge
 premultiplyAlpha=false
 grid=false
-square=true
+square=false
 bleed=true
 limitMemory=false
 useIndexes=true
@@ -76,7 +76,7 @@ inputFiles=[{path:slay,type:Input,dirFilePrefix:null,recursive:false,flattenPath
 
 -PROJ-
 
-version=4.9.0
+version=4.10.0
 fileTypeType=png
 fileTypeData={encoding:RGBA8888}
 previewBackgroundColor=ffffffff
