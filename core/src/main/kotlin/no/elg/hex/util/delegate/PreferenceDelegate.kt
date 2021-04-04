@@ -5,16 +5,29 @@ import com.badlogic.gdx.Preferences
 import no.elg.hex.util.trace
 import kotlin.reflect.KProperty
 
-class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (T) -> Boolean = { false }) {
+class PreferenceDelegate<T : Any>(
+  private val initialValue: T,
+  private val preferences: Preferences = Companion.preferences,
+  private val requireRestart: Boolean = false,
+  val onChange: ((old: T, new: T) -> Unit)? = null,
+  val invalidate: (T) -> Boolean = { false }
+) {
+
+  private var changed = false
+  private var currentValue: T? = null
+
+  fun displayRestartWarning() = requireRestart && changed
 
   init {
     require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char) {
       "Type must either be a Number, String, Char, or a Boolean. The given type us ${initialValue::class.simpleName}"
     }
     require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
-  }
 
-  private var currentValue: T? = null
+    Gdx.app.postRunnable {
+      onChange?.invoke(initialValue, currentValue ?: initialValue)
+    }
+  }
 
   @Suppress("UNCHECKED_CAST")
   operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
@@ -66,13 +79,21 @@ class PreferenceDelegate<T : Any>(private val initialValue: T, val invalidate: (
       is Double -> preferences.putFloat(propertyName, (value as Double).toFloat())
       else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
     }
+
+    val old = currentValue ?: initialValue
     currentValue = value
     preferences.flush()
+    changed = true
+    if (onChange != null) {
+      Gdx.app.trace("PREF", "Calling on change for setting $propertyName")
+      onChange.invoke(old, value)
+    }
   }
 
   companion object {
     private val preferences: Preferences by lazy {
       val name = this::class.qualifiedName
+
       Gdx.app.trace("PREFS", "Using preference name $name")
       Gdx.app.getPreferences(name)
     }
