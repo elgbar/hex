@@ -1,10 +1,15 @@
 package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.profiling.GLErrorListener
 import com.badlogic.gdx.graphics.profiling.GLProfiler
 import com.badlogic.gdx.utils.Disposable
+import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenDrawPosition.CENTER_LEFT
+import no.elg.hex.screens.LevelSelectScreen
+import java.util.concurrent.atomic.AtomicBoolean
 
 object GLProfilerRenderer : FrameUpdatable, Disposable {
 
@@ -19,8 +24,34 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
     variableText("Screen Renderer Batches ", ScreenRenderer::draws, 0, 4),
   )
 
+  var changeLevel = AtomicBoolean(true)
+
+  init {
+    profiler.setListener {
+      GLErrorListener.LOGGING_LISTENER.onError(it)
+      if (changeLevel.getAndSet(false)) {
+        Gdx.app.postRunnable {
+          if (Hex.screen != LevelSelectScreen) {
+            Hex.screen = LevelSelectScreen
+          }
+        }
+
+        Gdx.app.error("GL ERROR", FrameBuffer.getManagedStatus())
+        LevelSelectScreen.disposePreviews()
+
+        MessagesRenderer.publishError(
+          """
+        An gl error occurred.
+        Please contact the maintainer, with what you did.
+          """.trimIndent()
+        )
+      }
+    }
+  }
+
   override fun frameUpdate() {
     if (profiler.isEnabled) {
+      changeLevel.set(true)
       ScreenRenderer.drawAll(*texts, position = CENTER_LEFT)
       profiler.reset()
       ScreenRenderer.resetDraws()
