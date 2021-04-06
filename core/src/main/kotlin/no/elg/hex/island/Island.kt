@@ -128,7 +128,6 @@ class Island(
         when (val hexPiece = this.getData(hexagon).piece) {
           is LivingPiece -> hexPiece.moved = false
           is TreePiece -> hexPiece.hasGrown = false
-          else -> Unit
         }
       }
     }

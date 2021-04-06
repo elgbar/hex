@@ -22,8 +22,8 @@ A simple turn based strategy game aiming to clone Slay.
 ## TODO
 
 * Allow splash screen to be used to show the game is loading something other than the intro
-  * Allow to specify what the next screen will be
-  * Used when loading island (when loading lazily)
+    * Allow to specify what the next screen will be
+    * Used when loading island (when loading lazily)
 * Remember state of islands between sessions
 * Add help page
 * Add minimap
@@ -31,11 +31,12 @@ A simple turn based strategy game aiming to clone Slay.
 * local multiplayer
 * Let AI surrender when it is clear that the player is winning
 * Hold to march
-  * Double click/long click to move all units to around the hexagon pressed
-  * disable hold to march setting
+    * Double click/long click to move all units to around the hexagon pressed
+    * disable hold to march setting
 * Sounds
 * Fix grave piece
-  * Graves behaves differently for the AI than the player
-  * It works correctly for players
-  * Does not work for AI (it stays too long)
+    * Graves behaves differently for the AI than the player
+    * It works correctly for players
+    * Does not work for AI (it stays too long)
 * Do not end the current AIs turn when exiting and re-entering a level, as this can be exploited
+* Major bug: Serialization will not remember if the piece was moved or not. It will always be in the default state. Piece serialization rewrite is necessary

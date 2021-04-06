@@ -54,16 +54,12 @@ subprojects {
     maven { url "https://oss.sonatype.org/content/repositories/releases/" }
   }
 
-  //[compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "1.8"
-  // [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
-
   spotless {
     kotlin {
       ktlint("0.41.0").userData([
-        "indent_size"             : "2",
-        "continuation_indent_size": "2",
-        "max_line_length"         : "180"
+         "indent_size"             : "2",
+         "continuation_indent_size": "2",
+         "max_line_length"         : "180"
       ])
     }
     format 'misc', {

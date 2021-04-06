@@ -85,7 +85,8 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
-    screen.camera.zoom = (amountY * ZOOM_SPEED * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom).coerceIn(MIN_ZOOM, MAX_ZOOM)
+    val newZoom = amountY * ZOOM_SPEED * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
+    screen.camera.zoom = newZoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
     screen.camera.update()
     return true
   }

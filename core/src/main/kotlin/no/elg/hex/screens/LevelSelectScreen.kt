@@ -270,7 +270,7 @@ object LevelSelectScreen : AbstractScreen() {
     disposePreviews()
   }
 
-  private fun disposePreviews() {
+  fun disposePreviews() {
     for (buffer in islandPreviews) {
       buffer.first?.dispose()
       buffer.second.dispose()

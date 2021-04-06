@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
+import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
@@ -23,11 +24,12 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
   }
 
   @Scene2dDsl
-  protected fun <S> KWidget<S>.addBackButton() {
+  protected fun <S> KWidget<S>.addBackButton(init: KVisTextButton.(S) -> Unit = {}) {
     visTextButton("Back") {
       onInteract(stage, intArrayOf(Keys.ESCAPE), intArrayOf(Keys.BACK)) {
         backToPreviousScreen()
       }
+      init(it)
     }
   }
 

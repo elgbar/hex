@@ -34,34 +34,32 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
         val data = islandScreen.island.getData(hexagon)
         if (data.invisible) continue
 
-        val piece = data.piece
-        val drawable =
-          when (piece) {
-            is Capital -> {
-              if (data.team != islandScreen.island.currentTeam || piece.balance < PEASANT_PRICE) {
-                Hex.assets.capital
-              } else {
-                piece.elapsedAnimationTime += Gdx.graphics.deltaTime
-                Hex.assets.capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
-              }
+        val drawable = when (val piece = data.piece) {
+          is Capital -> {
+            if (data.team != islandScreen.island.currentTeam || piece.balance < PEASANT_PRICE) {
+              Hex.assets.capital
+            } else {
+              piece.elapsedAnimationTime += Gdx.graphics.deltaTime
+              Hex.assets.capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
             }
-            is PalmTree -> Hex.assets.palm
-            is PineTree -> Hex.assets.pine
-            is Castle -> Hex.assets.castle
-            is Grave -> Hex.assets.grave
-            is LivingPiece -> {
-
-              val time = if (data.team == islandScreen.island.currentTeam && islandScreen.island.currentAI == null) piece.updateAnimationTime() else 0f
-
-              when (piece) {
-                is Peasant -> Hex.assets.peasant
-                is Spearman -> Hex.assets.spearman
-                is Knight -> Hex.assets.knight
-                is Baron -> Hex.assets.baron
-              }.getKeyFrame(time)
-            }
-            is Empty -> continue@loop
           }
+          is PalmTree -> Hex.assets.palm
+          is PineTree -> Hex.assets.pine
+          is Castle -> Hex.assets.castle
+          is Grave -> Hex.assets.grave
+          is LivingPiece -> {
+
+            val time = if (data.team == islandScreen.island.currentTeam && islandScreen.island.currentAI == null) piece.updateAnimationTime() else 0f
+
+            when (piece) {
+              is Peasant -> Hex.assets.peasant
+              is Spearman -> Hex.assets.spearman
+              is Knight -> Hex.assets.knight
+              is Baron -> Hex.assets.baron
+            }.getKeyFrame(time)
+          }
+          is Empty -> continue@loop
+        }
 
         val boundingBox = hexagon.internalBoundingBox
         batch.draw(drawable, boundingBox.x.toFloat(), boundingBox.y.toFloat(), boundingBox.height.toFloat(), boundingBox.width.toFloat())

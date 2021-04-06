@@ -269,7 +269,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           interactButton(
             tooltip = "Buy Peasant",
             up = Hex.assets.peasant.getKeyFrame(0f),
-            disableCheck = { (it?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(it) },
+            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(territory) },
             keyShortcut = intArrayOf(Keys.NUM_1)
           ) {
             inputProcessor.buyUnit(Peasant::class.createHandInstance())
@@ -278,7 +278,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           interactButton(
             tooltip = "Buy Castle",
             up = Hex.assets.castle,
-            disableCheck = { (it?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(it) },
+            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(territory) },
             keyShortcut = intArrayOf(Keys.NUM_2)
           ) {
             inputProcessor.buyUnit(Castle::class.createHandInstance())
@@ -422,7 +422,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) }
           val canNotMergeWithOtherPiece = territory.hexagons.none {
             val terrPiece = island.getData(it).piece
-            if (terrPiece === piece) false //can never merge with self
+            return@none if (terrPiece === piece) false // can never merge with self
             else terrPiece is LivingPiece && piece.canMerge(terrPiece)
           }
           if (canNotAttackAnything && canNotMergeWithOtherPiece) {

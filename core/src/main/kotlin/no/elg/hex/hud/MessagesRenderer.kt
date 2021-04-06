@@ -29,7 +29,11 @@ object MessagesRenderer : FrameUpdatable {
   }
 
   fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
-    publishMessage(message, durationSeconds, RED)
+    val sst = staticTextPool.obtain()
+    sst.text = message
+    sst.color = RED
+    Gdx.app.error("ERR MSG", sst.wholeText)
+    messages.add(0, sst to durationSeconds)
   }
 
   fun publishMessage(message: ScreenText, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
