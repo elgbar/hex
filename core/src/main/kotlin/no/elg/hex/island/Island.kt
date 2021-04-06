@@ -33,6 +33,7 @@ import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.next
+import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -562,7 +563,7 @@ class Island(
     return IslandDto(
       grid.gridData.gridWidth,
       grid.gridData.gridHeight,
-      grid.gridData.gridLayout,
+      grid.gridData.gridLayout.toEnumValue(),
       coord,
       hand?.piece?.createDtoCopy(),
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap()

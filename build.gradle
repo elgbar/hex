@@ -13,7 +13,6 @@ buildscript {
     junitVersion = "5.4.2"
     kotlinCoroutineVersion = "1.4.2"
     argparserVersion = "2.0.7"
-    mixiteVersion = "2020.1.0"
   }
 
   repositories {
@@ -53,7 +52,6 @@ subprojects {
     google()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    maven { url 'https://jitpack.io' }
   }
 
   //[compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "1.8"
@@ -142,8 +140,7 @@ project(":core") {
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
     api "com.kotcrab.vis:vis-ui:$visVersion"
-    api "com.github.Hexworks.mixite:mixite.core-jvm:$mixiteVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
 
     api "io.github.libktx:ktx-app:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
