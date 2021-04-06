@@ -79,8 +79,6 @@ class Assets : AssetManager() {
     const val ISLAND_FILE_ENDING = "is"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
-    const val ORIGINAL_SPRITES_ATLAS = "sprites/original_sprites.atlas"
-    const val ORIGINAL_SPRITES_ATLAS_2X = "sprites/original_sprites_2x.atlas"
 
     const val BOLD_FONT = "fonts/UbuntuMono-B.ttf"
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
@@ -109,20 +107,17 @@ class Assets : AssetManager() {
   val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
   val boldItalicFont: BitmapFont by lazy { get(BOLD_ITALIC_FONT) }
 
-  val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
-  val originalSprites: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS) }
-  val originalSprites2x: TextureAtlas by lazy { get(ORIGINAL_SPRITES_ATLAS_2X) }
+  private val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
   val fontSize by lazy { FONT_SIZE * scale }
 
-  val resolver: FileHandleResolver
+  private val resolver: FileHandleResolver
 
   private fun findSprite(regionName: String): AtlasRegion {
-    val textureAtlas = if (Hex.args.retro) Hex.assets.originalSprites else Hex.assets.sprites
     val region: AtlasRegion = try {
-      textureAtlas.findRegion(regionName)
+      Hex.assets.sprites.findRegion(regionName)
     } catch (e: GdxRuntimeException) {
       throw IllegalArgumentException("Failed to find loaded sprite $regionName")
-    } ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${textureAtlas.regions.map { it.name }}")
+    } ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${Hex.assets.sprites.regions.map { it.name }}")
 
     require(region.originalHeight == region.originalWidth) {
       "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}"
@@ -157,7 +152,7 @@ class Assets : AssetManager() {
   val grave by lazy { findSprite("grave") }
   val peasant by lazy { findAnimation("man0", 5, 1 / 17f) }
   val spearman by lazy { findAnimation("man1", 5, 1 / 15f) }
-  val knight by lazy { findAnimation("man2", 5, 1 / 17f) }
+  val knight by lazy { findAnimation("man2", 5, 1 / 15f) }
   val baron by lazy { findAnimation("man3", 5, 1 / 10f) }
 
   val surrender by lazy { findSprite("surrender") }
@@ -279,11 +274,7 @@ class Assets : AssetManager() {
 
     loadingInfo = "sprites"
 
-    if (!Hex.args.retro) {
-      load(SPRITE_ATLAS, TEXTURE_ATLAS)
-    } else {
-      load(ORIGINAL_SPRITES_ATLAS, TEXTURE_ATLAS)
-    }
+    load(SPRITE_ATLAS, TEXTURE_ATLAS)
 
     loadingInfo = "islands"
 
