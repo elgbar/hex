@@ -7,16 +7,15 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.utils.TimeUtils
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
-import no.elg.hex.Settings.limitFps
-import no.elg.hex.Settings.targetFps
+import no.elg.hex.Settings.MSAA_SAMPLES_PATH
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
@@ -31,6 +30,8 @@ import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 
 object Hex : ApplicationAdapter() {
+
+  const val LAUNCH_PREF = "launchPref"
 
   @JvmStatic
   val mapper =
@@ -63,6 +64,8 @@ object Hex : ApplicationAdapter() {
 
   lateinit var settingsScreen: SettingsScreen
     private set
+
+  lateinit var launchPreference: Preferences
 
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
@@ -104,6 +107,7 @@ object Hex : ApplicationAdapter() {
       KtxAsync.initiate()
       Gdx.app.debug("SYS", "App backend ${Gdx.app.type}")
       Gdx.app.debug("SYS", "Max pointers ${Gdx.input.maxPointers}")
+      Gdx.app.debug("SYS", "MSAA ${launchPreference.getInteger(MSAA_SAMPLES_PATH)}")
 
       Gdx.input.inputProcessor = inputMultiplexer
       Gdx.input.setCatchKey(Keys.BACK, true)

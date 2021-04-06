@@ -3,15 +3,21 @@ package no.elg.hex.desktop
 import com.badlogic.gdx.Files.FileType.Internal
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl.LwjglPreferences
 import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
+import no.elg.hex.Settings.MSAA_SAMPLES_PATH
 import no.elg.hex.util.defaultDisplayMode
 
 fun main(args: Array<String>) {
-  Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
 
   val config = LwjglApplicationConfiguration()
+
+  LwjglApplicationConfiguration.disableAudio = true
+
+  Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
+  Hex.launchPreference = LwjglPreferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
   config.width = defaultDisplayMode.width / 2
   config.height = defaultDisplayMode.height / 2
@@ -21,12 +27,15 @@ fun main(args: Array<String>) {
   config.backgroundFPS = 10
   config.foregroundFPS = 9999
   config.vSyncEnabled = true // Why not? it's not like this is a competitive FPS
-  config.samples = 16 // max out the samples as this isn't a very heavy game.
   config.useHDPI = true
   config.addIcon("icons/icon32.png", Internal)
   config.addIcon("icons/icon128.png", Internal)
 
-  LwjglApplicationConfiguration.disableAudio = true
+  if (Hex.launchPreference.contains(MSAA_SAMPLES_PATH)) {
+    config.samples = Hex.launchPreference.getInteger(MSAA_SAMPLES_PATH)
+  } else {
+    config.samples = 16 // default value
+  }
 
   config.title = "Hex"
   if (Hex.args.mapEditor) {
