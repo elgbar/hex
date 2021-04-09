@@ -6,5 +6,7 @@ import kotlin.reflect.jvm.isAccessible
 val KProperty0<*>.isLazyInitialized: Boolean
   get() {
     isAccessible = true
-    return (getDelegate() as Lazy<*>).isInitialized()
+    val delegate = getDelegate()
+    require(delegate is Lazy<*>) { "KProperty0 $this is not Lazy, this method cannot be used " }
+    return delegate.isInitialized()
   }
