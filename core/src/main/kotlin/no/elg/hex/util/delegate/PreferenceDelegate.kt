@@ -2,17 +2,20 @@ package no.elg.hex.util.delegate
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
+import no.elg.hex.util.debug
 import no.elg.hex.util.trace
 import kotlin.reflect.KProperty
 
 class PreferenceDelegate<T : Any>(
-  private val initialValue: T,
-  private val preferences: Preferences = Companion.preferences,
-  private val requireRestart: Boolean = false,
-  val onChange: ((old: T, new: T) -> Unit)? = null,
+  internal val initialValue: T,
+  internal val preferences: Preferences = Companion.preferences,
+  internal val requireRestart: Boolean = false,
+  val onChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> T)? = null,
   val invalidate: (T) -> Boolean = { false }
 ) {
 
+  internal var initOnChange: Boolean = true
+    private set
   private var changed = false
   private var currentValue: T? = null
 
@@ -25,7 +28,8 @@ class PreferenceDelegate<T : Any>(
     require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
 
     Gdx.app.postRunnable {
-      onChange?.invoke(initialValue, currentValue ?: initialValue)
+      onChange?.invoke(this, initialValue, currentValue ?: initialValue)
+      initOnChange = false
     }
   }
 
@@ -67,27 +71,39 @@ class PreferenceDelegate<T : Any>(
       return
     }
 
-    when (initialValue) {
-      is Boolean -> preferences.putBoolean(propertyName, value as Boolean)
-      is Int -> preferences.putInteger(propertyName, value as Int)
-      is Float -> preferences.putFloat(propertyName, value as Float)
-      is CharSequence -> preferences.putString(propertyName, value.toString())
-      is Long -> preferences.putLong(propertyName, value as Long)
-      is Byte -> preferences.putInteger(propertyName, (value as Byte).toInt())
-      is Char -> preferences.putInteger(propertyName, (value as Char).toInt())
-      is Short -> preferences.putInteger(propertyName, (value as Short).toInt())
-      is Double -> preferences.putFloat(propertyName, (value as Double).toFloat())
-      else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
+    val old = currentValue ?: initialValue
+    val newValue = if (onChange != null) {
+      Gdx.app.trace("PREF", "Calling on change for setting $propertyName")
+      onChange.invoke(this, old, value)
+    } else {
+      value
     }
 
-    val old = currentValue ?: initialValue
-    currentValue = value
-    preferences.flush()
-    changed = true
-    if (onChange != null) {
-      Gdx.app.trace("PREF", "Calling on change for setting $propertyName")
-      onChange.invoke(old, value)
+    if (invalidate(newValue)) {
+      Gdx.app.trace("PREF", "Will not set $propertyName to $value as it is invalid")
+      return
     }
+    currentValue = newValue
+
+    if (!changed && currentValue != old) {
+      changed = true
+    }
+
+    Gdx.app.debug("SETTINGS") { "Changing '$propertyName' from '$old' to '$currentValue'" }
+
+    when (initialValue) {
+      is Boolean -> preferences.putBoolean(propertyName, currentValue as Boolean)
+      is Int -> preferences.putInteger(propertyName, currentValue as Int)
+      is Float -> preferences.putFloat(propertyName, currentValue as Float)
+      is CharSequence -> preferences.putString(propertyName, currentValue.toString())
+      is Long -> preferences.putLong(propertyName, currentValue as Long)
+      is Byte -> preferences.putInteger(propertyName, (currentValue as Byte).toInt())
+      is Char -> preferences.putInteger(propertyName, (currentValue as Char).toInt())
+      is Short -> preferences.putInteger(propertyName, (currentValue as Short).toInt())
+      is Double -> preferences.putFloat(propertyName, (currentValue as Double).toFloat())
+      else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
+    }
+    preferences.flush()
   }
 
   companion object {

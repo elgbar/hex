@@ -14,6 +14,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Island.IslandDto
 import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SplashIslandScreen
 
 fun getIslandFileName(slot: Int, preview: Boolean = false): String {
@@ -59,6 +60,14 @@ fun saveIsland(id: Int, island: Island): Boolean {
     publishError("Failed to saved island '${file.name()}'")
     e.printStackTrace()
     false
+  }
+}
+
+fun resetAllIslandProgress() {
+  PreviewIslandScreen.islandPreferences.clear()
+  PreviewIslandScreen.islandPreferences.flush()
+  if (Hex.screen == LevelSelectScreen) {
+    LevelSelectScreen.renderPreviews()
   }
 }
 
