@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys.BACK
 import com.badlogic.gdx.Input.Keys.ESCAPE
 import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
@@ -85,7 +86,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
-    val newZoom = amountY * ZOOM_SPEED * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
+    val newZoom = amountY * Settings.zoomSpeed * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
     screen.camera.zoom = newZoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
     screen.camera.update()
     return true
@@ -111,7 +112,5 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
     const val MIN_ZOOM = 0.1f
     const val MAX_ZOOM = 3.0f
-
-    private const val ZOOM_SPEED = 0.1f
   }
 }
