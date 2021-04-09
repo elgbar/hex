@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 /** @author Elg */
 object MessagesRenderer : FrameUpdatable {
 
-  const val DEFAULT_DURATION_SECONDS = 10f
+  private const val DEFAULT_DURATION_SECONDS = 10f
   private const val FADE_START = 0.5f
 
   private val messages = CopyOnWriteArrayList<Pair<ScreenText, Float>>()
@@ -28,16 +28,24 @@ object MessagesRenderer : FrameUpdatable {
     publishMessage(message, durationSeconds, YELLOW)
   }
 
-  fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
+  fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS, exception: Exception? = null) {
     val sst = staticTextPool.obtain()
     sst.text = message
     sst.color = RED
-    Gdx.app.error("ERR MSG", sst.wholeText)
+    if (exception == null) {
+      Gdx.app.error("ERR MSG", sst.wholeText)
+    } else {
+      Gdx.app.error("ERR MSG", sst.wholeText, exception)
+    }
     messages.add(0, sst to durationSeconds)
   }
 
-  fun publishMessage(message: ScreenText, durationSeconds: Float = DEFAULT_DURATION_SECONDS) {
-    Gdx.app.log("MESSAGE", message.wholeText)
+  fun publishMessage(message: ScreenText, durationSeconds: Float = DEFAULT_DURATION_SECONDS, exception: Exception? = null) {
+    if (exception == null) {
+      Gdx.app.log("MESSAGE", message.wholeText)
+    } else {
+      Gdx.app.log("MESSAGE", message.wholeText, exception)
+    }
     messages.add(0, message to durationSeconds)
   }
 
