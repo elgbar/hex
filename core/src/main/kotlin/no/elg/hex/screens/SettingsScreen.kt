@@ -175,8 +175,6 @@ class SettingsScreen : OverlayScreen() {
 
         require(property is KMutableProperty1) { "All settings properties with delegates must be mutable, ${property.name} is not mutable" }
 
-        println("${property.name}")
-
         @Suppress("UNCHECKED_CAST")
         addSetting(property as KMutableProperty1<Settings, Any>, delegate as PreferenceDelegate<*>)
       }
