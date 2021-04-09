@@ -98,7 +98,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
 
   fun saveProgress() {
     Gdx.app.debug("IS PROGRESS", "Saving progress of island $id")
-    islandPreferences.putString(getPrefName(id, false), island.serialize())
+    islandPreferences.putString(getPrefName(id, false), island.createDto().serialize())
     islandPreferences.flush()
   }
 

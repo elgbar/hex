@@ -48,7 +48,7 @@ fun saveIsland(id: Int, island: Island): Boolean {
     return false
   }
   return try {
-    file.writeString(island.serialize(), false)
+    file.writeString(island.createDto().serialize(), false)
     publishMessage("Successfully saved island '${file.name()}'", color = Color.GREEN)
     if (!existed) {
       IslandFiles.fullFilesSearch()
@@ -62,5 +62,4 @@ fun saveIsland(id: Int, island: Island): Boolean {
   }
 }
 
-fun Island.serialize(): String = Hex.mapper.writeValueAsString(this)
 fun IslandDto.serialize(): String = Hex.mapper.writeValueAsString(this)
