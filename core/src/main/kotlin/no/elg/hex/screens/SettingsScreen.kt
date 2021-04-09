@@ -25,7 +25,10 @@ import kotlin.reflect.jvm.isAccessible
 
 class SettingsScreen : OverlayScreen() {
 
+  val onShowListener = mutableListOf<() -> Unit>()
+
   init {
+
     rootTable {
       center()
       pad(0f)
@@ -52,7 +55,11 @@ class SettingsScreen : OverlayScreen() {
         when (val classifier = property.returnType.classifier) {
           Boolean::class -> visCheckBox("") {
             commonStyle(it)
-            isChecked = property.get(Settings) as Boolean
+
+            val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
+            onShowListener += readSetting
+            readSetting()
+
             setProgrammaticChangeEvents(false)
             onChange {
               property.set(Settings, isChecked)
@@ -64,7 +71,11 @@ class SettingsScreen : OverlayScreen() {
           String::class ->
             visTextField {
               commonStyle(it)
-              text = property.get(Settings).toString()
+
+              val readSetting: () -> Unit = { text = property.get(Settings).toString() }
+              onShowListener += readSetting
+              readSetting()
+
               programmaticChangeEvents = false
               onChange {
                 property.set(Settings, text)
@@ -76,6 +87,11 @@ class SettingsScreen : OverlayScreen() {
           Int::class ->
             spinner("", IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
               commonStyle(it)
+
+              onShowListener += {
+                (model as IntSpinnerModel).value = property.get(Settings) as Int
+              }
+
               isProgrammaticChangeEvents = false
               onChange {
                 val intModel = model as IntSpinnerModel
@@ -88,6 +104,11 @@ class SettingsScreen : OverlayScreen() {
           Float::class ->
             spinner("", SimpleFloatSpinnerModel(property.get(Settings) as Float, Float.MIN_VALUE, Float.MAX_VALUE, 1f, 1000)) {
               commonStyle(it)
+
+              onShowListener += {
+                (model as SimpleFloatSpinnerModel).value = property.get(Settings) as Float
+              }
+
               isProgrammaticChangeEvents = false
               onChange {
                 val floatModel = model as SimpleFloatSpinnerModel
@@ -109,6 +130,11 @@ class SettingsScreen : OverlayScreen() {
               )
             ) {
               commonStyle(it)
+
+              onShowListener += {
+                (model as FloatSpinnerModel).value = (property.get(Settings) as Double).toBigDecimal()
+              }
+
               isProgrammaticChangeEvents = false
               onChange {
                 val floatModel = model as FloatSpinnerModel
@@ -148,6 +174,13 @@ class SettingsScreen : OverlayScreen() {
         it.space(0f)
       }
       pack()
+    }
+  }
+
+  override fun show() {
+    super.show()
+    for (function in onShowListener) {
+      function()
     }
   }
 }
