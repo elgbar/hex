@@ -8,6 +8,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
@@ -24,6 +25,8 @@ const val BARON_STRENGTH = 4
 
 const val CASTLE_PRICE = 15
 const val PEASANT_PRICE = 10
+
+const val DESER_TAG = "PIECE DESER"
 
 fun strengthToType(str: Int): KClass<out LivingPiece> {
   return when (str) {
@@ -123,6 +126,10 @@ sealed class Piece {
 
   /** Called when all visible hexagons' [beginTurn] has been called */
   open fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) = Unit
+
+  open val serializationData: Any? = null
+
+  open fun handleDeserializationData(serializationData: Any?) = Unit
 }
 
 val PIECES: List<KClass<out Piece>> by lazy {
@@ -236,6 +243,18 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
   }
 
   override fun toString(): String = "${this::class.simpleName}(balance: $balance)"
+
+  override val serializationData: Int
+    get() = balance
+
+  override fun handleDeserializationData(serializationData: Any?) {
+    if (serializationData is Number) {
+      Gdx.app.trace(DESER_TAG, "Setting balance of $this to $serializationData")
+      balance = serializationData.toInt()
+    } else if (serializationData != null) {
+      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}")
+    }
+  }
 }
 
 class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, placed) {
@@ -265,6 +284,18 @@ class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree
   }
 
   override fun toString(): String = "${this::class.simpleName}(timeToTree: $roundsToTree)"
+
+  override val serializationData: Byte
+    get() = roundsToTree
+
+  override fun handleDeserializationData(serializationData: Any?) {
+    if (serializationData is Number) {
+      Gdx.app.trace(DESER_TAG, "Setting rounds to tree of $this to $serializationData")
+      roundsToTree = serializationData.toByte()
+    } else if (serializationData != null) {
+      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}")
+    }
+  }
 }
 
 // ////////
@@ -357,12 +388,14 @@ class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
 // LIVING //
 // //////////
 
-sealed class LivingPiece(final override val data: HexagonData, var moved: Boolean) : Piece() {
+sealed class LivingPiece(
+  final override val data: HexagonData,
+  var moved: Boolean
+) : Piece() {
 
   final override val movable: Boolean = true
 
-  override val canBePlacedOn: Array<KClass<out Piece>> =
-    arrayOf(LivingPiece::class, StationaryPiece::class)
+  override val canBePlacedOn: Array<KClass<out Piece>> = PLACEABLE_CLASSES
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
     island.getData(hex).setPiece(Grave::class)
@@ -394,6 +427,22 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
   }
 
   override fun toString(): String = "${this::class.simpleName}(moved? $moved)"
+
+  override val serializationData: Boolean
+    get() = moved
+
+  override fun handleDeserializationData(serializationData: Any?) {
+    if (serializationData is Boolean) {
+      Gdx.app.trace(DESER_TAG, "Updating moved of $this to $serializationData")
+      moved = serializationData
+    } else if (serializationData != null) {
+      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a boolean or null, but got ${serializationData::class}")
+    }
+  }
+
+  companion object {
+    val PLACEABLE_CLASSES = arrayOf(LivingPiece::class, StationaryPiece::class)
+  }
 }
 
 class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {

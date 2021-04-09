@@ -39,4 +39,3 @@ A simple turn based strategy game aiming to clone Slay.
     * It works correctly for players
     * Does not work for AI (it stays too long)
 * Do not end the current AIs turn when exiting and re-entering a level, as this can be exploited
-* Major bug: Serialization will not remember if the piece was moved or not. It will always be in the default state. Piece serialization rewrite is necessary

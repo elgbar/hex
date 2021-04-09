@@ -45,16 +45,13 @@ data class HexagonData(
    * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type
    * [pieceType].
    */
-  @JsonSetter("pieceType")
   fun <T : Piece> setPiece(pieceType: KClass<out T>, init: T.() -> Unit = { }): Boolean {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
     val pieceToPlace = pieceType.createInstance(this)
 
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace
-      require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) {
-        "Pieces data does not point to this!"
-      }
+      require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) { "Pieces data does not point to this!" }
       pieceToPlace.init()
       return true
     }
@@ -77,19 +74,23 @@ data class HexagonData(
   // serialization //
   // /////////////////
 
+  @field:JsonSetter("pieceType")
+  internal var loadedTypeName: String? = null
+
+  @field:JsonSetter("data")
+  internal var serializationDataToLoad: Any? = null
+
   @JsonGetter("pieceType")
   fun getPieceTypeName() = piece::class.qualifiedName
 
-  @JsonSetter("pieceType")
-  fun setPieceFromTypeName(typeName: String?) {
-    setPiece(PIECES_MAP[typeName] ?: error("Unknown piece with the name $typeName"))
-  }
+  @JsonGetter("data")
+  private fun getSerializationData() = piece.serializationData
 
   fun copy(): HexagonData {
     if (edge) return this
     return HexagonData(edge, isOpaque, isPassable).also {
       it.team = team
-      it.piece = piece.copyTo(this)
+      it.piece = piece.copyTo(it)
     }
   }
 

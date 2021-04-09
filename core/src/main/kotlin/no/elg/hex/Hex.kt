@@ -10,6 +10,7 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotcrab.vis.ui.VisUI
 import ktx.async.AsyncExecutorDispatcher
@@ -20,6 +21,7 @@ import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
+import no.elg.hex.jackson.serialization.HexagonDataDeserializerModifier
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.SplashScreen
@@ -37,6 +39,11 @@ object Hex : ApplicationAdapter() {
   val mapper =
     jacksonObjectMapper().also {
       it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
+      it.registerModule(
+        SimpleModule().also { module ->
+          module.setDeserializerModifier(HexagonDataDeserializerModifier())
+        }
+      )
     }
 
   val AA_BUFFER_CLEAR =
