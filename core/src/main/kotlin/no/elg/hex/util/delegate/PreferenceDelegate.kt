@@ -41,6 +41,7 @@ class PreferenceDelegate<T : Any>(
 
   private var changed = false
   private var currentValue: T? = null
+  private lateinit var initialLoadedValue: T
 
   fun displayRestartWarning() = requireRestart && changed
 
@@ -59,25 +60,17 @@ class PreferenceDelegate<T : Any>(
 
   @Suppress("UNCHECKED_CAST")
   operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+
     currentValue?.also { return it }
 
     val propertyName = property.name
     if (preferences.contains(propertyName)) {
-      val value = when (initialValue) {
-        is Boolean -> preferences.getBoolean(propertyName, initialValue as Boolean)
-        is Int -> preferences.getInteger(propertyName, initialValue as Int)
-        is Float -> preferences.getFloat(propertyName, initialValue as Float)
-        is CharSequence -> preferences.getString(propertyName, initialValue.toString())
-        is Long -> preferences.getLong(propertyName, initialValue as Long)
+      val value = readPreference(propertyName)
 
-        is Byte -> preferences.getInteger(propertyName, (initialValue as Byte).toInt()).toByte()
-        is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
-        is Char -> preferences.getInteger(propertyName, (initialValue as Char).toInt()).toChar()
-        is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
-        else -> error("Nullable types are not allowed")
-      } as T
-
-      if (!invalidate(value)) {
+      if (value != null && !invalidate(value)) {
+        if (!::initialLoadedValue.isInitialized) {
+          initialLoadedValue = value
+        }
         currentValue = value
         return value
       }
@@ -85,7 +78,30 @@ class PreferenceDelegate<T : Any>(
       Gdx.app.log("PREF", "Invalid preference value ($value) found for '$propertyName', restoring initial value ($initialValue)")
       setValue(thisRef, property, initialValue)
     }
+    if (!::initialLoadedValue.isInitialized) {
+      initialLoadedValue = initialValue
+    }
     return initialValue
+  }
+
+  private fun readPreference(propertyName: String): T? {
+    if (!preferences.contains(propertyName)) {
+      return null
+    }
+
+    return when (initialValue) {
+      is Boolean -> preferences.getBoolean(propertyName, initialValue as Boolean)
+      is Int -> preferences.getInteger(propertyName, initialValue as Int)
+      is Float -> preferences.getFloat(propertyName, initialValue as Float)
+      is CharSequence -> preferences.getString(propertyName, initialValue.toString())
+      is Long -> preferences.getLong(propertyName, initialValue as Long)
+
+      is Byte -> preferences.getInteger(propertyName, (initialValue as Byte).toInt()).toByte()
+      is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
+      is Char -> preferences.getInteger(propertyName, (initialValue as Char).toInt()).toChar()
+      is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
+      else -> error("Nullable types are not allowed")
+    } as T
   }
 
   operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
@@ -107,10 +123,19 @@ class PreferenceDelegate<T : Any>(
       Gdx.app.trace("PREF", "Will not set $propertyName to $value as it is invalid")
       return
     }
-    currentValue = newValue
 
-    if (!changed && currentValue != old) {
-      changed = true
+    // make sure initialLoadedValue is initiated
+    if (!::initialLoadedValue.isInitialized) {
+      getValue(thisRef, property)
+    }
+
+    currentValue = newValue
+    if (currentValue != old) {
+      if (!changed) {
+        changed = true
+      } else if (initialLoadedValue == currentValue) {
+        changed = false
+      }
     }
 
     Gdx.app.debug("SETTINGS") { "Changing '$propertyName' from '$old' to '$currentValue'" }
