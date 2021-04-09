@@ -31,6 +31,7 @@ import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 
+@Suppress("GDXKotlinStaticResource")
 object Hex : ApplicationAdapter() {
 
   const val LAUNCH_PREF = "launchPref"
@@ -51,11 +52,9 @@ object Hex : ApplicationAdapter() {
 
   lateinit var args: ApplicationArgumentsParser
 
-  @Suppress("LibGDXStaticResource")
   lateinit var assets: Assets
     private set
 
-  @Suppress("LibGDXStaticResource")
   lateinit var asyncThread: AsyncExecutorDispatcher
     private set
 

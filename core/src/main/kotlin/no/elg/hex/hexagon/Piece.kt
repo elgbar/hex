@@ -99,16 +99,13 @@ sealed class Piece {
    * @return If the placement was successful
    */
   open fun place(onto: HexagonData): Boolean {
-    return if (!Hex.args.mapEditor &&
-      (!(onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }))
-    ) {
+    return if (Hex.args.mapEditor || onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }) {
+      true
+    } else {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}") {
-        "Piece ${this::class.simpleName} can only be placed on Empty or " +
-          "${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}"
+        "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}"
       }
       false
-    } else {
-      true
     }
   }
 
@@ -149,7 +146,7 @@ val PIECES: List<KClass<out Piece>> by lazy {
   return@lazy subclasses
 }
 
-val PIECES_MAP: Map<String?, KClass<out Piece>> by lazy { PIECES.map { it.qualifiedName to it }.toMap() }
+val PIECES_MAP: Map<String?, KClass<out Piece>> by lazy { PIECES.associateBy { it.qualifiedName } }
 
 // /////////
 // Empty //
@@ -413,7 +410,7 @@ sealed class LivingPiece(
     return this.strength + with.strength > BARON_STRENGTH
   }
 
-  fun canMerge(with: LivingPiece): Boolean {
+  inline fun canMerge(with: LivingPiece): Boolean {
     return !canNotMerge(with)
   }
 

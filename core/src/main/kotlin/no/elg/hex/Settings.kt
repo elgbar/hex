@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.util.delegate.PreferenceDelegate
 
+@Suppress("unused")
 object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true)
