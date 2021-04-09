@@ -5,10 +5,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.kotcrab.vis.ui.widget.VisLabel
+import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.SimpleFloatSpinnerModel
 import ktx.actors.onChange
+import ktx.collections.toGdxArray
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
@@ -16,9 +18,13 @@ import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
+import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.util.delegate.PreferenceDelegate
+import no.elg.hex.util.findEnumValues
 import no.elg.hex.util.toTitleCase
+import org.hexworks.mixite.core.api.HexagonalGridLayout
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -52,99 +58,124 @@ class SettingsScreen : OverlayScreen() {
 //          it.expand()
         }
 
-        when (val classifier = property.returnType.classifier) {
-          Boolean::class -> visCheckBox("") {
+        val clazz = delegate.initialValue::class
+        if (clazz.java.isEnum) {
+          val model = ArraySpinnerModel(findEnumValues(clazz as KClass<Enum<*>>).toGdxArray())
+          spinner("", model) {
+            val minWidth = Hex.assets.fontSize * HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
+            cells.get(1)?.minWidth(minWidth)
+
             commonStyle(it)
+            onShowListener += {
+              model.current = property.get(Settings) as Enum<*>
+            }
 
-            val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
-            onShowListener += readSetting
-            readSetting()
-
-            setProgrammaticChangeEvents(false)
+            isProgrammaticChangeEvents = false
             onChange {
-              property.set(Settings, isChecked)
-              isChecked = property.get(Settings) as Boolean
+              property.set(Settings, model.current)
+              model.current = property.get(Settings) as Enum<*>
               restartLabel.fire(ChangeListener.ChangeEvent())
             }
           }
-
-          String::class ->
-            visTextField {
+        } else {
+          when (clazz) {
+            Boolean::class -> visCheckBox("") {
               commonStyle(it)
 
-              val readSetting: () -> Unit = { text = property.get(Settings).toString() }
+              val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
               onShowListener += readSetting
               readSetting()
 
-              programmaticChangeEvents = false
+              setProgrammaticChangeEvents(false)
               onChange {
-                property.set(Settings, text)
-                text = property.get(Settings).toString()
+                property.set(Settings, isChecked)
+                isChecked = property.get(Settings) as Boolean
                 restartLabel.fire(ChangeListener.ChangeEvent())
               }
             }
 
-          Int::class ->
-            spinner("", IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
-              commonStyle(it)
+            String::class ->
+              visTextField {
+                commonStyle(it)
 
-              onShowListener += {
-                (model as IntSpinnerModel).value = property.get(Settings) as Int
+                val readSetting: () -> Unit = {
+                  text = property.get(Settings).toString()
+                  val minWidth = Hex.assets.fontSize * HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
+                  it.minWidth(minWidth)
+                }
+                onShowListener += readSetting
+                readSetting()
+
+                programmaticChangeEvents = false
+                onChange {
+                  property.set(Settings, text)
+                  text = property.get(Settings).toString()
+                  restartLabel.fire(ChangeListener.ChangeEvent())
+                }
               }
 
-              isProgrammaticChangeEvents = false
-              onChange {
-                val intModel = model as IntSpinnerModel
-                property.set(Settings, intModel.value)
-                intModel.value = property.get(Settings) as Int
-                restartLabel.fire(ChangeListener.ChangeEvent())
-              }
-            }
+            Int::class ->
+              spinner("", IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
+                commonStyle(it)
 
-          Float::class ->
-            spinner("", SimpleFloatSpinnerModel(property.get(Settings) as Float, Float.MIN_VALUE, Float.MAX_VALUE, 1f, 1000)) {
-              commonStyle(it)
+                onShowListener += {
+                  (model as IntSpinnerModel).value = property.get(Settings) as Int
+                }
 
-              onShowListener += {
-                (model as SimpleFloatSpinnerModel).value = property.get(Settings) as Float
-              }
-
-              isProgrammaticChangeEvents = false
-              onChange {
-                val floatModel = model as SimpleFloatSpinnerModel
-                property.set(Settings, floatModel.value)
-                floatModel.value = property.get(Settings) as Float
-                restartLabel.fire(ChangeListener.ChangeEvent())
-              }
-            }
-
-          Double::class ->
-            spinner(
-              "",
-              FloatSpinnerModel(
-                property.get(Settings).toString(),
-                Double.MIN_VALUE.toString(),
-                Double.MAX_VALUE.toString(),
-                "1",
-                1000
-              )
-            ) {
-              commonStyle(it)
-
-              onShowListener += {
-                (model as FloatSpinnerModel).value = (property.get(Settings) as Double).toBigDecimal()
+                isProgrammaticChangeEvents = false
+                onChange {
+                  val intModel = model as IntSpinnerModel
+                  property.set(Settings, intModel.value)
+                  intModel.value = property.get(Settings) as Int
+                  restartLabel.fire(ChangeListener.ChangeEvent())
+                }
               }
 
-              isProgrammaticChangeEvents = false
-              onChange {
-                val floatModel = model as FloatSpinnerModel
-                property.set(Settings, floatModel.value.toDouble())
-                floatModel.value = (property.get(Settings) as Double).toBigDecimal()
-                restartLabel.fire(ChangeListener.ChangeEvent())
-              }
-            }
+            Float::class ->
+              spinner("", SimpleFloatSpinnerModel(property.get(Settings) as Float, Float.MIN_VALUE, Float.MAX_VALUE, 1f, 1000)) {
+                commonStyle(it)
 
-          else -> error("The class $classifier is not yet supported as a settings")
+                onShowListener += {
+                  (model as SimpleFloatSpinnerModel).value = property.get(Settings) as Float
+                }
+
+                isProgrammaticChangeEvents = false
+                onChange {
+                  val floatModel = model as SimpleFloatSpinnerModel
+                  property.set(Settings, floatModel.value)
+                  floatModel.value = property.get(Settings) as Float
+                  restartLabel.fire(ChangeListener.ChangeEvent())
+                }
+              }
+
+            Double::class ->
+              spinner(
+                "",
+                FloatSpinnerModel(
+                  property.get(Settings).toString(),
+                  Double.MIN_VALUE.toString(),
+                  Double.MAX_VALUE.toString(),
+                  "1",
+                  1000
+                )
+              ) {
+                commonStyle(it)
+
+                onShowListener += {
+                  (model as FloatSpinnerModel).value = (property.get(Settings) as Double).toBigDecimal()
+                }
+
+                isProgrammaticChangeEvents = false
+                onChange {
+                  val floatModel = model as FloatSpinnerModel
+                  property.set(Settings, floatModel.value.toDouble())
+                  floatModel.value = (property.get(Settings) as Double).toBigDecimal()
+                  restartLabel.fire(ChangeListener.ChangeEvent())
+                }
+              }
+
+            else -> error("The class $clazz is not yet supported as a settings")
+          }
         }
 
         horizontalGroup {

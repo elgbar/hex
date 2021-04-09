@@ -3,7 +3,9 @@ package no.elg.hex.util.delegate
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import no.elg.hex.util.debug
+import no.elg.hex.util.toEnum
 import no.elg.hex.util.trace
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 class PreferenceDelegate<T : Any>(
@@ -46,8 +48,8 @@ class PreferenceDelegate<T : Any>(
   fun displayRestartWarning() = requireRestart && changed
 
   init {
-    require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char) {
-      "Type must either be a Number, String, Char, or a Boolean. The given type us ${initialValue::class.simpleName}"
+    require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char || initialValue is Enum<*>) {
+      "Type must either be Enum, Number, String, Char, or Boolean. The given type us ${initialValue::class.simpleName}"
     }
     require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
 
@@ -100,6 +102,7 @@ class PreferenceDelegate<T : Any>(
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
       is Char -> preferences.getInteger(propertyName, (initialValue as Char).toInt()).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
+      is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnum(initialValue::class as KClass<Enum<*>>)
       else -> error("Nullable types are not allowed")
     } as T
   }
@@ -150,6 +153,7 @@ class PreferenceDelegate<T : Any>(
       is Char -> preferences.putInteger(propertyName, (currentValue as Char).toInt())
       is Short -> preferences.putInteger(propertyName, (currentValue as Short).toInt())
       is Double -> preferences.putFloat(propertyName, (currentValue as Double).toFloat())
+      is Enum<*> -> preferences.putString(propertyName, (currentValue as Enum<*>).name)
       else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
     }
     preferences.flush()
