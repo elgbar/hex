@@ -160,13 +160,25 @@ class SettingsScreen : OverlayScreen() {
         row()
       }
 
-      for (property in Settings::class.declaredMemberProperties) {
-        val delegate = property.also { it.isAccessible = true }.getDelegate(Settings)
-        if (delegate is PreferenceDelegate<*>) {
-          require(property is KMutableProperty1) { "All settings properties with delegates must be mutable, ${property.name} is not mutable" }
-          @Suppress("UNCHECKED_CAST")
-          addSetting(property as KMutableProperty1<Settings, Any>, delegate)
-        }
+      for (
+        (property, delegate) in Settings::class.declaredMemberProperties //
+          .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
+          .filterValues { it is PreferenceDelegate<*> } //
+          .toSortedMap { o1, o2 ->
+            val delegate1Pri = (o1.getDelegate(Settings) as PreferenceDelegate<*>).priority
+            val delegate2Pri = (o2.getDelegate(Settings) as PreferenceDelegate<*>).priority
+
+            return@toSortedMap if (delegate1Pri == delegate2Pri) o1.name.compareTo(o2.name, true)
+            else delegate1Pri - delegate2Pri
+          } //
+      ) {
+
+        require(property is KMutableProperty1) { "All settings properties with delegates must be mutable, ${property.name} is not mutable" }
+
+        println("${property.name}")
+
+        @Suppress("UNCHECKED_CAST")
+        addSetting(property as KMutableProperty1<Settings, Any>, delegate as PreferenceDelegate<*>)
       }
       addBackButton {
         it.colspan(2)

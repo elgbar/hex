@@ -7,15 +7,38 @@ import no.elg.hex.util.trace
 import kotlin.reflect.KProperty
 
 class PreferenceDelegate<T : Any>(
+  /**
+   * Initial value this setting should have
+   */
   internal val initialValue: T,
+  /**
+   * What preference this setting should be saved to
+   *
+   * @see no.elg.hex.Hex.launchPreference
+   */
   internal val preferences: Preferences = Companion.preferences,
+  /**
+   * If changing this requires a restart to apply
+   */
   internal val requireRestart: Boolean = false,
+  /**
+   * How far up this setting should be, lower means higher in the settings screen. If multiple settings have the same [priority] they are listed alphabetically
+   */
+  val priority: Int = 1000,
+  /**
+   * If [onChange] should be called when the program starts
+   */
+  runOnChangeOnInit: Boolean = true,
+  /**
+   * Method to call when a change is applied. The first argument will always be `this`. If the onChange
+   */
   val onChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> T)? = null,
+  /**
+   * A function to test if a given value is **in**valid
+   */
   val invalidate: (T) -> Boolean = { false }
 ) {
 
-  internal var initOnChange: Boolean = true
-    private set
   private var changed = false
   private var currentValue: T? = null
 
@@ -27,9 +50,10 @@ class PreferenceDelegate<T : Any>(
     }
     require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
 
-    Gdx.app.postRunnable {
-      onChange?.invoke(this, initialValue, currentValue ?: initialValue)
-      initOnChange = false
+    if (runOnChangeOnInit) {
+      Gdx.app.postRunnable {
+        onChange?.invoke(this, initialValue, currentValue ?: initialValue)
+      }
     }
   }
 

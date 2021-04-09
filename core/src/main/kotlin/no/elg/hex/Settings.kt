@@ -10,18 +10,19 @@ import no.elg.hex.util.resetAllIslandProgress
 @Suppress("unused")
 object Settings {
 
-  var confirmEndTurn by PreferenceDelegate(true)
-  var confirmSurrender by PreferenceDelegate(true)
+  var confirmEndTurn by PreferenceDelegate(true, priority = 100)
+  var confirmSurrender by PreferenceDelegate(true, priority = 100)
 
-  var showFps by PreferenceDelegate(false)
-  var limitFps by PreferenceDelegate(false, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new })
-  var targetFps by PreferenceDelegate(30, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }) { it < 5 }
+  var showFps by PreferenceDelegate(false, priority = 109)
+  var limitFps by PreferenceDelegate(false, priority = 110, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new })
+  var targetFps by PreferenceDelegate(30, priority = 111, runOnChangeOnInit = false, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }) { it < 5 }
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
   var MSAA by PreferenceDelegate(0, Hex.launchPreference, true) { it !in 0..16 }
 
   var enableGLDebugging by PreferenceDelegate(
     false,
+    priority = 10_000,
     onChange = { _, old, new ->
       if (new != old) {
         if (new) {
@@ -38,8 +39,10 @@ object Settings {
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
   var deleteAllProgress by PreferenceDelegate(
     "Type '$DELETE_ALL_PROGRESS_STRING' to confirm",
+    runOnChangeOnInit = false,
+    priority = 10_000,
     onChange = { delegate, _, new ->
-      if (!delegate.initOnChange && new.equals(DELETE_ALL_PROGRESS_STRING, true)) {
+      if (new.equals(DELETE_ALL_PROGRESS_STRING, true)) {
         resetAllIslandProgress()
         MessagesRenderer.publishWarning("All progress have been deleted")
         Hex.screen = LevelSelectScreen
