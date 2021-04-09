@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.NotAsRandomAI
 import no.elg.hex.hexagon.Capital
@@ -533,7 +534,7 @@ class Island(
 
     const val START_CAPITAL_PER_HEX = 5
 
-    val STARTING_TEAM = Team.LEAF
+    val STARTING_TEAM get() = Settings.yourTeam
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)
