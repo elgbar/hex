@@ -45,6 +45,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
     when {
       index == -PREVIEWS_PER_ROW -> Hex.screen = Hex.settingsScreen
       index == -1 -> Hex.screen = Hex.tutorialScreen
+      index in -PREVIEWS_PER_ROW..-1 -> return false
       index != INVALID_ISLAND_INDEX -> play(index)
       Hex.args.mapEditor -> {
         val (ix, iy, width, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
