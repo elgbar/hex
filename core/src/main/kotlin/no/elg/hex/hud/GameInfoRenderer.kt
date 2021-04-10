@@ -54,18 +54,20 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   init {
 
     val treasuryText = IfScreenText {
-      if (screen.island.selected != null) {
+      val selected = screen.island.selected
+      if (selected != null) {
         StaticScreenText(
           "Treasury: ",
-          next = signColoredText(screen.island.selected!!.capital::balance) { "%d".format(it) }
+          next = signColoredText(selected.capital::balance) { "%d".format(it) }
         )
       } else emptyText()
     }
 
     val incomeText = IfScreenText {
-      if (screen.island.selected != null) StaticScreenText(
+      val selected = screen.island.selected
+      if (selected != null) StaticScreenText(
         "Estimated income: ",
-        next = signColoredText(screen.island.selected!!::income) { "%+d".format(it) }
+        next = signColoredText(selected::income) { "%+d".format(it) }
       ) else emptyText()
     }
 
