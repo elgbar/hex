@@ -43,6 +43,8 @@ object LevelSelectScreen : AbstractScreen() {
   private const val PREVIEW_PADDING_PERCENT = 0.025f
   private const val MIN_PREVIEW_SIZE = 512
 
+  private const val NON_ISLAND_SCALE = 0.4f
+
   private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
   private val SELECT_COLOR: Color = Color.GREEN
 
@@ -62,7 +64,7 @@ object LevelSelectScreen : AbstractScreen() {
   private val shownPreviewSize
     get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
 
-  val rendereredPreviewSize get() = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
+  private val rendereredPreviewSize get() = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
 
   fun projectCoordinates(inputX: Float, inputY: Float) {
     unprojectVector.x = inputX
@@ -205,13 +207,23 @@ object LevelSelectScreen : AbstractScreen() {
     }
   }
 
-  fun rect(index: Int): Rectangle {
+  /**
+   * @param scale in range 0..1
+   * @param horzOffset in range 0..1
+   */
+  fun rect(index: Int, scale: Float = 1f, horzOffset: Float = 0.5f): Rectangle {
     val gridX = index % PREVIEWS_PER_ROW
     val gridY = index / PREVIEWS_PER_ROW
 
     val size = this.shownPreviewSize
+    val paddedSize = padding + size
 
-    return Rectangle(padding + (padding + size) * gridX, padding + (padding + size) * gridY, size, size)
+    return Rectangle(
+      padding + paddedSize * gridX + size * horzOffset * (1f - scale),
+      padding + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale),
+      size * scale,
+      size * scale
+    )
   }
 
   private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
@@ -225,13 +237,14 @@ object LevelSelectScreen : AbstractScreen() {
     lineRenderer.begin(Line)
     batch.begin()
 
-    val (sx, sy, swidth, sheight) = rect(0)
-    batch.draw(Hex.assets.settings, sx, sy, swidth, sheight)
-    drawBox(sx, sy, swidth, sheight)
+    val (sx, sy, swidth, sheight) = rect(0, NON_ISLAND_SCALE, 0f)
 
-    val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1)
-    batch.draw(Hex.assets.help, hx, hy, hwidth, hheight)
-    drawBox(hx, hy, hwidth, hheight)
+    val settingsSprite = if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
+    batch.draw(settingsSprite, sx, sy, swidth, sheight)
+
+    val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
+    val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
+    batch.draw(helpSprite, hx, hy, hwidth, hheight)
 
     for ((i, preview) in islandPreviews.withIndex()) {
       val (x, y, width, height) = rect(i + PREVIEWS_PER_ROW)
