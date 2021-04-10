@@ -20,6 +20,11 @@ import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hexagon.Team.EARTH
+import no.elg.hex.hexagon.Team.FOREST
+import no.elg.hex.hexagon.Team.LEAF
+import no.elg.hex.hexagon.Team.STONE
+import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
@@ -170,9 +175,14 @@ class Island(
 
   private val teamToPlayer =
     HashMap<Team, AI?>().apply {
+      // if we create more this makes sure they are playing along
       this.putAll(Team.values().map { it to NotAsRandomAI(it) })
-      put(STARTING_TEAM, null) // player
-      //        put(STARTING_TEAM, NotAsRandomAI(STARTING_TEAM, true)) // player
+
+      put(SUN, Settings.sun.aiConstructor(SUN))
+      put(LEAF, Settings.leaf.aiConstructor(LEAF))
+      put(FOREST, Settings.forest.aiConstructor(FOREST))
+      put(EARTH, Settings.earth.aiConstructor(EARTH))
+      put(STONE, Settings.stone.aiConstructor(STONE))
     }
 
   fun isCurrentTeamAI() = currentAI != null
@@ -534,7 +544,7 @@ class Island(
 
     const val START_CAPITAL_PER_HEX = 5
 
-    val STARTING_TEAM get() = Settings.yourTeam
+    val STARTING_TEAM get() = Settings.startTeam
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)

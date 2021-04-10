@@ -1,6 +1,7 @@
 package no.elg.hex
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
@@ -22,7 +23,79 @@ object Settings {
   var MSAA by PreferenceDelegate(0, Hex.launchPreference, true) { it !in 0..16 }
 
   var zoomSpeed by PreferenceDelegate(0.1f) { it !in 0.0f..1.0f }
-  var yourTeam by PreferenceDelegate(Team.LEAF, runOnChangeOnInit = false, onChange = { _, _, new -> Hex.screen = LevelSelectScreen; return@PreferenceDelegate new })
+
+  // TODO change yourTeam to be select if a team is AI or another player
+
+  var startTeam by PreferenceDelegate(
+    Team.LEAF,
+    runOnChangeOnInit = false,
+    applyOnChangeOnSettingsHide = true,
+    priority = 91,
+    onChange = { _, _, new ->
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      return@PreferenceDelegate new
+    }
+  )
+
+  var sun by PreferenceDelegate(
+    Difficulty.HARD,
+    runOnChangeOnInit = false,
+    applyOnChangeOnSettingsHide = true,
+    priority = 90,
+    onChange = { _, _, new ->
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      return@PreferenceDelegate new
+    }
+  )
+
+  var leaf by PreferenceDelegate(
+    Difficulty.PLAYER,
+    runOnChangeOnInit = false,
+    applyOnChangeOnSettingsHide = true,
+    priority = 90,
+    onChange = { _, _, new ->
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      return@PreferenceDelegate new
+    }
+  )
+  var forest by PreferenceDelegate(
+    Difficulty.HARD,
+    runOnChangeOnInit = false,
+    applyOnChangeOnSettingsHide = true,
+    priority = 90,
+    onChange = { _, _, new ->
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      return@PreferenceDelegate new
+    }
+  )
+
+  var earth by PreferenceDelegate(
+    Difficulty.HARD,
+    runOnChangeOnInit = false,
+    applyOnChangeOnSettingsHide = true,
+    priority = 90,
+    onChange = { _, _, new ->
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      return@PreferenceDelegate new
+    }
+  )
+
+  var stone by PreferenceDelegate(
+    Difficulty.HARD,
+    runOnChangeOnInit = false,
+    applyOnChangeOnSettingsHide = true,
+    priority = 90,
+    onChange = { _, _, new ->
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      return@PreferenceDelegate new
+    }
+  )
 
   var enableGLDebugging by PreferenceDelegate(
     false,
