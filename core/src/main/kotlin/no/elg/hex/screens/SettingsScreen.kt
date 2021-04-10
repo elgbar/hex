@@ -31,7 +31,8 @@ import kotlin.reflect.jvm.isAccessible
 
 class SettingsScreen : OverlayScreen() {
 
-  val onShowListener = mutableListOf<() -> Unit>()
+  private val onShowListeners = mutableListOf<() -> Unit>()
+  private val onHideListeners = mutableListOf<() -> Unit>()
 
   init {
 
@@ -66,9 +67,11 @@ class SettingsScreen : OverlayScreen() {
             cells.get(1)?.minWidth(minWidth)
 
             commonStyle(it)
-            onShowListener += {
+            onShowListeners += {
               model.current = property.get(Settings) as Enum<*>
             }
+
+            onHideListeners += { delegate.hide(property) }
 
             isProgrammaticChangeEvents = false
             onChange {
@@ -83,8 +86,10 @@ class SettingsScreen : OverlayScreen() {
               commonStyle(it)
 
               val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
-              onShowListener += readSetting
+              onShowListeners += readSetting
               readSetting()
+
+              onHideListeners += { delegate.hide(property) }
 
               setProgrammaticChangeEvents(false)
               onChange {
@@ -103,8 +108,10 @@ class SettingsScreen : OverlayScreen() {
                   val minWidth = Hex.assets.fontSize * HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
                   it.minWidth(minWidth)
                 }
-                onShowListener += readSetting
+                onShowListeners += readSetting
                 readSetting()
+
+                onHideListeners += { delegate.hide(property) }
 
                 programmaticChangeEvents = false
                 onChange {
@@ -118,9 +125,11 @@ class SettingsScreen : OverlayScreen() {
               spinner("", IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
                 commonStyle(it)
 
-                onShowListener += {
+                onShowListeners += {
                   (model as IntSpinnerModel).value = property.get(Settings) as Int
                 }
+
+                onHideListeners += { delegate.hide(property) }
 
                 isProgrammaticChangeEvents = false
                 onChange {
@@ -135,9 +144,11 @@ class SettingsScreen : OverlayScreen() {
               spinner("", SimpleFloatSpinnerModel(property.get(Settings) as Float, Float.MIN_VALUE, Float.MAX_VALUE, 1f, 1000)) {
                 commonStyle(it)
 
-                onShowListener += {
+                onShowListeners += {
                   (model as SimpleFloatSpinnerModel).value = property.get(Settings) as Float
                 }
+
+                onHideListeners += { delegate.hide(property) }
 
                 isProgrammaticChangeEvents = false
                 onChange {
@@ -161,9 +172,11 @@ class SettingsScreen : OverlayScreen() {
               ) {
                 commonStyle(it)
 
-                onShowListener += {
+                onShowListeners += {
                   (model as FloatSpinnerModel).value = (property.get(Settings) as Double).toBigDecimal()
                 }
+
+                onHideListeners += { delegate.hide(property) }
 
                 isProgrammaticChangeEvents = false
                 onChange {
@@ -220,7 +233,14 @@ class SettingsScreen : OverlayScreen() {
 
   override fun show() {
     super.show()
-    for (function in onShowListener) {
+    for (function in onShowListeners) {
+      function()
+    }
+  }
+
+  override fun hide() {
+    super.hide()
+    for (function in onHideListeners) {
       function()
     }
   }

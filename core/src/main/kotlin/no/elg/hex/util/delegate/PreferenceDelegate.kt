@@ -31,6 +31,11 @@ class PreferenceDelegate<T : Any>(
    * If [onChange] should be called when the program starts
    */
   runOnChangeOnInit: Boolean = true,
+
+  /**
+   * only apply settings when leaving the settings screen
+   */
+  val applyOnChangeOnSettingsHide: Boolean = false,
   /**
    * Method to call when a change is applied. The first argument will always be `this`. If the onChange
    */
@@ -42,7 +47,8 @@ class PreferenceDelegate<T : Any>(
 ) {
 
   private var changed = false
-  private var currentValue: T? = null
+  internal var currentValue: T? = null
+    private set
   private lateinit var initialLoadedValue: T
 
   fun displayRestartWarning() = requireRestart && changed
@@ -115,7 +121,7 @@ class PreferenceDelegate<T : Any>(
     }
 
     val old = currentValue ?: initialValue
-    val newValue = if (onChange != null) {
+    val newValue = if (onChange != null && !applyOnChangeOnSettingsHide) {
       Gdx.app.trace("PREF", "Calling on change for setting $propertyName")
       onChange.invoke(this, old, value)
     } else {
@@ -157,6 +163,13 @@ class PreferenceDelegate<T : Any>(
       else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
     }
     preferences.flush()
+  }
+
+  fun hide(property: KProperty<*>) {
+    if (applyOnChangeOnSettingsHide) {
+      val old = currentValue ?: initialValue
+      onChange?.invoke(this, old, getValue(null, property))
+    }
   }
 
   companion object {
