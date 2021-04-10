@@ -39,7 +39,7 @@ import no.elg.hex.util.takeScreenshot
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
 
-  private const val PREVIEWS_PER_ROW = 4
+  const val PREVIEWS_PER_ROW = 4
   private const val PREVIEW_PADDING_PERCENT = 0.025f
   private const val MIN_PREVIEW_SIZE = 512
 
@@ -224,15 +224,24 @@ object LevelSelectScreen : AbstractScreen() {
 
     lineRenderer.begin(Line)
     batch.begin()
+
+    val (sx, sy, swidth, sheight) = rect(0)
+    batch.draw(Hex.assets.settings, sx, sy, swidth, sheight)
+    drawBox(sx, sy, swidth, sheight)
+
+    val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1)
+    batch.draw(Hex.assets.help, hx, hy, hwidth, hheight)
+    drawBox(hx, hy, hwidth, hheight)
+
     for ((i, preview) in islandPreviews.withIndex()) {
-      val (x, y, width, height) = rect(i)
+      val (x, y, width, height) = rect(i + PREVIEWS_PER_ROW)
       batch.draw(preview.second, x, y, width, height)
       drawBox(x, y, width, height)
     }
     batch.end()
 
     if (Hex.args.mapEditor) {
-      val (x, y, width, height) = rect(islandPreviews.size)
+      val (x, y, width, height) = rect(islandPreviews.size + PREVIEWS_PER_ROW)
 
       lineRenderer.line(
         x + width / 2f,

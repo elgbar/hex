@@ -1,8 +1,6 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
@@ -19,11 +17,11 @@ import ktx.actors.onClick
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
+import ktx.scene2d.horizontalGroup
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.buttonBar
-import ktx.scene2d.vis.horizontalCollapsible
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
@@ -41,7 +39,6 @@ import no.elg.hex.hexagon.PEASANT_PRICE
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
-import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -248,6 +245,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
             visImageButton {
 
+              pad(10f)
+
               visTextTooltip(tooltip)
               style.imageUp = drawableToTextureRegion(up)
 
@@ -261,32 +260,40 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               disableChecker[this] = disableCheck
 
               background = null
+              isGenerateDisabledImage = true
+              isFocusBorderEnabled = true
               isTransform = true
               imageCell.size(size)
             }
           }
 
-          interactButton(
-            tooltip = "Buy Peasant",
-            up = Hex.assets.peasant.getKeyFrame(0f),
-            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(territory) },
-            keyShortcut = intArrayOf(Keys.NUM_1)
-          ) {
-            inputProcessor.buyUnit(Peasant::class.createHandInstance())
+          horizontalGroup {
+            it.space(30f)
+            it.expandX()
+            it.left()
+
+            interactButton(
+              tooltip = "Buy Peasant",
+              up = Hex.assets.peasant.getKeyFrame(0f),
+              disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(territory) },
+              keyShortcut = intArrayOf(Keys.NUM_1)
+            ) {
+              inputProcessor.buyUnit(Peasant::class.createHandInstance())
+            }
+
+            interactButton(
+              tooltip = "Buy Castle",
+              up = Hex.assets.castle,
+              disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(territory) },
+              keyShortcut = intArrayOf(Keys.NUM_2)
+            ) {
+              inputProcessor.buyUnit(Castle::class.createHandInstance())
+            }
           }
 
-          interactButton(
-            tooltip = "Buy Castle",
-            up = Hex.assets.castle,
-            disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(territory) },
-            keyShortcut = intArrayOf(Keys.NUM_2)
-          ) {
-            inputProcessor.buyUnit(Castle::class.createHandInstance())
-          }
-
-          horizontalCollapsible {
-
-//            setCollapsed(true,false)
+          horizontalGroup {
+            it.expandX()
+            it.center()
 
             interactButton(
               tooltip = "Undo",
@@ -312,6 +319,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             ) {
               island.history.undoAll()
             }
+
             interactButton(
               tooltip = "Surrender",
               up = Hex.assets.surrender,
@@ -323,45 +331,22 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
                 surrender()
               }
             }
-            interactButton(
-              tooltip = "Settings",
-              up = Hex.assets.settings,
-              down = Hex.assets.settingsDown,
-              keyShortcut = intArrayOf(Keys.NUM_7)
-            ) {
-              Hex.screen = Hex.settingsScreen
-            }
-
-            interactButton(
-              tooltip = "Help",
-              up = Hex.assets.help,
-              down = Hex.assets.helpDown,
-              keyShortcut = intArrayOf(Keys.NUM_8)
-            ) {
-              if (distress) {
-                distress = false
-                Gdx.app.debug("DISTRESS SIGNAL", "Im suck in here!")
-                if (Hex.args.cheating) {
-                  MessagesRenderer.publishMessage("You're asking for help when cheating!? Not a very good cheater are you?", color = Color.GOLD)
-                }
-              }
-              Hex.screen = Hex.tutorialScreen
-            }
           }
 
-          visTextButton("End Turn") { cell ->
-//            cell.fillX()
-//            cell.expandX()
-//            cell.right()
+          horizontalGroup {
+            it.expandX()
+            it.right()
 
-            labelCell.height(size)
-            labelCell.minWidth(size)
-            labelCell.right()
-//            cell.maxWidth(labelCell.prefWidth + 20)
+            visTextButton("End Turn") { cell ->
 
-            disableChecker[this] = { disableInteract(null) }
-            onInteract(stage, Keys.ENTER) {
-              endTurn()
+              labelCell.height(size)
+              labelCell.minWidth(size)
+              labelCell.right()
+
+              disableChecker[this] = { disableInteract(null) }
+              onInteract(stage, Keys.ENTER) {
+                endTurn()
+              }
             }
           }
         }

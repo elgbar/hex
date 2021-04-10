@@ -9,6 +9,7 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
 import no.elg.hex.screens.LevelSelectScreen.camera
 import no.elg.hex.screens.LevelSelectScreen.mouseX
 import no.elg.hex.screens.LevelSelectScreen.mouseY
@@ -25,13 +26,13 @@ import java.lang.Float.max
 object LevelSelectInputProcessor : AbstractInput(true) {
 
   private const val SCROLL_SPEED = 1f
-  private const val INVALID_ISLAND_INDEX = -1
+  private const val INVALID_ISLAND_INDEX = Int.MIN_VALUE
 
   private fun getHoveringIslandIndex(): Int {
     for ((index, i) in IslandFiles.islandIds.withIndex()) {
       val (x, y, width, height) = LevelSelectScreen.rect(index)
       if (mouseX in x..x + width && mouseY in y..y + height) {
-        return i
+        return i - PREVIEWS_PER_ROW
       }
     }
     return INVALID_ISLAND_INDEX
@@ -42,6 +43,8 @@ object LevelSelectInputProcessor : AbstractInput(true) {
     val index = getHoveringIslandIndex()
     Gdx.app.debug("SELECT", "Clicked on index $index")
     when {
+      index == -PREVIEWS_PER_ROW -> Hex.screen = Hex.settingsScreen
+      index == -1 -> Hex.screen = Hex.tutorialScreen
       index != INVALID_ISLAND_INDEX -> play(index)
       Hex.args.mapEditor -> {
         val (ix, iy, width, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
