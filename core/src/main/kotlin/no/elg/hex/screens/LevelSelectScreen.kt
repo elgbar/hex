@@ -238,16 +238,29 @@ object LevelSelectScreen : AbstractScreen() {
     batch.begin()
 
     val (sx, sy, swidth, sheight) = rect(0, NON_ISLAND_SCALE, 0f)
+    if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
 
-    val settingsSprite = if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
-    batch.draw(settingsSprite, sx, sy, swidth, sheight)
+      val settingsSprite = if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
+      batch.draw(settingsSprite, sx, sy, swidth, sheight)
 
-    val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
-    val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
-    batch.draw(helpSprite, hx, hy, hwidth, hheight)
+      val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
+      val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
+      batch.draw(helpSprite, hx, hy, hwidth, hheight)
+    }
 
     for ((i, preview) in islandPreviews.withIndex()) {
       val (x, y, width, height) = rect(i + PREVIEWS_PER_ROW)
+
+      if (y + height < camera.position.y - camera.viewportHeight / 2f) {
+        // island is above camera, no need to render
+        continue
+      }
+
+      if (y > camera.position.y + camera.viewportHeight / 2f) {
+        // the island is below the camera, no need to render further
+        break
+      }
+
       batch.draw(preview.second, x, y, width, height)
       drawBox(x, y, width, height)
     }
