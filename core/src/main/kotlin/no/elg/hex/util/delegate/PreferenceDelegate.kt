@@ -166,7 +166,7 @@ class PreferenceDelegate<T : Any>(
   }
 
   fun hide(property: KProperty<*>) {
-    if (applyOnChangeOnSettingsHide) {
+    if (applyOnChangeOnSettingsHide && changed) {
       val old = currentValue ?: initialValue
       onChange?.invoke(this, old, getValue(null, property))
     }
