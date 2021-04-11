@@ -44,15 +44,16 @@ object LevelSelectInputProcessor : AbstractInput(true) {
     Gdx.app.debug("SELECT", "Clicked on index $index")
     when {
       index == -PREVIEWS_PER_ROW -> Hex.screen = Hex.settingsScreen
+      index == -PREVIEWS_PER_ROW + 1 -> {
+        if (Hex.args.mapEditor) {
+          Hex.screen = LevelCreationScreen
+          return true
+        }
+        return false
+      }
       index == -1 -> Hex.screen = Hex.tutorialScreen
       index in -PREVIEWS_PER_ROW..-1 -> return false
       index != INVALID_ISLAND_INDEX -> play(index)
-      Hex.args.mapEditor -> {
-        val (ix, iy, width, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
-        if (mouseX in ix..ix + width && mouseY in iy..iy + height) {
-          Hex.screen = LevelCreationScreen
-        }
-      }
       else -> return false
     }
     return true

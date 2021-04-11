@@ -246,6 +246,15 @@ object LevelSelectScreen : AbstractScreen() {
       val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
       val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
       batch.draw(helpSprite, hx, hy, hwidth, hheight)
+
+      if (Hex.args.mapEditor) {
+        val (x, y, width, height) = rect(1, NON_ISLAND_SCALE)
+
+        drawBox(x, y, width, height)
+        val color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
+        lineRenderer.line(x + width / 2f, y + height / 2f + height / 10f, x + width / 2f, y + height / 2f - height / 10f, color, color)
+        lineRenderer.line(x + width / 2f + width / 10f, y + height / 2f, x + width / 2f - width / 10f, y + height / 2f, color, color)
+      }
     }
 
     for ((i, preview) in islandPreviews.withIndex()) {
@@ -265,28 +274,6 @@ object LevelSelectScreen : AbstractScreen() {
       drawBox(x, y, width, height)
     }
     batch.end()
-
-    if (Hex.args.mapEditor) {
-      val (x, y, width, height) = rect(islandPreviews.size + PREVIEWS_PER_ROW)
-
-      lineRenderer.line(
-        x + width / 2f,
-        y + height / 2f + height / 10f,
-        x + width / 2f,
-        y + height / 2f - height / 10f,
-        WHITE,
-        WHITE
-      )
-      lineRenderer.line(
-        x + width / 2f + width / 10f,
-        y + height / 2f,
-        x + width / 2f - width / 10f,
-        y + height / 2f,
-        WHITE,
-        WHITE
-      )
-      drawBox(x, y, width, height)
-    }
 
     lineRenderer.end()
   }
