@@ -32,8 +32,7 @@ object Settings {
     applyOnChangeOnSettingsHide = true,
     priority = 91,
     onChange = { _, _, new ->
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      gotoLevelSelect()
       return@PreferenceDelegate new
     }
   )
@@ -44,8 +43,7 @@ object Settings {
     applyOnChangeOnSettingsHide = true,
     priority = 90,
     onChange = { _, _, new ->
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      gotoLevelSelect()
       return@PreferenceDelegate new
     }
   )
@@ -56,8 +54,7 @@ object Settings {
     applyOnChangeOnSettingsHide = true,
     priority = 90,
     onChange = { _, _, new ->
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      gotoLevelSelect()
       return@PreferenceDelegate new
     }
   )
@@ -67,8 +64,7 @@ object Settings {
     applyOnChangeOnSettingsHide = true,
     priority = 90,
     onChange = { _, _, new ->
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      gotoLevelSelect()
       return@PreferenceDelegate new
     }
   )
@@ -79,8 +75,7 @@ object Settings {
     applyOnChangeOnSettingsHide = true,
     priority = 90,
     onChange = { _, _, new ->
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      gotoLevelSelect()
       return@PreferenceDelegate new
     }
   )
@@ -91,8 +86,7 @@ object Settings {
     applyOnChangeOnSettingsHide = true,
     priority = 90,
     onChange = { _, _, new ->
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      gotoLevelSelect()
       return@PreferenceDelegate new
     }
   )
@@ -133,5 +127,16 @@ object Settings {
     val maxFps = if (limitFps) targetFps else 9999
     Gdx.graphics.setForegroundFPS(maxFps)
     Gdx.app.debug("SETTINGS", "New max frame rate is: $maxFps")
+  }
+
+  private var lastGotoCalled = 0L
+  private fun gotoLevelSelect() {
+
+    val frameId = Gdx.graphics.frameId
+    if (lastGotoCalled != frameId) {
+      lastGotoCalled = frameId
+      // do next frame to fix cyclic problem
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+    }
   }
 }
