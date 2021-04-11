@@ -21,14 +21,10 @@ A simple turn based strategy game aiming to clone Slay.
 
 ## TODO
 
-* Allow splash screen to be used to show the game is loading something other than the intro
-    * Allow to specify what the next screen will be
-    * Used when loading island (when loading lazily)
 * Remember state of islands between sessions
-* Add help page
+* Add pictures to tutorial page
 * Add minimap
 * Add relative strength bar
-* local multiplayer
 * Let AI surrender when it is clear that the player is winning
 * Hold to march
     * Double click/long click to move all units to around the hexagon pressed
