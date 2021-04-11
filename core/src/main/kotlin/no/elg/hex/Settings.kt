@@ -52,7 +52,7 @@ object Settings {
     Difficulty.PLAYER,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
-    priority = 90,
+    priority = 89,
     onChange = { _, _, new ->
       gotoLevelSelect()
       return@PreferenceDelegate new
