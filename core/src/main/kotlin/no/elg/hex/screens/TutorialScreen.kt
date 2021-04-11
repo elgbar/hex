@@ -16,7 +16,7 @@ class TutorialScreen : OverlayScreen(false) {
 
   init {
     stage.actors {
-      val a = this@actors.visTable(defaultSpacing = true) {
+      val table = this@actors.visTable(defaultSpacing = true) {
         top()
         left()
         pad(Value.percentWidth(0.01f, this@visTable))
@@ -101,11 +101,14 @@ class TutorialScreen : OverlayScreen(false) {
       }
 
       visScrollPane {
+        // remove the weird edge color
+        this.style.background = null
+
         setFillParent(true)
         setFlickScroll(true)
         fadeScrollBars = false
         setScrollFocus(true)
-        actor = a
+        actor = table
       }
     }
   }
