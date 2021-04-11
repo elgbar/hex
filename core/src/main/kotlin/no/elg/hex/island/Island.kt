@@ -178,11 +178,11 @@ class Island(
       // if we create more this makes sure they are playing along
       this.putAll(Team.values().map { it to NotAsRandomAI(it) })
 
-      put(SUN, Settings.sun.aiConstructor(SUN))
-      put(LEAF, Settings.leaf.aiConstructor(LEAF))
-      put(FOREST, Settings.forest.aiConstructor(FOREST))
-      put(EARTH, Settings.earth.aiConstructor(EARTH))
-      put(STONE, Settings.stone.aiConstructor(STONE))
+      put(SUN, Settings.teamSunAI.aiConstructor(SUN))
+      put(LEAF, Settings.teamLeafAI.aiConstructor(LEAF))
+      put(FOREST, Settings.teamForestAI.aiConstructor(FOREST))
+      put(EARTH, Settings.teamEarthAI.aiConstructor(EARTH))
+      put(STONE, Settings.teamStoneAI.aiConstructor(STONE))
     }
 
   fun isCurrentTeamAI() = currentAI != null

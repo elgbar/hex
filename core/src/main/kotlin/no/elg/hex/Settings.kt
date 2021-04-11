@@ -37,7 +37,7 @@ object Settings {
     }
   )
 
-  var sun by PreferenceDelegate(
+  var teamSunAI by PreferenceDelegate(
     Difficulty.HARD,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
@@ -48,7 +48,7 @@ object Settings {
     }
   )
 
-  var leaf by PreferenceDelegate(
+  var teamLeafAI by PreferenceDelegate(
     Difficulty.PLAYER,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
@@ -58,7 +58,7 @@ object Settings {
       return@PreferenceDelegate new
     }
   )
-  var forest by PreferenceDelegate(
+  var teamForestAI by PreferenceDelegate(
     Difficulty.HARD,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
@@ -69,7 +69,7 @@ object Settings {
     }
   )
 
-  var earth by PreferenceDelegate(
+  var teamEarthAI by PreferenceDelegate(
     Difficulty.HARD,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
@@ -80,7 +80,7 @@ object Settings {
     }
   )
 
-  var stone by PreferenceDelegate(
+  var teamStoneAI by PreferenceDelegate(
     Difficulty.HARD,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
