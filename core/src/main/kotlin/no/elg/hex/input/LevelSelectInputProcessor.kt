@@ -60,13 +60,13 @@ object LevelSelectInputProcessor : AbstractInput(true) {
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     val delta = -Gdx.input.getDeltaY(0).toFloat()
-    val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size)
+    val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = camera.position.y
     val min = screenHeight / 2f
+    val maximum = max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding)
 
-    camera.position.y = (oldY + delta * SCROLL_SPEED)
-      .coerceIn(min..max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding))
+    camera.position.y = (oldY + delta * SCROLL_SPEED).coerceIn(min..maximum)
     LevelSelectScreen.updateCamera()
     return true
   }
