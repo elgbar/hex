@@ -22,7 +22,7 @@ object Settings {
   var targetFps by PreferenceDelegate(30, priority = 111, runOnChangeOnInit = false, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }) { it < 5 }
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
-  var MSAA by PreferenceDelegate(0, Hex.launchPreference, true) { it !in 0..16 }
+  var MSAA by PreferenceDelegate(4, Hex.launchPreference, true) { it !in 0..16 }
 
   var zoomSpeed by PreferenceDelegate(0.2f) { it !in (0.001f - Float.MIN_VALUE)..(1.0f + Float.MIN_VALUE) }
 
