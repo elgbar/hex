@@ -27,6 +27,7 @@ import no.elg.hex.Settings
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.findEnumValues
 import no.elg.hex.util.toTitleCase
+import kotlin.math.max
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.declaredMemberProperties
@@ -69,10 +70,13 @@ class SettingsScreen : OverlayScreen() {
             }
           }
 
-          fun commonStyle(it: Cell<*>) {
+          fun commonStyle(it: Cell<*>, includeWidth: Boolean = true) {
             it.right()
             it.pad(0f)
             it.space(20f)
+            if (includeWidth) {
+              it.minWidth(Hex.assets.fontSize * MIN_FIELD_WIDTH)
+            }
           }
 
           val clazz = delegate.initialValue::class
@@ -100,7 +104,7 @@ class SettingsScreen : OverlayScreen() {
           } else {
             when (clazz) {
               Boolean::class -> visCheckBox("") {
-                commonStyle(it)
+                commonStyle(it, false)
 
                 val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
                 onShowListeners += readSetting
@@ -122,8 +126,9 @@ class SettingsScreen : OverlayScreen() {
 
                   val readSetting: () -> Unit = {
                     text = property.get(Settings).toString()
-//                      val minWidth = Hex.assets.fontSize * (max(text.length, (delegate.initialValue as CharSequence).length) / 2f + 1)
-//                      it.minWidth(minWidth)
+
+                    val chars = (max(text.length, (delegate.initialValue as CharSequence).length) / 2f + 1).coerceAtLeast(MIN_FIELD_WIDTH)
+                    it.minWidth(Hex.assets.fontSize * chars)
                   }
                   onShowListeners += readSetting
                   readSetting()
@@ -265,5 +270,9 @@ class SettingsScreen : OverlayScreen() {
     for (function in onHideListeners) {
       function()
     }
+  }
+
+  companion object {
+    const val MIN_FIELD_WIDTH = 5f
   }
 }
