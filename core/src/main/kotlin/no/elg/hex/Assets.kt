@@ -79,6 +79,7 @@ class Assets : AssetManager() {
     const val ISLAND_FILE_ENDING = "is"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
+    const val TUTORIAL_ATLAS = "sprites/tutorial.atlas"
 
     const val BOLD_FONT = "fonts/UbuntuMono-B.ttf"
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
@@ -108,6 +109,8 @@ class Assets : AssetManager() {
   val boldItalicFont: BitmapFont by lazy { get(BOLD_ITALIC_FONT) }
 
   private val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
+  val tutorialScreenShots: TextureAtlas by lazy { get(TUTORIAL_ATLAS) }
+
   val fontSize by lazy { FONT_SIZE * scale }
 
   private val resolver: FileHandleResolver
@@ -275,6 +278,7 @@ class Assets : AssetManager() {
     loadingInfo = "sprites"
 
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
+    load(TUTORIAL_ATLAS, TEXTURE_ATLAS)
 
     loadingInfo = "islands"
 

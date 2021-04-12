@@ -65,8 +65,17 @@ object Hex : ApplicationAdapter() {
 
   val inputMultiplexer = InputMultiplexer()
 
-  lateinit var tutorialScreen: TutorialScreen
-    private set
+  private var internalTutorialScreen: TutorialScreen? = null
+  val tutorialScreen: TutorialScreen
+    get() {
+      val its = internalTutorialScreen
+      if (its == null || its.isDisposed) {
+        val newITS = TutorialScreen()
+        internalTutorialScreen = TutorialScreen()
+        return newITS
+      }
+      return its
+    }
 
   lateinit var settingsScreen: SettingsScreen
     private set
@@ -157,7 +166,6 @@ object Hex : ApplicationAdapter() {
 
     assets.loadAssets()
 
-    tutorialScreen = TutorialScreen()
     settingsScreen = SettingsScreen()
 
     // must be last
