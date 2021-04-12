@@ -182,7 +182,7 @@ object Hex : ApplicationAdapter() {
     asyncThread.dispose()
     ScreenRenderer.dispose()
     settingsScreen.dispose()
-    tutorialScreen.dispose()
+    internalTutorialScreen?.dispose()
   }
 
   override fun resize(width: Int, height: Int) {
