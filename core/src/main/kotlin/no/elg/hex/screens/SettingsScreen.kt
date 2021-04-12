@@ -9,7 +9,6 @@ import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
-import com.kotcrab.vis.ui.widget.spinner.SimpleFloatSpinnerModel
 import ktx.actors.onChange
 import ktx.actors.setScrollFocus
 import ktx.collections.toGdxArray
@@ -159,35 +158,26 @@ class SettingsScreen : OverlayScreen() {
                 }
 
               Float::class ->
-                spinner("", SimpleFloatSpinnerModel(property.get(Settings) as Float, Float.MIN_VALUE, Float.MAX_VALUE, 1f, 1000)) {
+                spinner("", FloatSpinnerModel(property.get(Settings).toString(), Double.MIN_VALUE.toString(), Double.MAX_VALUE.toString(), "0.1", 1000)) {
                   commonStyle(it)
 
                   onShowListeners += {
-                    (model as SimpleFloatSpinnerModel).value = property.get(Settings) as Float
+                    (model as FloatSpinnerModel).value = (property.get(Settings) as Float).toBigDecimal()
                   }
 
                   onHideListeners += { delegate.hide(property) }
 
                   isProgrammaticChangeEvents = false
                   onChange {
-                    val floatModel = model as SimpleFloatSpinnerModel
-                    property.set(Settings, floatModel.value)
-                    floatModel.value = property.get(Settings) as Float
+                    val floatModel = model as FloatSpinnerModel
+                    property.set(Settings, floatModel.value.toFloat())
+                    floatModel.value = (property.get(Settings) as Float).toBigDecimal()
                     restartLabel.fire(ChangeEvent())
                   }
                 }
 
               Double::class ->
-                spinner(
-                  "",
-                  FloatSpinnerModel(
-                    property.get(Settings).toString(),
-                    Double.MIN_VALUE.toString(),
-                    Double.MAX_VALUE.toString(),
-                    "1",
-                    1000
-                  )
-                ) {
+                spinner("", FloatSpinnerModel(property.get(Settings).toString(), Double.MIN_VALUE.toString(), Double.MAX_VALUE.toString(), "0.1", 1000)) {
                   commonStyle(it)
 
                   onShowListeners += {
