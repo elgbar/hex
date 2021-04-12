@@ -4,6 +4,7 @@ project.ext.mainClassName = "no.elg.hex.desktop.AndroidLauncher"
 project.ext.assetsDir = new File("../core/src/main/resources")
 
 android {
+  kotlinOptions.useIR = true
   buildToolsVersion "30.0.3"
   compileSdkVersion 30
   sourceSets {
@@ -32,7 +33,7 @@ android {
   }
   buildTypes {
     release {
-      minifyEnabled false
+      minifyEnabled true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
