@@ -133,11 +133,6 @@ class PreferenceDelegate<T : Any>(
       return
     }
 
-    // make sure initialLoadedValue is initiated
-    if (!::initialLoadedValue.isInitialized) {
-      getValue(thisRef, property)
-    }
-
     currentValue = newValue
     if (currentValue != old) {
       if (!changed) {
