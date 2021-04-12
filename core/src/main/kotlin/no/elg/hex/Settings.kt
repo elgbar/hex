@@ -24,7 +24,7 @@ object Settings {
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
   var MSAA by PreferenceDelegate(0, Hex.launchPreference, true) { it !in 0..16 }
 
-  var zoomSpeed by PreferenceDelegate(0.1f) { it !in (0.001f - Float.MIN_VALUE)..(1.0f + Float.MIN_VALUE) }
+  var zoomSpeed by PreferenceDelegate(0.2f) { it !in (0.001f - Float.MIN_VALUE)..(1.0f + Float.MIN_VALUE) }
 
   // TODO change yourTeam to be select if a team is AI or another player
 
