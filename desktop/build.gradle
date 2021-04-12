@@ -2,7 +2,7 @@ apply plugin: "kotlin"
 
 sourceCompatibility = 1.8
 
-project.ext.mainClassName = "no.elg.hex.desktop.DesktopLauncher"
+project.ext.mainClassName = "no.elg.hex.desktop.DesktopLauncherKt"
 project.ext.assetsDir = new File("../core/src/main/resources")
 
 task run(dependsOn: classes, type: JavaExec) {
