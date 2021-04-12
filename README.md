@@ -2,6 +2,10 @@
 
 A simple turn based strategy game aiming to clone Slay.
 
+![Level select screen](./images/levelselect.png)
+
+![Playing the game](./images/placing-unit.png)
+
 ## Glossaries
 
 | Glossary  | Explanation                                                                                            |
