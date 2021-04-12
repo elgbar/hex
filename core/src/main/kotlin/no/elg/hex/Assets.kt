@@ -234,9 +234,6 @@ class Assets : AssetManager() {
     loadingInfo = "VisUI"
 
     if (!VisUI.isLoaded()) {
-      // skip version check as there is a bug in Gdx Version 1.9.12
-      // see https://github.com/libgdx/libgdx/commit/091f3bac7fc68ce96732897a5fcd80578bdba893#r43758450
-      VisUI.setSkipGdxVersionCheck(true)
       if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
     }
     with(VisUI.getSkin() as Skin) {
