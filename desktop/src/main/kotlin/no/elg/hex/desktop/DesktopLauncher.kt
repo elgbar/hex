@@ -8,6 +8,7 @@ import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
 import no.elg.hex.util.defaultDisplayMode
 
@@ -15,10 +16,10 @@ fun main(args: Array<String>) {
 
   val config = LwjglApplicationConfiguration()
 
-  LwjglApplicationConfiguration.disableAudio = true
-
   Hex.args = mainBody { ArgParser(args).parseInto(::ApplicationArgumentsParser) }
   Hex.launchPreference = LwjglPreferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
+
+  LwjglApplicationConfiguration.disableAudio = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
 
   config.width = defaultDisplayMode.width / 2
   config.height = defaultDisplayMode.height / 2

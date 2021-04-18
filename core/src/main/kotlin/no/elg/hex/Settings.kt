@@ -15,6 +15,11 @@ import kotlin.reflect.jvm.isAccessible
 @Suppress("unused")
 object Settings {
 
+  const val DISABLE_AUDIO_PATH = "disableAudio" // Settings::disableAudio.name
+  var disableAudio by PreferenceDelegate(false, priority = 200, preferences = Hex.launchPreference, requireRestart = true)
+
+  var volume by PreferenceDelegate(1f, priority = 210) { it < 0f || it > 1f }
+
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)

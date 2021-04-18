@@ -24,7 +24,7 @@ class AndroidLauncher : AndroidApplication() {
 
     if (Hex.launchPreference.contains(MSAA_SAMPLES_PATH)) {
       config.numSamples = Hex.launchPreference.getInteger(MSAA_SAMPLES_PATH)
-    }else{
+    } else {
       config.numSamples = 2 //default value
     }
 
@@ -35,7 +35,7 @@ class AndroidLauncher : AndroidApplication() {
     config.useAccelerometer = false
     config.useGyroscope = false
     config.useRotationVectorSensor = false
-    config.disableAudio = true
+    config.disableAudio = Hex.launchPreference.getBoolean(Settings.SOUND_ENABLED_PATH)
     initialize(Hex, config)
   }
 }
