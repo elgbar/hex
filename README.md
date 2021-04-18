@@ -67,14 +67,9 @@ Process finished with exit code 0
 
 ## TODO
 
-* Remember state of islands between sessions
-* Add pictures to tutorial page
 * Add minimap
 * Add relative strength bar
 * Let AI surrender when it is clear that the player is winning
-* Hold to march
-    * Double click/long click to move all units to around the hexagon pressed
-    * disable hold to march setting
 * Sounds
 * Fix grave piece
     * Graves behaves differently for the AI than the player

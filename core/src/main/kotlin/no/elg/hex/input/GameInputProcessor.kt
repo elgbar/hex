@@ -228,6 +228,8 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
   }
 
   private fun march(hexagon: Hexagon<HexagonData>): Boolean {
+    if (!Settings.enableHoldToMarch) return false
+
     screen.island.selected?.also { territory ->
       if (hexagon !in territory.hexagons) return false
       val pieces = mutableListOf<LivingPiece>()

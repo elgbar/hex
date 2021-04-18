@@ -17,6 +17,7 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
+  var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
 
   var showFps by PreferenceDelegate(false, priority = 109)
   var limitFps by PreferenceDelegate(false, priority = 110, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new })
