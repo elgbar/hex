@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl.LwjglPreferences
 import com.xenomachina.argparser.ArgParser
+import com.xenomachina.argparser.mainBody
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
@@ -16,7 +17,7 @@ fun main(args: Array<String>) {
 
   LwjglApplicationConfiguration.disableAudio = true
 
-  Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
+  Hex.args = mainBody { ArgParser(args).parseInto(::ApplicationArgumentsParser) }
   Hex.launchPreference = LwjglPreferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
   config.width = defaultDisplayMode.width / 2
