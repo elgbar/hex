@@ -1,5 +1,6 @@
 package no.elg.hex.util.delegate
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import no.elg.hex.util.debug
@@ -36,6 +37,13 @@ class PreferenceDelegate<T : Any>(
    * only apply settings when leaving the settings screen
    */
   val applyOnChangeOnSettingsHide: Boolean = false,
+
+  /**
+   * Do not show this setting in the settings screen if the application log level [Application.getLogLevel()] is below [hideLevel].
+   *
+   * Setting this to [Application.LOG_NONE] (default) will always display this setting.
+   */
+  val hideLevel: Int = Application.LOG_NONE,
   /**
    * Method to call when a change is applied. The first argument will always be `this`. If the onChange
    */

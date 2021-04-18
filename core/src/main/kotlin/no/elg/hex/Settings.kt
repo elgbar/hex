@@ -1,5 +1,6 @@
 package no.elg.hex
 
+import com.badlogic.gdx.Application.LOG_DEBUG
 import com.badlogic.gdx.Gdx
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
@@ -24,9 +25,13 @@ object Settings {
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
   var MSAA by PreferenceDelegate(4, Hex.launchPreference, true) { it !in 0..16 }
 
-  var zoomSpeed by PreferenceDelegate(0.2f) { it !in (0.001f - Float.MIN_VALUE)..(1.0f + Float.MIN_VALUE) }
-
-  // TODO change yourTeam to be select if a team is AI or another player
+  var zoomSpeed by PreferenceDelegate(
+    0.2f,
+    priority = 100_000,
+    hideLevel = LOG_DEBUG
+  ) {
+    it !in (0.001f - Float.MIN_VALUE)..(1.0f + Float.MIN_VALUE)
+  }
 
   var startTeam by PreferenceDelegate(
     Team.LEAF,
@@ -96,6 +101,7 @@ object Settings {
   var enableGLDebugging by PreferenceDelegate(
     false,
     priority = 100_000,
+    hideLevel = LOG_DEBUG,
     onChange = { _, old, new ->
       if (new != old) {
         if (new) {
