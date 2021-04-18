@@ -23,6 +23,48 @@ A simple turn based strategy game aiming to clone Slay.
 | palm      | A type of tree that grows along the coast                                                              |
 | tree      | Collective word for `pine` and `palm`                                                                  |
 
+## Help page
+
+*Accurate as of version 1.0*
+
+```
+usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
+       [--draw-edges] [--stage-debug] [--update-previews] [--load-all-islands]
+       [--scale SCALE] [--profile]
+
+optional arguments:
+  -h, --help                 show this help message and exit
+
+  -d, --debug                Enable debug logging
+
+  -t, --trace                Enable even more logging
+
+  -s, --silent               Do not print anything to stdout or stderr
+
+  -e, --map-editor           Start the program in map editor mode
+
+  --i-am-a-cheater           Enable cheating
+
+  --disable-island-loading   Don't load islands
+
+  --draw-edges               Draw the edge hexagons to assists with debugging
+
+  --stage-debug              Enable debug overlay for UI using scene2d
+
+  --update-previews          Update pre-rendered previews of islands
+
+  --load-all-islands         Load all islands at startup instead of when first
+                             played
+
+  --scale SCALE              Scale of UI, if <= 0 default scale apply
+
+  --profile                  Enable GL profiling
+
+
+Process finished with exit code 0
+
+```
+
 ## TODO
 
 * Remember state of islands between sessions
@@ -39,3 +81,4 @@ A simple turn based strategy game aiming to clone Slay.
     * It works correctly for players
     * Does not work for AI (it stays too long)
 * Do not end the current AIs turn when exiting and re-entering a level, as this can be exploited
+* Allow for scrolling farther down in setttings to allow mobile user to see what they type 
