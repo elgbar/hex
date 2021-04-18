@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.Input.Keys.Y
 import com.badlogic.gdx.Input.Keys.Z
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -103,6 +104,16 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     }
 
     if (hexData.setPiece(newPieceType)) {
+
+      if (hexData.team != territory.team) {
+        when {
+          oldPiece is LivingPiece -> Hex.assets.deathSound?.play(Settings.volume)
+//          oldPiece is Tree -> Hex.assets.chopWood?.play(Settings.volume)
+//          oldPiece is Castle -> Hex.assets.destroyCastleSound?.play(Settings.volume)
+//          oldPiece is Capital -> Hex.assets.destroyCapitalSound?.play(Settings.volume)
+        }
+      }
+
       island.history.remember("Placing piece") {
         hexData.team = territory.team
 
@@ -142,12 +153,22 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       Gdx.app.debug("PLACE", "Territory is still null after selecting it")
       return false
     }
+    val selectedTerritory = territory != oldTerritory && !cursorHexData.piece.movable
+
+    fun playSound(action: Boolean) {
+      if (action) {
+        Hex.assets.pieceDownSound?.play(Settings.volume)
+      } else if (selectedTerritory) {
+        val sound = if (territory.income > 0) Hex.assets.coinsSound else Hex.assets.emptyCoffersSound
+        sound?.play(Settings.volume)
+      }
+    }
 
     val hand = island.hand
     return when {
       longPress -> march(hexagon)
-      hand == null -> pickUp(island, cursorHexData, territory)
-      else -> placeDown(island, territory, hexagon, hand.piece)
+      hand == null -> pickUp(island, cursorHexData, territory).also { playSound(it) }
+      else -> placeDown(island, territory, hexagon, hand.piece).also { playSound(it) }
     }
   }
 
@@ -170,16 +191,15 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       else -> {
         if (screen.island.hand == null || screen.island.hand?.piece?.data === EDGE_DATA) {
           val piece = keycodeToPiece(keycode) ?: return false
-          return buyUnit(piece)
+          buyUnit(piece)
         }
       }
     }
     return true
   }
 
-  fun buyUnit(piece: Piece): Boolean {
+  fun buyUnit(piece: Piece) {
     screen.island.selected?.also { territory ->
-
       val hand = screen.island.hand
       if (hand != null && (
         piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
@@ -224,7 +244,6 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         }
       }
     }
-    return true
   }
 
   private fun march(hexagon: Hexagon<HexagonData>): Boolean {
@@ -276,6 +295,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           }
         }
       }
+      Hex.assets.marchingSound?.play(Settings.volume)
       return true
     }
     return false

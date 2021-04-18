@@ -1,6 +1,8 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.island.Island.IslandDto
 
 /**
@@ -65,18 +67,22 @@ class IslandHistory(val island: Island) {
   fun canRedo(): Boolean = (historyPointer - 1) in history.indices
 
   fun undo() {
+    Hex.assets.undoSound?.play(Settings.volume)
     `do`(historyPointer + 1, "un")
   }
 
   fun redo() {
+    Hex.assets.undoSound?.play(Settings.volume)
     `do`(historyPointer - 1, "re")
   }
 
   fun undoAll() {
+    Hex.assets.undoAllSound?.play(Settings.volume)
     `do`(history.size - 1, "un")
   }
 
   fun redoAll() {
+    Hex.assets.undoAllSound?.play(Settings.volume)
     `do`(0, "re")
   }
 

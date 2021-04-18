@@ -46,6 +46,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
 import no.elg.hex.util.debug
 import no.elg.hex.util.defaultDisplayWidth
+import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -85,6 +86,24 @@ class Assets : AssetManager() {
     const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
     const val REGULAR_FONT = "fonts/UbuntuMono-R.ttf"
     const val REGULAR_ITALIC_FONT = "fonts/UbuntuMono-RI.ttf"
+
+    const val MARCHING_SOUND = "sounds/marching.mp3"
+    const val UNDO_ALL_SOUND = "sounds/undo_all.mp3"
+
+    const val PIECE_DOWN_SOUND = "sounds/piece_down_%d.mp3"
+    private val PIECE_DOWN_SOUND_RANGE = 1..12
+
+    const val UNDO_SOUND = "sounds/undo_%d.mp3"
+    private val UNDO_SOUND_RANGE = 1..8
+
+    const val COINS_SOUND = "sounds/coins_%d.mp3"
+    private val COINS_SOUND_RANGE = 1..4
+
+    const val EMPTY_COFFERS_SOUND = "sounds/empty_coffers_%d.mp3"
+    private val EMPTY_COFFERS_SOUND_RANGE = 1..5
+
+    const val DEATH_SOUND = "sounds/death_%d.mp3"
+    private val DEATH_SOUND_RANGE = 1..4
 
     private const val FONT_SIZE = 20
 
@@ -166,6 +185,14 @@ class Assets : AssetManager() {
   val settingsDown by lazy { findSprite("settings_selected") }
   val help by lazy { findSprite("help") }
   val helpDown by lazy { findSprite("help_selected") }
+
+  val marchingSound by lazy<Sound?> { get(MARCHING_SOUND, SOUND) }
+  val undoAllSound by lazy<Sound?> { get(UNDO_ALL_SOUND, SOUND) }
+  val pieceDownSound by SoundAlternativeDelegate(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
+  val undoSound by SoundAlternativeDelegate(UNDO_SOUND, UNDO_SOUND_RANGE)
+  val coinsSound by SoundAlternativeDelegate(COINS_SOUND, COINS_SOUND_RANGE)
+  val emptyCoffersSound by SoundAlternativeDelegate(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
+  val deathSound by SoundAlternativeDelegate(DEATH_SOUND, DEATH_SOUND_RANGE)
 
   fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize) {
     val boldness = if (bold) "B" else "R"
@@ -277,6 +304,24 @@ class Assets : AssetManager() {
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
     load(TUTORIAL_ATLAS, TEXTURE_ATLAS)
 
+    if (!Settings.disableAudio) {
+
+      loadingInfo = "Sounds"
+      load(MARCHING_SOUND, SOUND)
+      load(UNDO_ALL_SOUND, SOUND)
+
+      fun loadSoundVariations(path: String, range: IntRange) {
+        for (i in range) {
+          load(path.format(i), SOUND)
+        }
+      }
+
+      loadSoundVariations(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
+      loadSoundVariations(UNDO_SOUND, UNDO_SOUND_RANGE)
+      loadSoundVariations(COINS_SOUND, COINS_SOUND_RANGE)
+      loadSoundVariations(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
+      loadSoundVariations(DEATH_SOUND, DEATH_SOUND_RANGE)
+    }
     loadingInfo = "islands"
 
     IslandFiles // find all island files
