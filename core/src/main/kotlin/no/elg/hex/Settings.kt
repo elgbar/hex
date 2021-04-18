@@ -25,8 +25,17 @@ object Settings {
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
 
   var showFps by PreferenceDelegate(false, priority = 109)
-  var limitFps by PreferenceDelegate(false, priority = 110, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new })
-  var targetFps by PreferenceDelegate(30, priority = 111, runOnChangeOnInit = false, onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }) { it < 5 }
+  var limitFps by PreferenceDelegate(
+    false,
+    priority = 110,
+    onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }
+  )
+  var targetFps by PreferenceDelegate(
+    30,
+    priority = 111,
+    runOnChangeOnInit = false,
+    onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }
+  ) { it < 5 }
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
   var MSAA by PreferenceDelegate(4, Hex.launchPreference, true) { it !in 0..16 }
@@ -35,9 +44,7 @@ object Settings {
     0.2f,
     priority = 100_000,
     hideLevel = LOG_DEBUG
-  ) {
-    it !in (0.001f - Float.MIN_VALUE)..(1.0f + Float.MIN_VALUE)
-  }
+  ) { it < 0.001f || it > 1f }
 
   var startTeam by PreferenceDelegate(
     Team.LEAF,
