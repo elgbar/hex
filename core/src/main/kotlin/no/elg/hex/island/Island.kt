@@ -287,6 +287,15 @@ class Island(
         // enable history only when it's a humans turn
         history.enable()
         history.clear()
+
+        // Loose when no player have any capitals left
+        if (hexagons.none {
+            val data = getData(it)
+            teamToPlayer[data.team] == null && data.piece is Capital
+          }
+        ) {
+          gameInputProcessor.screen.gameEnded(false)
+        }
       }
     }
   }
