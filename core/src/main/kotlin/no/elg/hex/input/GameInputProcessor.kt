@@ -243,6 +243,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           screen.island.hand = Hand(territory, piece)
         }
       }
+      Hex.assets.pieceDownSound?.play(Settings.volume)
     }
   }
 
