@@ -51,6 +51,6 @@ data class Hand(
   }
 
   override fun toString(): String {
-    return "team: $territory, piece: ${piece::class.simpleName}"
+    return "piece: ${piece::class.simpleName}, territory: $territory"
   }
 }

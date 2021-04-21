@@ -145,7 +145,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         }
       }
       ScreenRenderer.drawAll(*centerRight, position = TOP_RIGHT)
-      //Return them to the pool after use
+      // Return them to the pool after use
       for (i in topRight.size until (topRight.size + history.historyNotes.size)) {
         staticTextPool.free(centerRight[i] as StaticScreenText)
       }
