@@ -191,7 +191,7 @@ class Island(
 
   val currentAI: AI? get() = teamToPlayer[currentTeam]
 
-  var currentTeam: Team = STARTING_TEAM
+  var currentTeam: Team = Settings.startTeam
     private set
 
   private val teamToPlayer =
@@ -240,14 +240,9 @@ class Island(
   }
 
   fun endTurn(gameInputProcessor: GameInputProcessor) {
+
     history.disable()
     history.clear()
-    select(null)
-
-    if (gameInputProcessor.screen.checkEndedGame()) {
-      return
-    }
-    gameInputProcessor.screen.saveProgress()
 
     KtxAsync.launch(Hex.asyncThread) {
 
@@ -260,7 +255,7 @@ class Island(
         data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
       }
 
-      if (currentTeam == STARTING_TEAM) {
+      if (currentTeam == Settings.startTeam) {
         Gdx.app.debug("TURN", "New round!")
         turn++
         for (hexagon in hexagons) {
@@ -290,9 +285,9 @@ class Island(
 
         // Loose when no player have any capitals left
         if (hexagons.none {
-            val data = getData(it)
-            teamToPlayer[data.team] == null && data.piece is Capital
-          }
+          val data = getData(it)
+          teamToPlayer[data.team] == null && data.piece is Capital
+        }
         ) {
           gameInputProcessor.screen.gameEnded(false)
         }
@@ -604,8 +599,6 @@ class Island(
     const val START_CAPITAL_PER_HEX = 5
 
     const val NO_ENEMY_HEXAGONS = -1
-
-    val STARTING_TEAM get() = Settings.startTeam
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)

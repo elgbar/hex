@@ -214,8 +214,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           }
         )
         island.select(null)
-        gameEnded()
-        youWon.show(stage)
+        gameEnded(true)
       }
 
       table {
@@ -375,27 +374,29 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     island.surrender()
   }
 
-  private fun gameEnded() {
+  internal fun gameEnded(win: Boolean) {
     for ((window, action) in labelUpdater) {
       window.action()
+    }
+    if (win) {
+      youWon.show(stage)
+    } else {
+      youLost.show(stage)
     }
   }
 
   fun checkEndedGame(): Boolean {
     val capitalCount = island.hexagons.count { island.getData(it).piece is Capital }
     if (capitalCount <= 1) {
-      gameEnded()
-      if (island.isCurrentTeamHuman()) {
-        youWon.show(stage)
-      } else {
-        youLost.show(stage)
-      }
+      gameEnded(island.isCurrentTeamHuman())
       return true
     }
     return false
   }
 
   private fun endTurn(allowAISurrender: Boolean = true) {
+
+    island.select(null)
 
     // we only ask for surrender when there is a single player
     // if there are no players (ai vs ai) we want to watch the whole thing
@@ -460,6 +461,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         return
       }
     }
+
+    if (checkEndedGame()) {
+      return
+    }
+    saveProgress()
+
     island.endTurn(inputProcessor)
   }
 
