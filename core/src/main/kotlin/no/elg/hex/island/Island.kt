@@ -2,6 +2,7 @@ package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.ObjectIntMap
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonValue
@@ -38,6 +39,7 @@ import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.next
 import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
@@ -48,6 +50,7 @@ import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
 import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
+import java.util.EnumMap
 import kotlin.math.max
 
 /** @author Elg */
@@ -71,6 +74,11 @@ class Island(
 
   /** Prefer this over calling [grid.hexagons] as this has better performance */
   val hexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
+
+  /**
+   * NUmber of visible hexagons on this island. Should not be used while in map editor mode as it is only counted once
+   */
+  private val visibleHexagons by lazy { hexagons.count { !getData(it).invisible } }
 
   var hand: Hand? = null
     set(value) {
@@ -129,10 +137,17 @@ class Island(
         "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
       }
     }
+
+    if (::hexagonsPerTeam.isLazyInitialized) {
+      countHexagons(hexagonsPerTeam)
+    }
+
     if (initialLoad) {
       ensureCapitalStartFunds()
       for (hexagon in hexagons) {
-        when (val hexPiece = this.getData(hexagon).piece) {
+        val data = this.getData(hexagon)
+        if (data.invisible) continue
+        when (val hexPiece = data.piece) {
           is TreePiece -> hexPiece.hasGrown = false
         }
       }
@@ -157,16 +172,22 @@ class Island(
     }
   }
 
-  private val initialState: IslandDto
+  val hexagonsPerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countHexagons(this) } }
 
-  init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad)
-    history.clear()
-    initialState = createDto().copy()
-  }
+  private val initialState: IslandDto
 
   var selected: Territory? = null
     private set
+
+  /**
+   * How many of the current players are real (i.e. no an AI)
+   */
+  val realPlayers: Int get() = teamToPlayer.count { (_, ai) -> ai == null }
+
+  /**
+   * How many of the current players are not real (i.e. an AI)
+   */
+  val aiPlayers: Int get() = Team.values().size - realPlayers
 
   val currentAI: AI? get() = teamToPlayer[currentTeam]
 
@@ -174,8 +195,8 @@ class Island(
     private set
 
   private val teamToPlayer =
-    HashMap<Team, AI?>().apply {
-      // if we create more this makes sure they are playing along
+    EnumMap<Team, AI?>(Team::class.java).apply {
+      // if we create more teams this makes sure they are playing along
       this.putAll(Team.values().map { it to NotAsRandomAI(it) })
 
       put(SUN, Settings.teamSunAI.aiConstructor(SUN))
@@ -185,12 +206,38 @@ class Island(
       put(STONE, Settings.teamStoneAI.aiConstructor(STONE))
     }
 
+  init {
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad)
+    history.clear()
+    initialState = createDto().copy()
+  }
+
   fun isCurrentTeamAI() = currentAI != null
   fun isCurrentTeamHuman() = currentAI == null
 
   // ////////////
   // Gameplay //
   // ////////////
+
+  private fun countHexagons(counter: ObjectIntMap<Team>) {
+    counter.clear(Team.values().size)
+    for (hexagon in hexagons) {
+      val data = getData(hexagon)
+      if (data.invisible) continue
+      counter.getAndIncrement(data.team, 0, 1)
+    }
+  }
+
+  fun percentagesHexagons(): EnumMap<Team, Float> {
+    val raw = hexagonsPerTeam
+    val total = visibleHexagons.toFloat()
+    val map = EnumMap<Team, Float>(Team::class.java)
+    for (team in Team.values()) {
+      val teamRaw = raw.get(team, 0)
+      map[team] = teamRaw / total
+    }
+    return map
+  }
 
   fun endTurn(gameInputProcessor: GameInputProcessor) {
     history.disable()
@@ -209,7 +256,7 @@ class Island(
 
       for (hexagon in hexagons) {
         val data = this@Island.getData(hexagon)
-        if (data.team != currentTeam) continue
+        if (data.team != currentTeam || data.invisible) continue
         data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
       }
 
@@ -217,7 +264,9 @@ class Island(
         Gdx.app.debug("TURN", "New round!")
         turn++
         for (hexagon in hexagons) {
-          this@Island.getData(hexagon).piece.newRound(this@Island, hexagon)
+          val data = this@Island.getData(hexagon)
+          if (data.invisible) continue
+          data.piece.newRound(this@Island, hexagon)
         }
       }
       select(null)
@@ -442,9 +491,6 @@ class Island(
     // if we have multiple contenders to become the capital, select the one with fewest enemy
     // hexagons near it
     // invisible hexagons count to ours hexagons
-
-    // number of hexagons expected to have around the given radius
-    val expectedHexagons = 6 * greatestDistance
 
     var currBest: Hexagon<HexagonData>? = null
     var currBestScore = -1.0

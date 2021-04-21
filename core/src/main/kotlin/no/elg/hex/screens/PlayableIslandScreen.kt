@@ -34,6 +34,7 @@ import no.elg.hex.hexagon.CASTLE_PRICE
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
+import no.elg.hex.hexagon.HexagonDataEvents
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.PEASANT_PRICE
 import no.elg.hex.hexagon.Peasant
@@ -448,6 +449,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     stageScreen.show()
     inputProcessor.show()
     super.show()
+
+    HexagonDataEvents.onTeamChange {
+      island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
+      island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
+    }
 
     if (island.isCurrentTeamAI()) {
       island.beginTurn(inputProcessor)

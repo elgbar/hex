@@ -56,6 +56,16 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
               "( %2d, % 2d) ${islandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
             }
           )
+        ),
+        prefixText("Team percentages ", { islandScreen.island.percentagesHexagons().map { (team, percent) -> "$team ${(percent * 100).toInt()}%" }.sorted() }),
+        StaticScreenText(
+          "Territory ",
+          next =
+          nullCheckedText(
+            callable = islandScreen.island::selected,
+            color = Color.YELLOW,
+            format = { territory -> "Size: ${territory.hexagons.count()} Bordering Enemies ${territory.enemyBorderHexes.size}" }
+          )
         )
       )
     } else {
