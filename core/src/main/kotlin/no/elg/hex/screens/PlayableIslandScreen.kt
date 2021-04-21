@@ -85,7 +85,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     stageScreen.stage.actors {
 
       @Scene2dDsl
-      fun confirmWindow(title: String, text: String, whenConfirmed: KVisWindow.() -> Unit): VisWindow {
+      fun confirmWindow(
+        title: String,
+        text: String,
+        whenDenied: KVisWindow.() -> Unit = {},
+        whenConfirmed: KVisWindow.() -> Unit
+      ): VisWindow {
         return this.visWindow(title) {
           isMovable = false
           isModal = true
@@ -115,7 +120,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
             setButton(
               ButtonBar.ButtonType.NO,
-              scene2d.visTextButton("No") { onClick { this@visWindow.fadeOut() } }
+              scene2d.visTextButton("No") {
+                onClick {
+                  this@visWindow.whenDenied()
+                  this@visWindow.fadeOut()
+                }
+              }
             )
           }
           centerWindow()
@@ -179,7 +189,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         surrender()
       }
 
-      acceptAISurrender = confirmWindow("Accept AI Surrender", "The AI want to surrender, do you accept?") {
+      acceptAISurrender = confirmWindow(
+        "Accept AI Surrender", "The AI wish to surrender, do you accept?",
+        {
+          endTurn(false)
+        }
+      ) {
         island.history.disable()
         island.history.clear()
 
@@ -380,7 +395,27 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     return false
   }
 
-  private fun endTurn() {
+  private fun endTurn(allowAISurrender: Boolean = true) {
+
+    // we only ask for surrender when there is a single player
+    // if there are no players (ai vs ai) we want to watch the whole thing
+    // and if there are more than one player they should decide if they surrender
+    val currentTeam = island.currentTeam
+
+    if (allowAISurrender && island.realPlayers == 1) {
+
+      // surrender rules
+      // either you own more than 75% of all hexagons
+      // or all enemies have less than 12,5% of the hexagons
+      val percentagesHexagons = island.percentagesHexagons()
+      if (percentagesHexagons[currentTeam] ?: 0f >= PERCENT_HEXES_OWNED_TO_WIN ||
+        percentagesHexagons.all { (team, percent) -> team === currentTeam || percent < MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER }
+      ) {
+        acceptAISurrender.show(stageScreen.stage)
+        return
+      }
+    }
+
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
 
       val minCost = Peasant::class.createHandInstance().price
@@ -390,7 +425,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         val data = island.getData(hexagon)
         val piece = data.piece
 
-        if (data.team != island.currentTeam) {
+        if (data.team != currentTeam) {
           // not our team
           continue
         } else if (piece is Capital) {
@@ -473,6 +508,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   companion object {
-    private var distress = true
+    const val PERCENT_HEXES_OWNED_TO_WIN = 0.75f
+    const val MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER = 0.125f
   }
 }
