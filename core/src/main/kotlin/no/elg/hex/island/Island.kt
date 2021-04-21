@@ -397,12 +397,16 @@ class Island(
           return r
         }
       }
-      return -1 // no hexes found we've won!
+      return NO_ENEMY_HEXAGONS // no hexes found we've won!
     }
 
     var greatestDistance = 1
     for (hex in feasibleHexagons) {
       val dist = findDistanceToClosestEnemyHex(hex, 1)
+      if (dist == NO_ENEMY_HEXAGONS) {
+        contenders.addAll(feasibleHexagons)
+        break
+      }
       if (dist > greatestDistance) {
         // we have a new greatest distance
         greatestDistance = dist
@@ -413,7 +417,7 @@ class Island(
       }
     }
 
-    require(contenders.isNotEmpty()) { "No capital contenders found!" }
+    require(contenders.isNotEmpty()) { "No capital contenders found in ${hexagons.map { "@${it.cubeCoordinate.toAxialKey()} | data ${getData(it)}" }}" }
 
     Gdx.app.trace(
       "ISLAND",
@@ -542,6 +546,8 @@ class Island(
     const val MIN_HEX_IN_TERRITORY = 2
 
     const val START_CAPITAL_PER_HEX = 5
+
+    const val NO_ENEMY_HEXAGONS = -1
 
     val STARTING_TEAM get() = Settings.startTeam
 
