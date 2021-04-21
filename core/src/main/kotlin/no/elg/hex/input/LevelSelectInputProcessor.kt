@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.IslandFiles
@@ -47,15 +48,16 @@ object LevelSelectInputProcessor : AbstractInput(true) {
       index == -PREVIEWS_PER_ROW + 1 -> {
         if (Hex.args.mapEditor) {
           Hex.screen = LevelCreationScreen
-          return true
+        } else {
+          return false
         }
-        return false
       }
       index == -1 -> Hex.screen = Hex.tutorialScreen
       index in -PREVIEWS_PER_ROW..-1 -> return false
       index != INVALID_ISLAND_INDEX -> play(index)
       else -> return false
     }
+    Hex.assets.clickSound?.play(Settings.volume)
     return true
   }
 

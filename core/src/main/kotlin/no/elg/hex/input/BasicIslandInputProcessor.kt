@@ -79,6 +79,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     when (keycode) {
       ESCAPE, BACK -> {
         Hex.screen = LevelSelectScreen
+        Hex.assets.clickSound?.play(Settings.volume)
       }
       else -> return false
     }

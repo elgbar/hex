@@ -89,6 +89,7 @@ class Assets : AssetManager() {
 
     const val MARCHING_SOUND = "sounds/marching.mp3"
     const val UNDO_ALL_SOUND = "sounds/undo_all.mp3"
+    const val CLICK_SOUND = "sounds/click.mp3"
 
     const val PIECE_DOWN_SOUND = "sounds/piece_down_%d.mp3"
     private val PIECE_DOWN_SOUND_RANGE = 1..12
@@ -188,6 +189,7 @@ class Assets : AssetManager() {
 
   val marchingSound by lazy<Sound?> { get(MARCHING_SOUND, SOUND) }
   val undoAllSound by lazy<Sound?> { get(UNDO_ALL_SOUND, SOUND) }
+  val clickSound by lazy<Sound?> { get(CLICK_SOUND, SOUND) }
   val pieceDownSound by SoundAlternativeDelegate(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
   val undoSound by SoundAlternativeDelegate(UNDO_SOUND, UNDO_SOUND_RANGE)
   val coinsSound by SoundAlternativeDelegate(COINS_SOUND, COINS_SOUND_RANGE)
@@ -309,6 +311,7 @@ class Assets : AssetManager() {
       loadingInfo = "Sounds"
       load(MARCHING_SOUND, SOUND)
       load(UNDO_ALL_SOUND, SOUND)
+      load(CLICK_SOUND, SOUND)
 
       fun loadSoundVariations(path: String, range: IntRange) {
         for (i in range) {
