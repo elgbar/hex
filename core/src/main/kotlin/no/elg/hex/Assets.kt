@@ -87,7 +87,6 @@ class Assets : AssetManager() {
     const val REGULAR_FONT = "fonts/UbuntuMono-R.ttf"
     const val REGULAR_ITALIC_FONT = "fonts/UbuntuMono-RI.ttf"
 
-    const val MARCHING_SOUND = "sounds/marching.mp3"
     const val UNDO_ALL_SOUND = "sounds/undo_all.mp3"
     const val CLICK_SOUND = "sounds/click.mp3"
 
@@ -102,9 +101,6 @@ class Assets : AssetManager() {
 
     const val EMPTY_COFFERS_SOUND = "sounds/empty_coffers_%d.mp3"
     private val EMPTY_COFFERS_SOUND_RANGE = 1..5
-
-    const val DEATH_SOUND = "sounds/death_%d.mp3"
-    private val DEATH_SOUND_RANGE = 1..4
 
     private const val FONT_SIZE = 20
 
@@ -187,14 +183,13 @@ class Assets : AssetManager() {
   val help by lazy { findSprite("help") }
   val helpDown by lazy { findSprite("help_selected") }
 
-  val marchingSound by lazy<Sound?> { get(MARCHING_SOUND, SOUND) }
   val undoAllSound by lazy<Sound?> { get(UNDO_ALL_SOUND, SOUND) }
   val clickSound by lazy<Sound?> { get(CLICK_SOUND, SOUND) }
+
   val pieceDownSound by SoundAlternativeDelegate(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
   val undoSound by SoundAlternativeDelegate(UNDO_SOUND, UNDO_SOUND_RANGE)
   val coinsSound by SoundAlternativeDelegate(COINS_SOUND, COINS_SOUND_RANGE)
   val emptyCoffersSound by SoundAlternativeDelegate(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
-  val deathSound by SoundAlternativeDelegate(DEATH_SOUND, DEATH_SOUND_RANGE)
 
   fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize) {
     val boldness = if (bold) "B" else "R"
@@ -309,7 +304,6 @@ class Assets : AssetManager() {
     if (!Settings.disableAudio) {
 
       loadingInfo = "Sounds"
-      load(MARCHING_SOUND, SOUND)
       load(UNDO_ALL_SOUND, SOUND)
       load(CLICK_SOUND, SOUND)
 
@@ -323,7 +317,6 @@ class Assets : AssetManager() {
       loadSoundVariations(UNDO_SOUND, UNDO_SOUND_RANGE)
       loadSoundVariations(COINS_SOUND, COINS_SOUND_RANGE)
       loadSoundVariations(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
-      loadSoundVariations(DEATH_SOUND, DEATH_SOUND_RANGE)
     }
     loadingInfo = "islands"
 

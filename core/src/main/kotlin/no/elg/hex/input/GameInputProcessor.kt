@@ -105,15 +105,6 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
     if (hexData.setPiece(newPieceType)) {
 
-      if (hexData.team != territory.team) {
-        when {
-          oldPiece is LivingPiece -> Hex.assets.deathSound?.play(Settings.volume)
-//          oldPiece is Tree -> Hex.assets.chopWood?.play(Settings.volume)
-//          oldPiece is Castle -> Hex.assets.destroyCastleSound?.play(Settings.volume)
-//          oldPiece is Capital -> Hex.assets.destroyCapitalSound?.play(Settings.volume)
-        }
-      }
-
       island.history.remember("Placing piece") {
         hexData.team = territory.team
 
@@ -296,7 +287,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           }
         }
       }
-      Hex.assets.marchingSound?.play(Settings.volume)
+      Hex.assets.pieceDownSound?.play(Settings.volume)
       return true
     }
     return false

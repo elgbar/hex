@@ -2,7 +2,6 @@ package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
-import no.elg.hex.Settings
 import no.elg.hex.island.Island
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.createHandInstance
@@ -397,7 +396,6 @@ sealed class LivingPiece(
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
     island.getData(hex).setPiece(Grave::class)
-    Hex.assets.deathSound?.play(Settings.volume)
   }
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
