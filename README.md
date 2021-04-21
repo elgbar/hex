@@ -68,13 +68,6 @@ Process finished with exit code 0
 ## TODO
 
 * Add minimap
-* Add relative strength bar
-* Let AI surrender when it is clear that the player is winning
-* Sounds
-* Fix grave piece
-    * Graves behaves differently for the AI than the player
-    * It works correctly for players
-    * Does not work for AI (it stays too long)
-* Do not end the current AIs turn when exiting and re-entering a level, as this can be exploited
+* Add relative strength bar (partially done, need to implement it graphically)
+* Sounds (partially done)
 * Allow for scrolling farther down in settings to allow mobile user to see what they type
-* Returning to level select screen is very slow
