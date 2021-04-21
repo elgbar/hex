@@ -55,7 +55,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
     val treasuryText = IfScreenText {
       val selected = screen.island.selected
-      if (selected != null) {
+      if (selected != null && screen.island.isCurrentTeamHuman()) {
         StaticScreenText(
           "Treasury: ",
           next = signColoredText(selected.capital::balance) { "%d".format(it) }
@@ -65,7 +65,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
     val incomeText = IfScreenText {
       val selected = screen.island.selected
-      if (selected != null) StaticScreenText(
+      if (selected != null && screen.island.isCurrentTeamHuman()) StaticScreenText(
         "Estimated income: ",
         next = signColoredText(selected::income) { "%+d".format(it) }
       ) else emptyText()
@@ -95,38 +95,40 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     batch.color = WHITE
     batch.use { batch ->
 
-      fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
-        val height = (Gdx.graphics.height * heightPercent)
-        val width = height * (region.packedWidth / region.packedHeight.toFloat())
-        return width to height
-      }
+      if (screen.island.isCurrentTeamHuman()) {
+        fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
+          val height = (Gdx.graphics.height * heightPercent)
+          val width = height * (region.packedWidth / region.packedHeight.toFloat())
+          return width to height
+        }
 
-      screen.island.hand?.also { (_, piece) ->
-        val region: AtlasRegion =
-          when (piece) {
-            is Capital -> Hex.assets.capital
-            is PalmTree -> Hex.assets.palm
-            is PineTree -> Hex.assets.pine
-            is Castle -> Hex.assets.castle
-            is Grave -> Hex.assets.grave
-            is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
-            is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
-            is Knight -> Hex.assets.knight.getKeyFrame(0f)
-            is Baron -> Hex.assets.baron.getKeyFrame(0f)
-            is Empty -> return@also
-          }
+        screen.island.hand?.also { (_, piece) ->
+          val region: AtlasRegion =
+            when (piece) {
+              is Capital -> Hex.assets.capital
+              is PalmTree -> Hex.assets.palm
+              is PineTree -> Hex.assets.pine
+              is Castle -> Hex.assets.castle
+              is Grave -> Hex.assets.grave
+              is Peasant -> Hex.assets.peasant.getKeyFrame(0f)
+              is Spearman -> Hex.assets.spearman.getKeyFrame(0f)
+              is Knight -> Hex.assets.knight.getKeyFrame(0f)
+              is Baron -> Hex.assets.baron.getKeyFrame(0f)
+              is Empty -> return@also
+            }
 
-        val (width, height) = calcSize(region)
-        val handWidth = height * (Hex.assets.hand.originalWidth / Hex.assets.hand.originalHeight.toFloat())
+          val (width, height) = calcSize(region)
+          val handWidth = height * (Hex.assets.hand.originalWidth / Hex.assets.hand.originalHeight.toFloat())
 
-        batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 4f) / 2f, (height + height / 2) / 2f, handWidth, height)
-        batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
+          batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 4f) / 2f, (height + height / 2) / 2f, handWidth, height)
+          batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
+        }
       }
     }
 
     ScreenRenderer.drawAll(*topCenter, position = TOP_CENTER)
 
-    if (Hex.debug) {
+    if (Hex.debug && screen.island.isCurrentTeamHuman()) {
 
       // due to the dynamic nature of history the array must be created each time
 
@@ -143,13 +145,13 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
         }
       }
       ScreenRenderer.drawAll(*centerRight, position = TOP_RIGHT)
+      //Return them to the pool after use
       for (i in topRight.size until (topRight.size + history.historyNotes.size)) {
         staticTextPool.free(centerRight[i] as StaticScreenText)
       }
     } else {
       ScreenRenderer.drawAll(*topRight, position = TOP_RIGHT)
     }
-    if (screen.island.isCurrentTeamAI()) return
   }
 
   override fun resize(width: Int, height: Int) {
