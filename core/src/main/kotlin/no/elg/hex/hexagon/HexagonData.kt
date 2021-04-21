@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
+import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
 import org.hexworks.mixite.core.api.Hexagon
@@ -19,7 +20,7 @@ import kotlin.reflect.KClass
 @JsonInclude(NON_DEFAULT)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
 @JsonIgnoreProperties("id")
-data class HexagonData(
+class HexagonData(
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works
    * these hexagon would be returned even when the mouse is not inside the hexagon In order to
@@ -31,11 +32,17 @@ data class HexagonData(
    */
   val edge: Boolean = false,
   override var isOpaque: Boolean = edge,
-  override var isPassable: Boolean = !edge
+  override var isPassable: Boolean = !edge,
+  team: Team = if (edge || !Hex.args.mapEditor) Team.SUN else Team.values().random()
 ) : DefaultSatelliteData() {
 
   @JsonInclude(ALWAYS)
-  var team: Team = if (edge) Team.SUN else Team.values().random()
+  var team: Team = team
+    set(value) {
+      if (field === value) return
+      HexagonDataEvents.fireEvent(TeamChangeHexagonDataEvent(this, field, value))
+      field = value
+    }
 
   @JsonIgnore
   var piece: Piece = Empty
@@ -88,14 +95,33 @@ data class HexagonData(
 
   fun copy(): HexagonData {
     if (edge) return this
-    return HexagonData(edge, isOpaque, isPassable).also {
-      it.team = team
+    return HexagonData(edge, isOpaque, isPassable, team).also {
       it.piece = piece.copyTo(it)
     }
   }
 
   override fun toString(): String {
     return "team: $team piece: $piece"
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as HexagonData
+
+    if (edge != other.edge) return false
+    if (team != other.team) return false
+    if (piece != other.piece) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = edge.hashCode()
+    result = 31 * result + team.hashCode()
+    result = 31 * result + piece.hashCode()
+    return result
   }
 
   companion object {

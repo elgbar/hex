@@ -17,6 +17,7 @@ import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
+import no.elg.hex.hexagon.HexagonDataEvents
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
@@ -99,6 +100,7 @@ object Hex : ApplicationAdapter() {
       // clean up any mess the previous screen have made
       inputMultiplexer.clear()
       Gdx.input.setOnscreenKeyboardVisible(false)
+      HexagonDataEvents.clear()
 
       Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
       value.show()
