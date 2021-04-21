@@ -26,7 +26,7 @@ import java.lang.Float.max
 /** @author Elg */
 object LevelSelectInputProcessor : AbstractInput(true) {
 
-  private const val SCROLL_SPEED = 1f
+  private const val SCROLL_SPEED = 50f
   private const val INVALID_ISLAND_INDEX = Int.MIN_VALUE
 
   private fun getHoveringIslandIndex(): Int {
@@ -68,16 +68,24 @@ object LevelSelectInputProcessor : AbstractInput(true) {
     return true
   }
 
-  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    val delta = -Gdx.input.getDeltaY(0).toFloat()
+  private fun scroll(delta: Float) {
     val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = camera.position.y
-    val min = screenHeight / 2f
-    val maximum = max(min, y + height - screenHeight / 2f + LevelSelectScreen.padding)
+    val minimum = screenHeight / 2f
+    val maximum = max(minimum, y + height - screenHeight / 2f + LevelSelectScreen.padding)
 
-    camera.position.y = (oldY + delta * SCROLL_SPEED).coerceIn(min..maximum)
+    camera.position.y = (oldY + delta).coerceIn(minimum..maximum)
     LevelSelectScreen.updateCamera()
+  }
+
+  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+    scroll(-Gdx.input.getDeltaY(0).toFloat())
+    return true
+  }
+
+  override fun scrolled(amountX: Float, amountY: Float): Boolean {
+    scroll(amountY * SCROLL_SPEED)
     return true
   }
 
