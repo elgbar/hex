@@ -76,4 +76,5 @@ Process finished with exit code 0
     * It works correctly for players
     * Does not work for AI (it stays too long)
 * Do not end the current AIs turn when exiting and re-entering a level, as this can be exploited
-* Allow for scrolling farther down in setttings to allow mobile user to see what they type 
+* Allow for scrolling farther down in settings to allow mobile user to see what they type
+* Returning to level select screen is very slow

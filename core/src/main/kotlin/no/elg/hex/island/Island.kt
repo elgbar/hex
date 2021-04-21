@@ -132,7 +132,6 @@ class Island(
       ensureCapitalStartFunds()
       for (hexagon in hexagons) {
         when (val hexPiece = this.getData(hexagon).piece) {
-          is LivingPiece -> hexPiece.moved = false
           is TreePiece -> hexPiece.hasGrown = false
         }
       }
