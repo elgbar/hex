@@ -23,6 +23,7 @@ import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.jackson.serialization.HexagonDataDeserializerModifier
 import no.elg.hex.screens.AbstractScreen
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.SplashScreen
 import no.elg.hex.screens.TutorialScreen
@@ -167,6 +168,7 @@ object Hex : ApplicationAdapter() {
     assets.loadAssets()
 
     settingsScreen = SettingsScreen()
+    LevelSelectScreen.renderPreviews()
 
     // must be last
     assets.finishMain()
@@ -184,6 +186,7 @@ object Hex : ApplicationAdapter() {
     settingsScreen.dispose()
     internalTutorialScreen?.dispose()
     internalTutorialScreen = null
+    LevelSelectScreen.disposePreviews()
   }
 
   override fun resize(width: Int, height: Int) {

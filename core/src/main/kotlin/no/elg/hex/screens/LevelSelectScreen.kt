@@ -35,6 +35,8 @@ import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
+import no.elg.hex.util.trace
+import kotlin.system.measureTimeMillis
 
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
@@ -141,37 +143,40 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   fun renderPreviews() {
-    if (IslandFiles.islandIds.size == 0) {
-      if (!Hex.args.`disable-island-loading`) {
-        publishWarning("Failed to find any islands to load")
+    val renderTime = measureTimeMillis {
+      if (IslandFiles.islandIds.size == 0) {
+        if (!Hex.args.`disable-island-loading`) {
+          publishWarning("Failed to find any islands to load")
+        }
+        return
       }
-      return
-    }
-    disposePreviews()
+      disposePreviews()
 
-    for (slot in IslandFiles.islandIds) {
-      val islandPreviewFile = getIslandFile(slot, true)
-      if (Hex.args.`force-update-previews`) {
-        updateSelectPreview(slot, true)
-        continue
-      }
-
-      val progress = getProgress(slot, true)
-      when {
-        progress != null ->
-          try {
-            islandPreviews.add(null to decodeStringToTexture(progress))
-          } catch (e: Exception) {
-            publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
-            updateSelectPreview(slot, false)
-          }
-        islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
-        else -> {
-          publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
+      for (slot in IslandFiles.islandIds) {
+        val islandPreviewFile = getIslandFile(slot, true)
+        if (Hex.args.`force-update-previews`) {
           updateSelectPreview(slot, true)
+          continue
+        }
+
+        val progress = getProgress(slot, true)
+        when {
+          progress != null ->
+            try {
+              islandPreviews.add(null to decodeStringToTexture(progress))
+            } catch (e: Exception) {
+              publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
+              updateSelectPreview(slot, false)
+            }
+          islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
+          else -> {
+            publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
+            updateSelectPreview(slot, true)
+          }
         }
       }
     }
+    Gdx.app.trace("TIME") { "It took $renderTime ms to render all island previews" }
   }
 
   fun updateSelectPreview(slot: Int, save: Boolean, modifier: PreviewModifier = NOTHING, island: Island? = null) {
@@ -279,13 +284,10 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   override fun show() {
-    renderPreviews()
     LevelSelectInputProcessor.show()
   }
 
-  override fun hide() {
-    disposePreviews()
-  }
+  override fun hide() = Unit
 
   override fun dispose() {
     super.dispose()
