@@ -50,6 +50,7 @@ object Settings {
     Team.LEAF,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
+    hideLevel = LOG_DEBUG,
     priority = 91,
     onChange = { _, _, new ->
       gotoLevelSelect()
