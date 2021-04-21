@@ -30,10 +30,17 @@ object LevelSelectInputProcessor : AbstractInput(true) {
   private const val INVALID_ISLAND_INDEX = Int.MIN_VALUE
 
   private fun getHoveringIslandIndex(): Int {
-    for ((index, i) in IslandFiles.islandIds.withIndex()) {
-      val (x, y, width, height) = LevelSelectScreen.rect(index)
+    for (i in 0..PREVIEWS_PER_ROW) {
+      val (x, y, width, height) = LevelSelectScreen.rect(i)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i - PREVIEWS_PER_ROW
+      }
+    }
+
+    for ((index, i) in IslandFiles.islandIds.withIndex()) {
+      val (x, y, width, height) = LevelSelectScreen.rect(index + PREVIEWS_PER_ROW)
+      if (mouseX in x..x + width && mouseY in y..y + height) {
+        return i
       }
     }
     return INVALID_ISLAND_INDEX
