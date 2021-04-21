@@ -59,9 +59,10 @@ class Island(
   @JsonAlias("piece")
   handPiece: Piece? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
+  turn: Int = 1,
+  initialLoad: Boolean = true
 ) {
-
-  var turn = 1
+  var turn = turn
     private set
   lateinit var grid: HexagonalGrid<HexagonData>
     private set
@@ -159,7 +160,7 @@ class Island(
   private val initialState: IslandDto
 
   init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, true)
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad)
     history.clear()
     initialState = createDto().copy()
   }
@@ -581,7 +582,9 @@ class Island(
       grid.gridData.gridLayout.toEnumValue(),
       coord,
       hand?.piece?.createDtoCopy(),
-      hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap()
+      hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
+      turn,
+      false
     )
   }
 
@@ -592,6 +595,8 @@ class Island(
     val selectedCoordinate: CubeCoordinate? = null,
     val handPiece: Piece? = null,
     val hexagonData: Map<CubeCoordinate, HexagonData>,
+    val turn: Int,
+    val initialLoad: Boolean
   ) {
     fun copy(): IslandDto {
       return IslandDto(
@@ -600,7 +605,9 @@ class Island(
         layout,
         selectedCoordinate,
         handPiece?.createDtoCopy(),
-        hexagonData.mapValues { (_, data) -> data.copy() }
+        hexagonData.mapValues { (_, data) -> data.copy() },
+        turn,
+        false
       )
     }
 
