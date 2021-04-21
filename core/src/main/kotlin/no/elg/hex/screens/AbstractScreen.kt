@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import no.elg.hex.Hex
+import kotlin.reflect.jvm.jvmName
 
 /** @author Elg */
 abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
@@ -59,10 +60,16 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
     try {
       dispose()
     } catch (e: Exception) {
+      Gdx.app.error("DISPOSE WARN", "Exception thrown when disposing ${this::class.simpleName}: ${e::class.jvmName}: ${e.message}")
+      e.printStackTrace()
     }
   }
 
   override fun dispose() {
+    if (isDisposed) {
+      Gdx.app.error("DISPOSE WARN", "The screen ${this::class.simpleName} is already disposed")
+      return
+    }
     batch.dispose()
     lineRenderer.dispose()
     isDisposed = true
