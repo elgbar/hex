@@ -168,12 +168,13 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     if (screen.island.isCurrentTeamAI()) return false
 
     when (keycode) {
-      BACKSPACE, SPACE -> {
-        if (screen.island.hand != null) {
-          screen.island.hand = null
-        } else {
-          screen.island.select(null)
+      BACKSPACE, SPACE, ESCAPE -> {
+        when {
+          screen.island.hand != null -> screen.island.hand = null
+          keycode != ESCAPE && screen.island.selected != null -> screen.island.select(null)
+          else -> return false
         }
+      }
       F12 -> if (Hex.debug) cheating = !cheating
       F11 -> if (cheating) screen.acceptAISurrender.toggleShown(screen.stage)
       F10 -> if (cheating) screen.island.selected?.hexagons?.forEach {
