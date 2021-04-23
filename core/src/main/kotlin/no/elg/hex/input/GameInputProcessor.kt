@@ -40,7 +40,8 @@ import kotlin.reflect.full.isSubclassOf
 /** @author Elg */
 class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true) {
 
-  var infiniteMoney = Hex.args.cheating
+  var cheating = Hex.args.cheating
+    private set
 
   private fun pickUp(island: Island, hexData: HexagonData, territory: Territory): Boolean {
     val cursorPiece = hexData.piece
@@ -173,9 +174,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         } else {
           screen.island.select(null)
         }
+      F12 -> if (Hex.debug) cheating = !cheating
+      F11 -> if (cheating) screen.acceptAISurrender.toggleShown(screen.stage)
       }
-      F12 -> if (Hex.debug) infiniteMoney = !infiniteMoney
-      F11 -> if (Hex.debug) screen.acceptAISurrender.toggleShown(screen.stage)
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
 
@@ -201,7 +202,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         return@also
       }
 
-      if (!infiniteMoney || screen.island.isCurrentTeamAI()) {
+      if (!cheating || screen.island.isCurrentTeamAI()) {
         if (!territory.capital.canBuy(piece)) {
           return@also
         }
