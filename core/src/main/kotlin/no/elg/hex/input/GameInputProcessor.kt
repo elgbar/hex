@@ -176,6 +176,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         }
       F12 -> if (Hex.debug) cheating = !cheating
       F11 -> if (cheating) screen.acceptAISurrender.toggleShown(screen.stage)
+      F10 -> if (cheating) screen.island.selected?.hexagons?.forEach {
+        val piece = screen.island.getData(it).piece
+        (piece as? LivingPiece)?.moved = false
       }
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
