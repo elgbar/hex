@@ -201,7 +201,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         return@also
       }
 
-      if (!infiniteMoney) {
+      if (!infiniteMoney || screen.island.isCurrentTeamAI()) {
         if (!territory.capital.canBuy(piece)) {
           return@also
         }
