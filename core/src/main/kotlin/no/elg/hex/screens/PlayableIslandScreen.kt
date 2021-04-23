@@ -290,7 +290,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Buy Peasant",
               up = Hex.assets.peasant.getKeyFrame(0f),
-              disableCheck = { territory -> (territory?.capital?.balance ?: -1) < PEASANT_PRICE || disableInteract(territory) },
+              disableCheck = { territory -> (!inputProcessor.cheating && (territory?.capital?.balance ?: -1) < PEASANT_PRICE) || disableInteract(territory) },
               keyShortcut = intArrayOf(Keys.NUM_1)
             ) {
               inputProcessor.buyUnit(Peasant::class.createHandInstance())
@@ -299,7 +299,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Buy Castle",
               up = Hex.assets.castle,
-              disableCheck = { territory -> (territory?.capital?.balance ?: -1) < CASTLE_PRICE || disableInteract(territory) },
+              disableCheck = { territory -> (!inputProcessor.cheating && (territory?.capital?.balance ?: -1) < CASTLE_PRICE) || disableInteract(territory) },
               keyShortcut = intArrayOf(Keys.NUM_2)
             ) {
               inputProcessor.buyUnit(Castle::class.createHandInstance())
@@ -398,11 +398,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
     island.select(null)
 
-    // we only ask for surrender when there is a single player
-    // if there are no players (ai vs ai) we want to watch the whole thing
-    // and if there are more than one player they should decide if they surrender
     val currentTeam = island.currentTeam
 
+    // we only ask for AI surrender when there is a single player
+    // if there are no players (ai vs ai) we want to watch the whole thing
+    // and if there are more than one player they should decide if they surrender
     if (allowAISurrender && island.realPlayers == 1) {
 
       // surrender rules
