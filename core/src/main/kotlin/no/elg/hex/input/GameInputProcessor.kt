@@ -3,6 +3,8 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.BACKSPACE
+import com.badlogic.gdx.Input.Keys.ESCAPE
+import com.badlogic.gdx.Input.Keys.F10
 import com.badlogic.gdx.Input.Keys.F11
 import com.badlogic.gdx.Input.Keys.F12
 import com.badlogic.gdx.Input.Keys.SPACE
@@ -50,13 +52,14 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       !cursorPiece.moved &&
       hexData.team == island.currentTeam
     ) {
+      var pieceChanged = false
       // We currently don't hold anything in our hand, so pick it up!
       island.history.remember("Pickup piece") {
         island.hand = Hand(territory, cursorPiece)
-        hexData.setPiece(Empty::class)
+        pieceChanged = hexData.setPiece(Empty::class)
       }
       Gdx.app.trace("PLACE", "Hand was null, now it is ${island.hand}")
-      return true
+      return pieceChanged
     }
     return false
   }
@@ -80,7 +83,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       hexData.team == territory.team
     ) {
       // merge cursor piece with held piece
-      if (newPiece.canNotMerge(oldPiece)) return true
+      if (newPiece.canNotMerge(oldPiece)) {
+        return false
+      }
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
       strengthToType(newPiece.strength + oldPiece.strength) to (newPiece.moved || oldPiece.moved)
     } else {
@@ -90,15 +95,15 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     if (newPieceType.isSubclassOf(LivingPiece::class)) {
       if (hexData.team == territory.team && (oldPiece is Capital || oldPiece is Castle)) {
         Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
-        return true
+        return false
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
         Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
-        return true
+        return false
       }
     } else if (Castle::class == newPieceType) {
       if (hexData.team != territory.team) {
         Gdx.app.debug("PLACE", "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
-        return true
+        return false
       }
     } else if (Castle::class != newPieceType) {
       throw IllegalStateException("Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
