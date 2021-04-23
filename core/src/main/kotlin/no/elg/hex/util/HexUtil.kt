@@ -17,7 +17,6 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
-import java.util.HashSet
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -76,6 +75,17 @@ private fun connectedHexagons(
     connectedHexagons(neighbor, team, visited, island)
   }
   return visited
+}
+
+fun Island.isPartOfTerritory(hexagon: Hexagon<HexagonData>): Boolean {
+  val team = getData(hexagon).team
+  for (neighbor in getNeighbors(hexagon)) {
+    val data = getData(neighbor)
+    if (data.team == team) {
+      return true
+    }
+  }
+  return false
 }
 
 /** Get all neighbors of the given [hexagon], not including [hexagon] */
