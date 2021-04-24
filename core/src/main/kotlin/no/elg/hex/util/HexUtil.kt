@@ -161,10 +161,13 @@ inline fun <reified T : Piece> Island.forEachPieceType(
 
 fun Iterable<Hexagon<HexagonData>>.withData(
   island: Island,
+  ignoreInvisible: Boolean = true,
   action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit
 ) {
   for (hexagon in this) {
-    action(hexagon, island.getData(hexagon))
+    val data = island.getData(hexagon)
+    if (ignoreInvisible && data.invisible) continue
+    action(hexagon, data)
   }
 }
 
