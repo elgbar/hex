@@ -42,10 +42,7 @@ class IslandHistory(val island: Island) {
    * Record the events within the [event] scope as a single event. Will call [remember] after [event]
    */
   fun remember(note: String, event: () -> Unit) {
-    val wasRemembering = rememberEnabled
-    rememberEnabled = false
-    event()
-    rememberEnabled = wasRemembering // only re-enable if it was enabled before
+    ignore(event)
     remember(note)
   }
 
@@ -61,6 +58,16 @@ class IslandHistory(val island: Island) {
       history.addFirst(island.createDto())
       historyNotes.addFirst(note)
     }
+  }
+
+  /**
+   * Ignore anything that happens within [event]
+   */
+  fun ignore(event: () -> Unit) {
+    val wasRemembering = rememberEnabled
+    rememberEnabled = false
+    event()
+    rememberEnabled = wasRemembering // only re-enable if it was enabled before
   }
 
   fun canUndo(): Boolean = (historyPointer + 1) in history.indices
