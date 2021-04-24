@@ -181,6 +181,22 @@ fun Island.getTerritories(team: Team): Collection<Territory> {
   return territories
 }
 
+fun Island.getAllTerritories(): HashMap<Team, Collection<Territory>> {
+
+  val visitedHexagons = HashSet<Hexagon<HexagonData>>()
+  val territories = HashMap<Team, Collection<Territory>>()
+
+  hexagons.withData(this) { hexagon, data ->
+    if (hexagon in visitedHexagons) return@withData
+
+    val set: MutableSet<Territory> = territories.computeIfAbsent(data.team) { HashSet() } as MutableSet<Territory>
+
+    findTerritory(hexagon)?.also { set.add(it) }
+  }
+
+  return territories
+}
+
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Taken from https://github.com/Hexworks/mixite/pull/56 TODO remove when this is in the library
 //                 //
