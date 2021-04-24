@@ -36,6 +36,7 @@ import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.ensureCapitalStartFunds
+import no.elg.hex.util.getAllTerritories
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -44,6 +45,7 @@ import no.elg.hex.util.next
 import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
+import no.elg.hex.util.withData
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
@@ -142,6 +144,10 @@ class Island(
       countHexagons(hexagonsPerTeam)
     }
 
+    if (::totalIncomePerTeam.isLazyInitialized) {
+      countTotalIncome(totalIncomePerTeam)
+    }
+
     if (initialLoad) {
       ensureCapitalStartFunds()
       for (hexagon in hexagons) {
@@ -173,6 +179,8 @@ class Island(
   }
 
   val hexagonsPerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countHexagons(this) } }
+
+  val totalIncomePerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countTotalIncome(this) } }
 
   private val initialState: IslandDto
 
@@ -212,18 +220,27 @@ class Island(
     initialState = createDto().copy()
   }
 
-  fun isCurrentTeamAI() = currentAI != null
-  fun isCurrentTeamHuman() = currentAI == null
+  inline fun isCurrentTeamAI() = currentAI != null
+  inline fun isCurrentTeamHuman() = currentAI == null
 
   // ////////////
   // Gameplay //
   // ////////////
 
+  internal fun recountTotalIncome() {
+    countTotalIncome(totalIncomePerTeam)
+  }
+
+  private fun countTotalIncome(counter: ObjectIntMap<Team>) {
+    counter.clear(Team.values().size)
+    for ((team, territory) in getAllTerritories()) {
+      counter.getAndIncrement(team, 0, territory.sumBy { it.income })
+    }
+  }
+
   private fun countHexagons(counter: ObjectIntMap<Team>) {
     counter.clear(Team.values().size)
-    for (hexagon in hexagons) {
-      val data = getData(hexagon)
-      if (data.invisible) continue
+    hexagons.withData(this) { _, data ->
       counter.getAndIncrement(data.team, 0, 1)
     }
   }

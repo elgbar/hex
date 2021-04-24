@@ -2,6 +2,8 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import ktx.collections.component1
+import ktx.collections.component2
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
@@ -58,6 +60,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
           )
         ),
         prefixText("Team percentages ", { islandScreen.island.percentagesHexagons().map { (team, percent) -> "$team ${(percent * 100).toInt()}%" }.sorted() }),
+        prefixText("Team income ", { islandScreen.island.totalIncomePerTeam.map { (team, income) -> "$team: $income" }.sorted() }),
         StaticScreenText(
           "Territory ",
           next =
