@@ -172,10 +172,8 @@ fun Island.getTerritories(team: Team): Collection<Territory> {
   val territories = HashSet<Territory>()
   hexagons.withData(this) { hexagon, data ->
     if (data.team == team) {
-      select(hexagon)
-      selected?.also { territories.add(it) }
+      findTerritory(hexagon)?.also { territories.add(it) }
     }
-    select(null)
   }
   return territories
 }
