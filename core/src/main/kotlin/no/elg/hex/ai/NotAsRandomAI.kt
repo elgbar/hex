@@ -161,7 +161,14 @@ class NotAsRandomAI(override val team: Team) : AI {
               return null
             }
 
-            tryAttack(Capital::class)
+            val connectingHex = attackableHexes.firstOrNull {
+              territory.island.getNeighbors(it).filter { fit ->
+                fit !in territory.hexagons
+              }.any { ait -> territory.island.getData(ait).team == territory.team }
+            }
+            think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.cubeCoordinate})" }
+
+            connectingHex ?: tryAttack(Capital::class)
               ?: tryAttack(Castle::class)
               ?: tryAttack(LivingPiece::class)
               ?: attackableHexes.randomOrNull() ?: return
