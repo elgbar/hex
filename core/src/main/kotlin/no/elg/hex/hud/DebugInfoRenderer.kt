@@ -62,9 +62,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
           )
         ),
         prefixText("Team hexagons    ", ::teamHexagons),
-//        prefixText("Team balance     ", { islandScreen.island.totalBalancePerTeam.map { (team, balance) -> "$team ${"%3d".format(balance)}" }.sorted() }),
-//        prefixText("Team income      ", { islandScreen.island.totalIncomePerTeam.map { (team, income) -> "$team ${"%3d".format(income)}" }.sorted() }),
-        prefixText("Team percentages ", ::percent),
+        prefixText("Team percentages ", ::teamPercent),
         StaticScreenText(
           "Territory ",
           next =
@@ -86,15 +84,22 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     drawAll(*lines)
   }
 
-  private val percent: MutableList<String> = mutableListOf()
+  private val teamPercent: MutableList<String> = mutableListOf()
   private val teamHexagons: MutableList<String> = mutableListOf()
 
   init {
-    SimpleEventListener.create<TeamChangeHexagonDataEvent> {
-      percent.clear()
+
+    fun updatePercentages() {
+      teamPercent.clear()
       teamHexagons.clear()
-      islandScreen.island.percentagesHexagons().mapTo(percent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
+      islandScreen.island.percentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
       islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
     }
+
+    SimpleEventListener.create<TeamChangeHexagonDataEvent> {
+      updatePercentages()
+    }
+
+    updatePercentages()
   }
 }
