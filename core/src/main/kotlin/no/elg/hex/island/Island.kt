@@ -267,6 +267,9 @@ class Island(
       Gdx.app.debug("TURN", "Starting turn of $currentTeam")
 
       for (hexagon in hexagons) {
+        if (gameInputProcessor.screen.checkEndedGame()) {
+          return@launch
+        }
         val data = this@Island.getData(hexagon)
         if (data.team != currentTeam || data.invisible) continue
         data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
