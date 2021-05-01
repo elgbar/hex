@@ -1,4 +1,4 @@
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_11
 
 project.ext.mainClassName = "no.elg.hex.desktop.AndroidLauncher"
 project.ext.assetsDir = new File("../core/src/main/resources")
