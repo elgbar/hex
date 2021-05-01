@@ -14,6 +14,7 @@ import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
 import ktx.actors.onClick
+import ktx.assets.disposeSafely
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -61,6 +62,7 @@ import no.elg.hex.util.show
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
+  private lateinit var listener: SimpleEventListener<TeamChangeHexagonDataEvent>
   private val stageScreen = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
 
@@ -497,7 +499,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     inputProcessor.show()
     super.show()
 
-    SimpleEventListener.create<TeamChangeHexagonDataEvent> {
+    listener = SimpleEventListener.create<TeamChangeHexagonDataEvent> {
       island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
       island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
     }
@@ -517,6 +519,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
     LevelSelectScreen.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
+    listener.disposeSafely()
   }
 
   companion object {
