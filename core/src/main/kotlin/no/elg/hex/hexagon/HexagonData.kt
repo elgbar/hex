@@ -40,8 +40,10 @@ class HexagonData(
   var team: Team = team
     set(value) {
       if (field === value) return
-      HexagonDataEvents.fireEvent(TeamChangeHexagonDataEvent(this, field, value))
+
+      val old = field
       field = value
+      HexagonDataEvents.fireEvent(TeamChangeHexagonDataEvent(this, old, value))
     }
 
   @JsonIgnore
