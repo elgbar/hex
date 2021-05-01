@@ -78,7 +78,7 @@ class Island(
   val hexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
 
   /**
-   * NUmber of visible hexagons on this island. Should not be used while in map editor mode as it is only counted once
+   * Number of visible hexagons on this island. Should not be used while in map editor mode as it is only counted once
    */
   private val visibleHexagons by lazy { hexagons.count { !getData(it).invisible } }
 
@@ -144,9 +144,7 @@ class Island(
       countHexagons(hexagonsPerTeam)
     }
 
-    if (::totalIncomePerTeam.isLazyInitialized) {
-      countTotalIncome(totalIncomePerTeam)
-    }
+    recountTotalTreasury()
 
     if (initialLoad) {
       ensureCapitalStartFunds()
@@ -180,7 +178,18 @@ class Island(
 
   val hexagonsPerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countHexagons(this) } }
 
-  val totalIncomePerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countTotalIncome(this) } }
+  val totalBalancePerTeam: ObjectIntMap<Team> = ObjectIntMap<Team>(Team.values().size)
+    get() {
+      synchronized(SYNC) {
+        return field
+      }
+    }
+  val totalIncomePerTeam: ObjectIntMap<Team> = ObjectIntMap<Team>(Team.values().size)
+    get() {
+      synchronized(SYNC) {
+        return field
+      }
+    }
 
   private val initialState: IslandDto
 
@@ -223,18 +232,21 @@ class Island(
   inline fun isCurrentTeamAI() = currentAI != null
   inline fun isCurrentTeamHuman() = currentAI == null
 
-  // ////////////
-  // Gameplay //
-  // ////////////
+  // ////////// //
+  //  Gameplay  //
+  // ////////// //
 
-  internal fun recountTotalIncome() {
-    countTotalIncome(totalIncomePerTeam)
-  }
-
-  private fun countTotalIncome(counter: ObjectIntMap<Team>) {
-    counter.clear(Team.values().size)
-    for ((team, territory) in getAllTerritories()) {
-      counter.getAndIncrement(team, 0, territory.sumBy { it.income })
+  /**
+   * SLOW!
+   */
+  internal fun recountTotalTreasury() {
+    synchronized(SYNC) {
+      totalIncomePerTeam.clear(Team.values().size)
+      totalBalancePerTeam.clear(Team.values().size)
+      for ((team, territory) in getAllTerritories()) {
+        totalIncomePerTeam.getAndIncrement(team, 0, territory.sumBy { it.income })
+        totalBalancePerTeam.getAndIncrement(team, 0, territory.sumBy { it.capital.balance })
+      }
     }
   }
 
@@ -246,14 +258,11 @@ class Island(
   }
 
   fun percentagesHexagons(): EnumMap<Team, Float> {
-    val raw = hexagonsPerTeam
-    val total = visibleHexagons.toFloat()
-    val map = EnumMap<Team, Float>(Team::class.java)
-    for (team in Team.values()) {
-      val teamRaw = raw.get(team, 0)
-      map[team] = teamRaw / total
+    val hexes = hexagonsPerTeam
+    val totalHexagons = visibleHexagons.toFloat()
+    return Team.values().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {
+      hexes.get(it, 0) / totalHexagons
     }
-    return map
   }
 
   fun endTurn(gameInputProcessor: GameInputProcessor) {
@@ -364,18 +373,7 @@ class Island(
    * @return The territory the hexagon is part of or `null` if no capital can be found
    */
   fun findTerritory(hexagon: Hexagon<HexagonData>): Territory? {
-    val territoryHexes = getTerritoryHexagons(hexagon)
-    if (territoryHexes == null) {
-      // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
-      // then replace the capital with a tree
-      val data = getData(hexagon)
-      if (data.piece is Capital) {
-        data.setPiece(treeType(hexagon))
-      }
-      return null
-    }
-    val team = this.getData(territoryHexes.first()).team
-    require(territoryHexes.all { this.getData(it).team == team }) { "Wrong team!" }
+    val territoryHexes = getTerritoryHexagons(hexagon) ?: return null
 
     val capital = findCapital(territoryHexes)
     return if (capital != null) Territory(this, capital, territoryHexes) else null
@@ -398,7 +396,10 @@ class Island(
       // No capital found, generate a new capital
       val capHexData = this.getData(calculateBestCapitalPlacement(territoryHexes))
       return if (capHexData.setPiece(Capital::class)) capHexData.piece as Capital else null
-    } else if (capitals.size == 1) return this.getData(capitals.first()).piece as Capital
+    } else if (capitals.size == 1) {
+      return this.getData(capitals.first()).piece as Capital
+    }
+    // No capital found, generate a new capital
 
     // there might be multiple capitals in the set of hexagons. Find the best one, transfer all
     // assets and delete the others
@@ -407,9 +408,12 @@ class Island(
     val bestData = this.getData(bestCapitalHex).piece as Capital
     for (capital in capitals) {
       if (capital === bestCapitalHex) continue
-
       val data = this.getData(capital)
-      val otherCapital = data.piece as Capital
+      val otherCapital = data.piece
+      if (otherCapital !is Capital) {
+        Gdx.app.log("FIND CAPITAL", "A piece which was a capital is no longer a capital, but a ${otherCapital::class.simpleName} piece. Data: $data")
+        continue
+      }
       otherCapital.transfer(bestData)
       data.setPiece(Empty::class)
     }
@@ -417,12 +421,20 @@ class Island(
   }
 
   /**
-   * Get all hexagons that is in tha same territory as the given [this@getTerritoryHexagons]. or
-   * null if hexagon is not a part of a territory
+   * Get all hexagons that is in the same territory as the given [hexagon] or
+   * `null` if hexagon is not a part of a territory
    */
   fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
     val territoryHexes = connectedHexagons(hexagon)
-    if (territoryHexes.size < MIN_HEX_IN_TERRITORY) return null
+    if (territoryHexes.size < MIN_HEX_IN_TERRITORY) {
+      // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
+      // then replace the capital with a tree
+      val data = getData(hexagon)
+      if (data.piece is Capital) {
+        data.setPiece(treeType(hexagon))
+      }
+      return null
+    }
     return territoryHexes
   }
 
@@ -619,6 +631,8 @@ class Island(
     const val START_CAPITAL_PER_HEX = 5
 
     const val NO_ENEMY_HEXAGONS = -1
+
+    private val SYNC = Any()
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)

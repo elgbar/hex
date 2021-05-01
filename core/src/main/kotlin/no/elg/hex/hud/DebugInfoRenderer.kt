@@ -7,6 +7,8 @@ import ktx.collections.component2
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
+import no.elg.hex.hexagon.SimpleEventListener
+import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
 import no.elg.hex.hud.ScreenRenderer.drawAll
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
@@ -59,8 +61,10 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
             }
           )
         ),
-        prefixText("Team percentages ", { islandScreen.island.percentagesHexagons().map { (team, percent) -> "$team ${(percent * 100).toInt()}%" }.sorted() }),
-        prefixText("Team income ", { islandScreen.island.totalIncomePerTeam.map { (team, income) -> "$team: $income" }.sorted() }),
+        prefixText("Team hexagons    ", ::teamHexagons),
+//        prefixText("Team balance     ", { islandScreen.island.totalBalancePerTeam.map { (team, balance) -> "$team ${"%3d".format(balance)}" }.sorted() }),
+//        prefixText("Team income      ", { islandScreen.island.totalIncomePerTeam.map { (team, income) -> "$team ${"%3d".format(income)}" }.sorted() }),
+        prefixText("Team percentages ", ::percent),
         StaticScreenText(
           "Territory ",
           next =
@@ -80,5 +84,17 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     if (!Hex.debug && !Settings.showFps) return
 
     drawAll(*lines)
+  }
+
+  private val percent: MutableList<String> = mutableListOf()
+  private val teamHexagons: MutableList<String> = mutableListOf()
+
+  init {
+    SimpleEventListener.create<TeamChangeHexagonDataEvent> {
+      percent.clear()
+      teamHexagons.clear()
+      islandScreen.island.percentagesHexagons().mapTo(percent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
+      islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
+    }
   }
 }

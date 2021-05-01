@@ -53,7 +53,7 @@ fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.g
 }
 
 /**
- * @param team The team to test, if null all teams are cheked
+ * @param team The team to test, if null all teams are checked
  */
 private fun connectedHexagons(
   center: Hexagon<HexagonData>,
@@ -63,7 +63,7 @@ private fun connectedHexagons(
 ): Set<Hexagon<HexagonData>> {
   val data = island.getData(center)
   // only check a hexagon if they have the same color and haven't been visited
-  if (visited.contains(center) || (team != null && data.team != team) || data.invisible) {
+  if (center in visited || (team != null && data.team != team) || data.invisible) {
     return visited
   }
 

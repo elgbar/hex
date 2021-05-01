@@ -38,37 +38,39 @@ data class Territory(
 
   val team: Team
 
-  fun findCapitalCoordinates(): CubeCoordinate {
-    for (hexagon in hexagons) {
-      for (it in hexagons) {
-        val data = island.getData(it)
-        if (data.piece === capital) {
-          return it.cubeCoordinate
-        }
-      }
-    }
-    error("Failed to find capital hexagon")
-  }
+  val capitalCoordinates: CubeCoordinate
 
   init {
     require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "Too few hexagons in territory must be at least $MIN_HEX_IN_TERRITORY" }
 
-    var foundCapital = false
+    var someCapitalCoordinates: CubeCoordinate? = null
+    var foundCapital = 0
     team = island.getData(hexagons.first()).team
+
     for (hexagon in hexagons) {
-      for (it in hexagons) {
-        val data = island.getData(it)
-        if (data.piece === capital) foundCapital = true
-        require(data.team == team) {
-          "Found a hex that does not have the same team as the rest of the hexagons. " +
-            "Expected every team to be on team $team but hex at ${it.cubeCoordinate} is on team ${data.team}"
-        }
+      val data = island.getData(hexagon)
+      if (data.piece === capital) {
+        someCapitalCoordinates = hexagon.cubeCoordinate
+        foundCapital += 1
+      }
+      require(data.team == team) {
+        "Found a hex that does not have the same team as the rest of the hexagons. " +
+          "Expected every team to be on team $team but hex at ${hexagon.cubeCoordinate} is on team ${data.team}"
       }
     }
-    require(foundCapital) { "Failed to find the capital among the hexagons in the given hexagons" }
+
+    require(foundCapital == 1) {
+      if (foundCapital < 1) {
+        "Failed to find the capital among the hexagons in the given hexagons"
+      } else {
+        "Found $foundCapital capitals! There can only be one capital in a territory"
+      }
+    }
+    requireNotNull(someCapitalCoordinates)
+    capitalCoordinates = someCapitalCoordinates
   }
 
   override fun toString(): String {
-    return "Territory of team ${capital.data.team}@${findCapitalCoordinates().let { it.gridX to it.gridZ }}"
+    return "Territory of team ${capital.data.team}@${capitalCoordinates.let { "(${it.gridX}, ${it.gridZ})" }}"
   }
 }
