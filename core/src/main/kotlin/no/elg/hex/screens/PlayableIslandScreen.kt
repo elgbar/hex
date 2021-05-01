@@ -34,10 +34,11 @@ import no.elg.hex.hexagon.CASTLE_PRICE
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
-import no.elg.hex.hexagon.HexagonDataEvents
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.PEASANT_PRICE
 import no.elg.hex.hexagon.Peasant
+import no.elg.hex.hexagon.SimpleEventListener
+import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
@@ -287,10 +288,14 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             it.expandX()
             it.left()
 
+            fun buyDisable(cost: Int): ((Territory?) -> Boolean) = { territory ->
+              territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || disableInteract(territory)
+            }
+
             interactButton(
               tooltip = "Buy Peasant",
               up = Hex.assets.peasant.getKeyFrame(0f),
-              disableCheck = { territory -> (!inputProcessor.cheating && (territory?.capital?.balance ?: -1) < PEASANT_PRICE) || disableInteract(territory) },
+              disableCheck = buyDisable(PEASANT_PRICE),
               keyShortcut = intArrayOf(Keys.NUM_1)
             ) {
               inputProcessor.buyUnit(Peasant::class.createHandInstance())
@@ -299,7 +304,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Buy Castle",
               up = Hex.assets.castle,
-              disableCheck = { territory -> (!inputProcessor.cheating && (territory?.capital?.balance ?: -1) < CASTLE_PRICE) || disableInteract(territory) },
+              disableCheck = buyDisable(CASTLE_PRICE),
               keyShortcut = intArrayOf(Keys.NUM_2)
             ) {
               inputProcessor.buyUnit(Castle::class.createHandInstance())
