@@ -57,7 +57,7 @@ class NotAsRandomAI(override val team: Team) : AI {
     arrayOf(
       Castle::class,
       Peasant::class,
-//      Peasant::class,
+      Peasant::class,
 //      Spearman::class,
 //      Knight::class,
 //      Baron::class,
