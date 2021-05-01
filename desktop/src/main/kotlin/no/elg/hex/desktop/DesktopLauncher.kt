@@ -20,6 +20,7 @@ fun main(args: Array<String>) {
   Hex.launchPreference = LwjglPreferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
   LwjglApplicationConfiguration.disableAudio = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
+  Hex.audioDisabled = LwjglApplicationConfiguration.disableAudio
 
   config.width = defaultDisplayMode.width / 2
   config.height = defaultDisplayMode.height / 2

@@ -83,6 +83,7 @@ object Hex : ApplicationAdapter() {
     private set
 
   lateinit var launchPreference: Preferences
+  var audioDisabled: Boolean = true
 
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }

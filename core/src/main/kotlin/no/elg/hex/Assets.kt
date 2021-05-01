@@ -47,6 +47,7 @@ import no.elg.hex.island.IslandFiles
 import no.elg.hex.util.debug
 import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
+import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -63,7 +64,7 @@ class Assets : AssetManager() {
 
     private val TEXTURE_ATLAS = TextureAtlas::class.java
     private val MUSIC = Music::class.java
-    private val SOUND = Sound::class.java
+    val SOUND = Sound::class.java
     private val PNG = PixmapIO.PNG::class.java
     private val BITMAP_FONT = BitmapFont::class.java
     private val FREE_TYPE_FONT_GEN = FreeTypeFontGenerator::class.java
@@ -183,8 +184,8 @@ class Assets : AssetManager() {
   val help by lazy { findSprite("help") }
   val helpDown by lazy { findSprite("help_selected") }
 
-  val undoAllSound by lazy<Sound?> { get(UNDO_ALL_SOUND, SOUND) }
-  val clickSound by lazy<Sound?> { get(CLICK_SOUND, SOUND) }
+  val undoAllSound by SoundDelegate(UNDO_ALL_SOUND)
+  val clickSound by SoundDelegate(CLICK_SOUND)
 
   val pieceDownSound by SoundAlternativeDelegate(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
   val undoSound by SoundAlternativeDelegate(UNDO_SOUND, UNDO_SOUND_RANGE)
@@ -301,23 +302,8 @@ class Assets : AssetManager() {
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
     load(TUTORIAL_ATLAS, TEXTURE_ATLAS)
 
-    if (!Settings.disableAudio) {
+    audioLoaded(false)
 
-      loadingInfo = "Sounds"
-      load(UNDO_ALL_SOUND, SOUND)
-      load(CLICK_SOUND, SOUND)
-
-      fun loadSoundVariations(path: String, range: IntRange) {
-        for (i in range) {
-          load(path.format(i), SOUND)
-        }
-      }
-
-      loadSoundVariations(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
-      loadSoundVariations(UNDO_SOUND, UNDO_SOUND_RANGE)
-      loadSoundVariations(COINS_SOUND, COINS_SOUND_RANGE)
-      loadSoundVariations(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
-    }
     loadingInfo = "islands"
 
     IslandFiles // find all island files
@@ -343,6 +329,45 @@ class Assets : AssetManager() {
   override fun unload(fileName: String?) {
     if (isLoaded(fileName)) {
       super.unload(fileName)
+    }
+  }
+
+  private var audioLoaded = false
+
+  /**
+   * @return If audio has been loaded
+   */
+  fun audioLoaded(wait: Boolean = true): Boolean {
+    return when {
+      Settings.disableAudio || Hex.audioDisabled -> false
+      audioLoaded -> true
+      else -> {
+        loadAudio(wait)
+        false
+      }
+    }
+  }
+
+  private fun loadAudio(wait: Boolean) {
+    audioLoaded = true
+
+    loadingInfo = "Sounds"
+    load(UNDO_ALL_SOUND, SOUND)
+    load(CLICK_SOUND, SOUND)
+
+    fun loadSoundVariations(path: String, range: IntRange) {
+      for (i in range) {
+        load(path.format(i), SOUND)
+      }
+    }
+
+    loadSoundVariations(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
+    loadSoundVariations(UNDO_SOUND, UNDO_SOUND_RANGE)
+    loadSoundVariations(COINS_SOUND, COINS_SOUND_RANGE)
+    loadSoundVariations(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
+
+    if (wait) {
+      update()
     }
   }
 }

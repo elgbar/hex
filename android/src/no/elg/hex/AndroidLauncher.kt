@@ -36,6 +36,7 @@ class AndroidLauncher : AndroidApplication() {
     config.useGyroscope = false
     config.useRotationVectorSensor = false
     config.disableAudio = Hex.launchPreference.getBoolean(Settings.SOUND_ENABLED_PATH)
+    Hex.audioDisabled = config.disableAudio
     initialize(Hex, config)
   }
 }
