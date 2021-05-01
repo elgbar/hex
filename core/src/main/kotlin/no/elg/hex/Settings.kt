@@ -129,6 +129,8 @@ object Settings {
     }
   )
 
+  var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
+
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
   var deleteAllProgress by PreferenceDelegate(
     "Type '$DELETE_ALL_PROGRESS_STRING' to confirm",

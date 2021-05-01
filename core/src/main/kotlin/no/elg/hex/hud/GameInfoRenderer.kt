@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import ktx.graphics.use
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
 import no.elg.hex.hexagon.Baron
@@ -50,6 +51,11 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     }
   )
   private val topRight: Array<ScreenText>
+  private val topRightDbg: Array<ScreenText>
+
+  private val topRightOffset: Int
+  private val topRightDbgOffset: Int
+  private val historyOffset: Int
 
   init {
 
@@ -71,24 +77,22 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
       ) else emptyText()
     }
 
-    topRight = if (Hex.debug) {
+    topRight = arrayOf(
+      treasuryText,
+      incomeText,
+    )
+    topRightDbg = if (Hex.debug) {
       arrayOf(
-        emptyText(),
-        treasuryText,
-        incomeText,
-        emptyText(),
         StaticScreenText("Holding: ", next = nullCheckedText(screen.island::hand, color = YELLOW)),
         StaticScreenText("Holding the edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data === EDGE_DATA })),
-        StaticScreenText("Held is edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data?.edge == true })),
-        emptyText(),
+        StaticScreenText("Held is edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data?.edge == true }))
       )
     } else {
-      arrayOf(
-        emptyText(),
-        treasuryText,
-        incomeText,
-      )
+      emptyArray()
     }
+    topRightOffset = 1
+    topRightDbgOffset = topRightOffset + topRight.size + 1
+    historyOffset = topRightDbgOffset + topRightDbg.size + 1
   }
 
   override fun frameUpdate() {
@@ -127,30 +131,24 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     }
 
     ScreenRenderer.drawAll(*topCenter, position = TOP_CENTER)
+    ScreenRenderer.drawAll(*topRight, position = TOP_RIGHT, lineOffset = topRightOffset)
+    if (Hex.debug && screen.island.isCurrentTeamHuman() && Settings.enableDebugHUD) {
 
-    if (Hex.debug && screen.island.isCurrentTeamHuman()) {
-
+      ScreenRenderer.drawAll(*topRightDbg, position = TOP_RIGHT, lineOffset = topRightDbgOffset)
       // due to the dynamic nature of history the array must be created each time
 
       val history = screen.island.history
-      val centerRight = Array(topRight.size + history.historyNotes.size) { i ->
-        if (i < topRight.size) {
-          topRight[i]
-        } else {
-          val historyIndex = i - topRight.size
-          staticTextPool.obtain().also { sst ->
-            sst.text = history.historyNotes[historyIndex]
-            sst.color = if (historyIndex == screen.island.history.historyPointer) YELLOW else WHITE
-          }
+      val centerRight = Array(history.historyNotes.size) { i ->
+        staticTextPool.obtain().also { sst ->
+          sst.text = history.historyNotes[i]
+          sst.color = if (i == screen.island.history.historyPointer) YELLOW else WHITE
         }
       }
-      ScreenRenderer.drawAll(*centerRight, position = TOP_RIGHT)
+      ScreenRenderer.drawAll(*centerRight, position = TOP_RIGHT, lineOffset = historyOffset)
       // Return them to the pool after use
-      for (i in topRight.size until (topRight.size + history.historyNotes.size)) {
+      for (i in 0 until (history.historyNotes.size)) {
         staticTextPool.free(centerRight[i] as StaticScreenText)
       }
-    } else {
-      ScreenRenderer.drawAll(*topRight, position = TOP_RIGHT)
     }
   }
 

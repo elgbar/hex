@@ -9,6 +9,8 @@ import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.SimpleEventListener
 import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
+import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
+import no.elg.hex.hud.ScreenRenderer.draw
 import no.elg.hex.hud.ScreenRenderer.drawAll
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
@@ -16,26 +18,25 @@ import no.elg.hex.util.getData
 /** @author Elg */
 class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable {
 
-  private val lines: Array<ScreenText>
+  private val fpsText: ScreenText
+  private val debugLines: Array<ScreenText>
 
   init {
 
-    val fpsText = variableText(
+    fpsText = variableText(
       "FPS: ",
       Gdx.graphics::getFramesPerSecond,
       10,
       Int.MAX_VALUE,
       format = { "%4d".format(it) },
-      next = prefixText(" Delta (ms) ", Gdx.graphics::getDeltaTime) { "%.3f".format(it) }
+      next = prefixText(" Delta (ms) ", Gdx.graphics::getDeltaTime) { "%.4f".format(it) }
     )
 
     if (Hex.debug) {
 
       val basicInputHandler = islandScreen.basicIslandInputProcessor
 
-      lines = arrayOf(
-        emptyText(),
-        fpsText,
+      debugLines = arrayOf(
         prefixText(
           "Island is ",
           callable = { islandScreen.island.grid.gridData },
@@ -74,14 +75,19 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
         )
       )
     } else {
-      lines = arrayOf(emptyText(), fpsText)
+      debugLines = emptyArray()
     }
   }
 
   override fun frameUpdate() {
-    if (!Hex.debug && !Settings.showFps) return
-
-    drawAll(*lines)
+    if (Settings.showFps || Hex.debug && Settings.enableDebugHUD) {
+      ScreenRenderer.begin()
+      fpsText.draw(1, TOP_LEFT)
+      ScreenRenderer.end()
+    }
+    if (Hex.debug && Settings.enableDebugHUD) {
+      drawAll(*debugLines, lineOffset = 2)
+    }
   }
 
   private val teamPercent: MutableList<String> = mutableListOf()

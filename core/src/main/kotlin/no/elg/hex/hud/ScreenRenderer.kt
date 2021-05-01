@@ -292,6 +292,9 @@ object ScreenRenderer : Disposable, Resizable {
   var draws = 0
     private set
 
+  /**
+   * Must call [begin] before using this function, call [end] when done drawing
+   */
   fun ScreenText.draw(
     line: Int,
     position: ScreenDrawPosition = TOP_LEFT,
@@ -337,7 +340,7 @@ object ScreenRenderer : Disposable, Resizable {
   }
 
   /** Draw all given text on different lines */
-  fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP_LEFT) {
+  fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP_LEFT, lineOffset: Int = 0) {
 
     if (position.vertical !== TOP) {
       screenTexts.reverse()
@@ -346,7 +349,7 @@ object ScreenRenderer : Disposable, Resizable {
 
     begin()
     for ((line, screenText) in screenTexts.withIndex()) {
-      screenText.draw(line + offset, position, lines = screenTexts.size)
+      screenText.draw(line + offset + lineOffset, position, lines = screenTexts.size)
     }
     end()
   }
