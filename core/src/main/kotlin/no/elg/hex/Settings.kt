@@ -18,6 +18,15 @@ object Settings {
   const val DISABLE_AUDIO_PATH = "disableAudio" // Settings::disableAudio.name
   var disableAudio by PreferenceDelegate(false, priority = 200, preferences = Hex.launchPreference, requireRestart = true)
 
+  const val VSYNC_PATH = "vsync" // Settings::vsync.name
+  var vsync by PreferenceDelegate(
+    true, priority = 200, preferences = Hex.launchPreference,
+    onChange = { _, _, new ->
+      Gdx.graphics.setVSync(new)
+      return@PreferenceDelegate new
+    }
+  )
+
   var volume by PreferenceDelegate(1f, priority = 210) { it < 0f || it > 1f }
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
