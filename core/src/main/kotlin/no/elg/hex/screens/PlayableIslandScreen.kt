@@ -497,11 +497,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     inputProcessor.show()
     super.show()
 
-    HexagonDataEvents.onTeamChange {
+    SimpleEventListener.create<TeamChangeHexagonDataEvent> {
       island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
       island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
-
-      island.recountTotalIncome()
     }
 
     if (island.isCurrentTeamAI()) {
