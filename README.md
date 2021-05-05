@@ -78,8 +78,5 @@ Process finished with exit code 0
 
 * Add minimap
 * Add relative strength bar (partially done, need to implement it graphically)
-* Sounds (partially done)
-* Allow for scrolling farther down in settings to allow mobile user to see what they type
-* bug: placeDown sound is played sometimes when trying to place a piece on an invalid hex
-* Add version number
+* Sounds are sometimes not properly loaded on android
 * Generate trees when generating random island
