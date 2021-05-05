@@ -58,7 +58,10 @@ class Assets : AssetManager() {
     private set
 
   var loadingInfo = "not begun"
-    private set
+    private set(value) {
+      Gdx.app.log("LOADING", value)
+      field = value
+    }
 
   companion object {
 
