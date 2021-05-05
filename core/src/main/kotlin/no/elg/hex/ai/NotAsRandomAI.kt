@@ -298,7 +298,7 @@ class NotAsRandomAI(override val team: Team) : AI {
         }
 
     // find any hexagon with that is protected the least
-    val minStr = placeableHexes.values.min() ?: return null
+    val minStr = placeableHexes.values.minOrNull() ?: return null
 
     val leastDefendedHexes =
       placeableHexes.filter { (_, str) -> str <= minStr }.mapTo(ArrayList()) { it.key }
@@ -308,7 +308,7 @@ class NotAsRandomAI(override val team: Team) : AI {
 
     // there are multiple hexagons that are defended as badly, choose the hexagon that will protect
     // the most hexagons
-    return leastDefendedHexes.maxBy {
+    return leastDefendedHexes.maxByOrNull {
       // note that this will give a slight disadvantage to hexagons surrounded by sea, as we look at
       // the absolute number of neighbors
       island.getNeighbors(it).filter { neighbor -> island.getData(neighbor).team == team }.count()
