@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
   config.initialBackgroundColor = Hex.backgroundColor
 
   config.backgroundFPS = 10
-  config.foregroundFPS = 9999
+  config.foregroundFPS = 0
   config.vSyncEnabled = Hex.launchPreference.getBoolean(Settings.VSYNC_PATH, true)
   config.useHDPI = true
   config.addIcon("icons/icon32.png", Internal)
