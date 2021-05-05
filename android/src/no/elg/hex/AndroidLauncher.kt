@@ -1,13 +1,10 @@
 package no.elg.hex
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidPreferences
-import com.badlogic.gdx.backends.lwjgl.LwjglPreferences
 import com.xenomachina.argparser.ArgParser
-import no.elg.hex.Settings.MSAA_SAMPLES_PATH
 
 class AndroidLauncher : AndroidApplication() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,8 +19,8 @@ class AndroidLauncher : AndroidApplication() {
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
 
 
-    if (Hex.launchPreference.contains(MSAA_SAMPLES_PATH)) {
-      config.numSamples = Hex.launchPreference.getInteger(MSAA_SAMPLES_PATH)
+    if (Hex.launchPreference.contains(Settings.MSAA_SAMPLES_PATH)) {
+      config.numSamples = Hex.launchPreference.getInteger(Settings.MSAA_SAMPLES_PATH)
     } else {
       config.numSamples = 2 //default value
     }
@@ -35,7 +32,7 @@ class AndroidLauncher : AndroidApplication() {
     config.useAccelerometer = false
     config.useGyroscope = false
     config.useRotationVectorSensor = false
-    config.disableAudio = Hex.launchPreference.getBoolean(Settings.SOUND_ENABLED_PATH)
+    config.disableAudio = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
     Hex.audioDisabled = config.disableAudio
     initialize(Hex, config)
   }
