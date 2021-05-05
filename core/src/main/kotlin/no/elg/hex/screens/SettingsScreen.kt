@@ -242,6 +242,14 @@ class SettingsScreen : OverlayScreen() {
           @Suppress("UNCHECKED_CAST")
           addSetting(property as KMutableProperty1<Settings, Any>, delegate as PreferenceDelegate<*>)
         }
+
+        row()
+        visLabel("Version: ${Hex.VERSION}") {
+          it.colspan(2)
+          it.center()
+          color = Color.LIGHT_GRAY
+        }
+        row()
         addBackButton {
           it.colspan(2)
           it.prefWidth(Value.percentHeight(0.25f, this@visTable))

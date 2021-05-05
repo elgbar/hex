@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
     config.samples = 16 // default value
   }
 
-  config.title = "Hex"
+  config.title = "Hex v${Hex.VERSION}"
   if (Hex.args.mapEditor) {
     config.title += " - Map Editor"
   }

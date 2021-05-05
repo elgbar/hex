@@ -40,6 +40,11 @@ object Hex : ApplicationAdapter() {
 
   const val LAUNCH_PREF = "launchPref"
 
+  /**
+   * Current Hex version in `major.minor.patch` format
+   */
+  const val VERSION = "1.1.0"
+
   @JvmStatic
   val mapper =
     jacksonObjectMapper().also {
