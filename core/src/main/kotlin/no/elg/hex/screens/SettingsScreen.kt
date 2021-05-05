@@ -45,6 +45,9 @@ class SettingsScreen : OverlayScreen() {
       val table = this@actors.visTable {
         pad(10f)
 
+        // allow scroll past back button
+        padBottom(this.prefHeight / 2f)
+
         val minWidth = 0.4f
 
         val init: (@Scene2dDsl VisLabel).(Cell<*>) -> Unit = {
