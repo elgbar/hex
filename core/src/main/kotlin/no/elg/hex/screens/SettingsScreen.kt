@@ -255,6 +255,8 @@ class SettingsScreen : OverlayScreen() {
         setFillParent(true)
         setFlickScroll(true)
         setScrollbarsVisible(false)
+        setClamp(false)
+        setForceScroll(false, true)
         setupFadeScrollBars(0f, 0f)
         setScrollFocus(true)
         actor = table
