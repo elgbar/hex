@@ -27,6 +27,7 @@ import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
+import ktx.scene2d.Scene2DSkin
 import ktx.style.imageTextButton
 import ktx.style.label
 import ktx.style.menu
@@ -299,6 +300,7 @@ class Assets : AssetManager() {
       menuItem(extend = "default") { font = notFlippedFont }
       menu { openButtonStyle = newOpenButtonStyle }
     }
+    Scene2DSkin.defaultSkin = VisUI.getSkin()
 
     loadingInfo = "sprites"
 
