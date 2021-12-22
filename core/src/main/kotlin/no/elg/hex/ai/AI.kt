@@ -9,5 +9,10 @@ interface AI {
 
   val team: Team
 
-  fun action(island: Island, gameInputProcessor: GameInputProcessor)
+  /**
+   * Do the AI's turn
+   *
+   * @return If the AI is still alive, i.e., `false` if the AI is dead
+   */
+  fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean
 }

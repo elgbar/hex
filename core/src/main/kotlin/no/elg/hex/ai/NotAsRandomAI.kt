@@ -76,9 +76,10 @@ class NotAsRandomAI(override val team: Team) : AI {
 //      Baron::class,
     )
 
-  override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
+  override fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean {
     island.select(island.hexagons.first())
-    for (territory in island.getTerritories(team)) {
+    val territories = island.getTerritories(team)
+    for (territory in territories) {
       resetBlacklists()
       do {
         island.select(territory.hexagons.first())
@@ -91,6 +92,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       } while (random.nextFloat() > 0.005f)
     }
     island.select(null)
+    return territories.isNotEmpty()
   }
 
   private fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {

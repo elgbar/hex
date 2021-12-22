@@ -54,6 +54,7 @@ import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import java.util.EnumMap
 import kotlin.math.max
+import kotlin.system.measureTimeMillis
 
 /** @author Elg */
 class Island(
@@ -303,13 +304,19 @@ class Island(
       val cai = currentAI
       if (cai != null) {
 
-        try {
-          cai.action(this@Island, gameInputProcessor)
-        } catch (e: RuntimeException) {
-          e.printStackTrace()
-          publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
+        var alive = true
+        val time = measureTimeMillis {
+          try {
+            alive = cai.action(this@Island, gameInputProcessor)
+          } catch (e: RuntimeException) {
+            e.printStackTrace()
+            publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
+          }
         }
-        delay(50)
+        Gdx.app.trace("AI") { "${cai.team} AI's turn took $time ms" }
+        if (!alive && time < 50) {
+          delay(50 - time)
+        }
         if (Hex.screen is PreviewIslandScreen) {
           endTurn(gameInputProcessor)
         }

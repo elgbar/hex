@@ -7,7 +7,8 @@ import no.elg.hex.island.Island
 /** @author Elg */
 class NOOPAI(override val team: Team) : AI {
 
-  override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
+  override fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean {
     // NO-OP
+    return false
   }
 }
