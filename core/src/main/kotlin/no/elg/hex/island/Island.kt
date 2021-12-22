@@ -302,7 +302,13 @@ class Island(
     KtxAsync.launch(Hex.asyncThread) {
       val cai = currentAI
       if (cai != null) {
-        cai.action(this@Island, gameInputProcessor)
+
+        try {
+          cai.action(this@Island, gameInputProcessor)
+        } catch (e: RuntimeException) {
+          e.printStackTrace()
+          publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
+        }
         delay(50)
         if (Hex.screen is PreviewIslandScreen) {
           endTurn(gameInputProcessor)
