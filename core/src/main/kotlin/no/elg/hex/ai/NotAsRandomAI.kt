@@ -1,6 +1,7 @@
 package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
+import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -30,6 +31,7 @@ import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
+import java.util.Arrays
 import kotlin.reflect.KClass
 import kotlin.random.Random.Default as random
 
@@ -52,6 +54,17 @@ class NotAsRandomAI(override val team: Team) : AI {
    * list of hexagon not to be picked up, as no action could be done with it, clear every round
    */
   private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
+  private val strengthUsable = Array(BARON_STRENGTH) { true }
+
+  private fun resetBlacklists() {
+    hexBlacklist.clear()
+    Arrays.fill(strengthUsable, true)
+  }
+
+  private fun canUseStrength(str: Int): Boolean = strengthUsable[str - 1]
+  private fun cannotUseStrength(str: Int) {
+    strengthUsable[str - 1] = false
+  }
 
   private val buyablePieces =
     arrayOf(
@@ -66,7 +79,7 @@ class NotAsRandomAI(override val team: Team) : AI {
   override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
     island.select(island.hexagons.first())
     for (territory in island.getTerritories(team)) {
-      hexBlacklist.clear()
+      resetBlacklists()
       do {
         island.select(territory.hexagons.first())
         val sel = territory.island.selected ?: continue
@@ -92,7 +105,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       HashSet<Hexagon<HexagonData>>(
         territory.hexagons.filter {
           val piece = territory.island.getData(it).piece
-          piece is LivingPiece && !piece.moved && !hexBlacklist.contains(it)
+          piece is LivingPiece && !piece.moved && it !in hexBlacklist && canUseStrength(piece.strength)
         }
       )
 
@@ -111,7 +124,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       }.randomOrNull()
 
       if (piece == null) {
-        think { "Cannot afford any pieces in this territory, I only have ${territory.capital.balance} and an income of ${territory.income}" }
+        think { "No pieces to pickup, and cannot afford any pieces in this territory, I only have ${territory.capital.balance} and an income of ${territory.income}" }
         return false
       }
       think { "Buying the unit ${piece.simpleName} " }
@@ -206,6 +219,7 @@ class NotAsRandomAI(override val team: Team) : AI {
                 think { "Placing the held piece in the best defensive position, nothing else to do" }
                 val emptyHex = calculateBestLivingDefencePosition(territory)
                 if (emptyHex != null) hexBlacklist.add(emptyHex)
+                cannotUseStrength(handPiece.strength)
                 emptyHex
               }
               else -> {
@@ -220,7 +234,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       }
       think {
         "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} " +
-          "(which is a ${territory.island.getData(hexagon).piece} of team ${territory.island.getData(hexagon).team})"
+          "(which is a ${island.getData(hexagon).piece} of team ${island.getData(hexagon).team})"
       }
       gameInputProcessor.click(hexagon)
     }
@@ -278,14 +292,18 @@ class NotAsRandomAI(override val team: Team) : AI {
 
       val newIncome = territory.income - piece.income - handUpkeep + mergedType.income
       val shouldCreate = shouldCreate(territory.capital.balance, newIncome)
-      think { "New income would be $newIncome, current income is ${territory.income}, current balance is ${territory.capital.balance}, this is ${if (shouldCreate) "acceptable" else "not acceptable, trying again"}" }
+      think {
+        "New income would be $newIncome, current income is ${territory.income}, " +
+          "current balance is ${territory.capital.balance}, this is " +
+          if (shouldCreate) "acceptable" else "not acceptable, trying again"
+      }
       return@find shouldCreate
     }
-    if(found == null){
+    if (found == null) {
       think { "Found no acceptable pieces to merge held item with" }
-    }else{
+    } else {
       // clear blacklist as a higher tier of units might mean some hexagon will now be attackable
-      hexBlacklist.clear()
+      resetBlacklists()
       think { "Merging hand with ${territory.island.getData(found).piece}" }
     }
     return found
