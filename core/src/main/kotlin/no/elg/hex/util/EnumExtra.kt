@@ -6,11 +6,11 @@ import kotlin.reflect.KClass
  * @author Elg
  */
 inline fun <reified T : Enum<T>> String.toEnum(): T {
-  return enumValueOf(this.toUpperCase())
+  return enumValueOf(this.uppercase())
 }
 
 inline fun <T : Enum<T>> String.toEnum(enumClass: KClass<T>): T {
-  return requireNotNull(toEnumOrNull(enumClass)) { "No enum with the name '${this.toUpperCase()}' of type $enumClass" }
+  return requireNotNull(toEnumOrNull(enumClass)) { "No enum with the name '${this.uppercase()}' of type $enumClass" }
 }
 
 inline fun <T : Enum<T>> String.toEnumOrNull(enumClass: KClass<T>): T? {

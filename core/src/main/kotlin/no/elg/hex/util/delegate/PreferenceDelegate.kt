@@ -4,7 +4,7 @@ import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import no.elg.hex.util.debug
-import no.elg.hex.util.toEnum
+import no.elg.hex.util.toEnumOrNull
 import no.elg.hex.util.trace
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -116,7 +116,7 @@ class PreferenceDelegate<T : Any>(
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
       is Char -> preferences.getInteger(propertyName, (initialValue as Char).toInt()).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
-      is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnum(initialValue::class as KClass<Enum<*>>)
+      is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnumOrNull(initialValue::class as KClass<Enum<*>>)
       else -> error("Nullable types are not allowed")
     } as T
   }
