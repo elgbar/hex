@@ -204,7 +204,7 @@ class NotAsRandomAI(override val team: Team) : AI {
               }
               random.nextFloat() >= 0.15f -> { // 85% chance of placing defensively
                 think { "Placing the held piece in the best defensive position, nothing else to do" }
-                val emptyHex = calculateBestCastlePlacement(territory)
+                val emptyHex = calculateBestLivingDefencePosition(territory)
                 if (emptyHex != null) hexBlacklist.add(emptyHex)
                 emptyHex
               }
@@ -303,8 +303,7 @@ class NotAsRandomAI(override val team: Team) : AI {
           val neighborStrength =
             island.getNeighbors(it).map { neighbor -> island.calculateStrength(neighbor) }
 
-          island.calculateStrength(it) +
-            (neighborStrength.sum().toDouble() / neighborStrength.size)
+          island.calculateStrength(it) + (neighborStrength.sum().toDouble() / neighborStrength.size)
         }
 
     // find any hexagon with that is protected the least
@@ -321,7 +320,58 @@ class NotAsRandomAI(override val team: Team) : AI {
     return leastDefendedHexes.maxByOrNull {
       // note that this will give a slight disadvantage to hexagons surrounded by sea, as we look at
       // the absolute number of neighbors
-      island.getNeighbors(it).count { neighbor -> island.getData(neighbor).team == team }
+      val neighbors = island.getNeighbors(it)
+      neighbors.count { neighbor -> island.getData(neighbor).team == team } / neighbors.size
+    }
+  }
+
+  private fun calculateBestLivingDefencePosition(territory: Territory): Hexagon<HexagonData>? {
+    val island = territory.island
+    val team = territory.team
+    val placeableHexes =
+      territory.hexagons
+        .filter {
+          // all legal hexagons we can place a piece at
+          val piece = island.getData(it).piece
+          piece is Empty || piece is TreePiece || piece is Grave
+        }
+        .associateWith { hex ->
+          val neighbors = island.getNeighbors(hex)
+          val strength = island.calculateStrength(hex).toDouble()
+
+          // we don't want to be placed on the border, but if we must then do it where there is the least defence
+          if (neighbors.any { island.getData(it).team != team }) {
+            return@associateWith -strength
+          }
+
+          val neighborStrength = neighbors.map { neighbor ->
+
+            // how much the strength an enemy neighbor has
+            island.getNeighbors(neighbor)
+              .filter { island.getData(it).team != team }
+              .maxOfOrNull { island.calculateStrength(it) }
+              ?: 0
+          }
+
+          val normalizedNeighborStrength = neighborStrength.sum().toDouble() / neighborStrength.size
+          // subtract current strength of a hex to not overprotect a given hex
+          return@associateWith normalizedNeighborStrength - strength
+        }
+
+    // find any hexagon with that is protected the least
+    val maxStr = placeableHexes.values.maxOrNull() ?: return null
+
+    val leastDefendedHexes =
+      placeableHexes.filter { (_, str) -> str >= maxStr }.mapTo(ArrayList()) { it.key }
+
+    // shuffle the list to make the selection more uniform
+    leastDefendedHexes.shuffle()
+
+    // there are multiple hexagons that are defended as badly, choose the hexagon that will protect
+    // the most hexagons
+    return leastDefendedHexes.maxByOrNull {
+      val neighbors = island.getNeighbors(it)
+      neighbors.count { neighbor -> island.getData(neighbor).team == team } / neighbors.size
     }
   }
 
@@ -346,7 +396,7 @@ class NotAsRandomAI(override val team: Team) : AI {
      * @see PIECE_MAINTAIN_CONTRACT_LENGTH
      */
     fun shouldCreate(currentBalance: Int, projectedIncome: Int): Boolean {
-      if(projectedIncome >= 0) return true
+      if (projectedIncome >= 0) return true
       return currentBalance + projectedIncome * PIECE_MAINTAIN_CONTRACT_LENGTH >= 0
     }
   }

@@ -92,7 +92,7 @@ fun Island.isPartOfTerritory(hexagon: Hexagon<HexagonData>): Boolean {
 fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = true) =
   grid.getNeighborsOf(hexagon).let {
     if (onlyVisible) {
-      it.filter { hex -> !getData(hex).invisible }
+      it.filterNot { hex -> getData(hex).invisible }
     } else {
       it
     }
@@ -103,15 +103,20 @@ fun Island.treeType(hexagon: Hexagon<HexagonData>): KClass<out TreePiece> {
   return if (neighbors.any { getData(it).invisible }) PalmTree::class else PineTree::class
 }
 
-fun Island.calculateStrength(hexagon: Hexagon<HexagonData>): Int {
+/**
+ * The strength of a hexagon is how much [Piece.strength] is needed to take a given hexagon. A hexagon defends its surrounding hexes.
+ *
+ * @param pretendedTeam The team to pretend to be, if null then use the actual team. Useful for calculated potential strength if it was another team
+ * @return the strength of the given hexagon
+ */
+fun Island.calculateStrength(hexagon: Hexagon<HexagonData>, pretendedTeam: Team? = null): Int {
   val data = getData(hexagon)
-  val team = data.team
+  val team = pretendedTeam ?: data.team
   val neighborStrength =
     getNeighbors(hexagon)
       .map { getData(it) }
       .filter { it.team == team }
-      .map { it.piece.strength }
-      .maxOrNull()
+      .maxOfOrNull { it.piece.strength }
       ?: 0
   return max(data.piece.strength, neighborStrength)
 }
