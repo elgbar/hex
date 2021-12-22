@@ -63,6 +63,23 @@ class NotAsRandomAI(override val team: Team) : AI {
 //      Baron::class,
     )
 
+  override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
+    island.select(island.hexagons.first())
+    for (territory in island.getTerritories(team)) {
+      hexBlacklist.clear()
+      do {
+        island.select(territory.hexagons.first())
+        val sel = territory.island.selected ?: continue
+
+        if (!pickUp(sel, gameInputProcessor)) {
+          break
+        }
+        place(sel, gameInputProcessor)
+      } while (random.nextFloat() > 0.005f)
+    }
+    island.select(null)
+  }
+
   private fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
     think { "Picking up a piece" }
     if (territory.island.hand?.piece != null) {
@@ -205,23 +222,6 @@ class NotAsRandomAI(override val team: Team) : AI {
       }
       gameInputProcessor.click(hexagon)
     }
-  }
-
-  override fun action(island: Island, gameInputProcessor: GameInputProcessor) {
-    island.select(island.hexagons.first())
-    for (territory in island.getTerritories(team)) {
-      hexBlacklist.clear()
-      do {
-        island.select(territory.hexagons.first())
-        val sel = territory.island.selected ?: continue
-
-        if (!pickUp(sel, gameInputProcessor)) {
-          break
-        }
-        place(sel, gameInputProcessor)
-      } while (random.nextFloat() > 0.005f)
-    }
-    island.select(null)
   }
 
   private fun mergeWithLivingTerritoryPiece(
