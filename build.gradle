@@ -1,17 +1,17 @@
 buildscript {
 
   ext {
-    kotlinVersion = "1.5.0"
+    kotlinVersion = "1.6.10"
     appName = "Hex"
     gdxVersion = '1.10.0'
-    ktxVersion = "1.10.0-b1"
-    visVersion = '1.5.0-SNAPSHOT'
-    jacksonVersion = "2.12.2"
-    junitVersion = "5.4.2"
-    kotlinCoroutineVersion = "1.5.0-RC"
+    ktxVersion = "1.10.0-b4"
+    visVersion = '1.5.0'
+    jacksonVersion = "2.13.1"
+    junitVersion = "5.8.2"
+    kotlinCoroutineVersion = "1.6.0"
     argparserVersion = "2.0.7"
     spotlessVersion = "5.12.4"
-    androidGraleToolsVersion = "4.1.3"
+    androidGraleToolsVersion = "7.0.0"
     ktlintVersion = "0.41.0"
   }
 
@@ -31,11 +31,11 @@ buildscript {
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 
   kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_11.getName()
+    jvmTarget = JavaVersion.VERSION_17.getName()
   }
 }
 
