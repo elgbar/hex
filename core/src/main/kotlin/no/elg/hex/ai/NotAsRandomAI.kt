@@ -63,7 +63,7 @@ class NotAsRandomAI(override val team: Team) : AI {
 //      Baron::class,
     )
 
-  fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
+  private fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
     think { "Picking up a piece" }
     if (territory.island.hand?.piece != null) {
       think { "Already holding a piece! (${territory.island.hand?.piece})" }
@@ -183,17 +183,14 @@ class NotAsRandomAI(override val team: Team) : AI {
                 think { "But there is a hexagon with a grave, lets clean it up early" }
                 graveHexagons.random()
               }
-              random.nextFloat() >= 0.15f -> {
-                think { "Place the held piece in the best defensive position" }
+              random.nextFloat() >= 0.15f -> { // 85% chance of placing defensively
+                think { "Placing the held piece in the best defensive position" }
                 val emptyHex = calculateBestCastlePlacement(territory)
                 if (emptyHex != null) hexBlacklist.add(emptyHex)
                 emptyHex
               }
               else -> {
-                mergeWithLivingTerritoryPiece(handPiece, territory)?.also {
-                  // unblacklist the hexagon as it might now be possible to do something more with this piece
-                  hexBlacklist.remove(it)
-                }
+                mergeWithLivingTerritoryPiece(handPiece, territory)
               }
             }
           }
@@ -233,11 +230,11 @@ class NotAsRandomAI(override val team: Team) : AI {
   ): Hexagon<HexagonData>? {
     think { "Will try to merge piece with another piece" }
     val maxBorderStr =
-      territory.enemyBorderHexes.map { territory.island.getData(it).piece.strength }.maxOrNull()
+      territory.enemyBorderHexes.maxOfOrNull { territory.island.getData(it).piece.strength }
         ?: NO_STRENGTH
 
     think {
-      if (maxBorderStr > 0) "The highest level threat on my boarder has the strength of a ${strengthToType(maxBorderStr).simpleName}"
+      if (maxBorderStr > 0) "The highest level threat on my border has the strength of a ${strengthToType(maxBorderStr).simpleName}"
       else "I have vanquished my foes!"
     }
 
@@ -256,7 +253,9 @@ class NotAsRandomAI(override val team: Team) : AI {
       think { "Should not merge to baron right now as the threat is not high enough" }
     }
 
-    return territory.hexagons.find {
+    think { "Trying to find piece to merge held ${handPiece::class.simpleName} with" }
+
+    val found = territory.hexagons.find {
       val piece = territory.island.getData(it).piece
       if (piece !is LivingPiece || piece.canNotMerge(handPiece)) {
         return@find false
@@ -268,20 +267,29 @@ class NotAsRandomAI(override val team: Team) : AI {
         return@find false
       }
 
-      think { "I can merge hand piece ${handPiece::class.simpleName}" }
-
       val mergedType = mergedType(piece, handPiece).createHandInstance()
+
+      think { "Checking if I should merge ${handPiece::class.simpleName} with ${piece::class.simpleName}" }
 
       // If we have not yet placed the held piece (ie directly merging it) we do not pay upkeep on it
       val handUpkeep = if (handPiece.data == HexagonData.EDGE_DATA) 0 else handPiece.income
 
       val newIncome = territory.income - piece.income - handUpkeep + mergedType.income
-      think { "New income would be $newIncome" }
-      shouldCreate(territory.capital.balance, newIncome)
+      val shouldCreate = shouldCreate(territory.capital.balance, newIncome)
+      think { "New income would be $newIncome, current income is ${territory.income}, current balance is ${territory.capital.balance}, this is ${if (shouldCreate) "acceptable" else "not acceptable, trying again"}" }
+      return@find shouldCreate
     }
+    if(found == null){
+      think { "Found no acceptable pieces to merge held item with" }
+    }else{
+      // clear blacklist as a higher tier of units might mean some hexagon will now be attackable
+      hexBlacklist.clear()
+      think { "Merging hand with ${territory.island.getData(found).piece}" }
+    }
+    return found
   }
 
-  fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
+  private fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
     val island = territory.island
     val placeableHexes =
       territory.hexagons
@@ -311,7 +319,7 @@ class NotAsRandomAI(override val team: Team) : AI {
     return leastDefendedHexes.maxByOrNull {
       // note that this will give a slight disadvantage to hexagons surrounded by sea, as we look at
       // the absolute number of neighbors
-      island.getNeighbors(it).filter { neighbor -> island.getData(neighbor).team == team }.count()
+      island.getNeighbors(it).count { neighbor -> island.getData(neighbor).team == team }
     }
   }
 
@@ -331,12 +339,13 @@ class NotAsRandomAI(override val team: Team) : AI {
     const val PIECE_MAINTAIN_CONTRACT_LENGTH = 2
 
     /**
-     * If we should buy/merge pieces with the given [projectedBalance] and [projectedIncome]
+     * If we should buy/merge pieces with the given [currentBalance] and [projectedIncome]
      *
      * @see PIECE_MAINTAIN_CONTRACT_LENGTH
      */
-    fun shouldCreate(projectedBalance: Int, projectedIncome: Int): Boolean {
-      return projectedBalance + projectedIncome * PIECE_MAINTAIN_CONTRACT_LENGTH >= 0
+    fun shouldCreate(currentBalance: Int, projectedIncome: Int): Boolean {
+      if(projectedIncome >= 0) return true
+      return currentBalance + projectedIncome * PIECE_MAINTAIN_CONTRACT_LENGTH >= 0
     }
   }
 }
