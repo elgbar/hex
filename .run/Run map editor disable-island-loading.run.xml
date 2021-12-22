@@ -1,13 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run map editor disable-island-loading" type="JetRunConfigurationType">
-    <module name="hex.desktop" />
-    <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="--map-editor --disable-island-loading" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="PASS_PARENT_ENVS" value="true" />
     <option name="MAIN_CLASS_NAME" value="no.elg.hex.desktop.DesktopLauncherKt" />
-    <option name="WORKING_DIRECTORY" value="" />
+    <module name="hex.desktop" />
+    <option name="PROGRAM_PARAMETERS" value="--map-editor --disable-island-loading" />
+    <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
