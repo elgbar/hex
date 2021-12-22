@@ -125,9 +125,10 @@ class NotAsRandomAI(override val team: Team) : AI {
     return true
   }
 
-  fun place(territory: Territory, gameInputProcessor: GameInputProcessor) {
+  private fun place(territory: Territory, gameInputProcessor: GameInputProcessor) {
 
-    val handPiece = territory.island.hand?.piece
+    val island = territory.island
+    val handPiece = island.hand?.piece
     think { "Placing held piece $handPiece" }
     if (handPiece == null) {
       think { "Not holding any piece!" }
@@ -145,7 +146,7 @@ class NotAsRandomAI(override val team: Team) : AI {
     } else if (handPiece is LivingPiece) {
 
       val treeHexagons =
-        territory.hexagons.filter { territory.island.getData(it).piece is TreePiece }
+        territory.hexagons.filter { island.getData(it).piece is TreePiece }
 
       val hexagon =
         if (treeHexagons.isNotEmpty()) {
@@ -163,13 +164,13 @@ class NotAsRandomAI(override val team: Team) : AI {
           //                })
 
           val attackableHexes =
-            territory.enemyBorderHexes.filter { territory.island.canAttack(it, handPiece) }
+            territory.enemyBorderHexes.filter { island.canAttack(it, handPiece) }
           if (attackableHexes.isNotEmpty()) {
             think { "I can attack an enemy hexagon with this piece" }
 
             fun tryAttack(type: KClass<out Piece>): Hexagon<HexagonData>? {
               val attackableOfType =
-                attackableHexes.filter { type.isInstance(territory.island.getData(it).piece) }
+                attackableHexes.filter { type.isInstance(island.getData(it).piece) }
               if (attackableOfType.isNotEmpty()) {
                 think { "Will attack a ${type.simpleName}" }
                 return attackableOfType.random()
@@ -179,29 +180,30 @@ class NotAsRandomAI(override val team: Team) : AI {
             }
 
             val connectingHex = attackableHexes.firstOrNull {
-              territory.island.getNeighbors(it).filter { fit ->
+              island.getNeighbors(it).filter { fit ->
                 fit !in territory.hexagons
-              }.any { ait -> territory.island.getData(ait).team == territory.team }
+              }.any { ait -> island.getData(ait).team == territory.team }
             }
             think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.cubeCoordinate})" }
 
             connectingHex ?: tryAttack(Capital::class)
               ?: tryAttack(Castle::class)
               ?: tryAttack(LivingPiece::class)
-              ?: attackableHexes.randomOrNull() ?: return
+              // Take over territory which is well defended, also helps with mass attacks
+              ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
+              ?: return
           } else {
-            think { "No territory is attackable" }
+            think { "No enemy territory is attackable" }
 
             val graveHexagons =
-              territory.hexagons.filter { territory.island.getData(it).piece is Grave }
-
+              territory.hexagons.filter { island.getData(it).piece is Grave }
             when {
               graveHexagons.isNotEmpty() -> {
                 think { "But there is a hexagon with a grave, lets clean it up early" }
                 graveHexagons.random()
               }
               random.nextFloat() >= 0.15f -> { // 85% chance of placing defensively
-                think { "Placing the held piece in the best defensive position" }
+                think { "Placing the held piece in the best defensive position, nothing else to do" }
                 val emptyHex = calculateBestCastlePlacement(territory)
                 if (emptyHex != null) hexBlacklist.add(emptyHex)
                 emptyHex
