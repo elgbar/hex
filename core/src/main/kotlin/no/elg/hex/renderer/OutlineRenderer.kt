@@ -91,6 +91,6 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
   }
 
   companion object {
-    private const val DEFAULT_RECT_LINE_WIDTH = 0.75f
+    private const val DEFAULT_RECT_LINE_WIDTH = 1f
   }
 }
