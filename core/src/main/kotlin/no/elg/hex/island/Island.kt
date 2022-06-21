@@ -152,8 +152,9 @@ class Island(
       for (hexagon in hexagons) {
         val data = this.getData(hexagon)
         if (data.invisible) continue
-        when (val hexPiece = data.piece) {
-          is TreePiece -> hexPiece.hasGrown = false
+        val hexPiece = data.piece
+        if (hexPiece is TreePiece) {
+            hexPiece.hasGrown = false
         }
       }
     }
