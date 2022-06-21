@@ -154,7 +154,7 @@ class Island(
         if (data.invisible) continue
         val hexPiece = data.piece
         if (hexPiece is TreePiece) {
-            hexPiece.hasGrown = false
+          hexPiece.hasGrown = false
         }
       }
     }

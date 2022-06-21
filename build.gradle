@@ -3,16 +3,16 @@ buildscript {
   ext {
     kotlinVersion = "1.7.0"
     appName = "Hex"
-    gdxVersion = '1.10.0'
-    ktxVersion = "1.10.0-b4"
+    gdxVersion = '1.11.0'
+    ktxVersion = "1.11.0-rc1"
     visVersion = '1.5.0'
-    jacksonVersion = "2.13.1"
+    jacksonVersion = "2.13.3"
     junitVersion = "5.8.2"
-    kotlinCoroutineVersion = "1.6.0"
+    kotlinCoroutineVersion = "1.6.3"
     argparserVersion = "2.0.7"
-    spotlessVersion = "5.12.4"
-    androidGraleToolsVersion = "7.0.0"
-    ktlintVersion = "0.41.0"
+    spotlessVersion = "6.7.2"
+    androidGradleToolsVersion = "7.0.0"
+    ktlintVersion = "0.44.0"
   }
 
   repositories {
@@ -26,7 +26,7 @@ buildscript {
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
-    classpath "com.android.tools.build:gradle:$androidGraleToolsVersion"
+    classpath "com.android.tools.build:gradle:$androidGradleToolsVersion"
   }
 }
 
