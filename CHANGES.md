@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix exception when entering invalid enum in settings
 * If the AI throw an exception, handle it
 * An AI will not cause an end-of-turn delay if it has no territories
+* Fix right control cannot be used to undo and redo moves
 
 ### Removed
 

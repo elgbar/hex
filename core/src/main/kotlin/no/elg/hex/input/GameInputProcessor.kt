@@ -191,8 +191,8 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         val piece = screen.island.getData(it).piece
         (piece as? LivingPiece)?.moved = false
       }
-      Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
-      Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
+      Z -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.undo()
+      Y -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.redo()
 
       else -> {
         if (screen.island.hand == null || screen.island.hand?.piece?.data === EDGE_DATA) {
