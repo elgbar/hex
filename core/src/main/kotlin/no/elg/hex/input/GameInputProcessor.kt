@@ -185,7 +185,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           else -> return false
         }
       }
-      F12 -> if (Hex.debug) cheating = !cheating
+      F12 -> if (Hex.debug || Hex.args.cheating) cheating = !cheating
       F11 -> if (cheating) screen.acceptAISurrender.toggleShown(screen.stage)
       F10 -> if (cheating) screen.island.selected?.hexagons?.forEach {
         val piece = screen.island.getData(it).piece
