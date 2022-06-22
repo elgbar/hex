@@ -225,14 +225,14 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
   }
 
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
-    hexagons.sumBy { island.getData(it).piece.income }
+    hexagons.sumOf { island.getData(it).piece.income }
 
   fun canBuy(piece: KClass<out Piece>): Boolean = canBuy(piece.createHandInstance())
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
   fun calculateStartCapital(hexagons: Iterable<Hexagon<HexagonData>>, island: Island): Int {
-    return hexagons.sumBy { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }
+    return hexagons.sumOf { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }
   }
 
   override fun copyTo(newData: HexagonData): Capital {

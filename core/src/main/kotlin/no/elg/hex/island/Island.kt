@@ -246,8 +246,8 @@ class Island(
       totalIncomePerTeam.clear(Team.values().size)
       totalBalancePerTeam.clear(Team.values().size)
       for ((team, territory) in getAllTerritories()) {
-        totalIncomePerTeam.getAndIncrement(team, 0, territory.sumBy { it.income })
-        totalBalancePerTeam.getAndIncrement(team, 0, territory.sumBy { it.capital.balance })
+        totalIncomePerTeam.getAndIncrement(team, 0, territory.sumOf { it.income })
+        totalBalancePerTeam.getAndIncrement(team, 0, territory.sumOf { it.capital.balance })
       }
     }
   }
