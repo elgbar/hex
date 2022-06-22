@@ -33,7 +33,7 @@ import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
-import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getAllTerritories
@@ -439,7 +439,7 @@ class Island(
    * `null` if hexagon is not a part of a territory
    */
   fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
-    val territoryHexes = connectedHexagons(hexagon)
+    val territoryHexes = connectedTerritoryHexagons(hexagon)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) {
       // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
       // then replace the capital with a tree
@@ -589,7 +589,7 @@ class Island(
     for (hexagon in hexagons) {
       if (checkedHexagons.contains(hexagon) || this.getData(hexagon).invisible) continue
 
-      val connectedHexes = this.connectedHexagons(hexagon)
+      val connectedHexes = this.connectedTerritoryHexagons(hexagon)
       checkedHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {

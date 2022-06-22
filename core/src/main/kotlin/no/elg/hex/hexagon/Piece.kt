@@ -3,7 +3,7 @@ package no.elg.hex.hexagon
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
@@ -209,7 +209,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     val hexagons = island.getTerritoryHexagons(pieceHex)
 
     if (hexagons == null) {
-      killall(island, island.connectedHexagons(pieceHex))
+      killall(island, island.connectedTerritoryHexagons(pieceHex))
       island.getData(pieceHex).setPiece(island.treeType(pieceHex))
       return
     }

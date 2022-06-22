@@ -34,7 +34,7 @@ import no.elg.hex.util.createInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isKeyPressed
-import no.elg.hex.util.isPartOfTerritory
+import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.toggleShown
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
@@ -144,7 +144,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
     val oldTerritory = island.selected
     if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) && cursorHexData.team == island.currentTeam) {
-      if (island.isPartOfTerritory(hexagon)) {
+      if (island.isPartOfATerritory(hexagon)) {
         island.select(hexagon)
       } else {
         return false
