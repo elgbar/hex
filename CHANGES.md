@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Visually show strength hint in the current selected territory
+  * Disabled by default, can be turned on in the settings
 ### Changed
 * Java 17 is the minimum java version
 * Minor improvement to the hard AI

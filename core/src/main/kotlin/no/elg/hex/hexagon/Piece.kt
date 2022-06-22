@@ -41,6 +41,13 @@ fun strengthToType(str: Int): KClass<out LivingPiece> {
   }
 }
 
+fun strengthToTypeOrNull(str: Int): KClass<out LivingPiece>? {
+  if (str !in PEASANT_STRENGTH..BARON_STRENGTH) {
+    return null
+  }
+  return strengthToType(str)
+}
+
 fun mergedType(piece1: LivingPiece, piece2: LivingPiece) =
   strengthToType(piece1.strength + piece2.strength)
 
