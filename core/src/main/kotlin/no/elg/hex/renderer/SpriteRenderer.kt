@@ -69,12 +69,14 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
         batch.draw(drawable, boundingBox.x.toFloat(), boundingBox.y.toFloat(), boundingBox.height.toFloat(), boundingBox.width.toFloat())
       }
 
-      if (Settings.enableStrengthHint) {
+      if (Settings.enableStrengthHint && island.isCurrentTeamHuman()) {
         val territory = island.selected
         if (territory != null) {
           for (hexagon in territory.hexagons) {
             val data = island.getData(hexagon)
             val str = island.calculateStrength(hexagon)
+            // Only show strength hint if the piece is different from the current piece
+            // i.e., don't show a spearman as a hint if the current piece is a spearman
             if (data.piece is LivingPiece && str <= data.piece.strength) continue
             val typ = strengthToTypeOrNull(str) ?: continue
 
