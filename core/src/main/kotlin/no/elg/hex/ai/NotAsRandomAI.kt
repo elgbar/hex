@@ -56,11 +56,13 @@ class NotAsRandomAI(override val team: Team) : AI {
   private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
   private val hexPickupPritoryList = ArrayList<Hexagon<HexagonData>>()
   private val strengthUsable = Array(BARON_STRENGTH) { true }
+  private var blockBuyingNewPiece = false
 
   private fun resetBlacklists() {
     hexBlacklist.clear()
     hexPickupPritoryList.clear()
     Arrays.fill(strengthUsable, true)
+    blockBuyingNewPiece = false
   }
 
   private fun canUseStrength(str: Int): Boolean = strengthUsable[str - 1]
@@ -125,11 +127,16 @@ class NotAsRandomAI(override val team: Team) : AI {
 
     // only buy if there are no more units to move
     if (pickUpHexes.isEmpty()) {
-      think {
-        "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
+      if (blockBuyingNewPiece) {
+        think { "No pieces to pick up. Buying unit is also blocked!" }
+        return false
       }
+      think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
       val piece = buyablePieces.filter {
         val toBuy = it.createHandInstance()
+        if (!canUseStrength(toBuy.strength)) {
+          return@filter false
+        }
         // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
         val newBalance = territory.capital.balance - toBuy.price
         val newIncome = territory.income + toBuy.income
@@ -226,14 +233,20 @@ class NotAsRandomAI(override val team: Team) : AI {
               territory.hexagons.filter { island.getData(it).piece is Grave }
             when {
               graveHexagons.isNotEmpty() -> {
-                think { "But there is a hexagon with a grave, lets clean it up early" }
+                think { "But there is a hexagon in my territory with a grave, lets clean it up early" }
                 graveHexagons.random()
               }
               random.nextFloat() >= 0.15f -> { // 85% chance of placing defensively
+                cannotUseStrength(handPiece.strength)
                 think { "Placing the held piece in the best defensive position, nothing else to do" }
                 val emptyHex = calculateBestLivingDefencePosition(territory)
-                if (emptyHex != null) hexBlacklist.add(emptyHex)
-                cannotUseStrength(handPiece.strength)
+                if (emptyHex != null) {
+                  hexBlacklist += emptyHex
+                } else {
+                  think { "Failed to place held piece on any hexagons" }
+                  blockBuyingNewPiece = true
+                  return
+                }
                 emptyHex
               }
               else -> {
