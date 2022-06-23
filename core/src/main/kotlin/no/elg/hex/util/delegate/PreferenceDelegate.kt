@@ -51,12 +51,11 @@ class PreferenceDelegate<T : Any>(
   /**
    * A function to test if a given value is **in**valid
    */
-  val invalidate: (T) -> Boolean = { false }
+  val invalidate: (T) -> Boolean = { false } // Note: this must be the last parameter
 ) {
 
   private var changed = false
-  internal var currentValue: T? = null
-    private set
+  private var currentValue: T? = null
   private lateinit var initialLoadedValue: T
 
   fun displayRestartWarning() = requireRestart && changed
@@ -114,7 +113,7 @@ class PreferenceDelegate<T : Any>(
 
       is Byte -> preferences.getInteger(propertyName, (initialValue as Byte).toInt()).toByte()
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
-      is Char -> preferences.getInteger(propertyName, (initialValue as Char).toInt()).toChar()
+      is Char -> preferences.getInteger(propertyName, (initialValue as Char).code).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
       is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnumOrNull(initialValue::class as KClass<Enum<*>>)
       else -> error("Nullable types are not allowed")
@@ -159,7 +158,7 @@ class PreferenceDelegate<T : Any>(
       is CharSequence -> preferences.putString(propertyName, currentValue.toString())
       is Long -> preferences.putLong(propertyName, currentValue as Long)
       is Byte -> preferences.putInteger(propertyName, (currentValue as Byte).toInt())
-      is Char -> preferences.putInteger(propertyName, (currentValue as Char).toInt())
+      is Char -> preferences.putInteger(propertyName, (currentValue as Char).code)
       is Short -> preferences.putInteger(propertyName, (currentValue as Short).toInt())
       is Double -> preferences.putFloat(propertyName, (currentValue as Double).toFloat())
       is Enum<*> -> preferences.putString(propertyName, (currentValue as Enum<*>).name)

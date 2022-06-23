@@ -35,9 +35,8 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
   }
 
   fun renderBackground() {
-    batch.begin()
-
     batch.disableBlending()
+    batch.begin()
 
     val bgWidth = Hex.assets.background.packedWidth.toFloat()
     val bgHeight = Hex.assets.background.packedHeight.toFloat()
@@ -52,8 +51,8 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
       offsetY++
     } while (offsetY < Gdx.graphics.height.toFloat() * camera.zoom)
 
-    batch.enableBlending()
     batch.end()
+    batch.enableBlending()
   }
 
   override fun hide() {
