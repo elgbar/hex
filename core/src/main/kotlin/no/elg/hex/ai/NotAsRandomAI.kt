@@ -54,10 +54,12 @@ class NotAsRandomAI(override val team: Team) : AI {
    * list of hexagon not to be picked up, as no action could be done with it, clear every round
    */
   private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
+  private val hexPickupPritoryList = ArrayList<Hexagon<HexagonData>>()
   private val strengthUsable = Array(BARON_STRENGTH) { true }
 
   private fun resetBlacklists() {
     hexBlacklist.clear()
+    hexPickupPritoryList.clear()
     Arrays.fill(strengthUsable, true)
   }
 
@@ -99,6 +101,16 @@ class NotAsRandomAI(override val team: Team) : AI {
     think { "Picking up a piece" }
     if (territory.island.hand?.piece != null) {
       think { "Already holding a piece! (${territory.island.hand?.piece})" }
+      return true
+    }
+
+    if (hexPickupPritoryList.isNotEmpty()) {
+      val hex = hexPickupPritoryList.removeLast()
+      think {
+        val data = territory.island.getData(hex)
+        "Picking up priority piece ${data.piece} at ${hex.cubeCoordinate.toAxialKey()}"
+      }
+      gameInputProcessor.click(hex)
       return true
     }
 
@@ -225,7 +237,12 @@ class NotAsRandomAI(override val team: Team) : AI {
                 emptyHex
               }
               else -> {
-                mergeWithLivingTerritoryPiece(handPiece, territory)
+                val hex = mergeWithLivingTerritoryPiece(handPiece, territory)
+                if (hex != null) {
+                  hexBlacklist -= hex
+                  hexPickupPritoryList += hex
+                }
+                hex
               }
             }
           }
