@@ -49,10 +49,12 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     get() = null
 
   override fun render(delta: Float) {
-    camera.resetHdpi()
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
+    if (DebugGraphRenderer.isEnabled) {
+      DebugGraphRenderer.frameUpdate()
+    }
   }
 
   override fun resize(width: Int, height: Int) {
@@ -81,6 +83,9 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     camera.position.y = islandCenterY.toFloat()
     camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
     updateCamera()
+    if (DebugGraphRenderer.isEnabled) {
+      DebugGraphRenderer.resize(width, height)
+    }
   }
 
   override fun show() {
@@ -94,6 +99,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     verticesRenderer.dispose()
     outlineRenderer.dispose()
     spriteRenderer.dispose()
+    DebugGraphRenderer.dispose()
   }
 
   fun saveProgress() {

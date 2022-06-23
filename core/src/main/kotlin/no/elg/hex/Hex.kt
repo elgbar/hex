@@ -164,7 +164,6 @@ object Hex : ApplicationAdapter() {
 
   override fun render() {
     try {
-
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
       ScreenRenderer.camera.resetHdpi()
@@ -180,7 +179,7 @@ object Hex : ApplicationAdapter() {
 
   override fun resume() {
     paused = false
-    setClearColorAlpha(1f)
+    resetClearColor()
     ScreenRenderer.resume()
 
     asyncThread = newSingleThreadAsyncContext()
@@ -226,6 +225,10 @@ object Hex : ApplicationAdapter() {
       assets.dispose()
     } catch (e: Exception) {
     }
+  }
+
+  fun resetClearColor() {
+    setClearColorAlpha(1f)
   }
 
   fun setClearColorAlpha(alpha: Float) {
