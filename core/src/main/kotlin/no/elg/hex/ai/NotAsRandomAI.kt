@@ -248,7 +248,7 @@ class NotAsRandomAI(override val team: Team) : AI {
   ): Hexagon<HexagonData>? {
     think { "Will try to merge piece with another piece" }
     val maxBorderStr =
-      territory.enemyBorderHexes.maxOfOrNull { territory.island.getData(it).piece.strength }
+      territory.enemyTerritoryHexagons.maxOfOrNull { territory.island.getData(it).piece.strength }
         ?: NO_STRENGTH
 
     think {

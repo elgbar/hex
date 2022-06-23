@@ -4,6 +4,7 @@ import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Team
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
+import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -32,6 +33,18 @@ data class Territory(
       enemyHexes.addAll(
         island.getNeighbors(hexagon).filter { island.getData(it).team != island.currentTeam }
       )
+    }
+    return@lazy enemyHexes
+  }
+
+  val enemyTerritoryHexagons: Collection<Hexagon<HexagonData>> by lazy {
+    val enemyHexes = HashSet<Hexagon<HexagonData>>()
+    for (hexagon in hexagons) {
+
+      val enemyHex = island.getNeighbors(hexagon).filter { island.getData(it).team != island.currentTeam }.flatMap {
+        island.connectedTerritoryHexagons(it)
+      }
+      enemyHexes.addAll(enemyHex)
     }
     return@lazy enemyHexes
   }
