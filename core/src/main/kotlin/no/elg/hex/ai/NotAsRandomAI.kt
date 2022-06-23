@@ -137,11 +137,12 @@ class NotAsRandomAI(override val team: Team) : AI {
         if (!canUseStrength(toBuy.strength)) {
           return@filter false
         }
+
+        val canBoughtAttackAnything = territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, toBuy) }
         // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
         val newBalance = territory.capital.balance - toBuy.price
         val newIncome = territory.income + toBuy.income
-
-        newBalance > 0 && shouldCreate(newBalance, newIncome)
+        shouldCreate(newBalance, newIncome, canBoughtAttackAnything)
       }.randomOrNull()
 
       if (piece == null) {
@@ -316,14 +317,19 @@ class NotAsRandomAI(override val team: Team) : AI {
       }
 
       val mergedType = mergedType(piece, handPiece).createHandInstance()
-
-      think { "Checking if I should merge ${handPiece::class.simpleName} with ${piece::class.simpleName}" }
+      val canMergedAttackAnything = territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, mergedType) }
+      val canAttack = !piece.moved && !handPiece.moved && canMergedAttackAnything
 
       // If we have not yet placed the held piece (ie directly merging it) we do not pay upkeep on it
       val handUpkeep = if (handPiece.data == HexagonData.EDGE_DATA) 0 else handPiece.income
 
       val newIncome = territory.income - piece.income - handUpkeep + mergedType.income
-      val shouldCreate = shouldCreate(territory.capital.balance, newIncome)
+
+      think {
+        "Checking if I should merge ${handPiece::class.simpleName} with ${piece::class.simpleName}. " +
+          "The merged piece can${if (canAttack) "" else " not"} be used to attack a bordering territory."
+      }
+      val shouldCreate = shouldCreate(territory.capital.balance, newIncome, canAttack)
       think {
         "New income would be $newIncome, current income is ${territory.income}, " +
           "current balance is ${territory.capital.balance}, this is " +
@@ -431,7 +437,7 @@ class NotAsRandomAI(override val team: Team) : AI {
 
     /**
      * Minimum number of turns we should aim to maintain a piece before bankruptcy.
-     * A higher number means higher risk of a bankruptcy.
+     * A higher number means lower risk of a bankruptcy.
      *
      * * A value of 0 means we might go bankrupt before beginning next turn
      * * A value of 1 makes sure we will survive at least till the next turn
@@ -441,13 +447,24 @@ class NotAsRandomAI(override val team: Team) : AI {
     const val PIECE_MAINTAIN_CONTRACT_LENGTH = 2
 
     /**
+     * Minimum balance projected to have next turn.
+     * A lower value allows for more risky investment, but runs a higher risk of bankruptcy.
+     *
+     * With a value less than zero we assume we can place piece to not go bankrupt.
+     *
+     * @see shouldCreate
+     */
+    private const val MINIMUM_NEXT_TURN_INCOME_ATTACKABLE_PIECE = -1
+
+    /**
      * If we should buy/merge pieces with the given [currentBalance] and [projectedIncome]
      *
      * @see PIECE_MAINTAIN_CONTRACT_LENGTH
      */
-    fun shouldCreate(currentBalance: Int, projectedIncome: Int): Boolean {
+    fun shouldCreate(currentBalance: Int, projectedIncome: Int, canAttack: Boolean = false): Boolean {
       if (projectedIncome >= 0) return true
-      return currentBalance + projectedIncome * PIECE_MAINTAIN_CONTRACT_LENGTH >= 0
+      val minIncome = if (canAttack) MINIMUM_NEXT_TURN_INCOME_ATTACKABLE_PIECE else 0
+      return currentBalance + projectedIncome * PIECE_MAINTAIN_CONTRACT_LENGTH >= minIncome
     }
   }
 }
