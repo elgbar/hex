@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * An AI will not cause an end-of-turn delay if it has no territories
 * Fix right control cannot be used to undo and redo moves
 * Fix certain settings name being badly formatted
+* Fix bankrupt territory not having their balance set to 0
 
 ### Removed
 

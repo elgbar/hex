@@ -228,6 +228,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     balance += calculateIncome(hexagons, island)
     if (balance < 0) {
       killall(island, hexagons)
+      balance = 0
     }
   }
 
