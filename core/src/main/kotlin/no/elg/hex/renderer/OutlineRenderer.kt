@@ -71,7 +71,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
 
     draw(islandScreen.island.hexagons, null, 0.25f)
 
-    if (islandScreen.island.currentAI == null) {
+    if (islandScreen.island.isCurrentTeamHuman()) {
       islandScreen.island.selected?.also {
         draw(it.hexagons, Color.WHITE, 1f)
 

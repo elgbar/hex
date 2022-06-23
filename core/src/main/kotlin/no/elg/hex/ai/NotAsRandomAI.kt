@@ -96,6 +96,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       } while (random.nextFloat() > 0.005f)
     }
     island.select(null)
+    resetBlacklists()
     return territories.isNotEmpty()
   }
 

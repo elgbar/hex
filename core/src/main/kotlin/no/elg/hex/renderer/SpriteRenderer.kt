@@ -53,7 +53,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
           is Grave -> Hex.assets.grave
           is LivingPiece -> {
 
-            val time = if (data.team == island.currentTeam && island.currentAI == null) piece.updateAnimationTime() else 0f
+            val time = if (data.team == island.currentTeam && island.isCurrentTeamHuman()) piece.updateAnimationTime() else 0f
 
             when (piece) {
               is Peasant -> Hex.assets.peasant
