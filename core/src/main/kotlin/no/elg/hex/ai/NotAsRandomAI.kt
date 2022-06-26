@@ -56,13 +56,15 @@ class NotAsRandomAI(override val team: Team) : AI {
   private val hexBlacklist = ArrayList<Hexagon<HexagonData>>()
   private val hexPickupPritoryList = ArrayList<Hexagon<HexagonData>>()
   private val strengthUsable = Array(BARON_STRENGTH) { true }
-  private var blockBuyingNewPiece = false
+  private var blockBuyingNewLivingPieces = false
+  private var blockBuyingNewCastles = false
 
   private fun resetBlacklists() {
     hexBlacklist.clear()
     hexPickupPritoryList.clear()
     Arrays.fill(strengthUsable, true)
-    blockBuyingNewPiece = false
+    blockBuyingNewLivingPieces = false
+    blockBuyingNewCastles = false
   }
 
   private fun canUseStrength(str: Int): Boolean = strengthUsable[str - 1]
@@ -127,37 +129,51 @@ class NotAsRandomAI(override val team: Team) : AI {
       )
 
     // only buy if there are no more units to move
-    if (pickUpHexes.isEmpty()) {
-      if (blockBuyingNewPiece) {
-        think { "No pieces to pick up. Buying unit is also blocked!" }
-        return false
-      }
-      think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
-      val piece = buyablePieces.filter {
-        val toBuy = it.createHandInstance()
-        if (!canUseStrength(toBuy.strength)) {
-          return@filter false
-        }
-
-        val canBoughtAttackAnything = territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, toBuy) }
-        // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
-        val newBalance = territory.capital.balance - toBuy.price
-        val newIncome = territory.income + toBuy.income
-        shouldCreate(newBalance, newIncome, canBoughtAttackAnything)
-      }.randomOrNull()
-
-      if (piece == null) {
-        think { "No pieces to pickup, and cannot afford any pieces in this territory, I only have ${territory.capital.balance} and an income of ${territory.income}" }
-        return false
-      }
-      think { "Buying the unit ${piece.simpleName} " }
-      gameInputProcessor.buyUnit(piece.createInstance(HexagonData.EDGE_DATA))
-      think { "New balance ${territory.capital.balance}" }
-    } else {
+    if (pickUpHexes.isNotEmpty()) {
       think { "There is something to pick up in the current territory!" }
       gameInputProcessor.click(pickUpHexes.random())
+    } else {
+      return buy(territory, gameInputProcessor)
     }
     think { "I am now holding ${territory.island.hand?.piece}" }
+    return true
+  }
+
+  private fun buy(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
+    think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
+    val piece = buyablePieces.filter {
+      val toBuy = it.createHandInstance()
+      // If we cannot use a piece, we should not buy it
+      if (toBuy is LivingPiece && !canUseStrength(toBuy.strength)) {
+        return@filter false
+      }
+      if (toBuy is Castle && blockBuyingNewCastles) {
+        think {
+          "No pieces to pick up. Buying ${if (blockBuyingNewLivingPieces) "castles and peasants" else "castles"} is also blocked!"
+        }
+        return@filter false
+      }
+      if (toBuy is LivingPiece && blockBuyingNewLivingPieces) {
+        think {
+          "No pieces to pick up. Buying ${if (blockBuyingNewCastles) "castles and peasants" else "peasants"} is also blocked!"
+        }
+        return false
+      }
+
+      val canBoughtAttackAnything = toBuy is LivingPiece && territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, toBuy) }
+      // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
+      val newBalance = territory.capital.balance - toBuy.price
+      val newIncome = territory.income + toBuy.income
+      shouldCreate(newBalance, newIncome, canBoughtAttackAnything)
+    }.randomOrNull()
+
+    if (piece == null) {
+      think { "No pieces to pickup, and cannot afford any pieces in this territory, I only have ${territory.capital.balance} and an income of ${territory.income}" }
+      return false
+    }
+    think { "Buying the unit ${piece.simpleName} " }
+    gameInputProcessor.buyUnit(piece.createInstance(HexagonData.EDGE_DATA))
+    think { "New balance ${territory.capital.balance}" }
     return true
   }
 
@@ -175,6 +191,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       val hexagon = calculateBestCastlePlacement(territory)
       if (hexagon == null) {
         think { "No valid hexagon to place the castle!" }
+        blockBuyingNewCastles = true
         return
       }
       think { "Best placement for this castle is ${hexagon.cubeCoordinate.toAxialKey()}" }
@@ -184,87 +201,72 @@ class NotAsRandomAI(override val team: Team) : AI {
       val treeHexagons =
         territory.hexagons.filter { island.getData(it).piece is TreePiece }
 
-      val hexagon =
+      val hexagon = kotlin.run {
         if (treeHexagons.isNotEmpty()) {
           think { "There is a piece of tree in my territory, must tear it down!" }
-          treeHexagons.random()
-        } else {
-          // hexagon where we can put a living piece
-          //        val attackableHexes =
-          //            HashSet<Hexagon<HexagonData>>(
-          //                territory.hexagons.filter {
-          //                  val piece = territory.island.getData(it).piece
-          //                  ((piece is LivingPiece && piece.canMerge(handPiece)) ||
-          //                      piece is Castle ||
-          //                      piece is Capital)
-          //                })
-
-          val attackableHexes =
-            territory.enemyBorderHexes.filter { island.canAttack(it, handPiece) }
-          if (attackableHexes.isNotEmpty()) {
-            think { "I can attack an enemy hexagon with this piece" }
-
-            fun tryAttack(type: KClass<out Piece>): Hexagon<HexagonData>? {
-              val attackableOfType =
-                attackableHexes.filter { type.isInstance(island.getData(it).piece) }
-              if (attackableOfType.isNotEmpty()) {
-                think { "Will attack a ${type.simpleName}" }
-                return attackableOfType.random()
-              }
-              think { "Cannot find any ${type.simpleName} to attack" }
-              return null
-            }
-
-            val connectingHex = attackableHexes.firstOrNull {
-              island.getNeighbors(it).filter { fit ->
-                fit !in territory.hexagons
-              }.any { ait -> island.getData(ait).team == territory.team }
-            }
-            think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.cubeCoordinate})" }
-
-            connectingHex ?: tryAttack(Capital::class)
-              ?: tryAttack(Castle::class)
-              ?: tryAttack(LivingPiece::class)
-              // Take over territory which is well defended, also helps with mass attacks
-              ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
-              ?: return
-          } else {
-            think { "No enemy territory is attackable" }
-
-            val graveHexagons =
-              territory.hexagons.filter { island.getData(it).piece is Grave }
-            when {
-              graveHexagons.isNotEmpty() -> {
-                think { "But there is a hexagon in my territory with a grave, lets clean it up early" }
-                graveHexagons.random()
-              }
-              random.nextFloat() >= 0.15f -> { // 85% chance of placing defensively
-                cannotUseStrength(handPiece.strength)
-                think { "Placing the held piece in the best defensive position, nothing else to do" }
-                val emptyHex = calculateBestLivingDefencePosition(territory)
-                if (emptyHex != null) {
-                  hexBlacklist += emptyHex
-                } else {
-                  think { "Failed to place held piece on any hexagons" }
-                  blockBuyingNewPiece = true
-                  return
-                }
-                emptyHex
-              }
-              else -> {
-                val hex = mergeWithLivingTerritoryPiece(handPiece, territory)
-                if (hex != null) {
-                  hexBlacklist -= hex
-                  hexPickupPritoryList += hex
-                }
-                hex
-              }
-            }
-          }
+          return@run treeHexagons.random()
         }
-      if (hexagon == null) {
-        think { "Failed to find any enemy hexagon to attack" }
-        return
+
+        val attackableHexes = attackableHexagons(territory, handPiece)
+        if (attackableHexes.isNotEmpty()) {
+          think { "I can attack an enemy hexagon with this piece" }
+
+          fun tryAttack(type: KClass<out Piece>): Hexagon<HexagonData>? {
+            val attackableOfType =
+              attackableHexes.filter { type.isInstance(island.getData(it).piece) }
+            if (attackableOfType.isNotEmpty()) {
+              think { "Will attack a ${type.simpleName}" }
+              return attackableOfType.random()
+            }
+            think { "Cannot find any ${type.simpleName} to attack" }
+            return null
+          }
+
+          val connectingHex = attackableHexes.firstOrNull {
+            island.getNeighbors(it).filter { fit ->
+              fit !in territory.hexagons
+            }.any { ait -> island.getData(ait).team == territory.team }
+          }
+          think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.cubeCoordinate})" }
+
+          return@run connectingHex
+            ?: tryAttack(Capital::class)
+            ?: tryAttack(Castle::class)
+            ?: tryAttack(LivingPiece::class)
+            // Take over territory which is well defended, also helps with mass attacks
+            ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
+            ?: kotlin.run {
+              think { "Failed to attack anything" }
+              return
+            }
+        } else {
+          think { "No enemy territory is attackable" }
+
+          val graveHexagons = territory.hexagons.filter { island.getData(it).piece is Grave }
+          if (graveHexagons.isNotEmpty()) {
+            think { "But there is a hexagon in my territory with a grave, lets clean it up early" }
+            return@run graveHexagons.random()
+          }
+
+          val mergeHex = mergeWithLivingTerritoryPiece(handPiece, territory)
+          if (mergeHex != null) {
+            hexBlacklist -= mergeHex
+            hexPickupPritoryList += mergeHex
+            return@run mergeHex
+          }
+
+          cannotUseStrength(handPiece.strength)
+          think { "Placing the held piece in the best defensive position, nothing else to do" }
+          val emptyHex = calculateBestLivingDefencePosition(territory)
+          if (emptyHex != null) {
+            hexBlacklist += emptyHex
+          } else {
+            think { "Failed to place held piece on any hexagons" }
+            blockBuyingNewLivingPieces = true
+            return
+          }
+          return@run emptyHex
+        }
       }
       think {
         "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} " +
@@ -273,6 +275,10 @@ class NotAsRandomAI(override val team: Team) : AI {
       gameInputProcessor.click(hexagon)
     }
   }
+
+  /* *************************************************************************
+   *  UTILITY METHODS
+   * *************************************************************************/
 
   private fun mergeWithLivingTerritoryPiece(
     handPiece: LivingPiece,
@@ -430,6 +436,10 @@ class NotAsRandomAI(override val team: Team) : AI {
       val neighbors = island.getNeighbors(it)
       neighbors.count { neighbor -> island.getData(neighbor).team == team } / neighbors.size
     }
+  }
+
+  private fun attackableHexagons(territory: Territory, piece: Piece): List<Hexagon<HexagonData>> {
+    return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) }
   }
 
   companion object {
