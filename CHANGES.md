@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The time AI uses on its move is subtracted from the minimum AI delay
 * Increase default outline width
 * Cheating can be toggled when cheating via the `--i-am-a-cheater` flag; i.e., debug and trace logging is disabled
+* Use lwjgl3 for desktop backend
 
 ### Fixed
 
