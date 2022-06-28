@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix right control cannot be used to undo and redo moves
 * Fix certain settings name being badly formatted
 * Fix bankrupt territory not having their balance set to 0
+* Remember whose turn it is when loading a saved island
 
 ### Removed
 

@@ -66,7 +66,9 @@ class Island(
   handPiece: Piece? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   turn: Int = 1,
-  initialLoad: Boolean = true
+  initialLoad: Boolean = true,
+  @JsonAlias("team")
+  startTeam: Team = Settings.startTeam
 ) {
   var turn = turn
     private set
@@ -104,7 +106,7 @@ class Island(
     }
 
   internal fun restoreState(dto: IslandDto) {
-    restoreState(dto.width, dto.height, dto.layout, dto.selectedCoordinate, dto.handPiece, dto.hexagonData, false)
+    restoreState(dto.width, dto.height, dto.layout, dto.selectedCoordinate, dto.handPiece, dto.hexagonData, false, dto.team)
   }
 
   private fun restoreState(
@@ -115,6 +117,7 @@ class Island(
     handPiece: Piece? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     initialLoad: Boolean,
+    team: Team
   ) {
     val builder =
       HexagonalGridBuilder<HexagonData>()
@@ -146,6 +149,7 @@ class Island(
     }
 
     recountTotalTreasury()
+    currentTeam = team
 
     if (initialLoad) {
       ensureCapitalStartFunds()
@@ -226,13 +230,13 @@ class Island(
     }
 
   init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad)
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
 
-  inline fun isCurrentTeamAI() = currentAI != null
-  inline fun isCurrentTeamHuman() = currentAI == null
+  fun isCurrentTeamAI() = currentAI != null
+  fun isCurrentTeamHuman() = currentAI == null
 
   // ////////// //
   //  Gameplay  //
@@ -680,7 +684,8 @@ class Island(
       hand?.piece?.createDtoCopy(),
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       turn,
-      false
+      false,
+      currentTeam
     )
   }
 
@@ -692,7 +697,8 @@ class Island(
     val handPiece: Piece? = null,
     val hexagonData: Map<CubeCoordinate, HexagonData>,
     val turn: Int,
-    val initialLoad: Boolean
+    val initialLoad: Boolean,
+    val team: Team = LEAF
   ) {
     fun copy(): IslandDto {
       return IslandDto(
@@ -703,7 +709,8 @@ class Island(
         handPiece?.createDtoCopy(),
         hexagonData.mapValues { (_, data) -> data.copy() },
         turn,
-        false
+        false,
+        team
       )
     }
 
