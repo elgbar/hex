@@ -326,7 +326,7 @@ class NotAsRandomAI(override val team: Team) : AI {
         "Checking if I should merge ${handPiece::class.simpleName} with ${piece::class.simpleName}. " +
           "The merged piece can${if (canAttack) "" else " not"} be used to attack a bordering territory."
       }
-      val shouldCreate = isEconomicalToCreatePiece(territory.capital.balance, newIncome, canAttack)
+      val shouldCreate = canAttack && isEconomicalToCreatePiece(territory.capital.balance, newIncome, true)
       think {
         "New income would be $newIncome, current income is ${territory.income}, " +
           "current balance is ${territory.capital.balance}, this is " +
