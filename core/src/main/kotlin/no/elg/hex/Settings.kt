@@ -31,6 +31,8 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
+  var allowAIToSurrender by PreferenceDelegate(true, priority = 100, hideLevel = LOG_DEBUG)
+
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
   var enableStrengthHint by PreferenceDelegate(false, priority = 100)
 

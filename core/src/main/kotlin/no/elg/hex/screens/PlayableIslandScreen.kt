@@ -414,7 +414,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     // we only ask for AI surrender when there is a single player
     // if there are no players (ai vs ai) we want to watch the whole thing
     // and if there are more than one player they should decide if they surrender
-    if (allowAISurrender && island.realPlayers == 1) {
+    if (Settings.allowAIToSurrender && allowAISurrender && island.realPlayers == 1) {
 
       // surrender rules
       // either you own more than 75% of all hexagons
