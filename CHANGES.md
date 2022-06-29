@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Visually show strength hint in the current selected territory
   * Disabled by default, can be turned on in the settings
 * Add debug fps graph
+* Add relative strength bar
 
 ### Changed
 

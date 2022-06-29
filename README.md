@@ -80,6 +80,5 @@ optional arguments:
 ## TODO
 
 * Add minimap
-* Add relative strength bar (partially done, need to implement it graphically)
 * Sounds are sometimes not properly loaded on android
 * Generate trees when generating random island
