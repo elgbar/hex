@@ -15,7 +15,10 @@ import no.elg.hex.api.Resizable
 
 object DebugGraphRenderer : FrameUpdatable, Disposable, Resizable {
 
-  const val RELATIVE_GRAPH_WIDTH = 0.25f
+  private const val RELATIVE_GRAPH_WIDTH = 0.25f
+
+  private const val COL_WIDTH = 2
+  private const val COLOR_SIZE = 6
 
   private lateinit var fbo: FrameBuffer
   private var batch = SpriteBatch()
@@ -25,9 +28,6 @@ object DebugGraphRenderer : FrameUpdatable, Disposable, Resizable {
   private var fboHeight: Int = 0
 
   private var fpsIndex: Int = 0 // frames per second
-
-  private const val COL_WIDTH = 2
-  private const val COLOR_SIZE = 6
 
   private val colors = Array<Color>(COLOR_SIZE) {
     when (it) {
@@ -111,7 +111,7 @@ object DebugGraphRenderer : FrameUpdatable, Disposable, Resizable {
   override fun resize(width: Int, height: Int) {
     batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
     fboWidth = width
-    fboHeight = height / 3
+    fboHeight = (height / 3).coerceAtLeast(1)
     fpsIndex = Int.MAX_VALUE
 
     if (::fbo.isInitialized) {
