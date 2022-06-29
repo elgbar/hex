@@ -35,6 +35,7 @@ object Settings {
 
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
   var enableStrengthHint by PreferenceDelegate(false, priority = 100)
+  var enableStrengthBar by PreferenceDelegate(true, priority = 100)
 
   var showFps by PreferenceDelegate(false, priority = 109)
   var limitFps by PreferenceDelegate(

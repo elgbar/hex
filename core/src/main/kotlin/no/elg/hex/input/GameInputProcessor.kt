@@ -204,7 +204,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     return true
   }
 
-  fun buyUnit(piece: Piece) {
+  fun buyUnit(piece: Piece): Boolean {
     screen.island.selected?.also { territory ->
       val hand = screen.island.hand
       if (hand != null && (
@@ -213,12 +213,12 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         )
       ) {
         // If we cannot merge or the pieces are identical we should not be able to buy new pieces
-        return@also
+        return false
       }
 
       if (!cheating || screen.island.isCurrentTeamAI()) {
         if (!territory.capital.canBuy(piece)) {
-          return@also
+          return false
         }
         territory.capital.balance -= piece.price
       }
@@ -230,7 +230,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       ) {
         require(piece.canMerge(hand.piece))
 
-        screen.island.history.remember("Buying piece") {
+        screen.island.history.remember("Upgrading held piece") {
           val newType = strengthToType(hand.piece.strength + piece.strength)
           Gdx.app.trace("BUY") { "Bought ${piece::class.simpleName} while holding ${hand.piece::class.simpleName}" }
 
@@ -250,7 +250,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         }
       }
       Hex.assets.pieceDownSound?.play(Settings.volume)
+      return true
     }
+    return false
   }
 
   private fun march(hexagon: Hexagon<HexagonData>): Boolean {

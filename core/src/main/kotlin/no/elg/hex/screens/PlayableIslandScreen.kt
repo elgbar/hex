@@ -419,8 +419,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       // surrender rules
       // either you own more than 75% of all hexagons
       // or all enemies have less than 12,5% of the hexagons
-      val percentagesHexagons = island.percentagesHexagons()
-      if (percentagesHexagons[currentTeam] ?: 0f >= PERCENT_HEXES_OWNED_TO_WIN ||
+      val percentagesHexagons = island.calculatePercentagesHexagons()
+      if ((percentagesHexagons[currentTeam] ?: 0f) >= PERCENT_HEXES_OWNED_TO_WIN ||
         percentagesHexagons.all { (team, percent) -> team === currentTeam || percent < MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER }
       ) {
         acceptAISurrender.show(stageScreen.stage)
@@ -515,11 +515,10 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     inputProcessor.show()
     super.show()
 
-    listener = SimpleEventListener.create<TeamChangeHexagonDataEvent> {
+    listener = SimpleEventListener.create {
       island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
       island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
     }
-
     if (island.isCurrentTeamAI()) {
       island.beginTurn(inputProcessor)
     }
@@ -542,6 +541,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     if (::strengthBarRenderer.isLazyInitialized) {
       strengthBarRenderer.dispose()
     }
+    debugRenderer.dispose()
   }
 
   companion object {

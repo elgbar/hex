@@ -263,7 +263,7 @@ class Island(
     }
   }
 
-  fun percentagesHexagons(): EnumMap<Team, Float> {
+  fun calculatePercentagesHexagons(): EnumMap<Team, Float> {
     val hexes = hexagonsPerTeam
     val totalHexagons = visibleHexagons.toFloat()
     return Team.values().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {

@@ -364,6 +364,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   override fun dispose() {
     super.dispose()
     stageScreen.dispose()
+    debugInfoRenderer.dispose()
   }
 
   companion object {
