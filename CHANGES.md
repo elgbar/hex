@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     it up again straight away
   * [940e556](https://github.com/elgbar/hex/commit/940e5568a0bdd62e902ede32e61079527979b2eb), Only buy new units when
     they can be used for something
+  * [1df3a6b](https://github.com/elgbar/hex/commit/1df3a6bc91ff646c726d0d7ddfc6a74dee069cdf), Disallow merging if the
+    new piece cannot attack
 * The time AI uses on its move is subtracted from the minimum AI delay
 * Increase default outline width
 * Cheating can be toggled when cheating via the `--i-am-a-cheater` flag; i.e., debug and trace logging is disabled

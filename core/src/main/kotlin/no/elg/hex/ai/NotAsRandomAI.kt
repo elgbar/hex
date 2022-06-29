@@ -1,10 +1,6 @@
 package no.elg.hex.ai
 
-import kotlin.random.Random.Default as random
 import com.badlogic.gdx.Gdx
-import java.util.Arrays
-import kotlin.random.Random
-import kotlin.reflect.KClass
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -34,6 +30,10 @@ import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
+import java.util.Arrays
+import kotlin.random.Random
+import kotlin.reflect.KClass
+import kotlin.random.Random.Default as random
 
 /**
  * An AI that does semi-random actions for a until it amount of time. All action it can take will
@@ -314,7 +314,7 @@ class NotAsRandomAI(override val team: Team) : AI {
       }
 
       val mergedType = mergedType(piece, handPiece).createHandInstance()
-      val canMergedAttackAnything = territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, mergedType) }
+      val canMergedAttackAnything = canPieceAttack(territory, mergedType)
       val canAttack = !piece.moved && !handPiece.moved && canMergedAttackAnything
 
       // If we have not yet placed the held piece (ie directly merging it) we do not pay upkeep on it
@@ -426,15 +426,24 @@ class NotAsRandomAI(override val team: Team) : AI {
   }
 
   private fun attackableHexagons(territory: Territory, piece: LivingPiece): List<Hexagon<HexagonData>> {
-    return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) }
+    return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) } +
+      territory.hexagons.filter { hex -> territory.island.getData(hex).piece is TreePiece }
   }
 
   private fun canPieceAttack(territory: Territory, piece: LivingPiece): Boolean {
-    return territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, piece) }
+    return territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, piece) } ||
+      territory.hexagons.any { hex -> territory.island.getData(hex).piece is TreePiece }
   }
 
   private fun canAttackOrMergePiece(territory: Territory, piece: LivingPiece): Boolean {
-    return canPieceAttack(territory, piece) || bestPieceToMergeWith(territory, piece) != null
+    if (canPieceAttack(territory, piece)) {
+      return true
+    }
+    val mergeWith = bestPieceToMergeWith(territory, piece) ?: return false
+    val mergePiece = territory.island.getData(mergeWith).piece
+    require(mergePiece is LivingPiece) { "Merge piece is not a living piece" }
+    val mergedType = mergedType(piece, mergePiece).createHandInstance()
+    return canPieceAttack(territory, mergedType)
   }
 
   private fun existsEmptyHexagon(territory: Territory): Boolean {
