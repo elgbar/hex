@@ -45,6 +45,7 @@ import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.renderer.DebugGraphRenderer
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
@@ -479,6 +480,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun render(delta: Float) {
     super.render(delta)
+    if (DebugGraphRenderer.isEnabled) {
+      DebugGraphRenderer.frameUpdate()
+    }
     debugRenderer.frameUpdate()
     frameUpdatable.frameUpdate()
     stageScreen.render(delta)
@@ -492,6 +496,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     super.resize(width, height)
     stageScreen.resize(width, height)
     frameUpdatable.resize(width, height)
+    if (DebugGraphRenderer.isEnabled) {
+      DebugGraphRenderer.resize(width, height)
+    }
   }
 
   override fun show() {
@@ -520,6 +527,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     LevelSelectScreen.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
     listener.disposeSafely()
+
+    DebugGraphRenderer.dispose()
   }
 
   companion object {

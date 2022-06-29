@@ -8,7 +8,6 @@ import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.island.Island
-import no.elg.hex.renderer.DebugGraphRenderer
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
@@ -53,9 +52,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
-    if (DebugGraphRenderer.isEnabled) {
-      DebugGraphRenderer.frameUpdate()
-    }
   }
 
   override fun resize(width: Int, height: Int) {
@@ -84,9 +80,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     camera.position.y = islandCenterY.toFloat()
     camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
     updateCamera()
-    if (DebugGraphRenderer.isEnabled) {
-      DebugGraphRenderer.resize(width, height)
-    }
   }
 
   override fun show() {
@@ -106,7 +99,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     if (::spriteRenderer.isLazyInitialized) {
       spriteRenderer.dispose()
     }
-    DebugGraphRenderer.dispose()
   }
 
   fun saveProgress() {
