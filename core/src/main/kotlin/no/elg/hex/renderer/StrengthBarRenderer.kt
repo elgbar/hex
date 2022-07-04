@@ -1,6 +1,7 @@
 package no.elg.hex.renderer
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -61,16 +62,25 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
     var offsetX = 0
     for (team in Team.values()) {
       val percent = percentagesHexagons[team] ?: error("No percentage for team $team")
-      offsetX += drawRect(offsetX, percent, team)
+      offsetX += drawRect(offsetX, percent, team, island.currentTeam == team)
     }
     end()
   }
 
-  private fun drawRect(xOffset: Int, percent: Float, team: Team): Int {
+  private fun drawRect(xOffset: Int, percent: Float, team: Team, currentTeam: Boolean): Int {
     val color = team.color
     val endX = (fboWidth * percent).roundToInt()
 
-    Gdx.gl.glScissor(xOffset, 0, xOffset + endX, fboHeight)
+    if (currentTeam) {
+      Gdx.gl.glScissor(xOffset, (fboHeight * RELATIVE_HIGHLIGHT_BORDER_PERCENT).toInt(), xOffset + endX, fboHeight)
+      val highlight = Color.WHITE
+      Gdx.gl.glClearColor(highlight.r, highlight.g, highlight.b, 1f)
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+      Gdx.gl.glScissor(xOffset, 0, xOffset + endX, (fboHeight * RELATIVE_HIGHLIGHT_BORDER_INVERSE_PERCENT).toInt())
+    } else {
+      Gdx.gl.glScissor(xOffset, 0, xOffset + endX, fboHeight)
+    }
     Gdx.gl.glClearColor(color.r, color.g, color.b, 1f)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
     return endX
@@ -111,6 +121,8 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
   companion object {
     private const val RELATIVE_GRAPH_LARGER_SIZE = 0.2f
     private const val RELATIVE_GRAPH_SMALLER_SIZE = 0.05f
+    private const val RELATIVE_HIGHLIGHT_BORDER_PERCENT = 0.10f
+    private const val RELATIVE_HIGHLIGHT_BORDER_INVERSE_PERCENT = 1f - RELATIVE_HIGHLIGHT_BORDER_PERCENT
 
     val isEnabled: Boolean get() = Settings.enableStrengthBar
   }
