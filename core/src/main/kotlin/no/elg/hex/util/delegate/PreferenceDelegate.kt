@@ -114,9 +114,9 @@ class PreferenceDelegate<T : Any>(
 
       is Byte -> preferences.getInteger(propertyName, (initialValue as Byte).toInt()).toByte()
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
-      is Char -> preferences.getInteger(propertyName, (initialValue as Char).toInt()).toChar()
+      is Char -> preferences.getInteger(propertyName, (initialValue as Char).code).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
-      is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnumOrNull(initialValue::class as KClass<Enum<*>>)
+      is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnumOrNull(initialValue::class as KClass<out Enum<*>>)
       else -> error("Nullable types are not allowed")
     } as T
   }

@@ -85,7 +85,7 @@ class SettingsScreen : OverlayScreen() {
 
           val clazz = delegate.initialValue::class
           if (clazz.java.isEnum) {
-            val enumValues = findEnumValues(clazz as KClass<Enum<*>>).toGdxArray()
+            val enumValues = findEnumValues(clazz as KClass<out Enum<*>>).toGdxArray()
             val model = ArraySpinnerModel(enumValues)
             spinner("", model) {
               val minWidth = Hex.assets.fontSize * enumValues.maxOf { enum -> enum.name.length / 2f + 1 }

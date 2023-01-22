@@ -25,9 +25,9 @@ class AndroidLauncher : AndroidApplication() {
       config.numSamples = 2 //default value
     }
 
-    config.hideStatusBar = true
-//    config.useImmersiveMode = true
+    config.useGL30 = true
     config.depth = 0
+    config.useImmersiveMode = true
     config.useCompass = false
     config.useAccelerometer = false
     config.useGyroscope = false

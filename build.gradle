@@ -1,18 +1,20 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
 
   ext {
-    kotlinVersion = "1.6.10"
     appName = "Hex"
-    gdxVersion = '1.10.0'
-    ktxVersion = "1.10.0-b4"
-    visVersion = '1.5.0'
-    jacksonVersion = "2.13.1"
-    junitVersion = "5.8.2"
-    kotlinCoroutineVersion = "1.6.0"
+    kotlinVersion = "1.8.0"
+    gdxVersion = '1.11.0'
+    ktxVersion = "1.11.0-rc3"
+    visVersion = '1.5.1'
+    jacksonVersion = "2.14.1"
+    junitVersion = "5.9.2"
+    kotlinCoroutineVersion = "1.6.4"
     argparserVersion = "2.0.7"
-    spotlessVersion = "5.12.4"
-    androidGraleToolsVersion = "7.0.0"
-    ktlintVersion = "0.41.0"
+    spotlessVersion = "6.13.0"
+    androidGradleToolsVersion = "7.4.0-beta02"
+    ktlintVersion = "0.48.1"
   }
 
   repositories {
@@ -23,24 +25,21 @@ buildscript {
     gradlePluginPortal()
     google()
   }
+
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
-    classpath "com.android.tools.build:gradle:$androidGraleToolsVersion"
+    classpath "com.android.tools.build:gradle:$androidGradleToolsVersion"
   }
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+tasks.withType(KotlinCompile).configureEach {
   sourceCompatibility = JavaVersion.VERSION_17
   targetCompatibility = JavaVersion.VERSION_17
-
-  kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_17.getName()
-  }
+  compilerOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
 subprojects {
-  apply plugin: "idea"
   apply plugin: "com.diffplug.spotless"
 
   version = '1.1.1-SNAPSHOT'
@@ -134,7 +133,6 @@ project(":core") {
 
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-//    api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
     api "com.kotcrab.vis:vis-ui:$visVersion"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
 
