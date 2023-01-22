@@ -210,6 +210,7 @@ object Hex : ApplicationAdapter() {
     internalTutorialScreen?.dispose()
     internalTutorialScreen = null
     LevelSelectScreen.disposePreviews()
+    VisUI.dispose(false)
   }
 
   override fun resize(width: Int, height: Int) {
@@ -218,10 +219,8 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun dispose() {
-    paused = true
     try {
       pause()
-      VisUI.dispose()
       screen.dispose()
       assets.dispose()
     } catch (e: Exception) {
