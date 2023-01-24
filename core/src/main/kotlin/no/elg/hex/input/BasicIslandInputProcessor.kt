@@ -64,8 +64,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    if (draggable && !pinching) {
-
+    if (draggable && pointer == 0) {
       val (maxX, minX, maxY, minY) = screen.visibleGridSize
 
       val zoom = screen.camera.zoom
