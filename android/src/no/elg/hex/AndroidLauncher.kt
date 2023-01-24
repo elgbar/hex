@@ -12,12 +12,11 @@ class AndroidLauncher : AndroidApplication() {
 
     val config = AndroidApplicationConfiguration()
 
-//    val args = arrayOf<String>("--debug")
-    val args = arrayOf<String>()
+    val args = arrayOf("--debug")
+//    val args = arrayOf<String>()
 
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
-
 
     if (Hex.launchPreference.contains(Settings.MSAA_SAMPLES_PATH)) {
       config.numSamples = Hex.launchPreference.getInteger(Settings.MSAA_SAMPLES_PATH)
@@ -25,9 +24,8 @@ class AndroidLauncher : AndroidApplication() {
       config.numSamples = 2 //default value
     }
 
-    config.useGL30 = true
     config.depth = 0
-    config.useImmersiveMode = true
+    config.useImmersiveMode = false
     config.useCompass = false
     config.useAccelerometer = false
     config.useGyroscope = false

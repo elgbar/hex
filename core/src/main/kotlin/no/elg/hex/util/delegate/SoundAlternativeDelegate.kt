@@ -16,7 +16,7 @@ class SoundAlternativeDelegate(private val filePath: String, private val alterna
   private lateinit var alternativeSounds: MutableList<Sound>
 
   operator fun getValue(thisRef: Any?, property: KProperty<*>): Sound? {
-    return if (Hex.assets.audioLoaded()) {
+    return if (Hex.assets.audioLoaded(false)) {
       if (!::alternativeSounds.isInitialized) {
         alternativeSounds = mutableListOf()
         for (i in alternatives) {

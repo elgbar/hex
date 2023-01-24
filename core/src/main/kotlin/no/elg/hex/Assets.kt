@@ -50,6 +50,8 @@ import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.trace
+import java.awt.SystemColor.menu
+import java.awt.SystemColor.window
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
@@ -307,7 +309,7 @@ class Assets : AssetManager() {
     load(SPRITE_ATLAS, TEXTURE_ATLAS)
     load(TUTORIAL_ATLAS, TEXTURE_ATLAS)
 
-    audioLoaded(false)
+    audioLoaded(true)
 
     loadingInfo = "islands"
 
@@ -342,7 +344,7 @@ class Assets : AssetManager() {
   /**
    * @return If audio has been loaded
    */
-  fun audioLoaded(wait: Boolean = true): Boolean {
+  fun audioLoaded(wait: Boolean): Boolean {
     return when {
       Settings.disableAudio || Hex.audioDisabled -> false
       audioLoaded -> true

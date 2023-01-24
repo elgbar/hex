@@ -13,7 +13,7 @@ class SoundDelegate(private val filePath: String) {
   private lateinit var sound: Sound
 
   operator fun getValue(thisRef: Any?, property: KProperty<*>): Sound? {
-    return if (Hex.assets.audioLoaded()) {
+    return if (Hex.assets.audioLoaded(false)) {
       if (!::sound.isInitialized) {
         sound = Hex.assets.get(filePath, Assets.SOUND)
       }

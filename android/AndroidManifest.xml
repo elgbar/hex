@@ -11,8 +11,7 @@
     android:icon="@drawable/ic_launcher"
     android:appCategory="game"
     android:label="@string/app_name"
-    android:theme="@style/GdxTheme"
-    android:dataExtractionRules="@xml/data_extraction_rules">
+    android:theme="@style/GdxTheme">
     <activity
       android:name="no.elg.hex.AndroidLauncher"
       android:screenOrientation="unspecified"
