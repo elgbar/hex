@@ -6,7 +6,7 @@ buildscript {
     appName = "Hex"
     kotlinVersion = "1.8.0"
     gdxVersion = '1.11.0'
-    ktxVersion = "1.11.0-rc3"
+    ktxVersion = "1.11.0-rc4"
     visVersion = '1.5.1'
     jacksonVersion = "2.14.1"
     junitVersion = "5.9.2"
