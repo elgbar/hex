@@ -14,7 +14,7 @@ import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.util.canAttack
-import no.elg.hex.util.createInstance
+import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getTerritories
 import no.elg.hex.util.trace
@@ -73,7 +73,7 @@ class RandomAI(override val team: Team) : AI {
         return false
       }
       Gdx.app.trace("RAI-$team", "Buying the unit ${piece.simpleName} ")
-      gameInputProcessor.buyUnit(piece.createInstance(HexagonData.EDGE_DATA))
+      gameInputProcessor.buyUnit(piece.createHandInstance())
       Gdx.app.trace("RAI-$team", "New balance ${territory.capital.balance}")
     } else {
       Gdx.app.trace("RAI-$team", "There is something to pick up in the current territory!")

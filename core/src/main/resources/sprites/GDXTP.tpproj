@@ -7,7 +7,7 @@ alphaThreshold=0
 debug=false
 duplicatePadding=true
 edgePadding=true
-fast=false
+fast=true
 filterMag=Nearest
 filterMin=Nearest
 ignoreBlankImages=true
@@ -15,10 +15,10 @@ maxHeight=4096
 maxWidth=4096
 minHeight=16
 minWidth=16
-paddingX=4
-paddingY=4
-pot=false
-mof=false
+paddingX=32
+paddingY=32
+pot=true
+mof=true
 rotation=false
 stripWhitespaceX=false
 stripWhitespaceY=false
@@ -33,6 +33,7 @@ useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:nearest}]
 inputFiles=[{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation/flag.png,type:Ignore}]
+keepInputFileExtensions=false
 
 
 ---
@@ -72,11 +73,13 @@ useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
 inputFiles=[{path:tutorial,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+keepInputFileExtensions=false
 
 
 -PROJ-
 
-version=4.10.0
+version=4.10.2
 fileTypeType=png
-fileTypeData={encoding:RGBA8888}
+fileTypeData={encoding:RGBA8888,compType:PNGTASTIC,compData:"{level:9,removeGamma:false}"}
 previewBackgroundColor=ffffffff
+projectSettings={inputFiles:{}}

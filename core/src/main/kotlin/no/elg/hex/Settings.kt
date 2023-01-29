@@ -31,7 +31,11 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
+  var allowAIToSurrender by PreferenceDelegate(true, priority = 100, hideLevel = LOG_DEBUG)
+
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
+  var enableStrengthHint by PreferenceDelegate(false, priority = 100)
+  var enableStrengthBar by PreferenceDelegate(true, priority = 100)
 
   var showFps by PreferenceDelegate(false, priority = 109)
   var limitFps by PreferenceDelegate(
@@ -139,6 +143,7 @@ object Settings {
   )
 
   var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
+  var enableDebugFPSGraph by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
 
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
   var deleteAllProgress by PreferenceDelegate(

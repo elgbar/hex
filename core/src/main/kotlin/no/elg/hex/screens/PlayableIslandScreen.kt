@@ -45,6 +45,8 @@ import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.renderer.DebugGraphRenderer
+import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
@@ -54,6 +56,7 @@ import no.elg.hex.util.canAttack
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.hide
+import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.onAnyKeysDownEvent
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
@@ -68,6 +71,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
+  private val strengthBarRenderer by lazy { StrengthBarRenderer(this.island) }
 
   private val confirmEndTurn: VisWindow
   private val confirmSurrender: VisWindow
@@ -410,13 +414,13 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     // we only ask for AI surrender when there is a single player
     // if there are no players (ai vs ai) we want to watch the whole thing
     // and if there are more than one player they should decide if they surrender
-    if (allowAISurrender && island.realPlayers == 1) {
+    if (Settings.allowAIToSurrender && allowAISurrender && island.realPlayers == 1) {
 
       // surrender rules
       // either you own more than 75% of all hexagons
       // or all enemies have less than 12,5% of the hexagons
-      val percentagesHexagons = island.percentagesHexagons()
-      if (percentagesHexagons[currentTeam] ?: 0f >= PERCENT_HEXES_OWNED_TO_WIN ||
+      val percentagesHexagons = island.calculatePercentagesHexagons()
+      if ((percentagesHexagons[currentTeam] ?: 0f) >= PERCENT_HEXES_OWNED_TO_WIN ||
         percentagesHexagons.all { (team, percent) -> team === currentTeam || percent < MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER }
       ) {
         acceptAISurrender.show(stageScreen.stage)
@@ -479,6 +483,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   override fun render(delta: Float) {
     super.render(delta)
+    if (DebugGraphRenderer.isEnabled) {
+      DebugGraphRenderer.frameUpdate()
+    }
+    if (StrengthBarRenderer.isEnabled) {
+      strengthBarRenderer.frameUpdate()
+    }
     debugRenderer.frameUpdate()
     frameUpdatable.frameUpdate()
     stageScreen.render(delta)
@@ -492,6 +502,12 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     super.resize(width, height)
     stageScreen.resize(width, height)
     frameUpdatable.resize(width, height)
+    if (DebugGraphRenderer.isEnabled) {
+      DebugGraphRenderer.resize(width, height)
+    }
+    if (StrengthBarRenderer.isEnabled) {
+      strengthBarRenderer.resize(width, height)
+    }
   }
 
   override fun show() {
@@ -499,11 +515,10 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     inputProcessor.show()
     super.show()
 
-    listener = SimpleEventListener.create<TeamChangeHexagonDataEvent> {
+    listener = SimpleEventListener.create {
       island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
       island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
     }
-
     if (island.isCurrentTeamAI()) {
       island.beginTurn(inputProcessor)
     }
@@ -520,6 +535,13 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     LevelSelectScreen.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
     listener.disposeSafely()
+
+    DebugGraphRenderer.dispose()
+
+    if (::strengthBarRenderer.isLazyInitialized) {
+      strengthBarRenderer.dispose()
+    }
+    debugRenderer.dispose()
   }
 
   companion object {

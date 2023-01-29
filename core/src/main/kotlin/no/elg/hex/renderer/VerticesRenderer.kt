@@ -25,10 +25,9 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpd
     )
 
   private val shader: ShaderProgram =
-    {
+    run {
       val fragShader: String = Gdx.files.internal(FRAG_SHADER_PATH).readString()
       val vertShader: String = Gdx.files.internal(VERT_SHADER_PATH).readString()
-
       ShaderProgram.pedantic = false
       val shader = ShaderProgram(vertShader, fragShader)
       val log = shader.log
@@ -38,8 +37,8 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpd
       if (log != null && log.isNotEmpty()) {
         Gdx.app.log("Shader Log", log)
       }
-      shader
-    }()
+      return@run shader
+    }
 
   // The array which holds all the data, interleaved like so:
   //    x, y, r, g, b, a

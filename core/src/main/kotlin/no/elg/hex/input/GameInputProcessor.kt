@@ -34,7 +34,7 @@ import no.elg.hex.util.createInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isKeyPressed
-import no.elg.hex.util.isPartOfTerritory
+import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.toggleShown
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
@@ -144,7 +144,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
     val oldTerritory = island.selected
     if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) && cursorHexData.team == island.currentTeam) {
-      if (island.isPartOfTerritory(hexagon)) {
+      if (island.isPartOfATerritory(hexagon)) {
         island.select(hexagon)
       } else {
         return false
@@ -185,14 +185,14 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           else -> return false
         }
       }
-      F12 -> if (Hex.debug) cheating = !cheating
+      F12 -> if (Hex.debug || Hex.args.cheating) cheating = !cheating
       F11 -> if (cheating) screen.acceptAISurrender.toggleShown(screen.stage)
       F10 -> if (cheating) screen.island.selected?.hexagons?.forEach {
         val piece = screen.island.getData(it).piece
         (piece as? LivingPiece)?.moved = false
       }
-      Z -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.undo()
-      Y -> if (Keys.CONTROL_LEFT.isKeyPressed()) screen.island.history.redo()
+      Z -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.undo()
+      Y -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.redo()
 
       else -> {
         if (screen.island.hand == null || screen.island.hand?.piece?.data === EDGE_DATA) {
@@ -204,7 +204,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     return true
   }
 
-  fun buyUnit(piece: Piece) {
+  fun buyUnit(piece: Piece): Boolean {
     screen.island.selected?.also { territory ->
       val hand = screen.island.hand
       if (hand != null && (
@@ -213,12 +213,12 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         )
       ) {
         // If we cannot merge or the pieces are identical we should not be able to buy new pieces
-        return@also
+        return false
       }
 
       if (!cheating || screen.island.isCurrentTeamAI()) {
         if (!territory.capital.canBuy(piece)) {
-          return@also
+          return false
         }
         territory.capital.balance -= piece.price
       }
@@ -230,7 +230,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       ) {
         require(piece.canMerge(hand.piece))
 
-        screen.island.history.remember("Buying piece") {
+        screen.island.history.remember("Upgrading held piece") {
           val newType = strengthToType(hand.piece.strength + piece.strength)
           Gdx.app.trace("BUY") { "Bought ${piece::class.simpleName} while holding ${hand.piece::class.simpleName}" }
 
@@ -250,7 +250,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         }
       }
       Hex.assets.pieceDownSound?.play(Settings.volume)
+      return true
     }
+    return false
   }
 
   private fun march(hexagon: Hexagon<HexagonData>): Boolean {

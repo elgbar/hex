@@ -47,15 +47,20 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
   }
 }
 
-/** @return All visible hexagons connected to the start hexagon of the same team */
-fun Island.connectedHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.getData(hexagon).team): Set<Hexagon<HexagonData>> {
-  return connectedHexagons(hexagon, team, HashSet(), this)
+/**
+ * @param hexagon The source hexagon
+ * @param team The team to test, if `null` all teams are checked
+ *
+ * @return All (visible) connected hexagons to the start hexagon of the same team.
+ */
+fun Island.connectedTerritoryHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.getData(hexagon).team): Set<Hexagon<HexagonData>> {
+  return connectedTerritoryHexagons(hexagon, team, HashSet(), this)
 }
 
 /**
  * @param team The team to test, if null all teams are checked
  */
-private fun connectedHexagons(
+private fun connectedTerritoryHexagons(
   center: Hexagon<HexagonData>,
   team: Team?,
   visited: MutableSet<Hexagon<HexagonData>>,
@@ -72,12 +77,16 @@ private fun connectedHexagons(
 
   // check each neighbor
   for (neighbor in island.grid.getNeighborsOf(center)) {
-    connectedHexagons(neighbor, team, visited, island)
+    connectedTerritoryHexagons(neighbor, team, visited, island)
   }
   return visited
 }
 
-fun Island.isPartOfTerritory(hexagon: Hexagon<HexagonData>): Boolean {
+/**
+ * If the given hexagon is a part of a territory.
+ * That is, the given hexagon have a neighbor hexagon which is in on the same team as the given hexagon
+ */
+fun Island.isPartOfATerritory(hexagon: Hexagon<HexagonData>): Boolean {
   val team = getData(hexagon).team
   for (neighbor in getNeighbors(hexagon)) {
     val data = getData(neighbor)
@@ -134,7 +143,7 @@ fun Island.findIslands(): Set<Set<Hexagon<HexagonData>>> {
   for (hexagon in hexagons) {
     if (hexagon in checkedHexagons || this.getData(hexagon).invisible) continue
 
-    val connectedHexes = this.connectedHexagons(hexagon, team = null)
+    val connectedHexes = this.connectedTerritoryHexagons(hexagon, team = null)
     checkedHexagons.addAll(connectedHexes)
 
     islands.add(connectedHexes)

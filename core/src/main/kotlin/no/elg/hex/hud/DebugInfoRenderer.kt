@@ -2,6 +2,8 @@ package no.elg.hex.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Disposable
+import ktx.assets.disposeSafely
 import ktx.collections.component1
 import ktx.collections.component2
 import no.elg.hex.Hex
@@ -16,10 +18,13 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
 
 /** @author Elg */
-class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable {
+class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
 
+  private val listener: SimpleEventListener<TeamChangeHexagonDataEvent>
   private val fpsText: ScreenText
   private val debugLines: Array<ScreenText>
+  private val teamPercent: MutableList<String> = mutableListOf()
+  private val teamHexagons: MutableList<String> = mutableListOf()
 
   init {
 
@@ -77,6 +82,19 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     } else {
       debugLines = emptyArray()
     }
+
+    fun updatePercentages() {
+      teamPercent.clear()
+      teamHexagons.clear()
+      islandScreen.island.calculatePercentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
+      islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
+    }
+
+    listener = SimpleEventListener.create {
+      updatePercentages()
+    }
+
+    updatePercentages()
   }
 
   override fun frameUpdate() {
@@ -90,22 +108,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     }
   }
 
-  private val teamPercent: MutableList<String> = mutableListOf()
-  private val teamHexagons: MutableList<String> = mutableListOf()
-
-  init {
-
-    fun updatePercentages() {
-      teamPercent.clear()
-      teamHexagons.clear()
-      islandScreen.island.percentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
-      islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
-    }
-
-    SimpleEventListener.create<TeamChangeHexagonDataEvent> {
-      updatePercentages()
-    }
-
-    updatePercentages()
+  override fun dispose() {
+    listener.disposeSafely()
   }
 }

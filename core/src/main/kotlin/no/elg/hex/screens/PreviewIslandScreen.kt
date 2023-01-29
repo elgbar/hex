@@ -13,7 +13,7 @@ import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.getData
-import no.elg.hex.util.resetHdpi
+import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.serialize
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
@@ -49,7 +49,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     get() = null
 
   override fun render(delta: Float) {
-    camera.resetHdpi()
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
@@ -91,9 +90,15 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     island.select(null)
 
     super.dispose()
-    verticesRenderer.dispose()
-    outlineRenderer.dispose()
-    spriteRenderer.dispose()
+    if (::verticesRenderer.isLazyInitialized) {
+      verticesRenderer.dispose()
+    }
+    if (::outlineRenderer.isLazyInitialized) {
+      outlineRenderer.dispose()
+    }
+    if (::spriteRenderer.isLazyInitialized) {
+      spriteRenderer.dispose()
+    }
   }
 
   fun saveProgress() {

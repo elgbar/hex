@@ -3,7 +3,7 @@ package no.elg.hex.hexagon
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
@@ -39,6 +39,13 @@ fun strengthToType(str: Int): KClass<out LivingPiece> {
         "Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)"
       )
   }
+}
+
+fun strengthToTypeOrNull(str: Int): KClass<out LivingPiece>? {
+  if (str !in PEASANT_STRENGTH..BARON_STRENGTH) {
+    return null
+  }
+  return strengthToType(str)
 }
 
 fun mergedType(piece1: LivingPiece, piece2: LivingPiece) =
@@ -209,7 +216,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     val hexagons = island.getTerritoryHexagons(pieceHex)
 
     if (hexagons == null) {
-      killall(island, island.connectedHexagons(pieceHex))
+      killall(island, island.connectedTerritoryHexagons(pieceHex))
       island.getData(pieceHex).setPiece(island.treeType(pieceHex))
       return
     }
@@ -221,18 +228,19 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     balance += calculateIncome(hexagons, island)
     if (balance < 0) {
       killall(island, hexagons)
+      balance = 0
     }
   }
 
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
-    hexagons.sumBy { island.getData(it).piece.income }
+    hexagons.sumOf { island.getData(it).piece.income }
 
   fun canBuy(piece: KClass<out Piece>): Boolean = canBuy(piece.createHandInstance())
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
   fun calculateStartCapital(hexagons: Iterable<Hexagon<HexagonData>>, island: Island): Int {
-    return hexagons.sumBy { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }
+    return hexagons.sumOf { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }
   }
 
   override fun copyTo(newData: HexagonData): Capital {

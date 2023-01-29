@@ -9,10 +9,10 @@ internal class NotAsRandomAITest {
 
   @Test
   fun shouldCreateWorks() {
-    assertFalse { NotAsRandomAI.shouldCreate(0, -1) }
-    assertTrue { NotAsRandomAI.shouldCreate(0, 1) }
-    assertTrue { NotAsRandomAI.shouldCreate(0, 0) }
-    assertTrue { NotAsRandomAI.shouldCreate(PIECE_MAINTAIN_CONTRACT_LENGTH, -1) }
-    assertFalse { NotAsRandomAI.shouldCreate(PIECE_MAINTAIN_CONTRACT_LENGTH, -2) }
+    assertFalse { NotAsRandomAI.isEconomicalToCreatePiece(0, -1) }
+    assertTrue { NotAsRandomAI.isEconomicalToCreatePiece(0, 1) }
+    assertTrue { NotAsRandomAI.isEconomicalToCreatePiece(0, 0) }
+    assertTrue { NotAsRandomAI.isEconomicalToCreatePiece(PIECE_MAINTAIN_CONTRACT_LENGTH, -1) }
+    assertFalse { NotAsRandomAI.isEconomicalToCreatePiece(PIECE_MAINTAIN_CONTRACT_LENGTH, -2) }
   }
 }

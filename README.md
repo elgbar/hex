@@ -25,7 +25,7 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 
 ## Help page
 
-*Accurate as of version 1.0*
+*Accurate as of version 1.1.0*
 
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
@@ -59,24 +59,26 @@ optional arguments:
   --scale SCALE              Scale of UI, if <= 0 default scale apply
 
   --profile                  Enable GL profiling
-
-
-Process finished with exit code 0
 ```
 
 ## Hints
 
 * Launch the game with `--map-editor` to be able to edit all maps, and even create new ones
     * Example launch command `java -jar Hex.jar --map-editor`
-* If cheating try to press `F10` and `F11`
-    * `F10` will let you move all living pieces
+* If cheating try to press...
+    * `F10` to re-move your moved pieces
+    * `F11` to make the AI surrender
+    * `F12` to toggle cheating
 * If launching with `--debug` or `--trace` mode try to press `F12` to enable cheating
 * There are more options available in the settings when launching with `--debug` or `--trace`
 * Pressing space or backspace will unselect piece in hand if holding something or unselect selected territory if not
+* Use `F1` to buy a castle in the currently selected territory
+* Likewise, `F2` will buy a spearman, `F3` a knight, and `F4` a baron
+* Undo and redo can be done with `Ctrl-Z` and `Ctrl-Y` respectfully
+* 
 
 ## TODO
 
 * Add minimap
-* Add relative strength bar (partially done, need to implement it graphically)
 * Sounds are sometimes not properly loaded on android
 * Generate trees when generating random island

@@ -33,7 +33,7 @@ import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
-import no.elg.hex.util.connectedHexagons
+import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getAllTerritories
@@ -66,7 +66,9 @@ class Island(
   handPiece: Piece? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   turn: Int = 1,
-  initialLoad: Boolean = true
+  initialLoad: Boolean = true,
+  @JsonAlias("team")
+  startTeam: Team = Settings.startTeam
 ) {
   var turn = turn
     private set
@@ -104,7 +106,7 @@ class Island(
     }
 
   internal fun restoreState(dto: IslandDto) {
-    restoreState(dto.width, dto.height, dto.layout, dto.selectedCoordinate, dto.handPiece, dto.hexagonData, false)
+    restoreState(dto.width, dto.height, dto.layout, dto.selectedCoordinate, dto.handPiece, dto.hexagonData, false, dto.team)
   }
 
   private fun restoreState(
@@ -115,6 +117,7 @@ class Island(
     handPiece: Piece? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     initialLoad: Boolean,
+    team: Team
   ) {
     val builder =
       HexagonalGridBuilder<HexagonData>()
@@ -146,15 +149,16 @@ class Island(
     }
 
     recountTotalTreasury()
+    currentTeam = team
 
     if (initialLoad) {
       ensureCapitalStartFunds()
       for (hexagon in hexagons) {
         val data = this.getData(hexagon)
         if (data.invisible) continue
-        when (val hexPiece = data.piece) {
-          is TreePiece -> hexPiece.hasGrown = false
-          else -> {}
+        val hexPiece = data.piece
+        if (hexPiece is TreePiece) {
+          hexPiece.hasGrown = false
         }
       }
     }
@@ -226,13 +230,13 @@ class Island(
     }
 
   init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad)
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
 
-  inline fun isCurrentTeamAI() = currentAI != null
-  inline fun isCurrentTeamHuman() = currentAI == null
+  fun isCurrentTeamAI() = currentAI != null
+  fun isCurrentTeamHuman() = currentAI == null
 
   // ////////// //
   //  Gameplay  //
@@ -246,8 +250,8 @@ class Island(
       totalIncomePerTeam.clear(Team.values().size)
       totalBalancePerTeam.clear(Team.values().size)
       for ((team, territory) in getAllTerritories()) {
-        totalIncomePerTeam.getAndIncrement(team, 0, territory.sumBy { it.income })
-        totalBalancePerTeam.getAndIncrement(team, 0, territory.sumBy { it.capital.balance })
+        totalIncomePerTeam.getAndIncrement(team, 0, territory.sumOf { it.income })
+        totalBalancePerTeam.getAndIncrement(team, 0, territory.sumOf { it.capital.balance })
       }
     }
   }
@@ -259,7 +263,7 @@ class Island(
     }
   }
 
-  fun percentagesHexagons(): EnumMap<Team, Float> {
+  fun calculatePercentagesHexagons(): EnumMap<Team, Float> {
     val hexes = hexagonsPerTeam
     val totalHexagons = visibleHexagons.toFloat()
     return Team.values().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {
@@ -439,7 +443,7 @@ class Island(
    * `null` if hexagon is not a part of a territory
    */
   fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
-    val territoryHexes = connectedHexagons(hexagon)
+    val territoryHexes = connectedTerritoryHexagons(hexagon)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) {
       // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
       // then replace the capital with a tree
@@ -589,7 +593,7 @@ class Island(
     for (hexagon in hexagons) {
       if (checkedHexagons.contains(hexagon) || this.getData(hexagon).invisible) continue
 
-      val connectedHexes = this.connectedHexagons(hexagon)
+      val connectedHexes = this.connectedTerritoryHexagons(hexagon)
       checkedHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
@@ -680,7 +684,8 @@ class Island(
       hand?.piece?.createDtoCopy(),
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       turn,
-      false
+      false,
+      currentTeam
     )
   }
 
@@ -692,7 +697,8 @@ class Island(
     val handPiece: Piece? = null,
     val hexagonData: Map<CubeCoordinate, HexagonData>,
     val turn: Int,
-    val initialLoad: Boolean
+    val initialLoad: Boolean,
+    val team: Team = LEAF
   ) {
     fun copy(): IslandDto {
       return IslandDto(
@@ -703,7 +709,8 @@ class Island(
         handPiece?.createDtoCopy(),
         hexagonData.mapValues { (_, data) -> data.copy() },
         turn,
-        false
+        false,
+        team
       )
     }
 

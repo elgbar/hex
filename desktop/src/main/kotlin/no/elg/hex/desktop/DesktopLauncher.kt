@@ -1,9 +1,9 @@
 package no.elg.hex.desktop
 
 import com.badlogic.gdx.Files.FileType.Internal
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.backends.lwjgl.LwjglPreferences
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Preferences
+import com.badlogic.gdx.backends.lwjgl3.ReadableLwjgl3ApplicationConfiguration
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import no.elg.hex.ApplicationArgumentsParser
@@ -14,31 +14,28 @@ import no.elg.hex.util.defaultDisplayMode
 
 fun main(args: Array<String>) {
 
-  val config = LwjglApplicationConfiguration()
+  val config = ReadableLwjgl3ApplicationConfiguration()
 
   Hex.args = mainBody { ArgParser(args).parseInto(::ApplicationArgumentsParser) }
-  Hex.launchPreference = LwjglPreferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
+  Hex.launchPreference = Lwjgl3Preferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
-  LwjglApplicationConfiguration.disableAudio = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
-  Hex.audioDisabled = LwjglApplicationConfiguration.disableAudio
+  Hex.audioDisabled = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
 
-  config.width = defaultDisplayMode.width / 2
-  config.height = defaultDisplayMode.height / 2
+  config.setWindowedMode(defaultDisplayMode.width / 2, defaultDisplayMode.height / 2)
+//  config.initialBackgroundColor = Hex.backgroundColor
 
-  config.initialBackgroundColor = Hex.backgroundColor
-
-  config.backgroundFPS = 10
+//  config.backgroundFPS = 10
   config.foregroundFPS = 0
-  config.vSyncEnabled = Hex.launchPreference.getBoolean(Settings.VSYNC_PATH, true)
-  config.useHDPI = true
-  config.addIcon("icons/icon32.png", Internal)
-  config.addIcon("icons/icon128.png", Internal)
+  config.isVSync = Hex.launchPreference.getBoolean(Settings.VSYNC_PATH, true)
+  config.setWindowIcon(Internal, "icons/icon32.png", "icons/icon128.png")
 
-  if (Hex.launchPreference.contains(MSAA_SAMPLES_PATH)) {
-    config.samples = Hex.launchPreference.getInteger(MSAA_SAMPLES_PATH)
+  val samples = if (Hex.launchPreference.contains(MSAA_SAMPLES_PATH)) {
+    Hex.launchPreference.getInteger(MSAA_SAMPLES_PATH)
   } else {
-    config.samples = 16 // default value
+    16 // default value
   }
+  val c = Hex.backgroundColor
+  config.setBackBufferConfig((c.r * 255).toInt(), (c.g * 255).toInt(), (c.b * 255).toInt(), 1, config.depth, config.stencil, samples)
 
   config.title = "Hex v${Hex.VERSION}"
   if (Hex.args.mapEditor) {
@@ -50,5 +47,5 @@ fun main(args: Array<String>) {
     config.title += " (debug)"
   }
 
-  LwjglApplication(Hex, config)
+  Lwjgl3Application(Hex, config)
 }

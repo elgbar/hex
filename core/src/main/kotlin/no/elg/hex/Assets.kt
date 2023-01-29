@@ -80,7 +80,8 @@ class Assets : AssetManager() {
         |"1,1":{"@id":1,"team":"STONE"},
         |"1,0":{"@id":2,"edge":true,"isOpaque":true,"isPassable":false,"team":"SUN"},
         |"2,1":2,"2,0":2,"0,2":2,"0,1":2,"1,2":2},
-        |"selectedCoordinate":null,"piece":null}""".replaceIndentByMargin("")
+        |"selectedCoordinate":null,"piece":null}
+      """.replaceIndentByMargin("")
 
     const val ISLAND_SAVES_DIR = "islands"
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
