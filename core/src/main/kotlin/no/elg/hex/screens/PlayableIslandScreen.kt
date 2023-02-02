@@ -8,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.kotcrab.vis.ui.util.OsUtils
-import com.kotcrab.vis.ui.widget.ButtonBar
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
@@ -19,10 +17,8 @@ import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
-import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.vis.KVisWindow
-import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
@@ -89,6 +85,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   val stage: Stage get() = stageScreen.stage
 
   init {
+
     stageScreen.stage.actors {
 
       @Scene2dDsl
@@ -106,40 +103,36 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           visLabel(text)
           row()
 
-          val order =
-            when {
-              OsUtils.isWindows() -> ButtonBar.WINDOWS_ORDER
-              OsUtils.isMac() -> ButtonBar.OSX_ORDER
-              else -> ButtonBar.LINUX_ORDER
-            }.replace(" ", "").map { " $it" }.joinToString()
+          table { cell ->
 
-          buttonBar(order = order) {
+            cell.fillX()
+            cell.expandX()
+            cell.space(10f)
 
-            setButton(
-              ButtonBar.ButtonType.YES,
-              scene2d.visTextButton("Yes") {
-                onClick {
-                  this@visWindow.whenConfirmed()
-                  this@visWindow.fadeOut()
-                }
+            visTextButton("Yes") {
+              pad(40f)
+              it.expandX()
+              it.center()
+              onClick {
+                this@visWindow.whenConfirmed()
+                this@visWindow.fadeOut()
               }
-            )
+            }
 
-            setButton(
-              ButtonBar.ButtonType.NO,
-              scene2d.visTextButton("No") {
-                onClick {
-                  this@visWindow.whenDenied()
-                  this@visWindow.fadeOut()
-                }
+            visTextButton("No") {
+              this.pad(40f)
+              it.expandX()
+              it.center()
+              onClick {
+                this@visWindow.whenDenied()
+                this@visWindow.fadeOut()
               }
-            )
+            }
           }
           centerWindow()
           onAnyKeysDownEvent(Keys.ESCAPE, Keys.BACK, catchEvent = true) {
             this@visWindow.fadeOut()
           }
-          addCloseButton()
           pack()
           fadeOut(0f)
         }
@@ -161,18 +154,16 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
           row()
 
-          buttonBar {
-            setButton(
-              ButtonBar.ButtonType.OK,
-              scene2d.visTextButton("OK") {
-                onClick {
-                  this@visWindow.whenConfirmed()
-                  this@visWindow.fadeOut()
-                }
-              }
-            )
-            createTable().pack()
+          visTextButton("OK") {
+            this.pad(40f)
+            it.expandX()
+            it.center()
+            it.space(10f)
+            onClick {this@visWindow.whenConfirmed()
+              this@visWindow.fadeOut()
+            }
           }
+
           pack()
           centerWindow()
           fadeOut(0f)
@@ -289,10 +280,10 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
 
-          horizontalGroup {
-            it.space(30f)
-            it.expandX()
-            it.left()
+          horizontalGroup { cell ->
+            cell.space(30f)
+            cell.expandX()
+            cell.left()
 
             fun buyDisable(cost: Int): ((Territory?) -> Boolean) = { territory ->
               territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || disableInteract(territory)
@@ -317,9 +308,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
 
-          horizontalGroup {
-            it.expandX()
-            it.center()
+          horizontalGroup { cell ->
+            cell.expandX()
+            cell.center()
 
             interactButton(
               tooltip = "Undo",
@@ -359,11 +350,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
           }
 
-          horizontalGroup {
-            it.expandX()
-            it.right()
+          horizontalGroup { cell ->
+            cell.expandX()
+            cell.right()
 
-            visTextButton("End Turn") { cell ->
+            visTextButton("End Turn") {
 
               labelCell.height(size)
               labelCell.minWidth(size)

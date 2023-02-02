@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Java 17 is the minimum java version
+* Minimum android SDK version have been bumped to 33
 * Minor improvement to the hard AI
   * [c0c024d](https://github.com/elgbar/hex/commit/c0c024db4cab54fccf2d5ee0d395cf524c16c305), Clear attack blacklist
     after merging pieces, as a higher level piece might be able attack something new
@@ -39,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Increase default outline width
 * Cheating can be toggled when cheating via the `--i-am-a-cheater` flag; i.e., debug and trace logging is disabled
 * Use lwjgl3 for desktop backend
+* Improve overlay window for android 
 
 ### Fixed
 
