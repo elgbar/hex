@@ -1,7 +1,5 @@
 package org.hexworks.mixite.core.api
 
-import kotlin.jvm.JvmStatic
-
 /**
  * Represents a cube coordinate pair.
  * See http://www.redblobgames.com/grids/hexagons/#coordinates to learn more.

@@ -86,7 +86,7 @@ class VariableScreenText<T : Any>(
   bold: Boolean = false,
   italic: Boolean = false,
   next: ScreenText? = null,
-  val format: (ScreenText.(T) -> String)? = null,
+  val format: (ScreenText.(T) -> String)? = null
 ) : ScreenText(color, bold, italic, next) {
 
   @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -100,7 +100,7 @@ class NullableVariableScreenText<T : Any>(
   bold: Boolean = false,
   italic: Boolean = false,
   next: ScreenText? = null,
-  val format: (ScreenText.(T?) -> String)? = null,
+  val format: (ScreenText.(T?) -> String)? = null
 ) : ScreenText(color, bold, italic, next) {
 
   @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -133,7 +133,7 @@ class StaticScreenText(
   color: Color = WHITE,
   bold: Boolean = false,
   italic: Boolean = false,
-  next: ScreenText? = null,
+  next: ScreenText? = null
 ) : ScreenText(color, bold, italic, next), Poolable {
   override fun reset() {
     text = ""
@@ -299,7 +299,7 @@ object ScreenRenderer : Disposable, Resizable {
     line: Int,
     position: ScreenDrawPosition = TOP_LEFT,
     offsetX: Float = spacing,
-    lines: Int = 1,
+    lines: Int = 1
   ) {
     val text = text
     if (text.isNotEmpty()) {
@@ -325,6 +325,7 @@ object ScreenRenderer : Disposable, Resizable {
           val totalLength = totalLength()
           totalLength - spacing * text.length to totalLength
         }
+
         LEFT -> offsetX to offsetX + spacing * text.length
         HORIZONTAL_CENTER -> {
           require(next == null) { "Horizontal centred text cannot have a next element" }
@@ -341,7 +342,6 @@ object ScreenRenderer : Disposable, Resizable {
 
   /** Draw all given text on different lines */
   fun drawAll(vararg screenTexts: ScreenText, position: ScreenDrawPosition = TOP_LEFT, lineOffset: Int = 0) {
-
     if (position.vertical !== TOP) {
       screenTexts.reverse()
     }

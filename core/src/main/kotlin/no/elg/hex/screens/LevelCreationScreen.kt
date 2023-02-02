@@ -82,7 +82,12 @@ object LevelCreationScreen : StageScreen() {
       var pixmap: Pixmap? = null
 
       fun createIsland(): Island {
-        return IslandGeneration.generate(seedField.text.hashCode(), widthSpinner.value + 2, heightSpinner.value + 2, layoutSpinner.current)
+        return IslandGeneration.generate(
+          seedField.text.hashCode(),
+          widthSpinner.value + 2,
+          heightSpinner.value + 2,
+          layoutSpinner.current
+        )
       }
 
       val previewSize = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
@@ -112,7 +117,9 @@ object LevelCreationScreen : StageScreen() {
       val validator =
         object : FormInputValidator("Invalid width/height for given layout") {
           override fun validate(input: String?): Boolean {
-            val valid = layoutSpinner.current?.gridLayoutStrategy?.checkParameters(widthSpinner.value, heightSpinner.value) ?: true
+            val valid =
+              layoutSpinner.current?.gridLayoutStrategy?.checkParameters(widthSpinner.value, heightSpinner.value)
+                ?: true
 
             for (disableable in disableables) {
               disableable.isDisabled = !valid
@@ -161,7 +168,8 @@ object LevelCreationScreen : StageScreen() {
 
           for (x in -size until size) {
             for (y in -size until size) {
-              val noise = IslandGeneration.noiseAt(x.toFloat(), y.toFloat(), widthSpinner.value + 2, heightSpinner.value + 2)
+              val noise =
+                IslandGeneration.noiseAt(x.toFloat(), y.toFloat(), widthSpinner.value + 2, heightSpinner.value + 2)
               val color = if (noise <= 1) BLACK else WHITE
               pixmap.drawPixel(size + x, size + y, color.toIntBits())
             }

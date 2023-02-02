@@ -22,6 +22,7 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
             color = Color.YELLOW
             mapEditorScreen.selectedTeam.name
           }
+
           is TeamEditor.RandomizeTeam -> {
             color = Color.PURPLE
             "Random"
@@ -41,6 +42,7 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
             color = Color.YELLOW
             mapEditorScreen.selectedPiece.simpleName ?: "Unknown"
           }
+
           is PieceEditor.RandomizePiece -> {
             color = Color.PURPLE
             "Random"
@@ -56,7 +58,8 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
 
   private val editorText by lazy {
     prefixText(
-      "Editor: ", callable = { mapEditorScreen.editor },
+      "Editor: ",
+      callable = { mapEditorScreen.editor },
       format = { editor ->
         if (editor.isNOP) {
           color = Color.RED

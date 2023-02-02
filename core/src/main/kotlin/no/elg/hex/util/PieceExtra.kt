@@ -10,7 +10,9 @@ import kotlin.reflect.full.primaryConstructor
 fun <T : Piece> KClass<out T>.createInstance(data: HexagonData): T {
   val objectInstance = objectInstance
   return (
-    if (objectInstance != null) objectInstance else {
+    if (objectInstance != null) {
+      objectInstance
+    } else {
       val constructor = primaryConstructor ?: error("No primary constructor found")
       val dataParameter = constructor.findParameterByName("data") ?: error("Failed to find the 'data' parameter")
       constructor.callBy(mapOf(dataParameter to data))

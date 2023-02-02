@@ -1,7 +1,5 @@
 package org.hexworks.mixite.core.api
 
-import kotlin.jvm.JvmStatic
-
 /**
  * Utility class for converting coordinated from the offset system to
  * the cube one (the library uses the latter).

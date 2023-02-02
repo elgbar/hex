@@ -5,7 +5,9 @@ import com.badlogic.gdx.math.Vector2
 import ktx.app.KtxInputAdapter
 import no.elg.hex.Hex
 
-abstract class AbstractInput(private val useGesture: Boolean = false) : KtxInputAdapter, GestureDetector.GestureListener {
+abstract class AbstractInput(private val useGesture: Boolean = false) :
+  KtxInputAdapter,
+  GestureDetector.GestureListener {
 
   private val detector by lazy {
     GestureDetector(
@@ -38,7 +40,12 @@ abstract class AbstractInput(private val useGesture: Boolean = false) : KtxInput
 
   override fun zoom(initialDistance: Float, distance: Float): Boolean = false
 
-  override fun pinch(initialPointer1: Vector2, initialPointer2: Vector2, pointer1: Vector2, pointer2: Vector2): Boolean = false
+  override fun pinch(
+    initialPointer1: Vector2,
+    initialPointer2: Vector2,
+    pointer1: Vector2,
+    pointer2: Vector2
+  ): Boolean = false
 
   override fun pinchStop() = Unit
 }

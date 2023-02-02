@@ -21,7 +21,7 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
     variableText("GL Texture Bindings ", profiler::getTextureBindings, 0, 20),
     variableText("GL Avg vertex count ", profiler.vertexCount::average, 0f, 1000f, format = { "%.2f".format(it) }),
     variableText("GL Errors ", Gdx.gl::glGetError, 0, 1),
-    variableText("Screen Renderer Batches ", ScreenRenderer::draws, 0, 4),
+    variableText("Screen Renderer Batches ", ScreenRenderer::draws, 0, 4)
   )
 
   var changeLevel = AtomicBoolean(true)

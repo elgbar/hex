@@ -37,7 +37,6 @@ internal class PreferenceDelegateTest {
 
   @Test
   fun test() {
-
     println(TestSettings.bytePref)
     println(TestSettings.doublePref)
     println(TestSettings.floatPref)

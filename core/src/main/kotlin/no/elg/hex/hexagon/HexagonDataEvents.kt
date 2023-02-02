@@ -47,7 +47,6 @@ object HexagonDataEvents {
 
     runBlocking {
       onRenderingThread {
-
         for (listener in listeners) {
           requireNotNull(listener) { "Null function given as a listener!" }
           try {
@@ -65,7 +64,8 @@ object HexagonDataEvents {
    */
   fun getEventList(eventClass: KClass<out HexagonDataEvent>): GdxUtilsArray<*> {
     val companionClass = eventClass.companionObject ?: error("No companion object found for ${eventClass.simpleName}")
-    val companionInstance = eventClass.companionObjectInstance ?: error("No companion object found for ${eventClass.simpleName}")
+    val companionInstance =
+      eventClass.companionObjectInstance ?: error("No companion object found for ${eventClass.simpleName}")
     val listenersField = companionClass.declaredMembers.firstOrNull { it.name == EXPECTED_LISTENERS_FIELD_NAME }
       ?: error("Failed to find a member within ${eventClass.simpleName}s companion object called $EXPECTED_LISTENERS_FIELD_NAME")
 

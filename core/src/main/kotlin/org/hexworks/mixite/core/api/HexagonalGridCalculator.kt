@@ -54,7 +54,11 @@ interface HexagonalGridCalculator<T : SatelliteData> {
    *
    * @return result
    */
-  fun rotateHexagon(originalHex: Hexagon<T>, targetHex: Hexagon<T>, rotationDirection: RotationDirection): Maybe<Hexagon<T>>
+  fun rotateHexagon(
+    originalHex: Hexagon<T>,
+    targetHex: Hexagon<T>,
+    rotationDirection: RotationDirection
+  ): Maybe<Hexagon<T>>
 
   /**
    * Returns the [Set] of [Hexagon]s which are `radius` distance

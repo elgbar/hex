@@ -59,8 +59,11 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     val data = island.grid.gridData
     if (island.hexagons.isEmpty()) return
 
-    val (maxX, minX, maxY, minY, maxInvX, maxInvY) = if (Hex.args.mapEditor) calcVisibleGridSize()
-    else visibleGridSize
+    val (maxX, minX, maxY, minY, maxInvX, maxInvY) = if (Hex.args.mapEditor) {
+      calcVisibleGridSize()
+    } else {
+      visibleGridSize
+    }
 
     // Sum the distance from the edge of the grid to the first visible hexagon
     // |.###..| (`.` are invisible, `#` are visible hexagons)

@@ -48,13 +48,18 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
           format = { gridData -> "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()}" }
         ),
         prefixText(
-          "Current team is ", islandScreen.island::currentTeam
+          "Current team is ",
+          islandScreen.island::currentTeam
         ),
         prefixText(
-          "Screen pos (", { "%4d,%4d".format(Gdx.input.x, Gdx.input.y) }, next = StaticScreenText(")")
+          "Screen pos (",
+          { "%4d,%4d".format(Gdx.input.x, Gdx.input.y) },
+          next = StaticScreenText(")")
         ),
         prefixText(
-          "Real pos (", { "% 5.0f,% 5.0f".format(basicInputHandler.mouseX, basicInputHandler.mouseY) }, next = StaticScreenText(")")
+          "Real pos (",
+          { "% 5.0f,% 5.0f".format(basicInputHandler.mouseX, basicInputHandler.mouseY) },
+          next = StaticScreenText(")")
         ),
         StaticScreenText(
           "Pointing at hex ",
@@ -86,7 +91,8 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     fun updatePercentages() {
       teamPercent.clear()
       teamHexagons.clear()
-      islandScreen.island.calculatePercentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
+      islandScreen.island.calculatePercentagesHexagons()
+        .mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
       islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
     }
 

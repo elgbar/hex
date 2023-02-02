@@ -75,7 +75,12 @@ class HexagonalGridImpl<T : SatelliteData>(builder: HexagonalGridBuilder<T>) : H
     }
   }
 
-  override fun getHexagonsByOffsetRange(gridXFrom: Int, gridXTo: Int, gridYFrom: Int, gridYTo: Int): Iterable<Hexagon<T>> {
+  override fun getHexagonsByOffsetRange(
+    gridXFrom: Int,
+    gridXTo: Int,
+    gridYFrom: Int,
+    gridYTo: Int
+  ): Iterable<Hexagon<T>> {
     val coords = ArrayList<CubeCoordinate>()
 
     for (gridX in gridXFrom..gridXTo) {
@@ -119,8 +124,10 @@ class HexagonalGridImpl<T : SatelliteData>(builder: HexagonalGridBuilder<T>) : H
   override fun getByPixelCoordinate(coordinateX: Double, coordinateY: Double): Maybe<Hexagon<T>> {
     var estimatedGridX = (coordinateX / gridData.hexagonWidth).toInt()
     var estimatedGridZ = (coordinateY / gridData.hexagonHeight).toInt()
-    estimatedGridX = CoordinateConverter.convertOffsetCoordinatesToCubeX(estimatedGridX, estimatedGridZ, gridData.orientation)
-    estimatedGridZ = CoordinateConverter.convertOffsetCoordinatesToCubeZ(estimatedGridX, estimatedGridZ, gridData.orientation)
+    estimatedGridX =
+      CoordinateConverter.convertOffsetCoordinatesToCubeX(estimatedGridX, estimatedGridZ, gridData.orientation)
+    estimatedGridZ =
+      CoordinateConverter.convertOffsetCoordinatesToCubeZ(estimatedGridX, estimatedGridZ, gridData.orientation)
     // it is possible that the estimated coordinates are off-grid so we
     // create a virtual hexagon
     val estimatedCoordinate = CubeCoordinate.fromCoordinates(estimatedGridX, estimatedGridZ)
@@ -192,7 +199,14 @@ class HexagonalGridImpl<T : SatelliteData>(builder: HexagonalGridBuilder<T>) : H
 
   companion object {
 
-    private val NEIGHBORS = arrayOf(intArrayOf(+1, 0), intArrayOf(+1, -1), intArrayOf(0, -1), intArrayOf(-1, 0), intArrayOf(-1, +1), intArrayOf(0, +1))
+    private val NEIGHBORS = arrayOf(
+      intArrayOf(+1, 0),
+      intArrayOf(+1, -1),
+      intArrayOf(0, -1),
+      intArrayOf(-1, 0),
+      intArrayOf(-1, +1),
+      intArrayOf(0, +1)
+    )
     private const val NEIGHBOR_X_INDEX = 0
     private const val NEIGHBOR_Z_INDEX = 1
   }

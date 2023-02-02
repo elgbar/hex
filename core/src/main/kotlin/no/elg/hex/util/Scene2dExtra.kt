@@ -59,7 +59,8 @@ fun Button.onInteract(
     for (keyShortcut in keyShortcuts) {
       if (keyShortcut.isEmpty()) continue
       stage += onAllKeysDownEvent(
-        *keyShortcut, catchEvent = catchEvent,
+        *keyShortcut,
+        catchEvent = catchEvent,
         listener = {
           if (!isDisabled) {
             interaction()
@@ -120,7 +121,12 @@ inline fun <T : Actor> T.onAllKeysDownEvent(
 ): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
-    if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all { it == eventKey || Gdx.input.isKeyPressed(it) }) {
+    if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all {
+        it == eventKey || Gdx.input.isKeyPressed(
+          it
+        )
+      }
+    ) {
       listener()
     }
   }

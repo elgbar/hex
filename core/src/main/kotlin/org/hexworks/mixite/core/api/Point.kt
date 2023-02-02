@@ -1,6 +1,5 @@
 package org.hexworks.mixite.core.api
 
-import kotlin.jvm.JvmStatic
 import kotlin.math.sqrt
 
 /**

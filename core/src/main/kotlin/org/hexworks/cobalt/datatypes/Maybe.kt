@@ -44,8 +44,9 @@ class Maybe<T> {
    * Calls `consumer` only if this [Maybe] has a value.
    */
   fun ifPresent(consumer: (T) -> Unit) {
-    if (value != null)
+    if (value != null) {
       consumer(value)
+    }
   }
 
   /**
@@ -56,9 +57,9 @@ class Maybe<T> {
    */
   // TODO: make this easier to use
   fun filter(predicate: Predicate<in T>): Maybe<T> {
-    return if (!isPresent)
+    return if (!isPresent) {
       this
-    else if (predicate(get())) this else empty()
+    } else if (predicate(get())) this else empty()
   }
 
   /**
@@ -67,9 +68,9 @@ class Maybe<T> {
    * Returns an empty [Maybe] if there was no value to transform.
    */
   fun <U> map(mapper: (T) -> U): Maybe<U> {
-    return if (isEmpty())
+    return if (isEmpty()) {
       empty()
-    else {
+    } else {
       ofNullable(mapper.invoke(get()))
     }
   }
@@ -82,9 +83,9 @@ class Maybe<T> {
    * return a [Maybe] instead of a flat value.
    */
   fun <U> flatMap(mapper: (T) -> Maybe<U>): Maybe<U> {
-    return if (isEmpty())
+    return if (isEmpty()) {
       empty()
-    else {
+    } else {
       mapper.invoke(get())
     }
   }
@@ -143,10 +144,11 @@ class Maybe<T> {
   }
 
   override fun toString(): String {
-    return if (value != null)
+    return if (value != null) {
       "Maybe[$value]"
-    else
+    } else {
       "Maybe.empty"
+    }
   }
 
   companion object {

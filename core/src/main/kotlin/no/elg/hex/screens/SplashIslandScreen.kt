@@ -56,7 +56,10 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
             }
           } catch (e: Exception) {
             Gdx.app.postRunnable {
-              MessagesRenderer.publishError("Failed to load island $id due to a ${e::class.simpleName}: ${e.message}", exception = e)
+              MessagesRenderer.publishError(
+                "Failed to load island $id due to a ${e::class.simpleName}: ${e.message}",
+                exception = e
+              )
               Hex.screen = LevelSelectScreen
             }
           }
@@ -71,7 +74,6 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
     if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)
 
   override fun render(delta: Float) {
-
     val currIsland = island
     if (currIsland != null) {
       loading = false

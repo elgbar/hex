@@ -59,6 +59,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
           return false
         }
       }
+
       index == -1 -> Hex.screen = Hex.tutorialScreen
       index in -PREVIEWS_PER_ROW..-1 -> return false
       index != INVALID_ISLAND_INDEX -> play(index)
@@ -121,6 +122,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
           Hex.screen = LevelSelectScreen
         }
       }
+
       else -> return false
     }
     return true

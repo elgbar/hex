@@ -13,7 +13,6 @@ import no.elg.hex.Settings.MSAA_SAMPLES_PATH
 import no.elg.hex.util.defaultDisplayMode
 
 fun main(args: Array<String>) {
-
   val config = ReadableLwjgl3ApplicationConfiguration()
 
   Hex.args = mainBody { ArgParser(args).parseInto(::ApplicationArgumentsParser) }

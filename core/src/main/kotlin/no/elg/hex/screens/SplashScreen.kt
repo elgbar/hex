@@ -57,7 +57,6 @@ object SplashScreen : AbstractScreen() {
   override fun hide() = Unit
 
   fun refreshAndSetScreen(screen: AbstractScreen) {
-
     if (screen is OverlayScreen) {
       screen.backToPreviousScreen()
     } else if (!screen.isDisposed) {

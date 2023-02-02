@@ -75,7 +75,6 @@ class PreferenceDelegate<T : Any>(
 
   @Suppress("UNCHECKED_CAST")
   operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-
     currentValue?.also { return it }
 
     val propertyName = property.name
@@ -90,7 +89,10 @@ class PreferenceDelegate<T : Any>(
         return value
       }
 
-      Gdx.app.log("PREF", "Invalid preference value ($value) found for '$propertyName', restoring initial value ($initialValue)")
+      Gdx.app.log(
+        "PREF",
+        "Invalid preference value ($value) found for '$propertyName', restoring initial value ($initialValue)"
+      )
       setValue(thisRef, property, initialValue)
     }
     if (!::initialLoadedValue.isInitialized) {
@@ -115,7 +117,9 @@ class PreferenceDelegate<T : Any>(
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
       is Char -> preferences.getInteger(propertyName, (initialValue as Char).code).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
-      is Enum<*> -> preferences.getString(propertyName, initialValue.toString()).toEnumOrNull(initialValue::class as KClass<out Enum<*>>)
+      is Enum<*> -> preferences.getString(propertyName, initialValue.toString())
+        .toEnumOrNull(initialValue::class as KClass<out Enum<*>>)
+
       else -> error("Nullable types are not allowed")
     } as T
   }

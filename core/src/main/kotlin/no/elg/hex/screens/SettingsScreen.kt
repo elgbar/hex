@@ -131,7 +131,10 @@ class SettingsScreen : OverlayScreen() {
                   val readSetting: () -> Unit = {
                     text = property.get(Settings).toString()
 
-                    val chars = (max(text.length, (delegate.initialValue as CharSequence).length) / 2f + 1).coerceAtLeast(MIN_FIELD_WIDTH)
+                    val chars =
+                      (max(text.length, (delegate.initialValue as CharSequence).length) / 2f + 1).coerceAtLeast(
+                        MIN_FIELD_WIDTH
+                      )
                     it.minWidth(Hex.assets.fontSize * chars)
                   }
                   onShowListeners += readSetting
@@ -167,7 +170,16 @@ class SettingsScreen : OverlayScreen() {
                 }
 
               Float::class ->
-                spinner("", FloatSpinnerModel(property.get(Settings).toString(), Double.MIN_VALUE.toString(), Double.MAX_VALUE.toString(), "0.1", 1000)) {
+                spinner(
+                  "",
+                  FloatSpinnerModel(
+                    property.get(Settings).toString(),
+                    Double.MIN_VALUE.toString(),
+                    Double.MAX_VALUE.toString(),
+                    "0.1",
+                    1000
+                  )
+                ) {
                   commonStyle(it)
 
                   onShowListeners += {
@@ -186,7 +198,16 @@ class SettingsScreen : OverlayScreen() {
                 }
 
               Double::class ->
-                spinner("", FloatSpinnerModel(property.get(Settings).toString(), Double.MIN_VALUE.toString(), Double.MAX_VALUE.toString(), "0.1", 1000)) {
+                spinner(
+                  "",
+                  FloatSpinnerModel(
+                    property.get(Settings).toString(),
+                    Double.MIN_VALUE.toString(),
+                    Double.MAX_VALUE.toString(),
+                    "0.1",
+                    1000
+                  )
+                ) {
                   commonStyle(it)
 
                   onShowListeners += {
@@ -225,16 +246,19 @@ class SettingsScreen : OverlayScreen() {
         }
 
         for (
-          (property, delegate) in Settings::class.declaredMemberProperties //
-            .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
-            .filterValues { it is PreferenceDelegate<*> && it.hideLevel <= Gdx.app.logLevel } //
-            .toSortedMap { o1, o2 ->
-              val delegate1Pri = (o1.getDelegate(Settings) as PreferenceDelegate<*>).priority
-              val delegate2Pri = (o2.getDelegate(Settings) as PreferenceDelegate<*>).priority
+        (property, delegate) in Settings::class.declaredMemberProperties //
+          .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
+          .filterValues { it is PreferenceDelegate<*> && it.hideLevel <= Gdx.app.logLevel } //
+          .toSortedMap { o1, o2 ->
+            val delegate1Pri = (o1.getDelegate(Settings) as PreferenceDelegate<*>).priority
+            val delegate2Pri = (o2.getDelegate(Settings) as PreferenceDelegate<*>).priority
 
-              return@toSortedMap if (delegate1Pri == delegate2Pri) o1.name.compareTo(o2.name, true)
-              else delegate1Pri - delegate2Pri
-            } //
+            return@toSortedMap if (delegate1Pri == delegate2Pri) {
+              o1.name.compareTo(o2.name, true)
+            } else {
+              delegate1Pri - delegate2Pri
+            }
+          } //
         ) {
 
           require(property is KMutableProperty1) { "All settings properties with delegates must be mutable, ${property.name} is not mutable" }

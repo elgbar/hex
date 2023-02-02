@@ -147,7 +147,6 @@ enum class HexType(private vararg val surfaces: Surface) {
     hexagon: Hexagon<HexagonData>,
     brightness: Float = 1f
   ) {
-
     for ((i, element) in hexagon.vertices.withIndex()) {
       points[i] = element.toFloat()
     }

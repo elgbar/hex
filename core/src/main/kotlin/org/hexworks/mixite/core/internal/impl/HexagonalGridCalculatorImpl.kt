@@ -12,7 +12,8 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
-class HexagonalGridCalculatorImpl<T : SatelliteData>(override val hexagonalGrid: HexagonalGrid<T>) : HexagonalGridCalculator<T> {
+class HexagonalGridCalculatorImpl<T : SatelliteData>(override val hexagonalGrid: HexagonalGrid<T>) :
+  HexagonalGridCalculator<T> {
 
   override fun calculateDistanceBetween(hex0: Hexagon<T>, hex1: Hexagon<T>): Int {
     val absX = abs(hex0.gridX - hex1.gridX)
@@ -33,7 +34,11 @@ class HexagonalGridCalculatorImpl<T : SatelliteData>(override val hexagonalGrid:
     return ret
   }
 
-  override fun rotateHexagon(originalHex: Hexagon<T>, targetHex: Hexagon<T>, rotationDirection: RotationDirection): Maybe<Hexagon<T>> {
+  override fun rotateHexagon(
+    originalHex: Hexagon<T>,
+    targetHex: Hexagon<T>,
+    rotationDirection: RotationDirection
+  ): Maybe<Hexagon<T>> {
     val diffX = targetHex.gridX - originalHex.gridX
     val diffZ = targetHex.gridZ - originalHex.gridZ
     val diffCoord = CubeCoordinate.fromCoordinates(diffX, diffZ)
@@ -75,7 +80,8 @@ class HexagonalGridCalculatorImpl<T : SatelliteData>(override val hexagonalGrid:
     for (i in 0..distance) {
       val interpolatedCoordinate = cubeLinearInterpolate(
         from.cubeCoordinate,
-        to.cubeCoordinate, 1.0 / distance * i
+        to.cubeCoordinate,
+        1.0 / distance * i
       )
       results.add(hexagonalGrid.getByCubeCoordinate(interpolatedCoordinate).get())
     }

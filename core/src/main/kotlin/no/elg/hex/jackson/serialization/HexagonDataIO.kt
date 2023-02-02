@@ -14,10 +14,11 @@ import no.elg.hex.hexagon.PIECES_MAP
 /**
  * @author Elg
  */
-class HexagonDataDeserializer(defaultSerializer: BeanDeserializer) : BeanDeserializer(defaultSerializer), ResolvableDeserializer {
+class HexagonDataDeserializer(defaultSerializer: BeanDeserializer) :
+  BeanDeserializer(defaultSerializer),
+  ResolvableDeserializer {
 
   override fun deserialize(parser: JsonParser, context: DeserializationContext): HexagonData {
-
     val hexagonData = super.deserialize(parser, context) as HexagonData
 
     with(hexagonData) {
@@ -39,7 +40,11 @@ class HexagonDataDeserializer(defaultSerializer: BeanDeserializer) : BeanDeseria
 
 class HexagonDataDeserializerModifier : BeanDeserializerModifier() {
 
-  override fun modifyDeserializer(config: DeserializationConfig?, beanDesc: BeanDescription, deserializer: JsonDeserializer<*>): JsonDeserializer<*> {
+  override fun modifyDeserializer(
+    config: DeserializationConfig?,
+    beanDesc: BeanDescription,
+    deserializer: JsonDeserializer<*>
+  ): JsonDeserializer<*> {
     if (beanDesc.beanClass == HexagonData::class.java) {
       require(deserializer is BeanDeserializer) { "Default deserializer must be a BeanDeserializer" }
       return HexagonDataDeserializer(deserializer)

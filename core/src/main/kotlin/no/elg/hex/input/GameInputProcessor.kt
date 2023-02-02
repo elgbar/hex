@@ -69,7 +69,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     island: Island,
     territory: Territory,
     placeOn: Hexagon<HexagonData>,
-    newPiece: Piece,
+    newPiece: Piece
   ): Boolean {
     val hexData = island.getData(placeOn)
     if (hexData.team != island.currentTeam && !territory.enemyBorderHexes.contains(placeOn)) {
@@ -111,7 +111,6 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     }
 
     if (hexData.setPiece(newPieceType)) {
-
       island.history.remember("Placing piece") {
         hexData.team = territory.team
 
@@ -185,12 +184,16 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           else -> return false
         }
       }
+
       F12 -> if (Hex.debug || Hex.args.cheating) cheating = !cheating
       F11 -> if (cheating) screen.acceptAISurrender.toggleShown(screen.stage)
-      F10 -> if (cheating) screen.island.selected?.hexagons?.forEach {
-        val piece = screen.island.getData(it).piece
-        (piece as? LivingPiece)?.moved = false
+      F10 -> if (cheating) {
+        screen.island.selected?.hexagons?.forEach {
+          val piece = screen.island.getData(it).piece
+          (piece as? LivingPiece)?.moved = false
+        }
       }
+
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.undo()
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.redo()
 
@@ -208,9 +211,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     screen.island.selected?.also { territory ->
       val hand = screen.island.hand
       if (hand != null && (
-        piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
-          piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
-        )
+          piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
+            piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
+          )
       ) {
         // If we cannot merge or the pieces are identical we should not be able to buy new pieces
         return false

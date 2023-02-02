@@ -106,7 +106,16 @@ class Island(
     }
 
   internal fun restoreState(dto: IslandDto) {
-    restoreState(dto.width, dto.height, dto.layout, dto.selectedCoordinate, dto.handPiece, dto.hexagonData, false, dto.team)
+    restoreState(
+      dto.width,
+      dto.height,
+      dto.layout,
+      dto.selectedCoordinate,
+      dto.handPiece,
+      dto.hexagonData,
+      false,
+      dto.team
+    )
   }
 
   private fun restoreState(
@@ -272,12 +281,10 @@ class Island(
   }
 
   fun endTurn(gameInputProcessor: GameInputProcessor) {
-
     history.disable()
     history.clear()
 
     KtxAsync.launch(Hex.asyncThread) {
-
       currentTeam = Team.values().next(currentTeam)
       Gdx.app.debug("TURN", "Starting turn of $currentTeam")
 
@@ -308,7 +315,6 @@ class Island(
     KtxAsync.launch(Hex.asyncThread) {
       val cai = currentAI
       if (cai != null) {
-
         var alive = true
         val time = measureTimeMillis {
           try {
@@ -332,9 +338,9 @@ class Island(
 
         // Loose when no player have any capitals left
         if (hexagons.none {
-          val data = getData(it)
-          teamToPlayer[data.team] == null && data.piece is Capital
-        }
+            val data = getData(it)
+            teamToPlayer[data.team] == null && data.piece is Capital
+          }
         ) {
           gameInputProcessor.screen.gameEnded(false)
         }
@@ -429,7 +435,10 @@ class Island(
       val data = this.getData(capital)
       val otherCapital = data.piece
       if (otherCapital !is Capital) {
-        Gdx.app.log("FIND CAPITAL", "A piece which was a capital is no longer a capital, but a ${otherCapital::class.simpleName} piece. Data: $data")
+        Gdx.app.log(
+          "FIND CAPITAL",
+          "A piece which was a capital is no longer a capital, but a ${otherCapital::class.simpleName} piece. Data: $data"
+        )
         continue
       }
       otherCapital.transfer(bestData)
@@ -491,12 +500,11 @@ class Island(
     val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
 
     fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
-
       for (r in discardIfLessThan..maxRadius) {
         if (this.calculateRing(hex, r).any {
-          val data = this.getData(it)
-          data.team != hexTeam && !data.invisible
-        }
+            val data = this.getData(it)
+            data.team != hexTeam && !data.invisible
+          }
         ) {
           return r
         }
@@ -521,7 +529,17 @@ class Island(
       }
     }
 
-    require(contenders.isNotEmpty()) { "No capital contenders found in ${hexagons.map { "@${it.cubeCoordinate.toAxialKey()} | data ${getData(it)}" }}" }
+    require(contenders.isNotEmpty()) {
+      "No capital contenders found in ${
+        hexagons.map {
+          "@${it.cubeCoordinate.toAxialKey()} | data ${
+            getData(
+              it
+            )
+          }"
+        }
+      }"
+    }
 
     Gdx.app.trace(
       "ISLAND",
@@ -529,14 +547,14 @@ class Island(
     )
     Gdx.app.trace("ISLAND") {
       "Contenders are ${
-      contenders.map {
-        "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${
-        findDistanceToClosestEnemyHex(
-          it,
-          1
-        )
-        }"
-      }
+        contenders.map {
+          "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${
+            findDistanceToClosestEnemyHex(
+              it,
+              1
+            )
+          }"
+        }
       }"
     }
 

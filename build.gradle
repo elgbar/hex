@@ -42,6 +42,7 @@ tasks.withType(KotlinCompile).configureEach {
 subprojects {
   apply plugin: "com.diffplug.spotless"
 
+  // When bumping this remember to bump android versionCode
   version = '1.2.0-SNAPSHOT'
 
   repositories {

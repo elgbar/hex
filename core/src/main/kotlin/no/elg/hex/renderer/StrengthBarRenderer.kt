@@ -29,7 +29,11 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
 
   override fun frameUpdate() {
     batch.begin()
-    batch.draw(fbo.colorBufferTexture, (Gdx.graphics.width) / 2f - (fboWidth / 2f), (Gdx.graphics.height) - fboHeight * 2f)
+    batch.draw(
+      fbo.colorBufferTexture,
+      (Gdx.graphics.width) / 2f - (fboWidth / 2f),
+      (Gdx.graphics.height) - fboHeight * 2f
+    )
     batch.end()
   }
 

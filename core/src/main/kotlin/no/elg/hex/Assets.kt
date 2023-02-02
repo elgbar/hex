@@ -50,8 +50,6 @@ import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.trace
-import java.awt.SystemColor.menu
-import java.awt.SystemColor.window
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
@@ -144,7 +142,8 @@ class Assets : AssetManager() {
       Hex.assets.sprites.findRegion(regionName)
     } catch (e: GdxRuntimeException) {
       throw IllegalArgumentException("Failed to find loaded sprite $regionName")
-    } ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${Hex.assets.sprites.regions.map { it.name }}")
+    }
+      ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${Hex.assets.sprites.regions.map { it.name }}")
 
     require(region.originalHeight == region.originalWidth) {
       "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}"
@@ -199,7 +198,7 @@ class Assets : AssetManager() {
   val coinsSound by SoundAlternativeDelegate(COINS_SOUND, COINS_SOUND_RANGE)
   val emptyCoffersSound by SoundAlternativeDelegate(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
 
-  fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize) {
+  private fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize) {
     val boldness = if (bold) "B" else "R"
     val italicness = if (italic) "I" else ""
 
@@ -249,7 +248,6 @@ class Assets : AssetManager() {
   }
 
   fun loadAssets() {
-
     setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
     setLoader(Island::class.java, IslandAsynchronousAssetLoader(resolver))
 

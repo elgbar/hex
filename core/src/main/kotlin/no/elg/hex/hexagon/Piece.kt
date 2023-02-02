@@ -257,7 +257,10 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
       Gdx.app.trace(DESER_TAG, "Setting balance of $this to $serializationData")
       balance = serializationData.toInt()
     } else if (serializationData != null) {
-      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}")
+      Gdx.app.error(
+        DESER_TAG,
+        "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}"
+      )
     }
   }
 }
@@ -271,7 +274,8 @@ class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data,
   }
 }
 
-class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree: Byte = 1) : StationaryPiece(data, placed) {
+class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree: Byte = 1) :
+  StationaryPiece(data, placed) {
   override val strength = NO_STRENGTH
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
@@ -298,7 +302,10 @@ class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree
       Gdx.app.trace(DESER_TAG, "Setting rounds to tree of $this to $serializationData")
       roundsToTree = serializationData.toByte()
     } else if (serializationData != null) {
-      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}")
+      Gdx.app.error(
+        DESER_TAG,
+        "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}"
+      )
     }
   }
 }
@@ -324,7 +331,8 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var hasGrown: Boolean
   }
 }
 
-class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
+class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) :
+  TreePiece(data, placed, hasGrown) {
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
 
@@ -361,7 +369,8 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
   }
 }
 
-class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
+class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) :
+  TreePiece(data, placed, hasGrown) {
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) return
@@ -441,7 +450,10 @@ sealed class LivingPiece(
       Gdx.app.trace(DESER_TAG, "Updating moved of $this to $serializationData")
       moved = serializationData
     } else if (serializationData != null) {
-      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a boolean or null, but got ${serializationData::class}")
+      Gdx.app.error(
+        DESER_TAG,
+        "The piece $this have the wrong type of serialization data. Expected a boolean or null, but got ${serializationData::class}"
+      )
     }
   }
 

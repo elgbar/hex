@@ -138,13 +138,15 @@ object Hex : ApplicationAdapter() {
       Gdx.app.debug("SYS") { "MSAA ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
       Gdx.app.debug("SYS") {
         "VSYNC ${
-        Gdx.app.graphics.let {
-          if (it is LwjglGraphics) {
-            "${it::class.java.getDeclaredField("vsync").also { field -> field.isAccessible = true }.get(it)} (by field)"
-          } else {
-            "${launchPreference.getBoolean(Settings.VSYNC_PATH)} (by settings)"
+          Gdx.app.graphics.let {
+            if (it is LwjglGraphics) {
+              "${
+                it::class.java.getDeclaredField("vsync").also { field -> field.isAccessible = true }.get(it)
+              } (by field)"
+            } else {
+              "${launchPreference.getBoolean(Settings.VSYNC_PATH)} (by settings)"
+            }
           }
-        }
         }"
       }
 

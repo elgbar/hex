@@ -30,10 +30,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
   private val batch: SpriteBatch = SpriteBatch()
 
   override fun frameUpdate() {
-
     val island = islandScreen.island
     batch.use(islandScreen.camera) {
-
       loop@ for (hexagon in island.hexagons) {
         val data = island.getData(hexagon)
         if (data.invisible) continue
@@ -47,13 +45,14 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
               Hex.assets.capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
             }
           }
+
           is PalmTree -> Hex.assets.palm
           is PineTree -> Hex.assets.pine
           is Castle -> Hex.assets.castle
           is Grave -> Hex.assets.grave
           is LivingPiece -> {
-
-            val time = if (data.team == island.currentTeam && island.isCurrentTeamHuman()) piece.updateAnimationTime() else 0f
+            val time =
+              if (data.team == island.currentTeam && island.isCurrentTeamHuman()) piece.updateAnimationTime() else 0f
 
             when (piece) {
               is Peasant -> Hex.assets.peasant
@@ -62,11 +61,18 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
               is Baron -> Hex.assets.baron
             }.getKeyFrame(time)
           }
+
           is Empty -> continue@loop
         }
 
         val boundingBox = hexagon.internalBoundingBox
-        batch.draw(drawable, boundingBox.x.toFloat(), boundingBox.y.toFloat(), boundingBox.height.toFloat(), boundingBox.width.toFloat())
+        batch.draw(
+          drawable,
+          boundingBox.x.toFloat(),
+          boundingBox.y.toFloat(),
+          boundingBox.height.toFloat(),
+          boundingBox.width.toFloat()
+        )
       }
 
       if (Settings.enableStrengthHint && island.isCurrentTeamHuman()) {

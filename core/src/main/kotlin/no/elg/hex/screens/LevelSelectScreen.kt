@@ -75,7 +75,12 @@ object LevelSelectScreen : AbstractScreen() {
     camera.unproject(unprojectVector)
   }
 
-  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, modifier: PreviewModifier = NOTHING): FrameBuffer {
+  fun renderPreview(
+    island: Island,
+    previewWidth: Int,
+    previewHeight: Int,
+    modifier: PreviewModifier = NOTHING
+  ): FrameBuffer {
     val islandScreen = PreviewIslandScreen(-1, island)
     islandScreen.resize(previewWidth, previewHeight)
     val buffer = FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
@@ -87,7 +92,6 @@ object LevelSelectScreen : AbstractScreen() {
     updateCamera()
     islandScreen.render(0f)
     if (modifier != NOTHING) {
-
       camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
       val widthOffset = camera.viewportWidth / 5
       val heightOffset = camera.viewportHeight / 5
@@ -100,6 +104,7 @@ object LevelSelectScreen : AbstractScreen() {
             camera.viewportWidth - widthOffset * 2,
             camera.viewportHeight - heightOffset * 2
           )
+
           LOST -> batch.draw(
             Hex.assets.grave,
             widthOffset,
@@ -107,6 +112,7 @@ object LevelSelectScreen : AbstractScreen() {
             camera.viewportWidth - widthOffset * 2,
             camera.viewportHeight - heightOffset * 2
           )
+
           WON -> {
             val text = "${island.turn}"
 
@@ -128,6 +134,7 @@ object LevelSelectScreen : AbstractScreen() {
               false
             )
           }
+
           else -> error("Unknown/illegal preview modifier: $modifier")
         }
       }
@@ -168,6 +175,7 @@ object LevelSelectScreen : AbstractScreen() {
               publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
               updateSelectPreview(slot, false)
             }
+
           islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
           else -> {
             publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
@@ -244,12 +252,13 @@ object LevelSelectScreen : AbstractScreen() {
 
     val (sx, sy, swidth, sheight) = rect(0, NON_ISLAND_SCALE, 0f)
     if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
-
-      val settingsSprite = if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
+      val settingsSprite =
+        if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
       batch.draw(settingsSprite, sx, sy, swidth, sheight)
 
       val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
-      val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
+      val helpSprite =
+        if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
       batch.draw(helpSprite, hx, hy, hwidth, hheight)
 
       if (Hex.args.mapEditor) {
@@ -257,8 +266,22 @@ object LevelSelectScreen : AbstractScreen() {
 
         drawBox(x, y, width, height)
         val color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
-        lineRenderer.line(x + width / 2f, y + height / 2f + height / 10f, x + width / 2f, y + height / 2f - height / 10f, color, color)
-        lineRenderer.line(x + width / 2f + width / 10f, y + height / 2f, x + width / 2f - width / 10f, y + height / 2f, color, color)
+        lineRenderer.line(
+          x + width / 2f,
+          y + height / 2f + height / 10f,
+          x + width / 2f,
+          y + height / 2f - height / 10f,
+          color,
+          color
+        )
+        lineRenderer.line(
+          x + width / 2f + width / 10f,
+          y + height / 2f,
+          x + width / 2f - width / 10f,
+          y + height / 2f,
+          color,
+          color
+        )
       }
     }
 

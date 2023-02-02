@@ -159,7 +159,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             it.expandX()
             it.center()
             it.space(10f)
-            onClick {this@visWindow.whenConfirmed()
+            onClick {
+              this@visWindow.whenConfirmed()
               this@visWindow.fadeOut()
             }
           }
@@ -179,7 +180,10 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       youWon = okWindow("You Won!", { "Congratulations! You won in ${island.turn} turns." }, endGame(WON))
       youLost = okWindow("You Lost", { "Too bad! You lost in ${island.turn} turns." }, endGame(LOST))
 
-      confirmEndTurn = confirmWindow("Confirm End Turn", "There still are actions to perform.\nAre you sure you want to end your turn?") {
+      confirmEndTurn = confirmWindow(
+        "Confirm End Turn",
+        "There still are actions to perform.\nAre you sure you want to end your turn?"
+      ) {
         island.endTurn(inputProcessor)
       }
 
@@ -188,7 +192,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       }
 
       acceptAISurrender = confirmWindow(
-        "Accept AI Surrender", "The AI wish to surrender, do you accept?",
+        "Accept AI Surrender",
+        "The AI wish to surrender, do you accept?",
         {
           endTurn(false)
         }
@@ -249,7 +254,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             vararg keyShortcut: Int,
             onClick: Button.() -> Unit
           ) {
-
             fun drawableToTextureRegion(drawable: TextureRegion): Drawable {
               val region = TextureRegion(drawable)
               region.flip(false, true)
@@ -257,7 +261,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             }
 
             visImageButton {
-
               pad(10f)
 
               visTextTooltip(tooltip)
@@ -286,7 +289,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             cell.left()
 
             fun buyDisable(cost: Int): ((Territory?) -> Boolean) = { territory ->
-              territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || disableInteract(territory)
+              territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || disableInteract(
+                territory
+              )
             }
 
             interactButton(
@@ -397,7 +402,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   private fun endTurn(allowAISurrender: Boolean = true) {
-
     island.select(null)
 
     val currentTeam = island.currentTeam
@@ -406,7 +410,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     // if there are no players (ai vs ai) we want to watch the whole thing
     // and if there are more than one player they should decide if they surrender
     if (Settings.allowAIToSurrender && allowAISurrender && island.realPlayers == 1) {
-
       // surrender rules
       // either you own more than 75% of all hexagons
       // or all enemies have less than 12,5% of the hexagons
@@ -420,7 +423,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     }
 
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
-
       val minCost = Peasant::class.createHandInstance().price
 
       // only display the confirm button if the user have any action to do left
@@ -442,12 +444,16 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             continue
           }
 
-          val territory = island.findTerritory(hexagon) ?: error("Piece $piece has not moved and is in not in a territory")
+          val territory =
+            island.findTerritory(hexagon) ?: error("Piece $piece has not moved and is in not in a territory")
           val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) }
           val canNotMergeWithOtherPiece = territory.hexagons.none {
             val terrPiece = island.getData(it).piece
-            return@none if (terrPiece === piece) false // can never merge with self
-            else terrPiece is LivingPiece && piece.canMerge(terrPiece)
+            return@none if (terrPiece === piece) {
+              false // can never merge with self
+            } else {
+              terrPiece is LivingPiece && piece.canMerge(terrPiece)
+            }
           }
           if (canNotAttackAnything && canNotMergeWithOtherPiece) {
             // The current piece is able to move, but not attack any territory, nor buy any new pieces to merge with

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Visually show strength hint in the current selected territory
-  * Disabled by default, can be turned on in the settings
+    * Disabled by default, can be turned on in the settings
 * Add debug fps graph
 * Add relative strength bar
 * Add debug option to disallow AI from surrendering
@@ -20,27 +20,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Java 17 is the minimum java version
 * Minimum android SDK version have been bumped to 33
 * Minor improvement to the hard AI
-  * [c0c024d](https://github.com/elgbar/hex/commit/c0c024db4cab54fccf2d5ee0d395cf524c16c305), Clear attack blacklist
-    after merging pieces, as a higher level piece might be able attack something new
-  * [7434fcf](https://github.com/elgbar/hex/commit/7434fcf1b25bb1dad6a2bfbe9dcd6c2283d797f1), Attack highest possible
-    defended hexagon if all attackable hexagons are empty
-  * [8e7488e](https://github.com/elgbar/hex/commit/8e7488eb929b2896bf9c38145f2e7993ac36afd4), Place living pieces
-    defensively different from castles
-  * [7a5bbcf](https://github.com/elgbar/hex/commit/7a5bbcf44d7231480747964e2bd3fb453361c693), Do not select pieces which
-    cannot do anything
-  * [fdcbe26](https://github.com/elgbar/hex/commit/fdcbe26f1433fcd001039327d41579cec26b7b12), When testing whether to
-    merge/buy a piece or not, look at all hexagons in neighbouring terriories and not only the bordering hexagons
-  * [351344b](https://github.com/elgbar/hex/commit/351344be3f44afbab58fa496a0c82c25f543fb33), When merging a piece pick
-    it up again straight away
-  * [940e556](https://github.com/elgbar/hex/commit/940e5568a0bdd62e902ede32e61079527979b2eb), Only buy new units when
-    they can be used for something
-  * [1df3a6b](https://github.com/elgbar/hex/commit/1df3a6bc91ff646c726d0d7ddfc6a74dee069cdf), Disallow merging if the
-    new piece cannot attack
+    * [c0c024d](https://github.com/elgbar/hex/commit/c0c024db4cab54fccf2d5ee0d395cf524c16c305), Clear attack blacklist
+      after merging pieces, as a higher level piece might be able attack something new
+    * [7434fcf](https://github.com/elgbar/hex/commit/7434fcf1b25bb1dad6a2bfbe9dcd6c2283d797f1), Attack highest possible
+      defended hexagon if all attackable hexagons are empty
+    * [8e7488e](https://github.com/elgbar/hex/commit/8e7488eb929b2896bf9c38145f2e7993ac36afd4), Place living pieces
+      defensively different from castles
+    * [7a5bbcf](https://github.com/elgbar/hex/commit/7a5bbcf44d7231480747964e2bd3fb453361c693), Do not select pieces
+      which
+      cannot do anything
+    * [fdcbe26](https://github.com/elgbar/hex/commit/fdcbe26f1433fcd001039327d41579cec26b7b12), When testing whether to
+      merge/buy a piece or not, look at all hexagons in neighbouring terriories and not only the bordering hexagons
+    * [351344b](https://github.com/elgbar/hex/commit/351344be3f44afbab58fa496a0c82c25f543fb33), When merging a piece
+      pick
+      it up again straight away
+    * [940e556](https://github.com/elgbar/hex/commit/940e5568a0bdd62e902ede32e61079527979b2eb), Only buy new units when
+      they can be used for something
+    * [1df3a6b](https://github.com/elgbar/hex/commit/1df3a6bc91ff646c726d0d7ddfc6a74dee069cdf), Disallow merging if the
+      new piece cannot attack
 * The time AI uses on its move is subtracted from the minimum AI delay
 * Increase default outline width
 * Cheating can be toggled when cheating via the `--i-am-a-cheater` flag; i.e., debug and trace logging is disabled
 * Use lwjgl3 for desktop backend
-* Improve overlay window for android 
+* Improve overlay window for android
 
 ### Fixed
 
@@ -62,10 +64,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added sounds!
-  * Might be a bit buggy on android
+    * Might be a bit buggy on android
 * AI will now surrender if they most definitely have lost to a player
 * Improve hard AI
-  * It will now try to merge territories if it can
+    * It will now try to merge territories if it can
 * Add scrolling to settings to allow mobile users a better experience with the settings
 * Add mouse scrolling back to the level select screen
 * Display version in the settings screen
@@ -88,7 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fix a series of serialization bugs
-  * Piece state was not serialized, if a piece had moved, treasury of a capital, etc. was not persisted
+    * Piece state was not serialized, if a piece had moved, treasury of a capital, etc. was not persisted
 * Fix `help` launch flag not displaying help, but crashing instead
 * Fix last four (islands per row) islands in level select screen not working
 * Fix AI using a very long time when they have large territories

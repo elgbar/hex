@@ -22,6 +22,9 @@ fun GridLayoutStrategy.toEnumValue(): HexagonalGridLayout {
   return try {
     HexagonalGridLayout.valueOf(getName())
   } catch (e: IllegalArgumentException) {
-    throw IllegalArgumentException("Custom hexagonal grid layout is not supported, only acceptable values are the enum constants of ${HexagonalGridLayout::class.jvmName}", e)
+    throw IllegalArgumentException(
+      "Custom hexagonal grid layout is not supported, only acceptable values are the enum constants of ${HexagonalGridLayout::class.jvmName}",
+      e
+    )
   }
 }

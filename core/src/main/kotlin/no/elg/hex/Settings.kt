@@ -16,11 +16,18 @@ import kotlin.reflect.jvm.isAccessible
 object Settings {
 
   const val DISABLE_AUDIO_PATH = "disableAudio" // Settings::disableAudio.name
-  var disableAudio by PreferenceDelegate(false, priority = 200, preferences = Hex.launchPreference, requireRestart = true)
+  var disableAudio by PreferenceDelegate(
+    false,
+    priority = 200,
+    preferences = Hex.launchPreference,
+    requireRestart = true
+  )
 
   const val VSYNC_PATH = "vsync" // Settings::vsync.name
   var vsync by PreferenceDelegate(
-    true, priority = 200, preferences = Hex.launchPreference,
+    true,
+    priority = 200,
+    preferences = Hex.launchPreference,
     onChange = { _, _, new ->
       Gdx.graphics.setVSync(new)
       return@PreferenceDelegate new
@@ -171,9 +178,9 @@ object Settings {
 
         Gdx.app.postRunnable {
           for (
-            (property, loopDelegate) in Settings::class.declaredMemberProperties //
-              .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
-              .filterValues { it is PreferenceDelegate<*> } //
+          (property, loopDelegate) in Settings::class.declaredMemberProperties //
+            .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
+            .filterValues { it is PreferenceDelegate<*> } //
           ) {
 
             // Nullable types are not allowed, this is ok cast
@@ -197,7 +204,6 @@ object Settings {
 
   private var lastGotoCalled = 0L
   private fun gotoLevelSelect() {
-
     val frameId = Gdx.graphics.frameId
     if (lastGotoCalled != frameId) {
       lastGotoCalled = frameId

@@ -72,7 +72,7 @@ class NotAsRandomAI(override val team: Team) : AI {
     arrayOf(
       Castle::class,
       Peasant::class,
-      Peasant::class,
+      Peasant::class
 //      Spearman::class,
 //      Knight::class,
 //      Baron::class,
@@ -167,7 +167,6 @@ class NotAsRandomAI(override val team: Team) : AI {
   }
 
   private fun place(territory: Territory, gameInputProcessor: GameInputProcessor) {
-
     val island = territory.island
     val handPiece = island.hand?.piece
     think { "Placing held piece $handPiece" }
@@ -185,7 +184,6 @@ class NotAsRandomAI(override val team: Team) : AI {
       think { "Best placement for this castle is ${hexagon.cubeCoordinate.toAxialKey()}" }
       gameInputProcessor.click(hexagon)
     } else if (handPiece is LivingPiece) {
-
       val treeHexagons =
         territory.hexagons.filter { island.getData(it).piece is TreePiece }
 
@@ -280,8 +278,11 @@ class NotAsRandomAI(override val team: Team) : AI {
         ?: NO_STRENGTH
 
     think {
-      if (maxBorderStr > 0) "The highest level threat on my border has the strength of a ${strengthToType(maxBorderStr).simpleName}"
-      else "I have vanquished my foes!"
+      if (maxBorderStr > 0) {
+        "The highest level threat on my border has the strength of a ${strengthToType(maxBorderStr).simpleName}"
+      } else {
+        "I have vanquished my foes!"
+      }
     }
 
     val knights = territory.hexagons.count { territory.island.getData(it).piece is Knight }
@@ -359,7 +360,8 @@ class NotAsRandomAI(override val team: Team) : AI {
       placeableHexes.filter { (hex, str) ->
         str <= minStr &&
           // Never place a castle next to another castle
-          island.getNeighbors(hex).map { island.getData(it) }.filter { it.team == island.getData(hex).team }.none { it.piece is Castle }
+          island.getNeighbors(hex).map { island.getData(it) }.filter { it.team == island.getData(hex).team }
+            .none { it.piece is Castle }
       }.mapTo(ArrayList()) { it.key }
 
     // shuffle the list to make the selection more uniform
@@ -456,7 +458,11 @@ class NotAsRandomAI(override val team: Team) : AI {
     // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
     val newBalance = territory.capital.balance - piece.price
     val newIncome = territory.income + piece.income
-    return territory.capital.canBuy(piece) && isEconomicalToCreatePiece(newBalance, newIncome, canPieceAttack(territory, piece))
+    return territory.capital.canBuy(piece) && isEconomicalToCreatePiece(
+      newBalance,
+      newIncome,
+      canPieceAttack(territory, piece)
+    )
   }
 
   companion object {

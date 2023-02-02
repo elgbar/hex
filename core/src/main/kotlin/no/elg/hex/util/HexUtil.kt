@@ -53,7 +53,10 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
  *
  * @return All (visible) connected hexagons to the start hexagon of the same team.
  */
-fun Island.connectedTerritoryHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.getData(hexagon).team): Set<Hexagon<HexagonData>> {
+fun Island.connectedTerritoryHexagons(
+  hexagon: Hexagon<HexagonData>,
+  team: Team? = this.getData(hexagon).team
+): Set<Hexagon<HexagonData>> {
   return connectedTerritoryHexagons(hexagon, team, HashSet(), this)
 }
 
@@ -196,7 +199,6 @@ fun Island.getTerritories(team: Team): Collection<Territory> {
 }
 
 fun Island.getAllTerritories(): HashMap<Team, Collection<Territory>> {
-
   val visitedHexagons = HashSet<Hexagon<HexagonData>>()
   val territories = HashMap<Team, Collection<Territory>>()
 

@@ -27,7 +27,8 @@ object IslandFiles {
     get() {
       if (islandIds.isEmpty()) return 0
       val firstExisting =
-        islandIds.filterIndexed { index, i -> index + 1 != islandIds.size && islandIds[index + 1] != i + 1 }.firstOrNull() ?: (islandIds.size - 1)
+        islandIds.filterIndexed { index, i -> index + 1 != islandIds.size && islandIds[index + 1] != i + 1 }
+          .firstOrNull() ?: (islandIds.size - 1)
       return firstExisting + 1
     }
 
@@ -41,7 +42,10 @@ object IslandFiles {
       if (file.exists()) {
         if (file.isDirectory) continue
         if (nonExistentFilesInRow > 0) {
-          Gdx.app.debug(TAG, "Missing the islands ${(slot - nonExistentFilesInRow until slot).map { getIslandFileName(it) }}")
+          Gdx.app.debug(
+            TAG,
+            "Missing the islands ${(slot - nonExistentFilesInRow until slot).map { getIslandFileName(it) }}"
+          )
         }
         val fileName = getIslandFileName(slot)
         Gdx.app.trace(TAG, "Found island $fileName")
@@ -52,7 +56,6 @@ object IslandFiles {
         }
         islandIds += slot
       } else {
-
         nonExistentFilesInRow++
         if (nonExistentFilesInRow >= FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH) {
           Gdx.app.trace(

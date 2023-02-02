@@ -62,7 +62,8 @@ class RandomAI(override val team: Team) : AI {
     // only buy if there are no more units to move
     if (pickUpHexes.isEmpty()) {
       Gdx.app.trace(
-        "RAI-$team", "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
+        "RAI-$team",
+        "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})"
       )
       val piece = buyablePieces.filter { territory.capital.canBuy(it) }.randomOrNull()
       if (piece == null) {
@@ -103,7 +104,6 @@ class RandomAI(override val team: Team) : AI {
       val hexagon = placableHexes.randomOrNull() ?: return
       gameInputProcessor.click(hexagon)
     } else if (handPiece is LivingPiece) {
-
       // hexagon where we can put a living piece
       val attackableHexes =
         HashSet<Hexagon<HexagonData>>(

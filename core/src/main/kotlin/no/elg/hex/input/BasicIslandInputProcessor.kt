@@ -17,7 +17,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
-
 /**
  * Handles input event related to the camera and other basic functiuons such as what
  *
@@ -116,7 +115,12 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     destination.set(src.x / Gdx.graphics.ppcX, src.y / Gdx.graphics.ppcY)
   }
 
-  override fun pinch(initialPointer1: Vector2, initialPointer2: Vector2, pointer1: Vector2, pointer2: Vector2): Boolean {
+  override fun pinch(
+    initialPointer1: Vector2,
+    initialPointer2: Vector2,
+    pointer1: Vector2,
+    pointer2: Vector2
+  ): Boolean {
     if (!pinching) {
       Gdx.app.debug("pinch zoom", "Pinch start")
       unprojectVector(initialPointer1, lastPointer1)
@@ -126,7 +130,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     unprojectVector(pointer1, currentPointer1)
     unprojectVector(pointer2, currentPointer2)
 
-    //figure out which way we're zooming,
+    // figure out which way we're zooming,
     // if the last distance was greater than the current distance the fingers are closer, we are zooming out
     // if the last distance was less than the current distance the fingers are further apart, we are zooming in
     val lastDistance = lastPointer1.dst2(lastPointer2)

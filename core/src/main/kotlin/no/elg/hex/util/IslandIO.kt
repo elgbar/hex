@@ -36,7 +36,6 @@ fun play(id: Int, island: Island? = null): Boolean {
 }
 
 fun saveIsland(id: Int, island: Island): Boolean {
-
   if (!island.validate()) {
     publishError("Island failed validation")
     return false

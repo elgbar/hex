@@ -66,26 +66,38 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
           "Treasury: ",
           next = signColoredText(selected.capital::balance) { "%d".format(it) }
         )
-      } else emptyText()
+      } else {
+        emptyText()
+      }
     }
 
     val incomeText = IfScreenText {
       val selected = screen.island.selected
-      if (selected != null && screen.island.isCurrentTeamHuman()) StaticScreenText(
-        "Estimated income: ",
-        next = signColoredText(selected::income) { "%+d".format(it) }
-      ) else emptyText()
+      if (selected != null && screen.island.isCurrentTeamHuman()) {
+        StaticScreenText(
+          "Estimated income: ",
+          next = signColoredText(selected::income) { "%+d".format(it) }
+        )
+      } else {
+        emptyText()
+      }
     }
 
     topRight = arrayOf(
       treasuryText,
-      incomeText,
+      incomeText
     )
     topRightDbg = if (Hex.debug) {
       arrayOf(
         StaticScreenText("Holding: ", next = nullCheckedText(screen.island::hand, color = YELLOW)),
-        StaticScreenText("Holding the edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data === EDGE_DATA })),
-        StaticScreenText("Held is edge piece: ", next = booleanText(callable = { screen.island.hand?.piece?.data?.edge == true }))
+        StaticScreenText(
+          "Holding the edge piece: ",
+          next = booleanText(callable = { screen.island.hand?.piece?.data === EDGE_DATA })
+        ),
+        StaticScreenText(
+          "Held is edge piece: ",
+          next = booleanText(callable = { screen.island.hand?.piece?.data?.edge == true })
+        )
       )
     } else {
       emptyArray()
@@ -124,7 +136,13 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
           val (width, height) = calcSize(region)
           val handWidth = height * (Hex.assets.hand.originalWidth / Hex.assets.hand.originalHeight.toFloat())
 
-          batch.draw(Hex.assets.hand, (Gdx.graphics.width - handWidth / 4f) / 2f, (height + height / 2) / 2f, handWidth, height)
+          batch.draw(
+            Hex.assets.hand,
+            (Gdx.graphics.width - handWidth / 4f) / 2f,
+            (height + height / 2) / 2f,
+            handWidth,
+            height
+          )
           batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
         }
       }
@@ -133,7 +151,6 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     ScreenRenderer.drawAll(*topCenter, position = TOP_CENTER)
     ScreenRenderer.drawAll(*topRight, position = TOP_RIGHT, lineOffset = topRightOffset)
     if (Hex.debug && screen.island.isCurrentTeamHuman() && Settings.enableDebugHUD) {
-
       ScreenRenderer.drawAll(*topRightDbg, position = TOP_RIGHT, lineOffset = topRightDbgOffset)
       // due to the dynamic nature of history the array must be created each time
 

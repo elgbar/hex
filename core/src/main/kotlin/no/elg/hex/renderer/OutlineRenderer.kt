@@ -20,7 +20,6 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
   override fun frameUpdate() {
-
     lineRenderer.begin(Filled)
     lineRenderer.projectionMatrix = islandScreen.camera.combined
 
@@ -33,7 +32,6 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       alpha: Float,
       lineWidth: Float = DEFAULT_RECT_LINE_WIDTH
     ) {
-
       for (hexagon in hexes) {
         val points = hexagon.points
         val data = islandScreen.island.getData(hexagon)
@@ -43,8 +41,11 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
 
         val brightness =
           HexagonData.BRIGHTNESS +
-            if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) HexagonData.SELECTED
-            else 0f
+            if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) {
+              HexagonData.SELECTED
+            } else {
+              0f
+            }
 
         if (drawEdges) {
           lineRenderer.color.set(Color.WHITE)
