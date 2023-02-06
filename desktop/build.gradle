@@ -1,5 +1,3 @@
-apply plugin: "kotlin"
-
 project.ext.mainClassName = "no.elg.hex.desktop.DesktopLauncherKt"
 project.ext.assetsDir = new File("../core/src/main/resources")
 
@@ -26,6 +24,7 @@ tasks.register('dist', Jar) {
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   dependsOn configurations.runtimeClasspath
   from {
     configurations.runtimeClasspath.collect {
@@ -34,6 +33,7 @@ tasks.register('dist', Jar) {
       exclude 'META-INF/LICENSE'
       exclude 'META-INF/LICENSE.txt'
       exclude 'META-INF/NOTICE.txt'
+      exclude 'META-INF/INDEX.LIST'
       exclude '**/module-info.class'
       it.isDirectory() ? it : zipTree(it)
     }
