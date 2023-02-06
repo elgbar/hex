@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.kotcrab.vis.ui.util.OsUtils
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
@@ -98,6 +99,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         return this.visWindow(title) {
           isMovable = false
           isModal = true
+          debugAll()
           hide()
 
           visLabel(text)
@@ -108,9 +110,17 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             cell.fillX()
             cell.expandX()
             cell.space(10f)
+            cell.pad(platformSpacing)
+
+            row()
+
+            visLabel("") {
+              it.expandX()
+              it.center()
+            }
 
             visTextButton("Yes") {
-              pad(40f)
+              pad(buttonPadding)
               it.expandX()
               it.center()
               onClick {
@@ -118,15 +128,23 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
                 this@visWindow.fadeOut()
               }
             }
+            visLabel("") {
+              it.expandX()
+              it.center()
+            }
 
             visTextButton("No") {
-              this.pad(40f)
+              pad(buttonPadding)
               it.expandX()
               it.center()
               onClick {
                 this@visWindow.whenDenied()
                 this@visWindow.fadeOut()
               }
+            }
+            visLabel("") {
+              it.expandX()
+              it.center()
             }
           }
           centerWindow()
@@ -155,10 +173,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           row()
 
           visTextButton("OK") {
-            this.pad(40f)
+            this.pad(buttonPadding)
             it.expandX()
             it.center()
             it.space(10f)
+            it.pad(platformSpacing)
             onClick {
               this@visWindow.whenConfirmed()
               this@visWindow.fadeOut()
@@ -544,5 +563,14 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   companion object {
     const val PERCENT_HEXES_OWNED_TO_WIN = 0.75f
     const val MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER = 0.125f
+
+    private const val MOBILE_BUTTON_PADDING = 45f
+    private const val DESKTOP_BUTTON_PADDING = 10f
+
+    private const val MOBILE_SPACING = 20f
+    private const val DESKTOP_SPACING = 5f
+
+    val buttonPadding: Float get() = if (OsUtils.isAndroid() || OsUtils.isIos()) MOBILE_BUTTON_PADDING else DESKTOP_BUTTON_PADDING
+    val platformSpacing: Float get() = if (OsUtils.isAndroid() || OsUtils.isIos()) MOBILE_SPACING else DESKTOP_SPACING
   }
 }
