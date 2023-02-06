@@ -66,9 +66,9 @@ subprojects {
   spotless {
     kotlin {
       ktlint(ktlintVersion).userData([
-         "indent_size"             : "2",
-         "continuation_indent_size": "2",
-         "max_line_length"         : "180"
+        "indent_size"             : "2",
+        "continuation_indent_size": "2",
+        "max_line_length"         : "180"
       ])
     }
     format 'misc', {
