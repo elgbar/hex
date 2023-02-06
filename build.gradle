@@ -49,7 +49,8 @@ subprojects {
   apply plugin: "com.github.ben-manes.versions"
 
   // When bumping this remember to bump android versionCode
-  version = '1.2.0-SNAPSHOT'
+  // and to bump the 'version' constant in Hex.kt
+  version = '1.2.0'
 
   repositories {
     mavenLocal()

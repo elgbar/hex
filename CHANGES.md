@@ -9,7 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Visually show strength hint in the current selected territory
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+## [1.2.0] - 2023-02-06
+
+### Added
+
+* Add a visual strength hint in the current selected territory
   * Disabled by default, can be turned on in the settings
 * Add debug fps graph
 * Add relative strength bar
@@ -17,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Java 17 is the minimum java version
+* Java 17 is the minimum Java version
 * Minimum android SDK version have been bumped to 33
 * Minor improvement to the hard AI
   * [c0c024d](https://github.com/elgbar/hex/commit/c0c024db4cab54fccf2d5ee0d395cf524c16c305), Clear attack blacklist after merging pieces, as a higher level piece might be able
@@ -27,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * [7a5bbcf](https://github.com/elgbar/hex/commit/7a5bbcf44d7231480747964e2bd3fb453361c693), Do not select pieces which cannot do anything
   * [fdcbe26](https://github.com/elgbar/hex/commit/fdcbe26f1433fcd001039327d41579cec26b7b12), When testing whether to merge/buy a piece or not, look at all hexagons in neighbouring
     terriories and not only the bordering hexagons
-  * [351344b](https://github.com/elgbar/hex/commit/351344be3f44afbab58fa496a0c82c25f543fb33), When merging a piece pick it up again straight away
+  * [351344b](https://github.com/elgbar/hex/commit/351344be3f44afbab58fa496a0c82c25f543fb33), When merging a piece, pick it up again straight away
   * [940e556](https://github.com/elgbar/hex/commit/940e5568a0bdd62e902ede32e61079527979b2eb), Only buy new units when they can be used for something
   * [1df3a6b](https://github.com/elgbar/hex/commit/1df3a6bc91ff646c726d0d7ddfc6a74dee069cdf), Disallow merging if the new piece cannot attack
 * The time AI uses on its move is subtracted from the minimum AI delay
@@ -53,6 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 * Remove the 11th piece down sound
+
+---
 
 ## [1.1.0] - 2021-05-06
 
@@ -91,6 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix AI using a very long time when they have large territories
 * Island now remember what turn it is when re-entering island
 * The player will now lose the game when no players have any capitals left, but AI(s) do
+
+---
 
 ## [1.0.0] - 2021.04.13
 
