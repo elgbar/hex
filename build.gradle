@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.VersionsPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -30,6 +31,7 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
     classpath "com.android.tools.build:gradle:$androidGradleToolsVersion"
+    classpath "com.github.ben-manes:gradle-versions-plugin:0.45.0"
   }
 }
 
@@ -39,8 +41,15 @@ tasks.withType(KotlinCompile).configureEach {
   compilerOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
+def isNonStable = { String version ->
+  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+  def regex = /^[0-9,.v-]+(-r)?$/
+  return !stableKeyword && !(version ==~ regex)
+}
+
 subprojects {
   apply plugin: "com.diffplug.spotless"
+  apply plugin: VersionsPlugin
 
   // When bumping this remember to bump android versionCode
   version = '1.2.0-SNAPSHOT'
@@ -73,6 +82,12 @@ subprojects {
     }
   }
   assemble.dependsOn(spotlessApply)
+
+  tasks.named("dependencyUpdates").configure {
+    rejectVersionIf {
+      isNonStable(it.candidate.version)
+    }
+  }
 }
 
 tasks.named('wrapper') {
