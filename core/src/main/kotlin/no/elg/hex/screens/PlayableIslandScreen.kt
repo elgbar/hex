@@ -99,7 +99,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         return this.visWindow(title) {
           isMovable = false
           isModal = true
-          debugAll()
           hide()
 
           visLabel(text)
