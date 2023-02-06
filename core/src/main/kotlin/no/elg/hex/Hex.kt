@@ -43,7 +43,7 @@ object Hex : ApplicationAdapter() {
   /**
    * Current Hex version in `major.minor.patch` format
    */
-  const val VERSION = "1.2.0"
+  const val VERSION = "1.2.1-SNAPSHOT"
 
   @JvmStatic
   val mapper =

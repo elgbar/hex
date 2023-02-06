@@ -31,7 +31,7 @@ android {
     applicationId "no.elg.hex"
     minSdkVersion 33
     targetSdkVersion 33
-    versionCode 3 //Bump when releasing new version
+    versionCode 4 //Bump when releasing new version
     versionName "$version"
   }
   buildTypes {
