@@ -27,6 +27,11 @@
 -dontwarn com.badlogic.gdx.physics.box2d.utils.Box2DBuild
 -dontwarn com.badlogic.gdx.jnigen.BuildTarget*
 -dontwarn com.badlogic.gdx.graphics.g2d.freetype.FreetypeBuild
+-dontwarn java.awt.DisplayMode
+-dontwarn java.awt.GraphicsDevice
+-dontwarn java.awt.GraphicsEnvironment
+-dontwarn java.beans.ConstructorProperties
+-dontwarn java.beans.Transient
 
 -keep class com.badlogic.gdx.controllers.android.AndroidControllers
 -keep class no.elg.hex.util.delegate.PreferenceDelegate
