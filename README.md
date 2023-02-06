@@ -9,7 +9,7 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 ## Glossaries
 
 | Glossary  | Explanation                                                                                            |
-| :-------- | :----------------------------------------------------------------------------------------------------- |
+|:----------|:-------------------------------------------------------------------------------------------------------|
 | Team      | A player or computer                                                                                   |
 | Territory | Two or more hexes of the same team connected together                                                  |
 | Piece     | A chip on a hex (for example `capital`, `castle`, or `peasant`)                                        |
@@ -75,10 +75,8 @@ optional arguments:
 * Use `F1` to buy a castle in the currently selected territory
 * Likewise, `F2` will buy a spearman, `F3` a knight, and `F4` a baron
 * Undo and redo can be done with `Ctrl-Z` and `Ctrl-Y` respectfully
-* 
 
 ## TODO
 
 * Add minimap
-* Sounds are sometimes not properly loaded on android
 * Generate trees when generating random island

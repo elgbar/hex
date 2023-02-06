@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.TimeUtils
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
+import com.kotcrab.vis.ui.util.OsUtils
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
@@ -97,7 +98,7 @@ class Assets : AssetManager() {
     const val CLICK_SOUND = "sounds/click.mp3"
 
     const val PIECE_DOWN_SOUND = "sounds/piece_down_%d.mp3"
-    private val PIECE_DOWN_SOUND_RANGE = 1..12
+    private val PIECE_DOWN_SOUND_RANGE = 1..11
 
     const val UNDO_SOUND = "sounds/undo_%d.mp3"
     private val UNDO_SOUND_RANGE = 1..8
