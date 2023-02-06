@@ -1,4 +1,3 @@
-import com.github.benmanes.gradle.versions.VersionsPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -36,9 +35,7 @@ buildscript {
 }
 
 tasks.withType(KotlinCompile).configureEach {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
-  compilerOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+  it.kotlinJavaToolchainProvider.languageVersion.set(JavaLanguageVersion.of(17))
 }
 
 def isNonStable = { String version ->
@@ -49,7 +46,7 @@ def isNonStable = { String version ->
 
 subprojects {
   apply plugin: "com.diffplug.spotless"
-  apply plugin: VersionsPlugin
+  apply plugin: "com.github.ben-manes.versions"
 
   // When bumping this remember to bump android versionCode
   version = '1.2.0-SNAPSHOT'
