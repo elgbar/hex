@@ -88,6 +88,4 @@ optional arguments:
 
 * Limit FPS does not work
 * Lag when un/redoing after a long game
-* Grave take too long to become trees
-* Calculate estimated income with holding piece
 * Map editor is not working

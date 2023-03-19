@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix capitals rendering "buy" flag when it is an AIs turn
 * Fix graves taking too long to become trees
 * Fix estimated income not updating when buying pieces
 * Fix unlimited fps is not really unlimited

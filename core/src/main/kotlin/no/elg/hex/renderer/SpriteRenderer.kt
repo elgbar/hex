@@ -38,7 +38,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
 
         val drawable = when (val piece = data.piece) {
           is Capital -> {
-            if (data.team != island.currentTeam || piece.balance < PEASANT_PRICE) {
+            if (data.team != island.currentTeam || piece.balance < PEASANT_PRICE || island.isCurrentTeamAI()) {
               Hex.assets.capital
             } else {
               piece.elapsedAnimationTime += Gdx.graphics.deltaTime
