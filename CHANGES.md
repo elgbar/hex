@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Minimum android SDK version have been reduced back to 30
   * Turns out not everyone have the latest android version :surprised_pikachu:
+* Improve enum sorting in the settings screen
 
 ### Fixed
 
