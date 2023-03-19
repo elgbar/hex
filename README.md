@@ -80,12 +80,9 @@ optional arguments:
 
 * Add minimap
 * Generate trees when generating random island
-* Cap start income to 25 (?)
 * Rework settings screen
 * Look into replacement logic for capitals
   * Optimize for survivability
-* Add an easier AI where castles are not placed by the AI (or the is a delay in turns before they are allowed to be placed)
-* Remove current easy and unbeatable ai
 
 ### Known bugs
 

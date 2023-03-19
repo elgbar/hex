@@ -14,7 +14,6 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.Difficulty
-import no.elg.hex.ai.NotAsRandomAI
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
@@ -570,7 +569,7 @@ class Island(
 
     for (origin in contenders) {
       val ring = this.getNeighbors(origin, onlyVisible = false)
-      val calcScore = ring.sumByDouble {
+      val calcScore = ring.sumOf {
         val data = this.getData(it)
         when {
           data.team == hexTeam -> 1.0
@@ -666,6 +665,7 @@ class Island(
     const val MIN_HEX_IN_TERRITORY = 2
 
     const val START_CAPITAL_PER_HEX = 5
+    const val MAX_START_CAPITAL = 25
 
     const val NO_ENEMY_HEXAGONS = -1
 

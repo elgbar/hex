@@ -3,6 +3,7 @@ package no.elg.hex.hexagon
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.MAX_START_CAPITAL
 import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
@@ -240,7 +241,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
   fun calculateStartCapital(hexagons: Iterable<Hexagon<HexagonData>>, island: Island): Int {
-    return hexagons.sumOf { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }
+    return hexagons.sumOf { Island.START_CAPITAL_PER_HEX + (island.getData(it).piece.income - 1) }.coerceAtMost(MAX_START_CAPITAL)
   }
 
   override fun copyTo(newData: HexagonData): Capital {
