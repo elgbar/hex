@@ -17,13 +17,13 @@ data class Territory(
   val hexagons: Collection<Hexagon<HexagonData>>
 ) {
 
-  val income: Int by lazy {
+  val income: Int get() {
     var income = capital.calculateIncome(hexagons, island)
     val hand = island.hand
     if (hand?.territory === this) {
       income += hand.piece.income
     }
-    income
+    return income
   }
 
   /** All enemy hexes that border this territory */
