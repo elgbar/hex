@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-
   ext {
     appName = "Hex"
     kotlinVersion = "1.8.10"
@@ -139,6 +138,16 @@ project(":desktop") {
 project(":core") {
 
   apply plugin: "kotlin"
+
+  classes {
+    doLast {
+      new File("$buildDir/resources/main/version.properties").withWriter { writer ->
+        Properties properties = new Properties()
+        properties['version'] = hexVersion
+        properties.store writer, null
+      }
+    }
+  }
 
   dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"

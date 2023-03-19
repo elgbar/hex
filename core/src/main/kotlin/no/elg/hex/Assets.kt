@@ -25,7 +25,6 @@ import com.badlogic.gdx.utils.TimeUtils
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
-import com.kotcrab.vis.ui.util.OsUtils
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
@@ -51,6 +50,7 @@ import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.trace
+import java.util.Properties
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
@@ -64,6 +64,11 @@ class Assets : AssetManager() {
       Gdx.app.log("LOADING", value)
       field = value
     }
+
+  /**
+   * Current Hex version in `major.minor.patch` format
+   */
+  var version: String? = null
 
   companion object {
 
@@ -85,6 +90,9 @@ class Assets : AssetManager() {
     const val ISLAND_SAVES_DIR = "islands"
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
     const val ISLAND_FILE_ENDING = "is"
+
+    const val VERSIONS_FILE_PATH = "version.properties"
+    const val VERSION_PATH = "version"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
     const val TUTORIAL_ATLAS = "sprites/tutorial.atlas"
@@ -169,6 +177,18 @@ class Assets : AssetManager() {
     return Animation(frameDuration, array, LOOP_PINGPONG)
   }
 
+  private fun loadProperties(path: String): Properties {
+    return Properties().also {
+      try {
+        Gdx.files.internal(path).read().use { inputStream ->
+          it.load(inputStream)
+        }
+      } catch (e: Exception) {
+        logger.error("Failed to load properties file $path: ${e.message}")
+      }
+    }
+  }
+
   val hand by lazy { findSprite("hand") }
   val background by lazy { findSprite("slay_game_background") }
   val pine by lazy { findSprite("pine") }
@@ -241,6 +261,8 @@ class Assets : AssetManager() {
     setLoader(FREE_TYPE_FONT_GEN, FreeTypeFontGeneratorLoader(resolver))
 
     loadFont(bold = false, italic = false)
+
+    version = loadProperties(VERSIONS_FILE_PATH).getProperty(VERSION_PATH)
 
     // essential assets for the loading splash screen
 
@@ -316,7 +338,7 @@ class Assets : AssetManager() {
     IslandFiles // find all island files
   }
 
-  fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
+  private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
     return finishLoadingAsset(fontName(bold, italic, flip, fontSize))
   }
 

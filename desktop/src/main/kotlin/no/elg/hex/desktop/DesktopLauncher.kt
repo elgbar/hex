@@ -35,16 +35,7 @@ fun main(args: Array<String>) {
   }
   val c = Hex.backgroundColor
   config.setBackBufferConfig((c.r * 255).toInt(), (c.g * 255).toInt(), (c.b * 255).toInt(), 1, config.depth, config.stencil, samples)
-
-  config.title = "Hex v${Hex.VERSION}"
-  if (Hex.args.mapEditor) {
-    config.title += " - Map Editor"
-  }
-  if (Hex.args.trace) {
-    config.title += " (trace)"
-  } else if (Hex.args.debug) {
-    config.title += " (debug)"
-  }
+  config.title = "Hex"
 
   Lwjgl3Application(Hex, config)
 }

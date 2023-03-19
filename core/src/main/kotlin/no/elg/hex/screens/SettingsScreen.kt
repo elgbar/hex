@@ -268,7 +268,7 @@ class SettingsScreen : OverlayScreen() {
         }
 
         row()
-        visLabel("Version: ${Hex.VERSION}") {
+        visLabel("Version: ${Hex.assets.version ?: "unknown"}") {
           it.colspan(2)
           it.center()
           color = Color.LIGHT_GRAY

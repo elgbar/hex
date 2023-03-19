@@ -40,11 +40,6 @@ object Hex : ApplicationAdapter() {
 
   const val LAUNCH_PREF = "launchPref"
 
-  /**
-   * Current Hex version in `major.minor.patch` format
-   */
-  const val VERSION = "1.2.1-SNAPSHOT"
-
   @JvmStatic
   val mapper =
     jacksonObjectMapper().also {
@@ -187,6 +182,7 @@ object Hex : ApplicationAdapter() {
     asyncThread = newSingleThreadAsyncContext()
 
     assets = Assets()
+    updateTitle()
     screen = SplashScreen
 
     assets.loadAssets()
@@ -234,5 +230,21 @@ object Hex : ApplicationAdapter() {
 
   fun setClearColorAlpha(alpha: Float) {
     Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, alpha)
+  }
+
+  private fun updateTitle() {
+    var title = "Hex"
+    if (assets.version != null) {
+      title += " v${assets.version}"
+    }
+    if (args.mapEditor) {
+      title += " - Map Editor"
+    }
+    if (args.trace) {
+      title += " (trace)"
+    } else if (args.debug) {
+      title += " (debug)"
+    }
+    Gdx.graphics.setTitle(title)
   }
 }
