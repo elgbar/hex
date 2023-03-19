@@ -6,7 +6,7 @@ buildscript {
     appName = "Hex"
     kotlinVersion = "1.8.10"
     gdxVersion = '1.11.0'
-    ktxVersion = "1.11.0-rc4"
+    ktxVersion = "1.11.0-rc5"
     visVersion = '1.5.1'
     jacksonVersion = "2.14.2"
     junitVersion = "5.9.2"
@@ -15,6 +15,7 @@ buildscript {
     spotlessVersion = "6.13.0"
     androidGradleToolsVersion = "7.4.0-beta02"
     ktlintVersion = "0.48.2"
+    gradleVersions = "0.46.0"
   }
 
   repositories {
@@ -30,7 +31,7 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
     classpath "com.android.tools.build:gradle:$androidGradleToolsVersion"
-    classpath "com.github.ben-manes:gradle-versions-plugin:0.45.0"
+    classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersions"
   }
 }
 
@@ -48,9 +49,7 @@ subprojects {
   apply plugin: "com.diffplug.spotless"
   apply plugin: "com.github.ben-manes.versions"
 
-  // When bumping this remember to bump android versionCode
-  // and to bump the 'version' constant in Hex.kt
-  version = '1.2.1-SNAPSHOT'
+  version = hexVersion
 
   repositories {
     mavenLocal()

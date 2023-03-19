@@ -1,9 +1,12 @@
 project.ext.mainClassName = "no.elg.hex.desktop.AndroidLauncher"
 project.ext.assetsDir = new File("../core/src/main/resources")
 
+int androidSdkVersion = 33
+int androidVersionCode = Integer.parseInt(androidVersionCode)
+
 android {
-  buildToolsVersion = "33.0.1"
-  compileSdk 33
+  buildToolsVersion = "33.0.2"
+  compileSdk androidSdkVersion
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -29,10 +32,10 @@ android {
   }
   defaultConfig {
     applicationId "no.elg.hex"
-    minSdkVersion 33
-    targetSdkVersion 33
-    versionCode 4 //Bump when releasing new version
-    versionName "$version"
+    minSdkVersion androidSdkVersion
+    targetSdkVersion androidSdkVersion
+    versionCode androidVersionCode
+    versionName hexVersion
   }
   buildTypes {
     release {
