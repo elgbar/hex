@@ -197,7 +197,7 @@ object Settings {
   )
 
   private fun updateForegroundFPS() {
-    val maxFps = if (limitFps) targetFps else 9999
+    val maxFps = if (limitFps) targetFps else 0
     Gdx.graphics.setForegroundFPS(maxFps)
     Gdx.app.debug("SETTINGS", "New max frame rate is: $maxFps")
   }
