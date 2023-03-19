@@ -1,11 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debug" type="JetRunConfigurationType">
-    <envs>
-      <env name="vblank_mode" value="0" />
-    </envs>
+  <configuration default="false" name="Debug map editor" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="no.elg.hex.desktop.DesktopLauncherKt" />
-    <module name="hex.desktop" />
-    <option name="PROGRAM_PARAMETERS" value="--debug" />
+    <module name="hex.desktop.main" />
+    <option name="PROGRAM_PARAMETERS" value="--map-editor --debug" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />

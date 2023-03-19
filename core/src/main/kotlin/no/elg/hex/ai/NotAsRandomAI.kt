@@ -36,15 +36,15 @@ import kotlin.reflect.KClass
 import kotlin.random.Random.Default as random
 
 /**
- * An AI that does semi-random actions for a until it amount of time. All action it can take will
- * have some value. For example it will not click on an empty hexagon in a territory when it does
- * not hold anything in it's hand.
+ * An AI that does semi-random actions for a random amount of time. All action it can take will
+ * have some value. For example, it will not click on an empty hexagon in a territory when it does
+ * not hold anything in its hand.
  *
  * This AI operates independently on each territory in the given team. It has no long term goals.
  *
  * @author Elg
  */
-class NotAsRandomAI(override val team: Team) : AI {
+class NotAsRandomAI(override val team: Team, val castleDelay: Int) : AI {
 
   private fun think(words: () -> String) {
     Gdx.app.trace("NARAI-$team", words)
@@ -140,7 +140,7 @@ class NotAsRandomAI(override val team: Team) : AI {
     think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
 
     val pieceToBuy = kotlin.run {
-      if (Random.nextDouble() > BUY_CASTLE_CHANCE && existsEmptyHexagon(territory) && territory.capital.canBuy(Castle::class)) {
+      if (allowedToBuyCastle(territory) && shouldBuyCastle() && existsEmptyHexagon(territory) && territory.capital.canBuy(Castle::class)) {
         // No upkeep for castles so as long as there is an empty hexagon, we can buy a castle
         return@run Castle::class.createHandInstance()
       } else {
@@ -267,6 +267,14 @@ class NotAsRandomAI(override val team: Team) : AI {
   /* *************************************************************************
    *  UTILITY METHODS
    * *************************************************************************/
+
+  private fun allowedToBuyCastle(territory: Territory): Boolean{
+    return territory.island.turn > castleDelay
+  }
+
+  private fun shouldBuyCastle(): Boolean{
+    return Random.nextDouble() > BUY_CASTLE_CHANCE
+  }
 
   private fun bestPieceToMergeWith(
     territory: Territory,

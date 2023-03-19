@@ -9,11 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* New `normal` and `easy` AI
+  * These are just the `hard` AI some restriction on placing castles
+
 ### Changed
+
+* Minimum android SDK version have been reduced back to 30
+  * Turns out not everyone have the latest android version :surprised_pikachu:
 
 ### Fixed
 
 ### Removed
+
+* Removed the old `easy` and `un_losable` AIs
 
 ---
 

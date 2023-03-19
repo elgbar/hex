@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Trace" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="no.elg.hex.desktop.DesktopLauncherKt" />
-    <module name="hex.desktop" />
+    <module name="hex.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="--trace" />
     <shortenClasspath name="NONE" />
     <method v="2">

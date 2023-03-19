@@ -13,6 +13,7 @@ import ktx.async.KtxAsync
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.ai.AI
+import no.elg.hex.ai.Difficulty
 import no.elg.hex.ai.NotAsRandomAI
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Empty
@@ -229,7 +230,7 @@ class Island(
   private val teamToPlayer =
     EnumMap<Team, AI?>(Team::class.java).apply {
       // if we create more teams this makes sure they are playing along
-      this.putAll(Team.values().map { it to NotAsRandomAI(it) })
+      this.putAll(Team.values().map { it to Difficulty.HARD.aiConstructor(it) })
 
       put(SUN, Settings.teamSunAI.aiConstructor(SUN))
       put(LEAF, Settings.teamLeafAI.aiConstructor(LEAF))
