@@ -25,7 +25,7 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 
 ## Help page
 
-*Accurate as of version 1.1.0*
+*Accurate as of version 1.2.0*
 
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
@@ -90,3 +90,4 @@ optional arguments:
 * Lag when un/redoing after a long game
 * Grave take too long to become trees
 * Calculate estimated income with holding piece
+* Map editor is not working

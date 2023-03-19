@@ -276,40 +276,17 @@ class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data,
   }
 }
 
-class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree: Byte = 0) :
-  StationaryPiece(data, placed) {
+class Grave(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, placed) {
+
   override val strength = NO_STRENGTH
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
-    if (roundsToTree > 0) {
-      roundsToTree--
-      return
-    }
     island.getData(pieceHex).setPiece(island.treeType(pieceHex))
   }
 
-  override fun copyTo(newData: HexagonData): Grave {
-    return Grave(newData, placed, roundsToTree)
-  }
-
-  override fun toString(): String = "${this::class.simpleName}(timeToTree: $roundsToTree)"
-
-  override val serializationData: Byte
-    get() = roundsToTree
-
-  override fun handleDeserializationData(serializationData: Any?) {
-    if (serializationData is Number) {
-      Gdx.app.trace(DESER_TAG, "Setting rounds to tree of $this to $serializationData")
-      roundsToTree = serializationData.toByte()
-    } else if (serializationData != null) {
-      Gdx.app.error(
-        DESER_TAG,
-        "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}"
-      )
-    }
-  }
+  override fun copyTo(newData: HexagonData): Grave { return Grave(newData, placed) }
 }
 
 // ////////

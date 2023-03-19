@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix graves taking too long to become trees
+* Fix estimated income not updating when buying pieces
 * Fix unlimited fps is not really unlimited
 * Fix starting capital was higher for the player who didn't start
 
