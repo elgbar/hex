@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Turns out not everyone have the latest android version :surprised_pikachu:
 * Improve enum sorting in the settings screen
 * Limit the maximum start capital to be 25
+* Improve which piece will be replaced by a capital when there is no capital in a territory
+  * The order of selection is as follows `empty`, `trees`/`graves`, `baron`, `knight`, `spearman`, `peasant`, `castle`
+  * E.g., if there is a peasant and a castle to choose from the algorithm will choose the peasant
 
 ### Fixed
 

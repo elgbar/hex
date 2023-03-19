@@ -81,8 +81,6 @@ optional arguments:
 * Add minimap
 * Generate trees when generating random island
 * Rework settings screen
-* Look into replacement logic for capitals
-  * Optimize for survivability
 
 ### Known bugs
 

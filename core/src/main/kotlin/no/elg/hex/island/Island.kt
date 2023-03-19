@@ -35,6 +35,7 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
+import no.elg.hex.util.debug
 import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getAllTerritories
 import no.elg.hex.util.getByCubeCoordinate
@@ -478,21 +479,14 @@ class Island(
    * @param hexagons All hexagons in a territory, must have a size equal to or greater than
    * [MIN_HEX_IN_TERRITORY]
    */
-  fun calculateBestCapitalPlacement(
-    hexagons: Collection<Hexagon<HexagonData>>
-  ): Hexagon<HexagonData> {
-    require(hexagons.size >= MIN_HEX_IN_TERRITORY) {
-      "There must be at least $MIN_HEX_IN_TERRITORY hexagons in the given set!"
-    }
+  private fun calculateBestCapitalPlacement(hexagons: Collection<Hexagon<HexagonData>>): Hexagon<HexagonData> {
+    require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "There must be at least $MIN_HEX_IN_TERRITORY hexagons in the given set!" }
     val hexTeam = this.getData(hexagons.first()).team
-    require(hexagons.all { this.getData(it).team == hexTeam }) {
-      "All hexagons given must be on the same team"
-    }
+    require(hexagons.all { this.getData(it).team == hexTeam }) { "All hexagons given must be on the same team" }
 
-    // Capitals should be prefer a worse location in favor of overwriting another piece
-    val maxPlacementPreference = hexagons.minOf { getData(it).piece.capitalPlacement }
-    val feasibleHexagons =
-      hexagons.filter { getData(it).piece.capitalPlacement <= maxPlacementPreference }
+    // Capitals should prefer a worse location in favor of overwriting another piece
+    val maxPlacementPreference = hexagons.minOf { getData(it).piece.capitalReplacementResistance }
+    val feasibleHexagons = hexagons.filter { getData(it).piece.capitalReplacementResistance <= maxPlacementPreference }
 
     val contenders = HashSet<Hexagon<HexagonData>>(feasibleHexagons.size)
 
@@ -501,11 +495,11 @@ class Island(
 
     fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
       for (r in discardIfLessThan..maxRadius) {
-        if (this.calculateRing(hex, r).any {
-            val data = this.getData(it)
-            data.team != hexTeam && !data.invisible
-          }
-        ) {
+        val isAnyEnemies = this.calculateRing(hex, r).any {
+          val data = this.getData(it)
+          data.team != hexTeam && !data.invisible
+        }
+        if (isAnyEnemies) {
           return r
         }
       }
@@ -530,32 +524,16 @@ class Island(
     }
 
     require(contenders.isNotEmpty()) {
-      "No capital contenders found in ${
-        hexagons.map {
-          "@${it.cubeCoordinate.toAxialKey()} | data ${
-            getData(
-              it
-            )
-          }"
-        }
-      }"
+      "No capital contenders found in ${hexagons.map { "@${it.cubeCoordinate.toAxialKey()} | data ${getData(it)}" }}"
     }
 
-    Gdx.app.trace(
-      "ISLAND",
+    Gdx.app.debug("ISLAND") {
       "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance, maxRadius is $maxRadius"
-    )
+    }
     Gdx.app.trace("ISLAND") {
-      "Contenders are ${
-        contenders.map {
-          "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${
-            findDistanceToClosestEnemyHex(
-              it,
-              1
-            )
-          }"
-        }
-      }"
+      "Contenders are ${contenders.map {
+        "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${findDistanceToClosestEnemyHex(it, 1)}"
+      }}"
     }
 
     if (contenders.size == 1) return contenders.first()
