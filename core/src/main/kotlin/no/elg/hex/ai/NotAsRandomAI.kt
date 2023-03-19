@@ -268,11 +268,11 @@ class NotAsRandomAI(override val team: Team, val castleDelay: Int) : AI {
    *  UTILITY METHODS
    * *************************************************************************/
 
-  private fun allowedToBuyCastle(territory: Territory): Boolean{
+  private fun allowedToBuyCastle(territory: Territory): Boolean {
     return territory.island.turn > castleDelay
   }
 
-  private fun shouldBuyCastle(): Boolean{
+  private fun shouldBuyCastle(): Boolean {
     return Random.nextDouble() > BUY_CASTLE_CHANCE
   }
 

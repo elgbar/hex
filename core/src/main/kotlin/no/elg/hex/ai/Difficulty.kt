@@ -11,5 +11,5 @@ enum class Difficulty(val aiConstructor: (Team) -> AI?) {
   PLAYER({ null }),
   EASY({ NotAsRandomAI(it, MAX_VALUE) }),
   NORMAL({ NotAsRandomAI(it, 5) }),
-  HARD({ NotAsRandomAI(it,0) })
+  HARD({ NotAsRandomAI(it, 0) })
 }

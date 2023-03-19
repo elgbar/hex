@@ -226,15 +226,16 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
       "Mismatch between this piece and the capital of the territory!"
     }
 
-    balance += calculateIncome(hexagons, island)
+    if (island.turn > 1) {
+      balance += calculateIncome(hexagons, island)
+    }
     if (balance < 0) {
       killall(island, hexagons)
       balance = 0
     }
   }
 
-  fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) =
-    hexagons.sumOf { island.getData(it).piece.income }
+  fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) = hexagons.sumOf { island.getData(it).piece.income }
 
   fun canBuy(piece: KClass<out Piece>): Boolean = canBuy(piece.createHandInstance())
 
@@ -275,7 +276,7 @@ class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data,
   }
 }
 
-class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree: Byte = 1) :
+class Grave(data: HexagonData, placed: Boolean = false, private var roundsToTree: Byte = 0) :
   StationaryPiece(data, placed) {
   override val strength = NO_STRENGTH
 
