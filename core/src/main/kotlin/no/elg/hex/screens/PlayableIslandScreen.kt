@@ -253,13 +253,14 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
           val size = Value.percentWidth(0.08f, this@table)
 
-          val disableInteract: (Territory?) -> Boolean = {
+          val interactDisabled: () -> Boolean = {
             island.isCurrentTeamAI() ||
               youWon.isShown() ||
               youLost.isShown() ||
               acceptAISurrender.isShown() ||
               confirmEndTurn.isShown() ||
-              confirmSurrender.isShown()
+              confirmSurrender.isShown() ||
+              island.history.disabled
           }
 
           @Scene2dDsl
@@ -268,7 +269,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             up: TextureRegion,
             down: TextureRegion? = null,
             disabled: TextureRegion? = null,
-            disableCheck: ((Territory?) -> Boolean) = disableInteract,
+            disableCheck: ((Territory?) -> Boolean) = { interactDisabled() },
             vararg keyShortcut: Int,
             onClick: Button.() -> Unit
           ) {
@@ -307,9 +308,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             cell.left()
 
             fun buyDisable(cost: Int): ((Territory?) -> Boolean) = { territory ->
-              territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || disableInteract(
-                territory
-              )
+              territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || interactDisabled()
             }
 
             interactButton(
@@ -338,7 +337,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Undo",
               up = Hex.assets.undo,
-              disableCheck = { !island.history.canUndo() || disableInteract(it) },
+              disableCheck = { interactDisabled() || !island.history.canUndo() },
               keyShortcut = intArrayOf(Keys.NUM_3)
             ) {
               island.history.undo()
@@ -346,7 +345,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Redo",
               up = Hex.assets.redo,
-              disableCheck = { !island.history.canRedo() || disableInteract(it) },
+              disableCheck = { interactDisabled() || !island.history.canRedo() },
               keyShortcut = intArrayOf(Keys.NUM_5)
             ) {
               island.history.redo()
@@ -354,7 +353,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Undo All",
               up = Hex.assets.undoAll,
-              disableCheck = { !island.history.canUndo() || disableInteract(it) },
+              disableCheck = { interactDisabled() || !island.history.canUndo() },
               keyShortcut = intArrayOf(Keys.NUM_4)
             ) {
               island.history.undoAll()
@@ -383,7 +382,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               labelCell.minWidth(size)
               labelCell.right()
 
-              disableChecker[this] = { disableInteract(null) }
+              disableChecker[this] = { interactDisabled() }
               onInteract(stage, Keys.ENTER) {
                 endTurn()
               }

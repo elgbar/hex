@@ -106,7 +106,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         Gdx.app.debug("PLACE", "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
         return false
       }
-    } else if (Castle::class != newPieceType) {
+    } else {
       throw IllegalStateException("Holding illegal piece '$newPieceType', can only hold living pieces and castle!")
     }
 

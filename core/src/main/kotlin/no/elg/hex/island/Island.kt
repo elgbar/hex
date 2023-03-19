@@ -531,16 +531,17 @@ class Island(
       "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance, maxRadius is $maxRadius"
     }
     Gdx.app.trace("ISLAND") {
-      "Contenders are ${contenders.map {
-        "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${findDistanceToClosestEnemyHex(it, 1)}"
-      }}"
+      "Contenders are ${
+        contenders.map {
+          "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${findDistanceToClosestEnemyHex(it, 1)}"
+        }
+      }"
     }
 
     if (contenders.size == 1) return contenders.first()
 
-    // if we have multiple contenders to become the capital, select the one with fewest enemy
-    // hexagons near it
-    // invisible hexagons count to ours hexagons
+    // if we have multiple contenders to become the capital, select the one with the fewest enemy hexagons near it.
+    // Invisible hexagons count as ours hexagons
 
     var currBest: Hexagon<HexagonData>? = null
     var currBestScore = -1.0

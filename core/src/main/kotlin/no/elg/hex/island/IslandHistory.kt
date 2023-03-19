@@ -18,7 +18,9 @@ class IslandHistory(val island: Island) {
   /**
    * If [remember] will record any remember request.
    */
-  private var rememberEnabled = true
+  var enabled = true
+    private set
+  val disabled get() = !enabled
 
   /**
    * Clear current history
@@ -31,11 +33,11 @@ class IslandHistory(val island: Island) {
   }
 
   fun enable() {
-    rememberEnabled = true
+    enabled = true
   }
 
   fun disable() {
-    rememberEnabled = false
+    enabled = false
   }
 
   /**
@@ -47,7 +49,7 @@ class IslandHistory(val island: Island) {
   }
 
   fun remember(note: String) {
-    if (rememberEnabled) {
+    if (enabled) {
       if (historyPointer != 0) {
         for (i in 0 until historyPointer) {
           history.removeFirst()
@@ -63,11 +65,11 @@ class IslandHistory(val island: Island) {
   /**
    * Ignore anything that happens within [event]
    */
-  fun ignore(event: () -> Unit) {
-    val wasRemembering = rememberEnabled
-    rememberEnabled = false
+  private fun ignore(event: () -> Unit) {
+    val wasRemembering = enabled
+    enabled = false
     event()
-    rememberEnabled = wasRemembering // only re-enable if it was enabled before
+    enabled = wasRemembering // only re-enable if it was enabled before
   }
 
   fun canUndo(): Boolean = (historyPointer + 1) in history.indices
@@ -75,34 +77,34 @@ class IslandHistory(val island: Island) {
 
   fun undo() {
     Hex.assets.undoSound?.play(Settings.volume)
-    `do`(historyPointer + 1, "un")
+    changeHistory(historyPointer + 1, "un")
   }
 
   fun redo() {
     Hex.assets.undoSound?.play(Settings.volume)
-    `do`(historyPointer - 1, "re")
+    changeHistory(historyPointer - 1, "re")
   }
 
   fun undoAll() {
     Hex.assets.undoAllSound?.play(Settings.volume)
-    `do`(history.size - 1, "un")
+    changeHistory(history.size - 1, "un")
   }
 
   fun redoAll() {
     Hex.assets.undoAllSound?.play(Settings.volume)
-    `do`(0, "re")
+    changeHistory(0, "re")
   }
 
-  private fun `do`(pointer: Int, prefix: String) {
+  private fun changeHistory(pointer: Int, prefix: String) {
     if (pointer !in history.indices) {
       Gdx.app.debug("HISTORY", "Nothing left to ${prefix}do")
       return
     }
     Gdx.app.debug("HISTORY", "${prefix}do ${historyNotes[historyPointer]}")
+    val wasEnabled = enabled
+    enabled = false
     historyPointer = pointer
-    val wasRemembering = rememberEnabled
-    rememberEnabled = false
     island.restoreState(history[pointer].copy())
-    rememberEnabled = wasRemembering
+    enabled = wasEnabled
   }
 }

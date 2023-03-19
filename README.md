@@ -87,3 +87,4 @@ optional arguments:
 * Limit FPS does not work
 * Lag when un/redoing after a long game
 * Map editor is not working
+* Merging two territories always keeps the capital of the selected territory
