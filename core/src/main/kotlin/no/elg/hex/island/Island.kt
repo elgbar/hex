@@ -551,7 +551,7 @@ class Island(
         val data = this.getData(it)
         when {
           data.team == hexTeam -> 1.0
-          data.invisible -> 0.5
+          data.invisible -> 1.1
           else -> 0.0
         }
       }

@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improve which piece will be replaced by a capital when there is no capital in a territory
   * The order of selection is as follows `empty`, `trees`/`graves`, `baron`, `knight`, `spearman`, `peasant`, `castle`
   * E.g., if there is a peasant and a castle to choose from the algorithm will choose the peasant
+* When calculating how exposed a capital placement is, count invisible hexagons as slight more (i.e, 10%) valuable then friendly hexagons
 
 ### Fixed
 
