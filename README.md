@@ -76,13 +76,26 @@ optional arguments:
 * Likewise, `F2` will buy a spearman, `F3` a knight, and `F4` a baron
 * Undo and redo can be done with `Ctrl-Z` and `Ctrl-Y` respectfully
 
-## TODO
+## For maintainers
+
+### Creating release files
+
+#### Android
+
+In the `Build` > `Generate Signed Bundle / Apk` choose bundle then (if not already done: import the `hex.jks` and get the password from the password manager) then choose `release`.
+It should be found [here](./android/release)
+
+#### Desktop
+
+Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `desktop-<version>.jar`
+
+### TODO
 
 * Add minimap
 * Generate trees when generating random island
 * Rework settings screen
 
-### Known bugs
+#### Known bugs
 
 * Limit FPS does not work
 * Lag when un/redoing after a long game
