@@ -149,8 +149,8 @@ object Settings {
     }
   )
 
-  var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
-  var enableDebugFPSGraph by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
+  var enableDebugHUD by PreferenceDelegate(false, priority = 100_000, hideLevel = LOG_DEBUG)
+  var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, hideLevel = LOG_DEBUG)
 
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
   var deleteAllProgress by PreferenceDelegate(
