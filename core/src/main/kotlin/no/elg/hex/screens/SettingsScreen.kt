@@ -268,10 +268,12 @@ class SettingsScreen : OverlayScreen() {
         }
 
         row()
-        visLabel("Version: ${Hex.assets.version ?: "unknown"}") {
-          it.colspan(2)
-          it.center()
-          color = Color.LIGHT_GRAY
+        Hex.assets.version?.also { version ->
+          visLabel("Version: $version") {
+            it.colspan(2)
+            it.center()
+            color = Color.LIGHT_GRAY
+          }
         }
         row()
         addBackButton {
