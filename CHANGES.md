@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Minimum android SDK version have been reduced to 21
+* Minimum android SDK version have been reduced to 26
   * Turns out not everyone have the latest android version :surprised_pikachu:
 * Improve enum sorting in the settings screen
 * Limit the maximum start capital to be 25
