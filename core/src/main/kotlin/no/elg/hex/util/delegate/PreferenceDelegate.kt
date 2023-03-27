@@ -48,6 +48,7 @@ class PreferenceDelegate<T : Any>(
    * Method to call when a change is applied. The first argument will always be `this`. If the onChange
    */
   val onChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> T)? = null,
+  private val shouldHide: (T) -> Boolean = { false },
   /**
    * A function to test if a given value is **in**valid
    */
@@ -170,6 +171,8 @@ class PreferenceDelegate<T : Any>(
     }
     preferences.flush()
   }
+
+  fun shouldHide(): Boolean = shouldHide(currentValue ?: initialValue) || hideLevel > Gdx.app.logLevel
 
   fun hide(property: KProperty<*>) {
     if (applyOnChangeOnSettingsHide && changed) {

@@ -1,6 +1,5 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Value
@@ -248,7 +247,7 @@ class SettingsScreen : OverlayScreen() {
         for (
         (property, delegate) in Settings::class.declaredMemberProperties //
           .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
-          .filterValues { it is PreferenceDelegate<*> && it.hideLevel <= Gdx.app.logLevel } //
+          .filterValues { it is PreferenceDelegate<*> && !it.shouldHide() } //
           .toSortedMap { o1, o2 ->
             val delegate1Pri = (o1.getDelegate(Settings) as PreferenceDelegate<*>).priority
             val delegate2Pri = (o2.getDelegate(Settings) as PreferenceDelegate<*>).priority

@@ -48,12 +48,14 @@ object Settings {
   var limitFps by PreferenceDelegate(
     false,
     priority = 110,
+    shouldHide = { !Hex.platform.canLimitFps },
     onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }
   )
   var targetFps by PreferenceDelegate(
     30,
     priority = 111,
     runOnChangeOnInit = false,
+    shouldHide = { !Hex.platform.canLimitFps },
     onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }
   ) { it < 5 }
 
@@ -198,8 +200,7 @@ object Settings {
 
   private fun updateForegroundFPS() {
     val maxFps = if (limitFps) targetFps else 0
-    Gdx.graphics.setForegroundFPS(maxFps)
-    Gdx.app.debug("SETTINGS", "New max frame rate is: $maxFps")
+    Hex.platform.setFps(maxFps)
   }
 
   private var lastGotoCalled = 0L
