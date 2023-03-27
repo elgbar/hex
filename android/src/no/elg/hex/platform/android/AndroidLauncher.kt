@@ -1,10 +1,14 @@
-package no.elg.hex
+package no.elg.hex.platform.android
 
 import android.os.Bundle
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidPreferences
 import com.xenomachina.argparser.ArgParser
+import no.elg.hex.ApplicationArgumentsParser
+import no.elg.hex.Hex
+import no.elg.hex.R
+import no.elg.hex.Settings
 
 class AndroidLauncher : AndroidApplication() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,11 +16,11 @@ class AndroidLauncher : AndroidApplication() {
 
     val config = AndroidApplicationConfiguration()
 
-    val args = arrayOf("--debug")
-//    val args = arrayOf<String>()
+    val args = arrayOf(resources.getString(R.string.args))
 
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
+    Hex.platform = AndroidPlatform(resources)
 
     if (Hex.launchPreference.contains(Settings.MSAA_SAMPLES_PATH)) {
       config.numSamples = Hex.launchPreference.getInteger(Settings.MSAA_SAMPLES_PATH)

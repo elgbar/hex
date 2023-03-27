@@ -91,9 +91,6 @@ class Assets : AssetManager() {
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
     const val ISLAND_FILE_ENDING = "is"
 
-    const val VERSIONS_FILE_PATH = "version.properties"
-    const val VERSION_PATH = "version"
-
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
     const val TUTORIAL_ATLAS = "sprites/tutorial.atlas"
 
@@ -177,17 +174,6 @@ class Assets : AssetManager() {
     return Animation(frameDuration, array, LOOP_PINGPONG)
   }
 
-  private fun loadProperties(path: String): Properties {
-    return Properties().also {
-      try {
-        Gdx.files.internal(path).read().use { inputStream ->
-          it.load(inputStream)
-        }
-      } catch (e: Exception) {
-        logger.error("Failed to load properties file $path: ${e.message}")
-      }
-    }
-  }
 
   val hand by lazy { findSprite("hand") }
   val background by lazy { findSprite("slay_game_background") }
@@ -261,8 +247,6 @@ class Assets : AssetManager() {
     setLoader(FREE_TYPE_FONT_GEN, FreeTypeFontGeneratorLoader(resolver))
 
     loadFont(bold = false, italic = false)
-
-    version = loadProperties(VERSIONS_FILE_PATH).getProperty(VERSION_PATH)
 
     // essential assets for the loading splash screen
 

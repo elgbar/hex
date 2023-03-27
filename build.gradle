@@ -140,7 +140,7 @@ project(":core") {
   apply plugin: "kotlin"
 
   classes {
-    doLast {
+    doFirst {
       new File("$buildDir/resources/main/version.properties").withWriter { writer ->
         Properties properties = new Properties()
         properties['version'] = hexVersion

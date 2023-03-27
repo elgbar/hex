@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run map editor disable-island-loading" type="JetRunConfigurationType">
-    <option name="MAIN_CLASS_NAME" value="no.elg.hex.desktop.DesktopLauncherKt" />
-    <module name="hex.desktop" />
+    <option name="MAIN_CLASS_NAME" value="no.elg.hex.platform.desktop.DesktopLauncherKt" />
+    <module name="hex.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="--map-editor --disable-island-loading" />
     <shortenClasspath name="NONE" />
     <method v="2">

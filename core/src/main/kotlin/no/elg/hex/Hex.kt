@@ -24,6 +24,7 @@ import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.jackson.serialization.HexagonDataDeserializerModifier
+import no.elg.hex.platform.Platform
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.SettingsScreen
@@ -86,6 +87,8 @@ object Hex : ApplicationAdapter() {
   lateinit var settingsScreen: SettingsScreen
     private set
 
+  lateinit var platform: Platform
+
   lateinit var launchPreference: Preferences
   var audioDisabled: Boolean = true
 
@@ -128,15 +131,16 @@ object Hex : ApplicationAdapter() {
         }
 
       KtxAsync.initiate()
+      Gdx.app.info("SYS" ) {"Version: ${platform.version}"}
       Gdx.app.info("SYS") { "App log level: ${logLevelToName(Gdx.app.logLevel)}" }
       Gdx.app.debug("SYS") { "App backend: ${Gdx.app.type}" }
       Gdx.app.debug("SYS") { "App version: ${Gdx.app.version}" }
       Gdx.app.debug("SYS") { "Max pointers: ${Gdx.input.maxPointers}" }
       Gdx.app.debug("SYS") { "GraphicsType: ${Gdx.graphics.type}" }
-      Gdx.app.debug("SYS") { "GL version ${Gdx.graphics.glVersion.debugVersionString}" }
-      Gdx.app.debug("SYS") { "MSAA ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
+      Gdx.app.debug("SYS") { "GL version: ${Gdx.graphics.glVersion.debugVersionString}" }
+      Gdx.app.debug("SYS") { "MSAA: ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
       Gdx.app.debug("SYS") {
-        "VSYNC ${
+        "VSYNC: ${
           Gdx.app.graphics.let {
             if (it is LwjglGraphics) {
               "${

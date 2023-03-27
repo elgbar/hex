@@ -1,4 +1,4 @@
-package no.elg.hex.desktop
+package no.elg.hex.platform.desktop
 
 import com.badlogic.gdx.Files.FileType.Internal
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
@@ -18,6 +18,7 @@ fun main(args: Array<String>) {
   Hex.args = mainBody { ArgParser(args).parseInto(::ApplicationArgumentsParser) }
   Hex.launchPreference = Lwjgl3Preferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
+  Hex.platform = DesktopPlatform()
   Hex.audioDisabled = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
 
   config.setWindowedMode(defaultDisplayMode.width / 2, defaultDisplayMode.height / 2)
