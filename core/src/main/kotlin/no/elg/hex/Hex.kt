@@ -131,7 +131,7 @@ object Hex : ApplicationAdapter() {
         }
 
       KtxAsync.initiate()
-      Gdx.app.info("SYS" ) {"Version: ${platform.version}"}
+      Gdx.app.info("SYS") { "Version: ${platform.version}" }
       Gdx.app.info("SYS") { "App log level: ${logLevelToName(Gdx.app.logLevel)}" }
       Gdx.app.debug("SYS") { "App backend: ${Gdx.app.type}" }
       Gdx.app.debug("SYS") { "App version: ${Gdx.app.version}" }

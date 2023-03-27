@@ -10,8 +10,8 @@ import com.badlogic.gdx.Gdx
 
 const val LOG_TRACE = LOG_DEBUG + 1
 
-fun logLevelToName(level: Int): String{
-  return when(level){
+fun logLevelToName(level: Int): String {
+  return when (level) {
     LOG_TRACE -> "trace"
     LOG_DEBUG -> "debug"
     LOG_INFO -> "info"

@@ -50,7 +50,6 @@ import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.trace
-import java.util.Properties
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
@@ -173,7 +172,6 @@ class Assets : AssetManager() {
 
     return Animation(frameDuration, array, LOOP_PINGPONG)
   }
-
 
   val hand by lazy { findSprite("hand") }
   val background by lazy { findSprite("slay_game_background") }
