@@ -31,6 +31,8 @@ import no.elg.hex.screens.SplashScreen
 import no.elg.hex.screens.TutorialScreen
 import no.elg.hex.util.LOG_TRACE
 import no.elg.hex.util.debug
+import no.elg.hex.util.info
+import no.elg.hex.util.logLevelToName
 import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -126,9 +128,11 @@ object Hex : ApplicationAdapter() {
         }
 
       KtxAsync.initiate()
-      Gdx.app.debug("SYS") { "App backend ${Gdx.app.type}" }
-      Gdx.app.debug("SYS") { "Max pointers ${Gdx.input.maxPointers}" }
-      Gdx.app.debug("SYS") { "GraphicsType ${Gdx.graphics.type}" }
+      Gdx.app.info("SYS") { "App log level: ${logLevelToName(Gdx.app.logLevel)}" }
+      Gdx.app.debug("SYS") { "App backend: ${Gdx.app.type}" }
+      Gdx.app.debug("SYS") { "App version: ${Gdx.app.version}" }
+      Gdx.app.debug("SYS") { "Max pointers: ${Gdx.input.maxPointers}" }
+      Gdx.app.debug("SYS") { "GraphicsType: ${Gdx.graphics.type}" }
       Gdx.app.debug("SYS") { "GL version ${Gdx.graphics.glVersion.debugVersionString}" }
       Gdx.app.debug("SYS") { "MSAA ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
       Gdx.app.debug("SYS") {

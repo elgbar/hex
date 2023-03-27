@@ -39,7 +39,7 @@ class PreferenceDelegate<T : Any>(
   val applyOnChangeOnSettingsHide: Boolean = false,
 
   /**
-   * Do not show this setting in the settings screen if the application log level [Application.getLogLevel()] is below [hideLevel].
+   * Do not show this setting in the settings screen if the application log level [Application.getLogLevel] is below [hideLevel].
    *
    * Setting this to [Application.LOG_NONE] (default) will always display this setting.
    */
