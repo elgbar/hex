@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * New `normal` and `easy` AI
-  * These are just the `hard` AI some restriction on placing castles
+  * These are all the same underlying AI different kind of restrictions
+  * Placing castles are disallowed until a few turns in for `normal` and never allowed for `easy` AI
+  * The chance of different AIs to just end their turn without considering all their options are depending on the difficultly
 
 ### Changed
 

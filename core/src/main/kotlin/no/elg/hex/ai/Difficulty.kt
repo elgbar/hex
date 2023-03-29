@@ -9,7 +9,7 @@ import java.lang.Integer.MAX_VALUE
 enum class Difficulty(val aiConstructor: (Team) -> AI?) {
 
   PLAYER({ null }),
-  EASY({ NotAsRandomAI(it, MAX_VALUE) }),
-  NORMAL({ NotAsRandomAI(it, 5) }),
-  HARD({ NotAsRandomAI(it, 0) })
+  EASY({ NotAsRandomAI(it, MAX_VALUE, 0.1f) }),
+  NORMAL({ NotAsRandomAI(it, 5, 0.01f) }),
+  HARD({ NotAsRandomAI(it, 0, 0.0001f) })
 }

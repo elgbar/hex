@@ -44,7 +44,26 @@ import kotlin.random.Random.Default as random
  *
  * @author Elg
  */
-class NotAsRandomAI(override val team: Team, val castleDelay: Int) : AI {
+class NotAsRandomAI(
+  /**
+   * The team of this AI
+   */
+  override val team: Team,
+  /**
+   * How many turns must elapse before the AI is allowed to buy castles.
+   *
+   * That is, a lower value will make this a harder AI
+   */
+  private val castleDelay: Int,
+  /**
+   * How likely it is that the AI will end it's turn.
+   * A value of `0` means it will never end its turn before it has tried to pick up all it's pieces
+   * while a value of `1` means it will only try a single action before ending it's turn
+   *
+   * That is, a lower value will make this a harder AI
+   */
+  private val endTurnChance: Float
+) : AI {
 
   private fun think(words: () -> String) {
     Gdx.app.trace("NARAI-$team", words)
@@ -91,7 +110,7 @@ class NotAsRandomAI(override val team: Team, val castleDelay: Int) : AI {
           break
         }
         place(sel, gameInputProcessor)
-      } while (random.nextFloat() > 0.005f)
+      } while (random.nextFloat() > endTurnChance)
     }
     island.select(null)
     resetBlacklists()
