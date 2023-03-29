@@ -15,7 +15,7 @@
     android:label="@string/app_name"
     android:theme="@style/GdxTheme"
     android:usesCleartextTraffic="false"
-    android:enableOnBackInvokedCallback="true"
+    android:enableOnBackInvokedCallback="false"
   >
     <activity
       android:name="no.elg.hex.platform.android.AndroidLauncher"
