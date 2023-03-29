@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array
 import ktx.graphics.center
 import ktx.graphics.use
 import no.elg.hex.Hex
+import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
@@ -153,7 +154,12 @@ object LevelSelectScreen : AbstractScreen() {
     val renderTime = measureTimeMillis {
       if (IslandFiles.islandIds.size == 0) {
         if (!Hex.args.`disable-island-loading`) {
-          publishWarning("Failed to find any islands to load")
+          publishError("Failed to find any islands to load")
+          if (Hex.args.mapEditor) {
+            publishWarning("Do you have the correct island symbolic link in the project?")
+            publishWarning("There should be a error printed in the gradle logs")
+            publishWarning("To fix on windows you can enable Developer Mode")
+          }
         }
         return
       }

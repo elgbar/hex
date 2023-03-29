@@ -1,5 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
 buildscript {
   ext {
     appName = "Hex"
@@ -132,6 +135,24 @@ project(":desktop") {
 
   test {
     useJUnitPlatform()
+  }
+
+  classes {
+    doFirst {
+      // Automatically create a soft link to the island folder to allow map-editor to work
+      // On windows developer mode must be turned on for this to work
+      // This file is only used when map editor is also used, you can play the game without this file existing
+      var root = rootDir.path
+      var targetPath = Paths.get(root, "core", "src", "main", "resources", "islands")
+      var link = Paths.get(root, "islands")
+      if (Files.notExists(link)) {
+        try {
+          Files.createSymbolicLink(link, targetPath)
+        } catch (IOException e) {
+          System.err.println("Failed to create symbolic link. Try enable developer mode: https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/.\n $e.class.simpleName: $e.message")
+        }
+      }
+    }
   }
 }
 

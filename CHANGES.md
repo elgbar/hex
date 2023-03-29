@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix estimated income not updating when buying pieces
 * Fix unlimited fps is not really unlimited
 * Fix starting capital was higher for the player who didn't start
+* Fix map editor no finding the island folder on a fresh clone
 
 ### Removed
 
