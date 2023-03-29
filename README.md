@@ -93,7 +93,8 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 
 * Add minimap
 * Generate trees when generating random island
-* Rework settings screen
+* Rework the settings screen
+* Rank how difficult islands are to beat
 
 #### Known bugs
 

@@ -75,6 +75,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   internal val acceptAISurrender: VisWindow
   private val youWon: VisWindow
   private val youLost: VisWindow
+  private val aiDone: VisWindow
 
   private val buttonGroup: VisTable
 
@@ -195,8 +196,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         island.restoreInitialState()
       }
 
-      youWon = okWindow("You Won!", { "Congratulations! You won in ${island.turn} turns." }, endGame(WON))
-      youLost = okWindow("You Lost", { "Too bad! You lost in ${island.turn} turns." }, endGame(LOST))
+      youWon = okWindow("You Won!", { "Congratulations! You won in ${island.turn} turns" }, endGame(WON))
+      youLost = okWindow("You Lost", { "Too bad! You lost in ${island.turn} turns to ${island.winningTeam.name}" }, endGame(LOST))
+      aiDone = okWindow("AI finished their game", { "The AI ${island.winningTeam.name} won in ${island.turn} turns" }, endGame(LOST))
 
       confirmEndTurn = confirmWindow(
         "Confirm End Turn",
@@ -257,6 +259,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             island.isCurrentTeamAI() ||
               youWon.isShown() ||
               youLost.isShown() ||
+              aiDone.isShown() ||
               acceptAISurrender.isShown() ||
               confirmEndTurn.isShown() ||
               confirmSurrender.isShown() ||
@@ -402,10 +405,10 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     for ((window, action) in labelUpdater) {
       window.action()
     }
-    if (win) {
-      youWon.show(stage)
-    } else {
-      youLost.show(stage)
+    when {
+        island.realPlayers == 0 -> aiDone.show(stage)
+        win -> youWon.show(stage)
+        else -> youLost.show(stage)
     }
   }
 

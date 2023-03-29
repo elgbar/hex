@@ -193,6 +193,7 @@ class Island(
   }
 
   val hexagonsPerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countHexagons(this) } }
+  val winningTeam: Team get() = hexagonsPerTeam.maxBy { it.value }.key
 
   val totalBalancePerTeam: ObjectIntMap<Team> = ObjectIntMap<Team>(Team.values().size)
     get() {
