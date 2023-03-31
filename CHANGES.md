@@ -39,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-* Removed the old `easy` and `un_losable` AIs
+* Remove the old `easy` and `un_losable` AIs
+* Remove the AI end turn delay
 
 ---
 

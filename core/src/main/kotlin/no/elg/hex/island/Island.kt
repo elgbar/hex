@@ -326,10 +326,7 @@ class Island(
             publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
           }
         }
-        Gdx.app.trace("AI") { "${cai.team} AI's turn took $time ms" }
-        if (!alive && time < 50) {
-          delay(50 - time)
-        }
+        Gdx.app.debug("AI") { "${cai.team} AI's turn took $time ms" }
         if (Hex.screen is PreviewIslandScreen) {
           endTurn(gameInputProcessor)
         }
