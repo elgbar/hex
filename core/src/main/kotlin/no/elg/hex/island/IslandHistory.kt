@@ -65,7 +65,7 @@ class IslandHistory(val island: Island) {
   /**
    * Ignore anything that happens within [event]
    */
-  private fun ignore(event: () -> Unit) {
+  fun ignore(event: () -> Unit) {
     val wasRemembering = enabled
     enabled = false
     event()

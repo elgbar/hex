@@ -367,8 +367,11 @@ class Island(
   /** Select the hex under the cursor */
   fun select(hexagon: Hexagon<HexagonData>?): Boolean {
     val oldSelected = selected
-    hand = null
-    selected = null
+
+    history.ignore {
+      hand = null
+      selected = null
+    }
 
     Gdx.app.trace("SELECT", "Selecting hexagon ${hexagon?.cubeCoordinate}")
 

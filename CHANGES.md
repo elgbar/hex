@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix starting capital was higher for the player who didn't start
 * Fix map editor no finding the island folder on a fresh clone
 * Fix saving while holding piece threw a serialization exception
+* Fix double recording of selecting territory event
 
 ### Removed
 
