@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * These are all the same underlying AI different kind of restrictions
   * Placing castles are disallowed until a few turns in for `normal` and never allowed for `easy` AI
   * The chance of different AIs to just end their turn without considering all their options are depending on the difficultly
+* Show castle when the AI is done with a game
 
 ### Changed
 

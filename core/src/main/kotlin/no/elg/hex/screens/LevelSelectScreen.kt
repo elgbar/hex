@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
@@ -20,6 +21,7 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.AI_DONE
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
@@ -92,56 +94,53 @@ object LevelSelectScreen : AbstractScreen() {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
     updateCamera()
     islandScreen.render(0f)
-    if (modifier != NOTHING) {
-      camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
-      val widthOffset = camera.viewportWidth / 5
-      val heightOffset = camera.viewportHeight / 5
-      batch.use(camera) {
-        when (modifier) {
-          SURRENDER -> batch.draw(
-            Hex.assets.surrender,
-            widthOffset,
-            heightOffset,
-            camera.viewportWidth - widthOffset * 2,
-            camera.viewportHeight - heightOffset * 2
-          )
+    camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
+    val widthOffset = camera.viewportWidth / 5
+    val heightOffset = camera.viewportHeight / 5
+    batch.use(camera) {
 
-          LOST -> batch.draw(
-            Hex.assets.grave,
-            widthOffset,
-            heightOffset,
-            camera.viewportWidth - widthOffset * 2,
-            camera.viewportHeight - heightOffset * 2
-          )
-
-          WON -> {
-            val text = "${island.turn}"
-
-            val font = Hex.assets.regularFont
-
-            camera.setToOrtho(yDown, widthOffset, heightOffset)
-            camera.center(widthOffset, heightOffset)
-
-            batch.projectionMatrix = camera.combined
-
-            font.color = WHITE
-            font.draw(
-              batch,
-              text,
-              0f,
-              (camera.viewportHeight - font.data.capHeight) / 2f,
-              camera.viewportWidth,
-              Align.center,
-              false
-            )
-          }
-
-          else -> error("Unknown/illegal preview modifier: $modifier")
-        }
+      fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
+        batch.draw(
+          textureRegion,
+          widthOffset,
+          heightOffset,
+          camera.viewportWidth - widthOffset * 2,
+          camera.viewportHeight - heightOffset * 2
+        )
       }
-      camera.setToOrtho(yDown)
-      updateCamera()
+
+      when (modifier) {
+        SURRENDER -> drawAsset(Hex.assets.surrender)
+        LOST -> drawAsset(Hex.assets.grave)
+        AI_DONE -> drawAsset(Hex.assets.castle)
+
+        WON -> {
+          val text = "${island.turn}"
+
+          val font = Hex.assets.regularFont
+
+          camera.setToOrtho(yDown, widthOffset, heightOffset)
+          camera.center(widthOffset, heightOffset)
+
+          batch.projectionMatrix = camera.combined
+
+          font.color = WHITE
+          font.draw(
+            batch,
+            text,
+            0f,
+            (camera.viewportHeight - font.data.capHeight) / 2f,
+            camera.viewportWidth,
+            Align.center,
+            false
+          )
+        }
+        NOTHING -> Unit
+      }
     }
+    camera.setToOrtho(yDown)
+    updateCamera()
+
     Hex.setClearColorAlpha(1f)
 
     renderingPreview = false
@@ -335,6 +334,7 @@ object LevelSelectScreen : AbstractScreen() {
     NOTHING,
     SURRENDER,
     WON,
-    LOST
+    LOST,
+    AI_DONE
   }
 }

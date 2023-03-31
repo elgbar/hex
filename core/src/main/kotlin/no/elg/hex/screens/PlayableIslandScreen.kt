@@ -45,6 +45,7 @@ import no.elg.hex.island.Territory
 import no.elg.hex.renderer.DebugGraphRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier
+import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.AI_DONE
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
@@ -198,7 +199,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
       youWon = okWindow("You Won!", { "Congratulations! You won in ${island.turn} turns" }, endGame(WON))
       youLost = okWindow("You Lost", { "Too bad! You lost in ${island.turn} turns to ${island.winningTeam.name}" }, endGame(LOST))
-      aiDone = okWindow("AI finished their game", { "The AI ${island.winningTeam.name} won in ${island.turn} turns" }, endGame(LOST))
+      aiDone = okWindow("Game Over", { "The AI ${island.winningTeam.name} won in ${island.turn} turns" }, endGame(AI_DONE))
 
       confirmEndTurn = confirmWindow(
         "Confirm End Turn",
