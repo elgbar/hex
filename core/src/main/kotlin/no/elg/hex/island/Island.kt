@@ -45,7 +45,6 @@ import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.next
 import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
-import no.elg.hex.util.treeType
 import no.elg.hex.util.withData
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
@@ -317,10 +316,9 @@ class Island(
     KtxAsync.launch(Hex.asyncThread) {
       val cai = currentAI
       if (cai != null) {
-        var alive = true
         val time = measureTimeMillis {
           try {
-            alive = cai.action(this@Island, gameInputProcessor)
+            cai.action(this@Island, gameInputProcessor)
           } catch (e: RuntimeException) {
             e.printStackTrace()
             publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
@@ -456,12 +454,6 @@ class Island(
   fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
     val territoryHexes = connectedTerritoryHexagons(hexagon)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) {
-      // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
-      // then replace the capital with a tree
-      val data = getData(hexagon)
-      if (data.piece is Capital) {
-        data.setPiece(treeType(hexagon))
-      }
       return null
     }
     return territoryHexes

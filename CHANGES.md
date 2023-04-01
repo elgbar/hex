@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * You will not get the `you lost` message when only AIs are playing against each other
 * Improve end turn warning to be less aggressive
   * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
+* Capitals behave like living pieces and will not instantly become a tree, but rather be replaced with a tree at the start of the owning teams turn
 
 ### Fixed
 

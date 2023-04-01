@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MAX_START_CAPITAL
-import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
@@ -48,12 +47,16 @@ fun strengthToTypeOrNull(str: Int): KClass<out LivingPiece>? {
 fun mergedType(piece1: LivingPiece, piece2: LivingPiece) =
   strengthToType(piece1.strength + piece2.strength)
 
+fun replaceWithTree(island: Island, hex: Hexagon<HexagonData>) {
+  island.getData(hex).setPiece(island.treeType(hex))
+}
+
 /** @author Elg */
 sealed class Piece {
 
   abstract val data: HexagonData
 
-  /** How powerful an object is. Must be Strictly positive */
+  /** How powerful a piece is. Must be Strictly positive */
   abstract val strength: Int
 
   /** Can this object move once placed */
@@ -194,14 +197,11 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     val hexagons = island.getTerritoryHexagons(pieceHex)
 
     if (hexagons == null) {
-      killall(island, island.connectedTerritoryHexagons(pieceHex))
-      island.getData(pieceHex).setPiece(island.treeType(pieceHex))
+      replaceWithTree(island, pieceHex)
       return
     }
 
-    require(island.findCapital(hexagons) === this) {
-      "Mismatch between this piece and the capital of the territory!"
-    }
+    require(island.findCapital(hexagons) === this) { "Mismatch between this piece and the capital of the territory!" }
 
     if (island.turn > 1) {
       balance += calculateIncome(hexagons, island)
