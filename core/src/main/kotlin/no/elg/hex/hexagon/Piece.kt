@@ -280,20 +280,14 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var hasGrown: Boolean
   override val income: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
-  override fun beginTurn(
-    island: Island,
-    pieceHex: Hexagon<HexagonData>,
-    data: HexagonData,
-    team: Team
-  ) {
+  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     hasGrown = false
   }
 }
 
 class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    if (hasGrown) return
-
+    super.newRound(island, pieceHex)
     // Find all empty neighbor hexes that are empty
     val list = island.getNeighbors(pieceHex).filter {
       val piece = island.getData(it).piece
@@ -330,7 +324,7 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
 class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    if (hasGrown) return
+    super.newRound(island, pieceHex)
     // Find all empty neighbor hexes that are empty along the cost
     val hex =
       island
