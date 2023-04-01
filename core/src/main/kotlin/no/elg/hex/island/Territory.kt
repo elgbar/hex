@@ -21,7 +21,8 @@ data class Territory(
     var income = capital.calculateIncome(hexagons, island)
     val hand = island.hand
     if (hand?.territory === this) {
-      income += hand.piece.income
+      // Subtract one from the income to balance out the +1 gained from the empty hexagon the piece should be placed on
+      income += hand.piece.income - 1
     }
     return income
   }

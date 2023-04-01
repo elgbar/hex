@@ -95,6 +95,8 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 * Generate trees when generating random island
 * Rework the settings screen
 * Rank how difficult islands are to beat
+* Allow swap between castle in hand and movable piece in territory
+* Add a proper tutorial, nobody likes to read
 
 #### Known bugs
 
