@@ -69,8 +69,8 @@ class TutorialScreen : OverlayScreen(false) {
         lab("Cost overview", "costs", false, Align.center)
 
         lab(
-          "When you start a new game the island is divided up between the six players. Adjoining hexagons " +
-            "of the same colour form territories and each territory which is larger than one hexagon has a Capital." +
+          "When you start a new game the island is divided up between the six players. Two or more hexagons " +
+            "of the same colour form a territory and each territory has a Capital." +
             " On your turn each capital that has enough money to buy new peasants or castles will have a flag waving" +
             " over it. To select a territory just tap anywhere on one of its hexagons.",
           "tutorial-1"
