@@ -369,7 +369,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
     island.getData(hex).setPiece(Grave::class)
   }
 
-  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (island.getTerritoryHexagons(pieceHex) == null) {
       kill(island, pieceHex)
     } else {
