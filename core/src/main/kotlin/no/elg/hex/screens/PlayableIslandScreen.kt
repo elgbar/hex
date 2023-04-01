@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -28,13 +29,15 @@ import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.hexagon.CASTLE_PRICE
+import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
+import no.elg.hex.hexagon.KNIGHT_STRENGTH
 import no.elg.hex.hexagon.LivingPiece
-import no.elg.hex.hexagon.PEASANT_PRICE
+import no.elg.hex.hexagon.PEASANT_STRENGTH
 import no.elg.hex.hexagon.Peasant
+import no.elg.hex.hexagon.SPEARMAN_STRENGTH
 import no.elg.hex.hexagon.SimpleEventListener
 import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
 import no.elg.hex.hud.DebugInfoRenderer
@@ -444,8 +447,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     }
 
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
-      val minCost = Peasant::class.createHandInstance().price
-
       // only display the confirm button if the user have any action to do left
       for (hexagon in island.hexagons) {
         val data = island.getData(hexagon)
@@ -455,8 +456,27 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           // not our team
           continue
         } else if (piece is Capital) {
-          if (piece.balance < minCost) {
-            // The piece is a capital but cannot afford a peasant
+          val balance = piece.balance
+          if (balance < PEASANT_PRICE) {
+            // We cannot afford anything
+            continue
+          }
+
+          val strength = when {
+            balance < PEASANT_PRICE * 2 -> PEASANT_STRENGTH
+            balance in PEASANT_PRICE * 2 until PEASANT_PRICE * 3 -> SPEARMAN_STRENGTH
+            balance in PEASANT_PRICE * 3 until PEASANT_PRICE * 4 -> KNIGHT_STRENGTH
+            else -> BARON_STRENGTH
+          }
+
+          val territory = island.findTerritory(hexagon)
+          if (territory == null) {
+            Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
+            continue
+          }
+          val cannotBuyAndAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, strength) }
+          val cannotBuyAndPlaceCastle = balance < CASTLE_PRICE || territory.hexagons.none { hex -> island.getData(hex).piece is Empty }
+          if (cannotBuyAndAttackAnything && cannotBuyAndPlaceCastle) {
             continue
           }
         } else if (piece is LivingPiece) {
@@ -465,8 +485,11 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             continue
           }
 
-          val territory =
-            island.findTerritory(hexagon) ?: error("Piece $piece has not moved and is in not in a territory")
+          val territory = island.findTerritory(hexagon)
+          if (territory == null) {
+            Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
+            continue
+          }
           val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) }
           val canNotMergeWithOtherPiece = territory.hexagons.none {
             val terrPiece = island.getData(it).piece
@@ -571,6 +594,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
     private const val MOBILE_SPACING = 20f
     private const val DESKTOP_SPACING = 5f
+
+    val PEASANT_PRICE = Peasant::class.createHandInstance().price
+    val CASTLE_PRICE = Castle::class.createHandInstance().price
 
     val buttonPadding: Float get() = if (OsUtils.isAndroid() || OsUtils.isIos()) MOBILE_BUTTON_PADDING else DESKTOP_BUTTON_PADDING
     val platformSpacing: Float get() = if (OsUtils.isAndroid() || OsUtils.isIos()) MOBILE_SPACING else DESKTOP_SPACING

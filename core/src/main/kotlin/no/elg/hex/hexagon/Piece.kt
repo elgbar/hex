@@ -15,13 +15,9 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
 
 const val NO_STRENGTH = 0
-
 const val PEASANT_STRENGTH = 1
-
 const val SPEARMAN_STRENGTH = 2
-
 const val KNIGHT_STRENGTH = 3
-
 const val BARON_STRENGTH = 4
 
 const val CASTLE_PRICE = 15

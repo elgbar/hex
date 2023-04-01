@@ -163,9 +163,8 @@ fun Island.ensureCapitalStartFunds() {
   }
 }
 
-fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean {
-  return with.strength > min(calculateStrength(hexagon), KNIGHT_STRENGTH)
-}
+fun Island.canAttack(hexagon: Hexagon<HexagonData>, strength: Int): Boolean = strength > min(calculateStrength(hexagon), KNIGHT_STRENGTH)
+fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canAttack(hexagon, with.strength)
 
 inline fun <reified T : Piece> Island.forEachPieceType(
   action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit

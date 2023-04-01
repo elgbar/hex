@@ -121,7 +121,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     if (hexData.setPiece(newPieceType)) {
       island.history.remember("Placing piece") {
         hexData.team = territory.team
-        //Never refund as we are placing the unit down right now
+        // Never refund as we are placing the unit down right now
         island.hand?.refund = false
         island.hand = null
 

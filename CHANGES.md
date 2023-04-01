@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * E.g., if there is a peasant and a castle to choose from the algorithm will choose the peasant
 * When calculating how exposed a capital placement is, count invisible hexagons as slight more (i.e, 10%) valuable then friendly hexagons
 * You will not get the `you lost` message when only AIs are playing against each other
+* Improve end turn warning to be less aggressive
+  * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
 
 ### Fixed
 
