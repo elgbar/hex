@@ -407,9 +407,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       window.action()
     }
     when {
-        island.realPlayers == 0 -> aiDone.show(stage)
-        win -> youWon.show(stage)
-        else -> youLost.show(stage)
+      island.realPlayers == 0 -> aiDone.show(stage)
+      win -> youWon.show(stage)
+      else -> youLost.show(stage)
     }
   }
 

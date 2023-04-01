@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import no.elg.hex.Hex
@@ -30,6 +29,7 @@ import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
+import no.elg.hex.island.Island.IslandDto.Companion.createDtoPieceCopy
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
@@ -680,7 +680,7 @@ class Island(
       grid.gridData.gridHeight,
       grid.gridData.gridLayout.toEnumValue(),
       coord,
-      hand?.piece?.createDtoCopy(),
+      hand?.createDtoPieceCopy(),
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       turn,
       false,
@@ -716,6 +716,9 @@ class Island(
     companion object {
       internal fun Piece?.createDtoCopy(): Piece? {
         return this?.let { it.copyTo(it.data.copy()) }
+      }
+      internal fun Hand?.createDtoPieceCopy(): Piece? {
+        return this?.piece?.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
       }
     }
   }

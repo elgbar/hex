@@ -89,7 +89,9 @@ sealed class Piece {
       true
     } else {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}") {
-        "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.map { it::simpleName }} pieces. Tried to place it on ${onto.piece::class.simpleName}"
+        "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.joinToString {
+          it.simpleName ?: "??"
+        }} pieces. Tried to place it on ${onto.piece::class.simpleName}"
       }
       false
     }
@@ -250,6 +252,7 @@ class Castle(data: HexagonData, placed: Boolean = false) : StationaryPiece(data,
   override val strength = SPEARMAN_STRENGTH
   override val price: Int = CASTLE_PRICE
   override val capitalReplacementResistance: Int = Int.MAX_VALUE
+  override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
   override fun copyTo(newData: HexagonData): Castle {
     return Castle(newData, placed)

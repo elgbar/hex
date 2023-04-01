@@ -11,11 +11,18 @@ import no.elg.hex.util.trace
 /** @author Elg */
 data class Hand(
   val territory: Territory,
-  val piece: Piece
+  val piece: Piece,
+  /**
+   * If the held piece should be refunded/returned when disposing.
+   * This is useful when modifying the held piece without duplicating money/pieces
+   */
+  var refund: Boolean = true
 ) : Disposable {
 
   init {
-    require(piece !is LivingPiece || !piece.moved) { "Holding a piece that has already moved" }
+    require(piece !is LivingPiece || !piece.moved) {
+      "Holding a living piece that has already moved"
+    }
     require(piece != Empty) { "Cannot hold empty piece" }
   }
 
@@ -23,12 +30,7 @@ data class Hand(
    * If this is the current held hand and has not been disposed
    */
   var currentHand = true
-
-  /**
-   * If the held piece should be refunded/returned when disposing.
-   * This is useful when modifying the held piece without duplicating money/pieces
-   */
-  var refund = true
+    private set
 
   override fun dispose() {
     require(currentHand) { "Hand already disposed " }

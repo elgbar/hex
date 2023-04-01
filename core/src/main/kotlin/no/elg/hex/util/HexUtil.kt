@@ -89,10 +89,10 @@ private fun connectedTerritoryHexagons(
  * If the given hexagon is a part of a territory.
  * That is, the given hexagon have a neighbor hexagon which is in on the same team as the given hexagon
  */
-fun Island.isPartOfATerritory(hexagon: Hexagon<HexagonData>): Boolean {
-  val team = getData(hexagon).team
-  for (neighbor in getNeighbors(hexagon)) {
-    val data = getData(neighbor)
+fun Hexagon<HexagonData>.isPartOfATerritory(island: Island): Boolean {
+  val team = island.getData(this).team
+  for (neighbor in island.getNeighbors(this)) {
+    val data = island.getData(neighbor)
     if (data.team == team) {
       return true
     }

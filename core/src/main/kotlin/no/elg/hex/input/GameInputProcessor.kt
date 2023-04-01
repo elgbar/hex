@@ -72,19 +72,27 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     newPiece: Piece
   ): Boolean {
     val hexData = island.getData(placeOn)
-    if (hexData.team != island.currentTeam && !territory.enemyBorderHexes.contains(placeOn)) {
+    val isBorderHexagon = territory.enemyBorderHexes.contains(placeOn)
+    if (hexData.team != island.currentTeam && !isBorderHexagon) {
       Gdx.app.debug("PLACE", "Tried to place piece on enemy hex outside border hexes")
       return false
     }
 
     val oldPiece = hexData.piece
+    if (oldPiece is LivingPiece && newPiece is Castle && hexData.team == territory.team) {
+      if (!oldPiece.moved && hexData.setPiece(Castle::class)) {
+        island.history.remember("Swapping castle for living piece") {
+          island.hand = Hand(territory, oldPiece, refund = false)
+        }
+        return true
+      }
+      return false
+    }
 
-    val (newPieceType, moved) = if (oldPiece is LivingPiece &&
-      newPiece is LivingPiece &&
-      hexData.team == territory.team
-    ) {
+    val (newPieceType, moved) = if (oldPiece is LivingPiece && newPiece is LivingPiece && hexData.team == territory.team) {
       // merge cursor piece with held piece
       if (newPiece.canNotMerge(oldPiece)) {
+        Gdx.app.debug("PLACE", "Cannot merge ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
         return false
       }
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
@@ -113,8 +121,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     if (hexData.setPiece(newPieceType)) {
       island.history.remember("Placing piece") {
         hexData.team = territory.team
-
-        island.hand?.currentHand = false
+        //Never refund as we are placing the unit down right now
+        island.hand?.refund = false
+        island.hand = null
 
         val updatedPiece = hexData.piece
         if (updatedPiece is LivingPiece) {
@@ -143,7 +152,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
     val oldTerritory = island.selected
     if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) && cursorHexData.team == island.currentTeam) {
-      if (island.isPartOfATerritory(hexagon)) {
+      if (hexagon.isPartOfATerritory(island)) {
         island.select(hexagon)
       } else {
         return false

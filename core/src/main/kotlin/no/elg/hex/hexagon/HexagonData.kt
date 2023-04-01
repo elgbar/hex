@@ -97,7 +97,7 @@ class HexagonData(
 
   fun copy(): HexagonData {
     if (edge) return this
-    return HexagonData(edge, isOpaque, isPassable, team).also {
+    return HexagonData(false, isOpaque, isPassable, team).also {
       it.piece = piece.copyTo(it)
     }
   }

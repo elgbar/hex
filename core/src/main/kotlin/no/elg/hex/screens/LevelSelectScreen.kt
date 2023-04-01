@@ -98,7 +98,6 @@ object LevelSelectScreen : AbstractScreen() {
     val widthOffset = camera.viewportWidth / 5
     val heightOffset = camera.viewportHeight / 5
     batch.use(camera) {
-
       fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
         batch.draw(
           textureRegion,
