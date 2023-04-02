@@ -8,6 +8,8 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.isNotPartOfATerritory
+import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
@@ -195,7 +197,6 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
     team: Team
   ) {
     val hexagons = island.getTerritoryHexagons(pieceHex)
-
     if (hexagons == null) {
       replaceWithTree(island, pieceHex)
       return
@@ -364,7 +365,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
   }
 
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
-    if (island.getTerritoryHexagons(pieceHex) == null) {
+    if (pieceHex.isNotPartOfATerritory(island)) {
       kill(island, pieceHex)
     } else {
       moved = false

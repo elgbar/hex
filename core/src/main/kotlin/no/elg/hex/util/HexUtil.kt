@@ -86,6 +86,12 @@ private fun connectedTerritoryHexagons(
 }
 
 /**
+ * If the given hexagon is NOT a part of a territory.
+ * That is, the given hexagon does not have a neighbor hexagon which is in on the same team as the given hexagon
+ */
+fun Hexagon<HexagonData>.isNotPartOfATerritory(island: Island): Boolean = !isPartOfATerritory(island)
+
+/**
  * If the given hexagon is a part of a territory.
  * That is, the given hexagon have a neighbor hexagon which is in on the same team as the given hexagon
  */
