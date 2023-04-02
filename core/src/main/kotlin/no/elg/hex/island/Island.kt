@@ -14,6 +14,7 @@ import no.elg.hex.Settings
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
@@ -531,6 +532,7 @@ class Island(
       val calcScore = ring.sumOf {
         val data = this.getData(it)
         when {
+          data.team == hexTeam && data.piece is Castle -> 2.0
           data.team == hexTeam -> 1.0
           data.invisible -> 1.1
           else -> 0.0
