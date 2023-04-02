@@ -102,6 +102,5 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 
 * Lag when un/redoing after a long game
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
-* Merging two territories always keeps the capital of the selected territory
 * Trees still behave weirdly
 * Living piece in a single territory?????

@@ -28,7 +28,6 @@ import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
-import no.elg.hex.island.Island.IslandDto.Companion.createDtoCopy
 import no.elg.hex.island.Island.IslandDto.Companion.createDtoPieceCopy
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
@@ -42,6 +41,7 @@ import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isLazyInitialized
+import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.next
 import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
@@ -53,6 +53,7 @@ import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import java.util.EnumMap
+import kotlin.collections.HashSet
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
@@ -334,10 +335,7 @@ class Island(
         history.clear()
 
         // Loose when no player have any capitals left
-        if (hexagons.none {
-            val data = getData(it)
-            teamToPlayer[data.team] == null && data.piece is Capital
-          }
+        if (hexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }
         ) {
           gameInputProcessor.screen.gameEnded(false)
         }
@@ -481,52 +479,35 @@ class Island(
     val maxPlacementPreference = hexagons.minOf { getData(it).piece.capitalReplacementResistance }
     val feasibleHexagons = hexagons.filter { getData(it).piece.capitalReplacementResistance <= maxPlacementPreference }
 
-    val contenders = HashSet<Hexagon<HexagonData>>(feasibleHexagons.size)
-
     // The maximum distance between two hexagons for this grid
     val maxRadius = 3 * max(grid.gridData.gridWidth, grid.gridData.gridHeight) + 1
 
-    fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>, discardIfLessThan: Int): Int {
-      for (r in discardIfLessThan..maxRadius) {
-        val isAnyEnemies = this.calculateRing(hex, r).any {
+    fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>): Int {
+      for (radius in 1..maxRadius) {
+        val isAnyEnemies = this.calculateRing(hex, radius).any {
           val data = this.getData(it)
-          data.team != hexTeam && !data.invisible
+          data.team != hexTeam && !data.invisible && it.isPartOfATerritory(this)
         }
         if (isAnyEnemies) {
-          return r
+          return radius
         }
       }
-      return NO_ENEMY_HEXAGONS // no hexes found we've won!
+      return NO_ENEMY_HEXAGONS
     }
 
-    var greatestDistance = 1
-    for (hex in feasibleHexagons) {
-      val dist = findDistanceToClosestEnemyHex(hex, 1)
-      if (dist == NO_ENEMY_HEXAGONS) {
-        contenders.addAll(feasibleHexagons)
-        break
-      }
-      if (dist > greatestDistance) {
-        // we have a new greatest distance
-        greatestDistance = dist
-        contenders.clear()
-      }
-      if (dist == greatestDistance) {
-        contenders += hex
-      }
+    val contenders: List<Hexagon<HexagonData>> = feasibleHexagons.associateWith { findDistanceToClosestEnemyHex(it) }.let { allContenders ->
+      val maxDistance: Int = allContenders.values.max()
+      allContenders.filterValues { distance -> distance == maxDistance }.map { it.key }
     }
 
     require(contenders.isNotEmpty()) {
       "No capital contenders found in ${hexagons.map { "@${it.cubeCoordinate.toAxialKey()} | data ${getData(it)}" }}"
     }
 
-    Gdx.app.debug("ISLAND") {
-      "There are ${contenders.size} hexes to become capital. Each of them have a minimum radius to other hexagons of $greatestDistance, maxRadius is $maxRadius"
-    }
     Gdx.app.trace("ISLAND") {
       "Contenders are ${
-        contenders.map {
-          "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${findDistanceToClosestEnemyHex(it, 1)}"
+        contenders.joinToString(prefix = "\n", separator = "\n") {
+          "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${findDistanceToClosestEnemyHex(it)}"
         }
       }"
     }
@@ -561,7 +542,7 @@ class Island(
   }
 
   // /////////////////
-  // Serialization //
+  // Serialization  //
   // /////////////////
 
   /**
@@ -709,6 +690,7 @@ class Island(
       internal fun Piece?.createDtoCopy(): Piece? {
         return this?.let { it.copyTo(it.data.copy()) }
       }
+
       internal fun Hand?.createDtoPieceCopy(): Piece? {
         return this?.piece?.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
       }

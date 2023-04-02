@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix saving while holding piece threw a serialization exception
 * Fix double recording of selecting territory event
 * Fix living pieces getting killed at the end of round and not start of turn
+* Fix merging two territories always keeps the capital of the selected territory
 
 ### Removed
 
