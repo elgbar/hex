@@ -40,6 +40,7 @@ import no.elg.hex.util.getAllTerritories
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.getTerritories
 import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.next
@@ -287,6 +288,7 @@ class Island(
     history.clear()
 
     KtxAsync.launch(Hex.asyncThread) {
+      select(null)
       currentTeam = Team.values().next(currentTeam)
       Gdx.app.debug("TURN", "Starting turn of $currentTeam")
 
@@ -308,8 +310,12 @@ class Island(
         if (data.team != currentTeam || data.invisible) continue
         data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
       }
-      select(null)
-      beginTurn(gameInputProcessor)
+      if (getTerritories(currentTeam).isNotEmpty()) {
+        beginTurn(gameInputProcessor)
+      } else {
+        Gdx.app.debug("TURN", "Team $currentTeam have no territories, skipping their turn")
+        endTurn(gameInputProcessor)
+      }
     }
   }
 
