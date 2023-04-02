@@ -69,47 +69,41 @@ class TutorialScreen : OverlayScreen(false) {
         lab("Cost overview", "costs", false, Align.center)
 
         lab(
-          "When you start a new game the island is divided up between the six players. Two or more hexagons " +
-            "of the same colour form a territory and each territory has a Capital." +
-            " On your turn each capital that has enough money to buy new peasants or castles will have a flag waving" +
-            " over it. To select a territory just tap anywhere on one of its hexagons.",
+          "When starting a new game, the island is divided between six players. " +
+            "Two or more hexagons of the same color form a territory, each with a capital. " +
+            "On your turn, each capital that has enough money to buy new peasants or castles will have a flag waving over it. " +
+            "To select a territory, tap anywhere on one of its hexagons.",
           "tutorial-1"
         )
         lab(
-          "When you select a territory you will see its economic situation in the Info window at the top" +
-            " right of the screen. This shows the territory's profit (or loss) and how much money the territory" +
-            " currently has. You can buy things (10 for a peasant, 15 for a castle) if you have enough money. Just" +
-            " tap on the peasant or castle icon that you want to buy.",
+          "Once you select a territory, you can view its economic situation in the Info window at the top right of the screen. " +
+            "This shows the territory's profit (or loss) and how much money the territory currently has. " +
+            "You can buy peasants, costing 10m or castles, costing 15, if you have enough money. " +
+            "Just tap on the icon in the lower left corner of the screen of the piece you want to buy.",
           "tutorial-2"
         )
         lab(
-          "Once you have bought a peasant you can tap any empty hexagon in the territory that you bought him" +
-            " from to place him. He will jump up and down to show you that he can be picked up and moved again. If you" +
-            " put him on to a tree in his territory he will chop the tree down and stop jumping to show that he has" +
-            " moved this turn and cannot be moved again. Chopping a tree down is a good idea as you don't earn money" +
-            " for hexagons with trees on.",
+          "When you buy a peasant, you can place him on any empty hexagon in the territory you bought him from. He will jump up and down to show you that he can be picked " +
+            "up and moved again. If you put him on a tree in his territory, he will chop the tree down and stop jumping to show that he has moved this turn and cannot be moved " +
+            "again. Chopping a tree down is a good idea since you don't earn money for hexagons with trees on.",
           "tutorial-3"
         )
         lab(
-          "You can capture hexagons adjacent to your territory as long as the hexagon isn't protected by an" +
-            " enemy piece. Pieces (capitals, castles or peasants) protect all the hexagons in their territory that are" +
-            " immediately surrounding them. You can see what hexagons you can move a held piece by the red outline around" +
-            " enemy hexagons. Trees in your territory will not have this outline, but can always be moved onto.",
+          "You can capture hexagons adjacent to your territory as long as the hexagon isn't protected by an enemy piece. Pieces like capitals, castles, or peasants protect" +
+            " all the hexagons in their territory that are immediately surrounding them. You can see which hexagons you can move a held piece to by the red outline around enemy" +
+            " hexagons. Trees in your territory will not have this outline, but you can still move pieces onto them.",
           "tutorial-4"
         )
         lab(
-          "If you capture a hexagon which joins two of your territories together one of the capitals will be" +
-            " removed and all of its money will be transferred into the other capital. Joining two territories " +
-            "together is a very good idea as the combined territory is stronger than the two smaller individual ones.",
+          "If you capture a hexagon that joins two of your territories together, one of the capitals will be removed, and all of its money will be transferred into the" +
+            " other capital. Joining two territories together is a good idea since the combined territory is stronger than the two smaller individual ones.",
           "tutorial-5"
         )
         lab(
-          "You can make more powerful men by dropping one peasant on top of another. This will make a spearman" +
-            " who has enough strength to take a hexagon protected by an enemy peasant or capital (or the hexagons that" +
-            " they are protecting). Adding another peasant to a spearman will make a knight who has the strength to" +
-            " kill an enemy peasant, spearman or castle (or to take the hexagons they are protecting). Adding another" +
-            " peasant to a knight makes a baron who has the strength to kill anything except another baron or capture" +
-            " any hexagon except those protected by other barons.",
+          "You can create more powerful men by dropping one peasant on top of another. This will create a spearman who has enough strength to take a hexagon protected by" +
+            " an enemy peasant or capital (or the hexagons that they are protecting). Adding another peasant to a spearman will create a knight who has the strength to kill" +
+            " an enemy peasant, spearman, or castle (or to take the hexagons they are protecting). Adding another peasant to a knight creates a baron who has the strength to" +
+            " kill anything except another baron or capture any hexagon except those protected by other barons.",
           "tutorial-6"
         )
         lab(
@@ -122,11 +116,9 @@ class TutorialScreen : OverlayScreen(false) {
         )
         lab(
           text =
-          "When you have finished buying, moving and attacking click on the 'End Turn' button. The computers" +
-            " will make their moves and when it comes around to your turn again trees will grow on your hexagons (palm" +
-            " trees grow along the coast next to existing palm trees and pine trees grow on hexagons surrounded by two" +
-            " or more other pine trees) and each territory will earn money. A territory earns one for every hexagon" +
-            " that doesn't have a tree, and pays for the cost of people that it has."
+          "At the end of your turn, click the 'End Turn' button to allow the computer to make its moves. Trees will grow on your hexagons, earning you money for every hexagon " +
+            "without a tree and costing you for each unit you own. Palms grow next to existing palms along the coast, and pine trees grow on hexagons surrounded by two or more " +
+            "other pine trees."
         )
 
         container {
