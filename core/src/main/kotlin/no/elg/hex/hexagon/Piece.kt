@@ -204,7 +204,7 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
 
     require(island.findCapital(hexagons) === this) { "Mismatch between this piece and the capital of the territory!" }
 
-    if (island.turn > 1) {
+    if (island.round > 1) {
       balance += calculateIncome(hexagons, island)
     }
     if (balance < 0) {

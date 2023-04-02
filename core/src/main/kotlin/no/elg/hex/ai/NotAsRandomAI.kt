@@ -288,7 +288,7 @@ class NotAsRandomAI(
    * *************************************************************************/
 
   private fun allowedToBuyCastle(territory: Territory): Boolean {
-    return territory.island.turn > castleDelay
+    return territory.island.round > castleDelay
   }
 
   private fun shouldBuyCastle(): Boolean {

@@ -114,7 +114,7 @@ object LevelSelectScreen : AbstractScreen() {
         AI_DONE -> drawAsset(Hex.assets.castle)
 
         WON -> {
-          val text = "${island.turn}"
+          val text = "${island.round}"
 
           val font = Hex.assets.regularFont
 
