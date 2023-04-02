@@ -41,7 +41,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   }
 
   private val topCenter: Array<ScreenText> = arrayOf(
-    VariableScreenText({ "Turn ${screen.island.round}" }),
+    VariableScreenText({ "Round ${screen.island.round}" }),
     IfScreenText {
       if (screen.inputProcessor.cheating) {
         StaticScreenText("Cheating enabled!", color = Color.GOLD)

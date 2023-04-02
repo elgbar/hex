@@ -68,12 +68,13 @@ class Island(
   @JsonAlias("piece")
   handPiece: Piece? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
-  turn: Int = 1,
+  @JsonAlias("turn")
+  round: Int = 1,
   initialLoad: Boolean = true,
   @JsonAlias("team")
   startTeam: Team = Settings.startTeam
 ) {
-  var round = turn
+  var round = round
     private set
   lateinit var grid: HexagonalGrid<HexagonData>
     private set
@@ -364,7 +365,7 @@ class Island(
 
   fun surrender() {
     restoreInitialState()
-    Gdx.app.log("ISLAND", "Player surrendered on turn $round")
+    Gdx.app.log("ISLAND", "Player surrendered on round $round")
   }
 
   /** Select the hex under the cursor */
@@ -676,7 +677,7 @@ class Island(
     val selectedCoordinate: CubeCoordinate? = null,
     val handPiece: Piece? = null,
     val hexagonData: Map<CubeCoordinate, HexagonData>,
-    val turn: Int,
+    val round: Int,
     val initialLoad: Boolean,
     val team: Team = LEAF
   ) {
@@ -688,7 +689,7 @@ class Island(
         selectedCoordinate,
         handPiece?.createDtoCopy(),
         hexagonData.mapValues { (_, data) -> data.copy() },
-        turn,
+        round,
         false,
         team
       )

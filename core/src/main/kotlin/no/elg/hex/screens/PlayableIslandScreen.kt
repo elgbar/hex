@@ -200,9 +200,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         island.restoreInitialState()
       }
 
-      youWon = okWindow("You Won!", { "Congratulations! You won in ${island.round} turns" }, endGame(WON))
-      youLost = okWindow("You Lost", { "Too bad! You lost in ${island.round} turns to ${island.winningTeam.name}" }, endGame(LOST))
-      aiDone = okWindow("Game Over", { "The AI ${island.winningTeam.name} won in ${island.round} turns" }, endGame(AI_DONE))
+      youWon = okWindow("You Won!", { "Congratulations! You won in ${island.round} rounds" }, endGame(WON))
+      youLost = okWindow("You Lost", { "Too bad! You lost in ${island.round} rounds to ${island.winningTeam.name}" }, endGame(LOST))
+      aiDone = okWindow("Game Over", { "The AI ${island.winningTeam.name} won in ${island.round} rounds" }, endGame(AI_DONE))
 
       confirmEndTurn = confirmWindow(
         "Confirm End Turn",

@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Capitals behave like living pieces and will not instantly become a tree, but rather be replaced with a tree at the start of the owning teams turn
 * Only grow trees once a round
 * Improve placement of capitals by placing them next to castles when possible
+* Rename turn to round
 
 ### Fixed
 
