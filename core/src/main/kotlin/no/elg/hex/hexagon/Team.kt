@@ -9,9 +9,9 @@ import no.elg.hex.hexagon.HexType.TRIANGULAR
 
 /** @author Elg */
 enum class Team(val color: Color, val type: HexType) {
-  SUN(Color.valueOf("#FFE049"), DIAMOND),
+  SUN(Color.valueOf("#c6c81b"), DIAMOND),
   LEAF(Color.valueOf("#67CE6E"), HOURGLASS),
   FOREST(Color.valueOf("#36823A"), CUBE),
   EARTH(Color.valueOf("#BC9953"), TRIANGULAR),
-  STONE(Color.valueOf("#7F7172"), HALF)
+  STONE(Color.valueOf("#988b8c"), HALF)
 }

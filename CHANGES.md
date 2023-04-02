@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Only grow trees once a round
 * Improve placement of capitals by placing them next to castles when possible
 * Rename turn to round
+* Adjust team color to make them easier to distinguish
 
 ### Fixed
 

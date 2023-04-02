@@ -9,7 +9,6 @@ import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isNotPartOfATerritory
-import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
