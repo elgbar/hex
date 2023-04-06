@@ -82,7 +82,7 @@ optional arguments:
 
 #### Android
 
-In the `Build` > `Generate Signed Bundle / Apk` choose bundle then (if not already done: import the `hex.jks` and get the password from the password manager) then choose `release`.
+In the `Build` > `Generate Signed Bundle / Apk` choose `Android App Bundle` then (if not already done: import the `hex.jks` and get the password from the password manager) then choose `release`.
 It should be found [here](./android/release)
 
 #### Desktop
@@ -102,4 +102,3 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 
 * Lag when un/redoing after a long game
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
-* Trees still behave weirdly

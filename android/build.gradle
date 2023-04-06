@@ -42,6 +42,7 @@ android {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       resValue("string", "version", hexVersion)
+      resValue("string", "args", "")
     }
     debug {
       minifyEnabled false
