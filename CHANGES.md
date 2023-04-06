@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix living pieces getting killed at the end of round and not start of turn
 * Fix merging two territories always keeps the capital of the selected territory
 * Fix players with no territories left still get to play
+* Fix double processing of pieces in a bankrupt territory at the beginning of a players turn
 
 ### Removed
 

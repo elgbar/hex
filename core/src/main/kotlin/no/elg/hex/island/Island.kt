@@ -54,8 +54,7 @@ import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
 import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
-import java.util.EnumMap
-import kotlin.collections.HashSet
+import java.util.*
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
@@ -298,20 +297,36 @@ class Island(
         Gdx.app.debug("TURN", "New round!")
         round++
         for (hexagon in hexagons) {
+          Gdx.app.trace("TURN") { "Handling new round of hex (${hexagon.gridX},${hexagon.gridZ})" }
           val data = this@Island.getData(hexagon)
           if (data.invisible) continue
           data.piece.newRound(this@Island, hexagon)
         }
       }
 
+      val capitals = mutableSetOf<Hexagon<HexagonData>>()
       for (hexagon in hexagons) {
-        if (gameInputProcessor.screen.checkEndedGame()) {
-          return@launch
-        }
+        Gdx.app.trace("TURN") { "Handling begin turn of hex (${hexagon.gridX},${hexagon.gridZ})" }
         val data = this@Island.getData(hexagon)
+        if (data.piece is Capital) {
+          capitals.add(hexagon)
+          continue
+        }
         if (data.team != currentTeam || data.invisible) continue
         data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
       }
+
+      // Process capitals last to ensure any pieces killed by bankruptcy
+      // will not be turns into trees during the same turn
+      for (capital in capitals) {
+        val data = this@Island.getData(capital)
+        data.piece.beginTurn(this@Island, capital, data, currentTeam)
+      }
+
+      if (gameInputProcessor.screen.checkEndedGame()) {
+        return@launch
+      }
+
       if (getTerritories(currentTeam).isNotEmpty()) {
         beginTurn(gameInputProcessor)
       } else {

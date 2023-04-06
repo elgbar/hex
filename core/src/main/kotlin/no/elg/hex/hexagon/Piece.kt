@@ -6,6 +6,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MAX_START_CAPITAL
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
+import no.elg.hex.util.error
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isNotPartOfATerritory
@@ -31,10 +32,7 @@ fun strengthToType(str: Int): KClass<out LivingPiece> {
     SPEARMAN_STRENGTH -> Spearman::class
     KNIGHT_STRENGTH -> Knight::class
     BARON_STRENGTH -> Baron::class
-    else ->
-      error(
-        "Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)"
-      )
+    else -> error("Invalid strength level '$str', must be between $PEASANT_STRENGTH and $BARON_STRENGTH (both inclusive)")
   }
 }
 
@@ -45,11 +43,13 @@ fun strengthToTypeOrNull(str: Int): KClass<out LivingPiece>? {
   return strengthToType(str)
 }
 
-fun mergedType(piece1: LivingPiece, piece2: LivingPiece) =
-  strengthToType(piece1.strength + piece2.strength)
+fun mergedType(piece1: LivingPiece, piece2: LivingPiece) = strengthToType(piece1.strength + piece2.strength)
 
 fun replaceWithTree(island: Island, hex: Hexagon<HexagonData>) {
-  island.getData(hex).setPiece(island.treeType(hex))
+  val data = island.getData(hex)
+  val pieceType = island.treeType(hex)
+  Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.gridX},${hex.gridZ}) with tree $pieceType" }
+  data.setPiece(pieceType)
 }
 
 /** @author Elg */
@@ -89,9 +89,11 @@ sealed class Piece {
       true
     } else {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}") {
-        "Piece ${this::class.simpleName} can only be placed on Empty or ${canBePlacedOn.joinToString {
-          it.simpleName ?: "??"
-        }} pieces. Tried to place it on ${onto.piece::class.simpleName}"
+        "Piece ${this::class.simpleName} can only be placed on Empty or ${
+          canBePlacedOn.joinToString {
+            it.simpleName ?: "??"
+          }
+        } pieces. Tried to place it on ${onto.piece::class.simpleName}"
       }
       false
     }
@@ -228,18 +230,16 @@ class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) 
 
   override fun toString(): String = "${this::class.simpleName}(balance: $balance)"
 
-  override val serializationData: Int
-    get() = balance
+  override val serializationData: Int get() = balance
 
   override fun handleDeserializationData(serializationData: Any?) {
     if (serializationData is Number) {
-      Gdx.app.trace(DESER_TAG, "Setting balance of $this to $serializationData")
+      Gdx.app.trace(DESER_TAG) { "Setting balance of $this to $serializationData" }
       balance = serializationData.toInt()
     } else if (serializationData != null) {
-      Gdx.app.error(
-        DESER_TAG,
+      Gdx.app.error(DESER_TAG) {
         "The piece $this have the wrong type of serialization data. Expected a number or null, but got ${serializationData::class}"
-      )
+      }
     }
   }
 }
@@ -263,10 +263,12 @@ class Grave(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
-    island.getData(pieceHex).setPiece(island.treeType(pieceHex))
+    replaceWithTree(island, pieceHex)
   }
 
-  override fun copyTo(newData: HexagonData): Grave { return Grave(newData, placed) }
+  override fun copyTo(newData: HexagonData): Grave {
+    return Grave(newData, placed)
+  }
 }
 
 // ////////
@@ -360,6 +362,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
   override val canBePlacedOn: Array<KClass<out Piece>> = PLACEABLE_CLASSES
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
+    Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.gridX},${hex.gridZ}) with a grave" }
     island.getData(hex).setPiece(Grave::class)
   }
 
