@@ -21,7 +21,7 @@ class AndroidLauncher : AndroidApplication() {
 
     val config = AndroidApplicationConfiguration()
 
-    val args = arrayOf(resources.getString(R.string.args))
+    val args = resources.getString(R.string.args).split(' ').toTypedArray()
 
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
