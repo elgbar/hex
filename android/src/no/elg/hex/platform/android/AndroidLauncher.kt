@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ConfigurationInfo
 import android.os.Bundle
+import android.os.StrictMode
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
@@ -22,8 +23,11 @@ class AndroidLauncher : AndroidApplication() {
     val config = AndroidApplicationConfiguration()
 
     val args = resources.getString(R.string.args).split(' ').toTypedArray()
-
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
+    if(Hex.debug){
+      StrictMode.enableDefaults()
+    }
+
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
     Hex.platform = AndroidPlatform(this)
 
