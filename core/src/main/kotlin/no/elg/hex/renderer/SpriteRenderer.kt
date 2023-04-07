@@ -23,7 +23,7 @@ import no.elg.hex.hexagon.strengthToTypeOrNull
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
-import no.elg.hex.util.schedule
+import no.elg.hex.util.requestRenderingIn
 import no.elg.hex.util.trace
 
 /** @author Elg */
@@ -85,9 +85,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
 
       if (minTimeToRender != Float.MAX_VALUE) {
         Gdx.app.trace("Sprite Rendering") { "[frame id ${Gdx.graphics.frameId}] Requesting frame in $minTimeToRender seconds" }
-        schedule(minTimeToRender) {
-//          Gdx.graphics.requestRendering()
-        }
+        Gdx.graphics.requestRenderingIn(minTimeToRender)
       }
 
       if (Settings.enableStrengthHint && island.isCurrentTeamHuman()) {
