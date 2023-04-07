@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rename turn to round
 * Adjust team color to make them easier to distinguish 
 * Flip the setting `disable audio` to `enable audio`
+* Rendering now happens non-continuously, that is, only when needed
 
 ### Fixed
 

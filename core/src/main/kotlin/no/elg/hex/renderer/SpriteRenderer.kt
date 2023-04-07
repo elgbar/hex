@@ -62,8 +62,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
               is Knight -> Hex.assets.knight
               is Baron -> Hex.assets.baron
             }
-            if (data.team == island.currentTeam && island.isCurrentTeamHuman()) {
-              minTimeToRender = minTimeToRender.coerceAtMost(pieceAnimation.frameDuration / 2f)
+            if (data.team == island.currentTeam && island.isCurrentTeamHuman() && !piece.moved) {
+              minTimeToRender = minTimeToRender.coerceAtMost(pieceAnimation.frameDuration)
               pieceAnimation.getKeyFrame(piece.updateAnimationTime())
             } else {
               pieceAnimation.getKeyFrame(0f)
