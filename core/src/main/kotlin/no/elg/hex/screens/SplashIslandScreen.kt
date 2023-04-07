@@ -99,6 +99,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
           true
         )
         Hex.assets.regularFont.draw(batch, layout, 0f, Gdx.graphics.height.toFloat() / 2)
+        Gdx.graphics.requestRendering()
       }
     }
   }
