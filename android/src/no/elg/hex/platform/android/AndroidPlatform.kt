@@ -38,8 +38,4 @@ class AndroidPlatform(private val activity: Activity) : Platform {
       Gdx.app.log("AndroidPlatform", "Cannot limit FPS")
     }
   }
-
-  override fun platformInit(){
-  }
-
 }

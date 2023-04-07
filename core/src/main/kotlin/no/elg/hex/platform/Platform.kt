@@ -13,6 +13,4 @@ interface Platform {
    * Only supported when [canLimitFps] is `true`
    */
   fun setFps(fps: Int)
-
-  fun platformInit() = Unit
 }

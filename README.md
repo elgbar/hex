@@ -82,6 +82,7 @@ optional arguments:
 
 #### Android
 
+**First bump the android version code!** 
 In the `Build` > `Generate Signed Bundle / Apk` choose `Android App Bundle` then (if not already done: import the `hex.jks` and get the password from the password manager) then choose `release`.
 It should be found [here](./android/release)
 
