@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ConfigurationInfo
 import android.os.Bundle
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidPreferences
@@ -46,7 +47,7 @@ class AndroidLauncher : AndroidApplication() {
     config.useAccelerometer = false
     config.useGyroscope = false
     config.useRotationVectorSensor = false
-    config.disableAudio = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
+    config.disableAudio = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
 
     Hex.audioDisabled = config.disableAudio
     initialize(Hex, config)

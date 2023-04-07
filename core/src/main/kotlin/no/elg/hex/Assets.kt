@@ -350,7 +350,7 @@ class Assets : AssetManager() {
    */
   fun audioLoaded(wait: Boolean): Boolean {
     return when {
-      Settings.disableAudio || Hex.audioDisabled -> false
+      !Settings.enableAudio || Hex.audioDisabled -> false
       audioLoaded -> true
       else -> {
         loadAudio(wait)

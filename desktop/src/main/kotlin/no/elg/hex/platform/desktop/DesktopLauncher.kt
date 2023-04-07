@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
   Hex.launchPreference = Lwjgl3Preferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
   Hex.platform = DesktopPlatform()
-  Hex.audioDisabled = Hex.launchPreference.getBoolean(Settings.DISABLE_AUDIO_PATH)
+  Hex.audioDisabled = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
 
   config.setWindowedMode(defaultDisplayMode.width / 2, defaultDisplayMode.height / 2)
 //  config.initialBackgroundColor = Hex.backgroundColor

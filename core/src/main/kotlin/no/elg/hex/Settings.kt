@@ -15,9 +15,9 @@ import kotlin.reflect.jvm.isAccessible
 @Suppress("unused")
 object Settings {
 
-  const val DISABLE_AUDIO_PATH = "disableAudio" // Settings::disableAudio.name
-  var disableAudio by PreferenceDelegate(
-    false,
+  const val ENABLE_AUDIO_PATH = "enableAudio" // Settings::enableAudio.name
+  var enableAudio by PreferenceDelegate(
+    true,
     priority = 200,
     preferences = Hex.launchPreference,
     requireRestart = true
