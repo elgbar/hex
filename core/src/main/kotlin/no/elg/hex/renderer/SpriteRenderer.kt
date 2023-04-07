@@ -23,6 +23,8 @@ import no.elg.hex.hexagon.strengthToTypeOrNull
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
+import no.elg.hex.util.schedule
+import no.elg.hex.util.trace
 
 /** @author Elg */
 class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
@@ -31,6 +33,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
 
   override fun frameUpdate() {
     val island = islandScreen.island
+    var minTimeToRender = Float.MAX_VALUE
     batch.use(islandScreen.camera) {
       loop@ for (hexagon in island.hexagons) {
         val data = island.getData(hexagon)
@@ -42,7 +45,9 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
               Hex.assets.capital
             } else {
               piece.elapsedAnimationTime += Gdx.graphics.deltaTime
-              Hex.assets.capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
+              val capitalFlag = Hex.assets.capitalFlag
+              minTimeToRender = minTimeToRender.coerceAtMost(capitalFlag.frameDuration)
+              capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
             }
           }
 
@@ -51,15 +56,18 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
           is Castle -> Hex.assets.castle
           is Grave -> Hex.assets.grave
           is LivingPiece -> {
-            val time =
-              if (data.team == island.currentTeam && island.isCurrentTeamHuman()) piece.updateAnimationTime() else 0f
-
-            when (piece) {
+            val pieceAnimation = when (piece) {
               is Peasant -> Hex.assets.peasant
               is Spearman -> Hex.assets.spearman
               is Knight -> Hex.assets.knight
               is Baron -> Hex.assets.baron
-            }.getKeyFrame(time)
+            }
+            if (data.team == island.currentTeam && island.isCurrentTeamHuman()) {
+              minTimeToRender = minTimeToRender.coerceAtMost(pieceAnimation.frameDuration / 2f)
+              pieceAnimation.getKeyFrame(piece.updateAnimationTime())
+            } else {
+              pieceAnimation.getKeyFrame(0f)
+            }
           }
 
           is Empty -> continue@loop
@@ -73,6 +81,13 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
           boundingBox.height.toFloat(),
           boundingBox.width.toFloat()
         )
+      }
+
+      if (minTimeToRender != Float.MAX_VALUE) {
+        Gdx.app.trace("Sprite Rendering") { "[frame id ${Gdx.graphics.frameId}] Requesting frame in $minTimeToRender seconds" }
+        schedule(minTimeToRender) {
+//          Gdx.graphics.requestRendering()
+        }
       }
 
       if (Settings.enableStrengthHint && island.isCurrentTeamHuman()) {

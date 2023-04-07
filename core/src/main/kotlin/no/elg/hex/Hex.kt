@@ -35,7 +35,6 @@ import no.elg.hex.util.debug
 import no.elg.hex.util.info
 import no.elg.hex.util.logLevelToName
 import no.elg.hex.util.resetHdpi
-import no.elg.hex.util.schedule
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
 
