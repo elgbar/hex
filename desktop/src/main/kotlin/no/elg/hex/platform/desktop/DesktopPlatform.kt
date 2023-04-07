@@ -10,6 +10,8 @@ class DesktopPlatform : Platform {
 
   override val canLimitFps: Boolean = true
 
+  override val canToggleVsync: Boolean = true
+
   override fun setFps(fps: Int) {
     Gdx.graphics.setForegroundFPS(fps)
   }

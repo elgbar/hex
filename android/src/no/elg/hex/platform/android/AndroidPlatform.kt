@@ -10,4 +10,6 @@ class AndroidPlatform(private val activity: Activity) : Platform {
 
   override val canLimitFps: Boolean = false
 
+  override val canToggleVsync: Boolean = false
+
 }

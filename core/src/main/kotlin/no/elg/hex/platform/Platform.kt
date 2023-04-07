@@ -2,6 +2,9 @@ package no.elg.hex.platform
 
 interface Platform {
 
+  /**
+   * Current version of Hex
+   */
   val version: String
 
   /**
@@ -12,5 +15,10 @@ interface Platform {
   /**
    * Only supported when [canLimitFps] is `true`
    */
-  fun setFps(fps: Int)
+  fun setFps(fps: Int) = Unit
+
+  /**
+   * Whether toggling of vsync is supported on this platform
+   */
+  val canToggleVsync: Boolean
 }

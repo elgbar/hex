@@ -28,6 +28,7 @@ object Settings {
     true,
     priority = 200,
     preferences = Hex.launchPreference,
+    shouldHide = { !Hex.platform.canToggleVsync },
     onChange = { _, _, new ->
       Gdx.graphics.setVSync(new)
       return@PreferenceDelegate new
