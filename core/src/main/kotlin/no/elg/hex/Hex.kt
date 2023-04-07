@@ -44,15 +44,12 @@ object Hex : ApplicationAdapter() {
   const val LAUNCH_PREF = "launchPref"
 
   @JvmStatic
-  val mapper =
-    jacksonObjectMapper().also {
-      it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
-      it.registerModule(
-        SimpleModule().also { module ->
-          module.setDeserializerModifier(HexagonDataDeserializerModifier())
-        }
-      )
-    }
+  val mapper = jacksonObjectMapper().also {
+    it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
+    it.registerModule(
+      SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) }
+    )
+  }
 
   val AA_BUFFER_CLEAR =
     lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
@@ -119,6 +116,7 @@ object Hex : ApplicationAdapter() {
 
   override fun create() {
     Gdx.graphics.isContinuousRendering = false
+    platform.platformInit()
     paused = false
 
     try {

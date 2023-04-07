@@ -1,8 +1,12 @@
 package no.elg.hex.platform.android
 
 import android.app.Activity
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.view.WindowManager
 import no.elg.hex.R
 import no.elg.hex.platform.Platform
+
 
 class AndroidPlatform(private val activity: Activity) : Platform {
 
@@ -12,4 +16,9 @@ class AndroidPlatform(private val activity: Activity) : Platform {
 
   override val canToggleVsync: Boolean = false
 
+  override fun platformInit() {
+    if (VERSION.SDK_INT >= VERSION_CODES.P) {
+      activity.window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+    }
+  }
 }

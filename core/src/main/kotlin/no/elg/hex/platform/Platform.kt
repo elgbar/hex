@@ -21,4 +21,6 @@ interface Platform {
    * Whether toggling of vsync is supported on this platform
    */
   val canToggleVsync: Boolean
+
+  fun platformInit() = Unit
 }
