@@ -322,6 +322,7 @@ class Island(
         val data = this@Island.getData(capital)
         data.piece.beginTurn(this@Island, capital, data, currentTeam)
       }
+      Gdx.graphics.requestRendering()
 
       if (gameInputProcessor.screen.checkEndedGame()) {
         return@launch
