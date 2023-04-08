@@ -2,10 +2,8 @@ package no.elg.hex.platform.android
 
 import android.app.ActivityManager
 import android.content.Context
-import android.content.pm.ConfigurationInfo
 import android.os.Bundle
 import android.os.StrictMode
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidPreferences
@@ -22,9 +20,9 @@ class AndroidLauncher : AndroidApplication() {
 
     val config = AndroidApplicationConfiguration()
 
-    val args = resources.getString(R.string.args).split(' ').toTypedArray()
+    val args = resources.getString(R.string.args).split(' ').filter { it.isNotBlank() }.toTypedArray()
     Hex.args = ArgParser(args).parseInto(::ApplicationArgumentsParser)
-    if(Hex.debug){
+    if (Hex.debug) {
       StrictMode.enableDefaults()
     }
 
@@ -43,7 +41,7 @@ class AndroidLauncher : AndroidApplication() {
     val configurationInfo = activityManager?.deviceConfigurationInfo
     val glVersion = configurationInfo?.glEsVersion?.toFloatOrNull() ?: 2f
 
-    if(glVersion >= 3) {
+    if (glVersion >= 3) {
       config.useGL30 = true
     }
     config.useImmersiveMode = false
