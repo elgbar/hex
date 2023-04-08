@@ -9,8 +9,8 @@ import ktx.collections.component2
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.hexagon.SimpleEventListener
-import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
+import no.elg.hex.event.HexagonChangedTeamEvent
+import no.elg.hex.event.SimpleEventListener
 import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
 import no.elg.hex.hud.ScreenRenderer.draw
 import no.elg.hex.hud.ScreenRenderer.drawAll
@@ -20,7 +20,7 @@ import no.elg.hex.util.getData
 /** @author Elg */
 class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
 
-  private val listener: SimpleEventListener<TeamChangeHexagonDataEvent>
+  private val listener: SimpleEventListener<HexagonChangedTeamEvent>
   private val fpsText: ScreenText
   private val debugLines: Array<ScreenText>
   private val teamPercent: MutableList<String> = mutableListOf()
@@ -96,9 +96,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
       islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
     }
 
-    listener = SimpleEventListener.create {
-      updatePercentages()
-    }
+    listener = SimpleEventListener.create { updatePercentages() }
 
     updatePercentages()
   }

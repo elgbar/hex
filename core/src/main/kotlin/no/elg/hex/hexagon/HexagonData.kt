@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
+import no.elg.hex.event.Events
+import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
 import org.hexworks.mixite.core.api.Hexagon
@@ -43,7 +45,7 @@ class HexagonData(
 
       val old = field
       field = value
-      HexagonDataEvents.fireEvent(TeamChangeHexagonDataEvent(this, old, value))
+      Events.fireEvent(HexagonChangedTeamEvent(this, old, value))
     }
 
   @JsonIgnore

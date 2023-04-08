@@ -13,6 +13,8 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.Difficulty
+import no.elg.hex.event.Events
+import no.elg.hex.event.TeamEndTurnEvent
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
@@ -290,10 +292,14 @@ class Island(
 
     KtxAsync.launch(Hex.asyncThread) {
       select(null)
-      currentTeam = Team.values().next(currentTeam)
-      Gdx.app.debug("TURN", "Starting turn of $currentTeam")
 
-      if (currentTeam == Settings.startTeam) {
+      val oldTeam = currentTeam
+      val newTeam = Team.values().next(oldTeam)
+      currentTeam = newTeam
+      Gdx.app.debug("TURN") { "Starting turn of $newTeam" }
+      Gdx.app.postRunnable { Events.fireEvent(TeamEndTurnEvent(oldTeam, newTeam)) }
+
+      if (newTeam == Settings.startTeam) {
         Gdx.app.debug("TURN", "New round!")
         round++
         for (hexagon in hexagons) {
@@ -312,15 +318,15 @@ class Island(
           capitals.add(hexagon)
           continue
         }
-        if (data.team != currentTeam || data.invisible) continue
-        data.piece.beginTurn(this@Island, hexagon, data, currentTeam)
+        if (data.team != newTeam || data.invisible) continue
+        data.piece.beginTurn(this@Island, hexagon, data, newTeam)
       }
 
       // Process capitals last to ensure any pieces killed by bankruptcy
       // will not be turns into trees during the same turn
       for (capital in capitals) {
         val data = this@Island.getData(capital)
-        data.piece.beginTurn(this@Island, capital, data, currentTeam)
+        data.piece.beginTurn(this@Island, capital, data, newTeam)
       }
       Gdx.graphics.requestRendering()
 
@@ -328,10 +334,10 @@ class Island(
         return@launch
       }
 
-      if (getTerritories(currentTeam).isNotEmpty()) {
+      if (getTerritories(newTeam).isNotEmpty()) {
         beginTurn(gameInputProcessor)
       } else {
-        Gdx.app.debug("TURN", "Team $currentTeam have no territories, skipping their turn")
+        Gdx.app.debug("TURN", "Team $newTeam have no territories, skipping their turn")
         endTurn(gameInputProcessor)
       }
     }

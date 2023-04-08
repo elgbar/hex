@@ -29,6 +29,8 @@ import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.event.HexagonChangedTeamEvent
+import no.elg.hex.event.SimpleEventListener
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -38,8 +40,6 @@ import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.PEASANT_STRENGTH
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.SPEARMAN_STRENGTH
-import no.elg.hex.hexagon.SimpleEventListener
-import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
@@ -66,7 +66,7 @@ import no.elg.hex.util.show
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  private lateinit var listener: SimpleEventListener<TeamChangeHexagonDataEvent>
+  private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private val stageScreen = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
 
@@ -556,7 +556,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     inputProcessor.show()
     super.show()
 
-    listener = SimpleEventListener.create {
+    teamChangedListener = SimpleEventListener.create {
       island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
       island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
     }
@@ -575,7 +575,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
     LevelSelectScreen.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
-    listener.disposeSafely()
+    teamChangedListener.disposeSafely()
 
     DebugGraphRenderer.dispose()
 

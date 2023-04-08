@@ -12,15 +12,18 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
-import no.elg.hex.hexagon.SimpleEventListener
+import no.elg.hex.event.HexagonChangedTeamEvent
+import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.TeamEndTurnEvent
 import no.elg.hex.hexagon.Team
-import no.elg.hex.hexagon.TeamChangeHexagonDataEvent
 import no.elg.hex.island.Island
 import kotlin.math.roundToInt
 
 class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resizable {
 
-  private val listener: SimpleEventListener<TeamChangeHexagonDataEvent>
+  private val hexagonChangeListener: SimpleEventListener<HexagonChangedTeamEvent>
+  private val endTurnListener: SimpleEventListener<TeamEndTurnEvent>
+
   private lateinit var fbo: FrameBuffer
   private var batch = SpriteBatch()
 
@@ -113,9 +116,8 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
   }
 
   init {
-    listener = SimpleEventListener.create {
-      redrawBar()
-    }
+    hexagonChangeListener = SimpleEventListener.create { redrawBar() }
+    endTurnListener = SimpleEventListener.create { redrawBar() }
   }
 
   companion object {
