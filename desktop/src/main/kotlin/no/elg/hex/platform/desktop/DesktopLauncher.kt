@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
   }
   val c = Hex.backgroundColor
   config.setBackBufferConfig((c.r * 255).toInt(), (c.g * 255).toInt(), (c.b * 255).toInt(), 1, config.depth, config.stencil, samples)
+  config.setInitialBackgroundColor(Hex.backgroundColor)
   config.title = "Hex"
 
   Lwjgl3Application(Hex, config)
