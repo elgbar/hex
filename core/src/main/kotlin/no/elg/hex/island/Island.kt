@@ -318,11 +318,11 @@ class Island(
       for (hexagon in hexagons) {
         Gdx.app.trace("TURN") { "Handling begin turn of hex (${hexagon.gridX},${hexagon.gridZ})" }
         val data = this@Island.getData(hexagon)
+        if (data.team != newTeam || data.invisible) continue
         if (data.piece is Capital) {
           capitals.add(hexagon)
           continue
         }
-        if (data.team != newTeam || data.invisible) continue
         data.piece.beginTurn(this@Island, hexagon, data, newTeam)
       }
 
