@@ -59,10 +59,9 @@ fun Graphics.requestRenderingIn(seconds: Float) {
     if (nextRenderTime < wantedRenderTime) {
       wantedRenderTime = nextRenderTime
       currentTask?.cancel()
-      Gdx.app.trace("requestRenderingIn") { "Will request rendering in $delayMs ms ($nextRenderTime)" }
       currentTask = futureRequestRenderTimer.schedule(delayMs) {
         synchronized(futureRequestRenderTimer) {
-          Gdx.app.trace("requestRenderingIn") { "Requesting rendering, (accuracy is ${System.currentTimeMillis() - nextRenderTime} ms)" }
+//          Gdx.app.trace("requestRenderingIn") { "Requesting rendering, (accuracy is ${System.currentTimeMillis() - nextRenderTime} ms)" }
           if (wantedRenderTime == nextRenderTime) {
             wantedRenderTime = Long.MAX_VALUE
           }

@@ -307,22 +307,22 @@ class Island(
         Gdx.app.debug("TURN", "New round!")
         round++
         for (hexagon in hexagons) {
-          Gdx.app.trace("TURN") { "Handling new round of hex (${hexagon.gridX},${hexagon.gridZ})" }
           val data = this@Island.getData(hexagon)
           if (data.invisible) continue
+          Gdx.app.trace("TURN") { "Handling new round of hex (${hexagon.gridX},${hexagon.gridZ})" }
           data.piece.newRound(this@Island, hexagon)
         }
       }
 
       val capitals = mutableSetOf<Hexagon<HexagonData>>()
       for (hexagon in hexagons) {
-        Gdx.app.trace("TURN") { "Handling begin turn of hex (${hexagon.gridX},${hexagon.gridZ})" }
         val data = this@Island.getData(hexagon)
         if (data.team != newTeam || data.invisible) continue
         if (data.piece is Capital) {
           capitals.add(hexagon)
           continue
         }
+        Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName} (${hexagon.gridX},${hexagon.gridZ})" }
         data.piece.beginTurn(this@Island, hexagon, data, newTeam)
       }
 
@@ -330,6 +330,7 @@ class Island(
       // will not be turns into trees during the same turn
       for (capital in capitals) {
         val data = this@Island.getData(capital)
+        Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName}  (${capital.gridX},${capital.gridZ})" }
         data.piece.beginTurn(this@Island, capital, data, newTeam)
       }
       Gdx.graphics.requestRendering()

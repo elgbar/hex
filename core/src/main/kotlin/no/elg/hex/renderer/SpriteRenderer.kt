@@ -24,7 +24,6 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
 import no.elg.hex.util.requestRenderingIn
-import no.elg.hex.util.trace
 
 /** @author Elg */
 class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
@@ -84,7 +83,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
       }
 
       if (minTimeToRender != Float.MAX_VALUE) {
-        Gdx.app.trace("Sprite Rendering") { "[frame id ${Gdx.graphics.frameId}] Requesting frame in $minTimeToRender seconds" }
+//        Gdx.app.trace("Sprite Rendering") { "[frame id ${Gdx.graphics.frameId}] Requesting frame in $minTimeToRender seconds" }
         Gdx.graphics.requestRenderingIn(minTimeToRender)
       }
 
