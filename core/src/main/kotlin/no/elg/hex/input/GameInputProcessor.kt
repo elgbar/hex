@@ -47,6 +47,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     private set
 
   private fun pickUp(island: Island, hexData: HexagonData, territory: Territory): Boolean {
+    if (screen.isDisposed) {
+      return false
+    }
     val cursorPiece = hexData.piece
     if (cursorPiece.movable &&
       cursorPiece is LivingPiece &&
@@ -71,6 +74,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     placeOn: Hexagon<HexagonData>,
     newPiece: Piece
   ): Boolean {
+    if (screen.isDisposed) {
+      return false
+    }
     val hexData = island.getData(placeOn)
     val isBorderHexagon = territory.enemyBorderHexes.contains(placeOn)
     if (hexData.team != island.currentTeam && !isBorderHexagon) {
@@ -147,6 +153,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
    * @param longPress If the click was a long press, always false when AI is clicking
    */
   fun click(hexagon: Hexagon<HexagonData>, longPress: Boolean = false): Boolean {
+    if (screen.isDisposed) {
+      return false
+    }
     val island = screen.island
     val cursorHexData = island.getData(hexagon)
 
@@ -217,6 +226,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
   }
 
   fun buyUnit(piece: Piece): Boolean {
+    if (screen.isDisposed) {
+      return false
+    }
     screen.island.selected?.also { territory ->
       val hand = screen.island.hand
       if (hand != null && (
@@ -268,6 +280,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
   }
 
   private fun march(hexagon: Hexagon<HexagonData>): Boolean {
+    if (screen.isDisposed) {
+      return false
+    }
     if (!Settings.enableHoldToMarch) return false
 
     screen.island.selected?.also { territory ->
@@ -323,6 +338,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
   }
 
   private fun click(longPress: Boolean): Boolean {
+    if (screen.isDisposed) {
+      return false
+    }
     if (screen.island.isCurrentTeamAI()) return false
     val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
     return click(cursorHex, longPress)

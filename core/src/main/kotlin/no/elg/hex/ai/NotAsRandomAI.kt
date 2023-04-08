@@ -1,6 +1,7 @@
 package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
+import kotlinx.coroutines.yield
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -97,12 +98,13 @@ class NotAsRandomAI(
 //      Baron::class,
     )
 
-  override fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean {
+  override suspend fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean {
     island.select(island.hexagons.first())
     val territories = island.getTerritories(team)
     for (territory in territories) {
       resetBlacklists()
       do {
+        yield()
         island.select(territory.hexagons.first())
         val sel = territory.island.selected ?: continue
 

@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import no.elg.hex.Hex
@@ -244,6 +246,8 @@ class Island(
       put(STONE, Settings.teamStoneAI.aiConstructor(STONE))
     }
 
+  private var aiJob: Job? = null
+
   init {
     restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad, startTeam)
     history.clear()
@@ -290,7 +294,7 @@ class Island(
     history.disable()
     history.clear()
 
-    KtxAsync.launch(Hex.asyncThread) {
+    aiJob = KtxAsync.launch(Hex.asyncThread) {
       select(null)
 
       val oldTeam = currentTeam
@@ -350,6 +354,8 @@ class Island(
         val time = measureTimeMillis {
           try {
             cai.action(this@Island, gameInputProcessor)
+          } catch (cancel: CancellationException) {
+            // Ignore cancel exceptions
           } catch (e: RuntimeException) {
             e.printStackTrace()
             publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
@@ -370,6 +376,15 @@ class Island(
           gameInputProcessor.screen.gameEnded(false)
         }
       }
+    }
+  }
+
+  fun cancelCurrentAI() {
+    try {
+      aiJob?.cancel()
+    } catch (ignore: Exception) {
+    } finally {
+      aiJob = null
     }
   }
 

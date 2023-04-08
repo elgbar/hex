@@ -14,5 +14,5 @@ interface AI {
    *
    * @return If the AI is still alive, i.e., `false` if the AI is dead
    */
-  fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean
+  suspend fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean
 }

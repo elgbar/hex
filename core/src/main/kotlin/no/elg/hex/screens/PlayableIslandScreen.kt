@@ -569,6 +569,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     super.dispose()
     frameUpdatable.dispose()
     stageScreen.dispose()
+    island.cancelCurrentAI()
     if (modifier == NOTHING) {
       saveProgress()
     }
