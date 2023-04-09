@@ -122,6 +122,9 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
 
     fun getProgress(id: Int, preview: Boolean = false): String? {
+      if (Hex.args.mapEditor) {
+        return null
+      }
       val pref = getPrefName(id, preview)
       return islandPreferences.getString(pref, null)
     }
