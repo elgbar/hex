@@ -33,7 +33,6 @@ import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
-import no.elg.hex.island.Island.IslandDto.Companion.createDtoPieceCopy
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
@@ -75,10 +74,12 @@ class Island(
   round: Int = 1,
   initialLoad: Boolean = true,
   @JsonAlias("team")
-  startTeam: Team = Settings.startTeam
+  startTeam: Team = Settings.startTeam,
+  var authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
 ) {
   var round = round
     private set
+
   lateinit var grid: HexagonalGrid<HexagonData>
     private set
 
@@ -668,8 +669,17 @@ class Island(
     const val MAX_START_CAPITAL = 25
 
     const val NO_ENEMY_HEXAGONS = -1
+    const val UNKNOWN_ROUNDS_TO_BEAT = -1
 
     private val SYNC = Any()
+
+    internal fun Piece?.createDtoCopy(): Piece? {
+      return this?.let { it.copyTo(it.data.copy()) }
+    }
+
+    internal fun Hand?.createDtoPieceCopy(): Piece? {
+      return this?.piece?.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
+    }
 
     fun deserialize(json: String): Island {
       return Hex.mapper.readValue(json)
@@ -704,7 +714,8 @@ class Island(
       hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       round,
       false,
-      currentTeam
+      currentTeam,
+      authorRoundsToBeat
     )
   }
 
@@ -717,7 +728,8 @@ class Island(
     val hexagonData: Map<CubeCoordinate, HexagonData>,
     val round: Int,
     val initialLoad: Boolean,
-    val team: Team = LEAF
+    val team: Team = LEAF,
+    val authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
   ) {
     fun copy(): IslandDto {
       return IslandDto(
@@ -729,18 +741,9 @@ class Island(
         hexagonData.mapValues { (_, data) -> data.copy() },
         round,
         false,
-        team
+        team,
+        authorRoundsToBeat
       )
-    }
-
-    companion object {
-      internal fun Piece?.createDtoCopy(): Piece? {
-        return this?.let { it.copyTo(it.data.copy()) }
-      }
-
-      internal fun Hand?.createDtoPieceCopy(): Piece? {
-        return this?.piece?.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
-      }
     }
   }
 }
