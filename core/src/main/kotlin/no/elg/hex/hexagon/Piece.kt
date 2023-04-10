@@ -302,16 +302,18 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
       val otherPines = island.getNeighbors(hexagon).filter {
         if (it == pieceHex) return@filter false
         val piece = island.getData(it).piece
-        return@filter piece is PineTree && !piece.hasGrown && it != pieceHex
+        return@filter piece is PineTree && !piece.hasGrown
       }
       if (otherPines.isNotEmpty()) {
         // Grow a tree between this pine and another pine
         val otherPine = island.getData(otherPines.random()).piece as TreePiece
         val loopData = island.getData(hexagon)
-        if (loopData.setPiece(PineTree::class)) {
-          hasGrown = true
+        val piece = loopData.setPiece<PineTree> {
+          this@PineTree.hasGrown = true
           otherPine.hasGrown = true
-          (loopData.piece as TreePiece).hasGrown = true
+          it.hasGrown = true
+        }
+        if (piece) {
           break
         }
       }

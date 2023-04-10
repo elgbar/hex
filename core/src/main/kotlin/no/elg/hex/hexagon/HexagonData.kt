@@ -56,14 +56,15 @@ class HexagonData(
    * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type
    * [pieceType].
    */
-  fun <T : Piece> setPiece(pieceType: KClass<out T>, init: T.() -> Unit = { }): Boolean {
+  inline fun <reified T : Piece> setPiece(noinline init: (T) -> Unit = { }): Boolean = setPiece(T::class, init)
+  fun <T : Piece> setPiece(pieceType: KClass<out T>, init: (T) -> Unit = { }): Boolean {
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
     val pieceToPlace = pieceType.createInstance(this)
 
     if (pieceToPlace.place(this)) {
       piece = pieceToPlace
       require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) { "Pieces data does not point to this!" }
-      pieceToPlace.init()
+      init(pieceToPlace)
       return true
     }
     return false
