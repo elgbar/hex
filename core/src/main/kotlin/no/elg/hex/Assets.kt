@@ -88,6 +88,7 @@ class Assets : AssetManager() {
 
     const val ISLAND_SAVES_DIR = "islands"
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
+    const val ISLAND_METADATA_DIR = "$ISLAND_SAVES_DIR/metadata"
     const val ISLAND_FILE_ENDING = "is"
 
     const val SPRITE_ATLAS = "sprites/sprites.atlas"

@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Disposable
+import ktx.assets.disposeSafely
 import ktx.graphics.center
 import ktx.graphics.use
 import no.elg.hex.Hex
@@ -29,6 +31,7 @@ import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
 import no.elg.hex.screens.PreviewIslandScreen.Companion.getPrefName
 import no.elg.hex.screens.PreviewIslandScreen.Companion.getProgress
 import no.elg.hex.screens.PreviewIslandScreen.Companion.islandPreferences
+import no.elg.hex.util.IslandFileType
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -53,7 +56,7 @@ object LevelSelectScreen : AbstractScreen() {
   private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
   private val SELECT_COLOR: Color = Color.GREEN
 
-  private val islandPreviews = Array<Pair<FrameBuffer?, Texture>>()
+  private val islandSlots = Array<IslandSlot>()
   private val unprojectVector = Vector3()
 
   var renderingPreview: Boolean = false
@@ -78,12 +81,7 @@ object LevelSelectScreen : AbstractScreen() {
     camera.unproject(unprojectVector)
   }
 
-  fun renderPreview(
-    island: Island,
-    previewWidth: Int,
-    previewHeight: Int,
-    modifier: PreviewModifier = NOTHING
-  ): FrameBuffer {
+  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, modifier: PreviewModifier = NOTHING): FrameBuffer {
     val islandScreen = PreviewIslandScreen(-1, island)
     islandScreen.resize(previewWidth, previewHeight)
     val buffer = FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
@@ -164,23 +162,25 @@ object LevelSelectScreen : AbstractScreen() {
       disposePreviews()
 
       for (slot in IslandFiles.islandIds) {
-        val islandPreviewFile = getIslandFile(slot, true)
+        val islandPreviewFile = getIslandFile(slot, IslandFileType.PREVIEW)
         if (Hex.args.`force-update-previews`) {
           updateSelectPreview(slot, true)
           continue
         }
 
+        val islandPreviewFile = getIslandFile(slot, IslandFileType.METADATA)
+
         val progress = getProgress(slot, true)
         when {
-          progress != null ->
-            try {
-              islandPreviews.add(null to decodeStringToTexture(progress))
-            } catch (e: Exception) {
-              publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
-              updateSelectPreview(slot, false)
-            }
+          progress != null -> try {
+            val texture = decodeStringToTexture(progress)
+            islandSlots.add(IslandSlot(slot, null, texture))
+          } catch (e: Exception) {
+            publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
+            updateSelectPreview(slot, false)
+          }
 
-          islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
+          islandPreviewFile.exists() -> islandSlots.add(IslandSlot(slot, null, Texture(islandPreviewFile)))
           else -> {
             publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
             updateSelectPreview(slot, true)
@@ -217,10 +217,10 @@ object LevelSelectScreen : AbstractScreen() {
       islandPreferences.putString(getPrefName(slot, true), preview.saveScreenshotAsString())
     }
     islandPreferences.flush()
-    if (index == islandPreviews.size) {
-      islandPreviews.add(preview to preview.colorBufferTexture)
+    if (index == islandSlots.size) {
+      islandSlots.add(preview to preview.colorBufferTexture)
     } else {
-      islandPreviews.set(index, preview to preview.colorBufferTexture)
+      islandSlots.set(index, preview to preview.colorBufferTexture)
     }
   }
 
@@ -289,7 +289,7 @@ object LevelSelectScreen : AbstractScreen() {
       }
     }
 
-    for ((i, preview) in islandPreviews.withIndex()) {
+    for ((i, preview) in islandSlots.withIndex()) {
       val (x, y, width, height) = rect(i + PREVIEWS_PER_ROW)
 
       if (y + height < camera.position.y - camera.viewportHeight / 2f) {
@@ -302,7 +302,7 @@ object LevelSelectScreen : AbstractScreen() {
         break
       }
 
-      batch.draw(preview.second, x, y, width, height)
+      batch.draw(preview.texture, x, y, width, height)
       drawBox(x, y, width, height)
     }
     batch.end()
@@ -322,11 +322,8 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   fun disposePreviews() {
-    for (buffer in islandPreviews) {
-      buffer.first?.dispose()
-      buffer.second.dispose()
-    }
-    islandPreviews.clear()
+    islandSlots.forEach { it.dispose() }
+    islandSlots.clear()
   }
 
   enum class PreviewModifier {
@@ -335,5 +332,16 @@ object LevelSelectScreen : AbstractScreen() {
     WON,
     LOST,
     AI_DONE
+  }
+
+  data class IslandSlot(val islandId: Int, val fbo: FrameBuffer?, val texture: Texture, val islandRTB: Int) : Disposable, Comparable<IslandSlot> {
+    override fun compareTo(other: IslandSlot): Int {
+      return islandRTB.compareTo(other.islandRTB)
+    }
+
+    override fun dispose() {
+      fbo.disposeSafely()
+      texture.disposeSafely()
+    }
   }
 }
