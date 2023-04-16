@@ -81,7 +81,7 @@ class Island(
   var round = round
     private set
 
-  val turn get() = (round - 1)* Team.values().size + (currentTeam.ordinal - startTeam.ordinal)
+  val turn get() = (round - 1) * Team.values().size + (currentTeam.ordinal - startTeam.ordinal)
 
   lateinit var grid: HexagonalGrid<HexagonData>
     private set

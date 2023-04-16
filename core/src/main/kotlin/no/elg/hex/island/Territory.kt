@@ -17,15 +17,16 @@ data class Territory(
   val hexagons: Collection<Hexagon<HexagonData>>
 ) {
 
-  val income: Int get() {
-    var income = capital.calculateIncome(hexagons, island)
-    val hand = island.hand
-    if (hand?.territory === this) {
-      // Subtract one from the income to balance out the +1 gained from the empty hexagon the piece should be placed on
-      income += hand.piece.income - 1
+  val income: Int
+    get() {
+      var income = capital.calculateIncome(hexagons, island)
+      val hand = island.hand
+      if (hand?.territory === this) {
+        // Subtract one from the income to balance out the +1 gained from the empty hexagon the piece should be placed on
+        income += hand.piece.income - 1
+      }
+      return income
     }
-    return income
-  }
 
   /** All enemy hexes that border this territory */
   val enemyBorderHexes: Collection<Hexagon<HexagonData>> by lazy {

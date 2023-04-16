@@ -1,7 +1,7 @@
 package no.elg.hex.util
 
 import com.badlogic.gdx.Gdx
-import java.util.*
+import java.util.Properties
 
 fun loadProperties(path: String): Properties = Properties().also {
   try {

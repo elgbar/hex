@@ -64,11 +64,11 @@ optional arguments:
 ## Hints
 
 * Launch the game with `--map-editor` to be able to edit all maps, and even create new ones
-    * Example launch command `java -jar Hex.jar --map-editor`
+  * Example launch command `java -jar Hex.jar --map-editor`
 * If cheating try to press...
-    * `F10` to re-move your moved pieces
-    * `F11` to make the AI surrender
-    * `F12` to toggle cheating
+  * `F10` to re-move your moved pieces
+  * `F11` to make the AI surrender
+  * `F12` to toggle cheating
 * If launching with `--debug` or `--trace` mode try to press `F12` to enable cheating
 * There are more options available in the settings when launching with `--debug` or `--trace`
 * Pressing space or backspace will unselect piece in hand if holding something or unselect selected territory if not
@@ -82,8 +82,9 @@ optional arguments:
 
 #### Android
 
-**First bump the android version code!** 
-In the `Build` > `Generate Signed Bundle / Apk` choose `Android App Bundle` then (if not already done: import the `hex.jks` and get the password from the password manager) then choose `release`.
+**First bump the android version code!**
+In the `Build` > `Generate Signed Bundle / Apk` choose `Android App Bundle` then (if not already done: import the `hex.jks` and get the password from the password manager) then
+choose `release`.
 It should be found [here](./android/release)
 
 #### Desktop

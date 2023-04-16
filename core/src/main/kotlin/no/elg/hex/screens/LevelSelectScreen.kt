@@ -134,6 +134,7 @@ object LevelSelectScreen : AbstractScreen() {
             false
           )
         }
+
         NOTHING -> Unit
       }
     }

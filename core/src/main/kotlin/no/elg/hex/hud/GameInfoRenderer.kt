@@ -41,9 +41,9 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
   }
 
   private val topCenter: Array<ScreenText> = arrayOf(
-    if(Hex.debug){
+    if (Hex.debug) {
       VariableScreenText({ "Round ${screen.island.round} (turn ${screen.island.turn})" })
-    }else {
+    } else {
       VariableScreenText({ "Round ${screen.island.round}" })
     },
     IfScreenText {

@@ -29,12 +29,12 @@ android {
       jniLibs.srcDirs = ['libs']
     }
   }
-    packagingOptions {
-        resources {
-            excludes += ['META-INF/robovm/ios/robovm.xml']
-        }
+  packagingOptions {
+    resources {
+      excludes += ['META-INF/robovm/ios/robovm.xml']
     }
-    defaultConfig {
+  }
+  defaultConfig {
     applicationId "no.elg.hex"
     minSdkVersion 26
     targetSdkVersion androidSdkVersion
@@ -55,10 +55,10 @@ android {
       resValue("string", "version", hexVersion)
     }
   }
-    buildFeatures {
-        renderScript true
-        aidl true
-    }
+  buildFeatures {
+    renderScript true
+    aidl true
+  }
 }
 
 // called every time gradle gets executed, takes the native dependencies of
