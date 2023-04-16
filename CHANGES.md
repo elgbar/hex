@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * The chance of different AIs to just end their turn without considering all their options are depending on the difficultly
 * Show a castle on the main menu when the AI is done with a game
 * Allow player to place castles on living pieces, the living piece will be in the players hand afterwards
-* A white line is drawn below whose turn it currently is
+* A white line is drawn below whose turn it currently is on the strength bar
 
 ### Changed
 
@@ -26,13 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improve which piece will be replaced by a capital when there is no capital in a territory
   * The order of selection is as follows `empty`, `trees`/`graves`, `baron`, `knight`, `spearman`, `peasant`, `castle`
   * E.g., if there is a peasant and a castle to choose from the algorithm will choose the peasant
-* When calculating how exposed a capital placement is, count invisible hexagons as slight more (i.e, 10%) valuable then friendly hexagons
+* Change calculation of best capital placement 
+  * Count invisible hexagons as slight more (i.e, 10%) valuable then friendly hexagons
+  * Count the surrounding hexagons of a castle as twice as valuable
 * You will not get the `you lost` message when only AIs are playing against each other
 * Improve end turn warning to be less aggressive
   * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
 * Living pieces behave like capitals and will instantly become a grave when no longer a part of a territory
 * Only grow trees once a round
-* Improve placement of capitals by placing them next to castles when possible
 * Rename turn to round
 * Adjust team color to make them easier to distinguish
 * Flip the setting `disable audio` to `enable audio`
