@@ -20,6 +20,7 @@ import no.elg.hex.event.TeamEndTurnEvent
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
+import no.elg.hex.hexagon.Grave
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.LivingPiece
@@ -31,6 +32,7 @@ import no.elg.hex.hexagon.Team.LEAF
 import no.elg.hex.hexagon.Team.STONE
 import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.TreePiece
+import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.screens.LevelSelectScreen
@@ -499,6 +501,14 @@ class Island(
   fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
     val territoryHexes = connectedTerritoryHexagons(hexagon)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) {
+      // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
+      // then replace the capital with a tree
+      val data = getData(hexagon)
+      if (data.piece is Capital) {
+        replaceWithTree(this, hexagon)
+      } else if (data.piece is LivingPiece) {
+        data.setPiece<Grave>()
+      }
       return null
     }
     return territoryHexes
