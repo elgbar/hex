@@ -17,6 +17,9 @@ import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 @JsonInclude(NON_DEFAULT)
@@ -48,16 +51,25 @@ class HexagonData(
       Events.fireEvent(HexagonChangedTeamEvent(this, old, value))
     }
 
+  /**
+   * DO NOT SET DIRECTLY!, use [setPiece]
+   */
   @JsonIgnore
   var piece: Piece = Empty
-    private set
 
   /**
    * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type
    * [pieceType].
    */
-  inline fun <reified T : Piece> setPiece(noinline init: (T) -> Unit = { }): Boolean = setPiece(T::class, init)
-  fun <T : Piece> setPiece(pieceType: KClass<out T>, init: (T) -> Unit = { }): Boolean {
+  @OptIn(ExperimentalContracts::class)
+  inline fun <reified T : Piece> setPiece(crossinline init: (T) -> Unit = { }): Boolean {
+    contract { callsInPlace(init, InvocationKind.AT_MOST_ONCE) }
+    return setPiece(T::class, init)
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  inline fun <T : Piece> setPiece(pieceType: KClass<out T>, init: (T) -> Unit = { }): Boolean {
+    contract { callsInPlace(init, InvocationKind.AT_MOST_ONCE) }
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
     val pieceToPlace = pieceType.createInstance(this)
 

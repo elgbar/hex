@@ -103,3 +103,4 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 
 * Lag when un/redoing after a long game
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
+* Sometimes the text is rendering upside-down

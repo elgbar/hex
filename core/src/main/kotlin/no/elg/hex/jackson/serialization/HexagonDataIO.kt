@@ -28,7 +28,7 @@ class HexagonDataDeserializer(defaultSerializer: BeanDeserializer) :
       if (loadedTypeName != null) {
         val pieceClass = PIECES_MAP[loadedTypeName] ?: error("Unknown piece with the name $loadedTypeName")
         val pieceUpdated = setPiece(pieceClass) {
-          this.handleDeserializationData(serializationDataToLoad)
+          it.handleDeserializationData(serializationDataToLoad)
         }
         require(pieceUpdated) { "Failed to set piece to $serializationDataToLoad during serialization" }
       }

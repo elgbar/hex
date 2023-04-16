@@ -308,7 +308,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         if (cursorData.piece is Empty) {
           val piece = iter.next()
           cursorData.setPiece(piece::class) {
-            moved = false
+            it.moved = false
           }
           require(cursorData.piece is LivingPiece) { "New piece is not Living Piece" }
         }
@@ -324,7 +324,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
             if (data.piece is Empty) {
               val piece = iter.next()
               val placed = data.setPiece(piece::class) {
-                moved = false
+                it.moved = false
               }
               require(placed) { "Failed to place on an empty hexagon" }
             }

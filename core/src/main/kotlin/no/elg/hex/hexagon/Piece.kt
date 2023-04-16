@@ -282,6 +282,10 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var hasGrown: Boolean
   override val income: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
+  fun grow(){
+    hasGrown = true
+  }
+
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     hasGrown = false
   }
@@ -295,12 +299,11 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
     }
     super.newRound(island, pieceHex)
     // Find all empty neighbor hexes that are empty
-    val list = island.getNeighbors(pieceHex).filter {
-      val piece = island.getData(it).piece
-      piece is Empty && island.treeType(it) == PineTree::class
+    val emptyNeighbors = island.getNeighbors(pieceHex).filter {
+      island.getData(it).piece is Empty && island.treeType(it) == PineTree::class
     }.shuffled()
 
-    for (hexagon in list) {
+    for (hexagon in emptyNeighbors) {
       // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to
       // grow
       val otherPines = island.getNeighbors(hexagon).filter {
@@ -310,14 +313,11 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
       }
       if (otherPines.isNotEmpty()) {
         // Grow a tree between this pine and another pine
-        val otherPine = island.getData(otherPines.random()).piece as TreePiece
-        val loopData = island.getData(hexagon)
-        val piece = loopData.setPiece<PineTree> {
-          this@PineTree.hasGrown = true
-          otherPine.hasGrown = true
-          it.hasGrown = true
-        }
-        if (piece) {
+        val neighborPine = island.getData(otherPines.random()).piece as TreePiece
+        val placed = island.getData(hexagon).setPiece<PineTree> { it.grow() }
+        if (placed) {
+          this@PineTree.grow()
+          neighborPine.grow()
           break
         }
       }
@@ -333,26 +333,19 @@ class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
     if (hasGrown) {
-      Gdx.app.trace("Tree", "Palm has already grown this round, skipping it")
+      Gdx.app.trace("Tree", "Palm tree has already grown this round, skipping it")
       return
     }
     super.newRound(island, pieceHex)
     // Find all empty neighbor hexes that are empty along the cost
-    val hex =
-      island
-        .getNeighbors(pieceHex)
-        .filter {
-          val piece = island.getData(it).piece
-          piece is Empty && island.treeType(it) == PalmTree::class
-        }
-        .randomOrNull()
-        ?: return
+    val neighbour = island.getNeighbors(pieceHex)
+      .filter { island.getData(it).piece is Empty && island.treeType(it) == PalmTree::class }
+      .randomOrNull()
+      ?: return
 
-    val randomNeighborData = island.getData(hex)
-
-    if (randomNeighborData.setPiece(PalmTree::class)) {
-      (randomNeighborData.piece as TreePiece).hasGrown = true
-      hasGrown = true
+    island.getData(neighbour).setPiece<PalmTree> {
+      it.grow()
+      this.grow()
     }
   }
 
