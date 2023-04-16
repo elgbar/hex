@@ -6,7 +6,7 @@ import java.nio.file.Paths
 buildscript {
   ext {
     appName = "Hex"
-    kotlinVersion = "1.8.10"
+    kotlinVersion = "1.8.20"
     gdxVersion = '1.11.0'
     ktxVersion = "1.11.0-rc5"
     visVersion = '1.5.1'
