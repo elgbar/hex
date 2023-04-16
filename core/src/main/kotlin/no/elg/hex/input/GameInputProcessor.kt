@@ -347,7 +347,13 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
   }
 
   override fun longPress(x: Float, y: Float): Boolean = click(true)
-  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean = click(false)
+  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean =
+    if (count <= 1) {
+      click(false)
+    } else {
+      super.tap(x, y, count, button)
+    }
+
 
   companion object {
     fun keycodeToPiece(keycode: Int): Piece? {

@@ -27,5 +27,5 @@ interface Platform {
   val canControlAudio: Boolean
 
   fun platformInit() = Unit
-  fun pause()
+  fun pause() = Unit
 }

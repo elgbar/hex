@@ -18,7 +18,4 @@ class DesktopPlatform : Platform {
   override fun setFps(fps: Int) {
     Gdx.graphics.setForegroundFPS(fps)
   }
-
-  override fun pause() {
-  }
 }

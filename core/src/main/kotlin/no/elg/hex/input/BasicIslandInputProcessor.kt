@@ -96,7 +96,8 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     return true
   }
 
-  private fun updateZoom(zoom: Float) {
+  private fun updateZoom(amount: Float) {
+    val zoom = amount * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
     if (zoom.isNaN()) {
       Gdx.app.error("Island Zoom", "Tried to update zoom to NaN!")
       return
@@ -106,8 +107,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
-    val newZoom = amountY * Settings.zoomSpeed * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
-    updateZoom(newZoom)
+    updateZoom(amountY * Settings.zoomSpeed)
     return true
   }
 
@@ -148,8 +148,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     Gdx.app.trace("pinch zoom") { "Last distance $lastDistance | current distance $currentDistance | sign $sign -> we are zooming ${if (sign == 1) "in" else "out"}" }
     Gdx.app.trace("pinch zoom") { "$sign * $distance * ${Gdx.graphics.deltaTime} -> $amount" }
 
-    val newZoom = amount * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
-    updateZoom(newZoom)
+    updateZoom(amount)
 
     lastPointer1.set(currentPointer1)
     lastPointer2.set(currentPointer2)
@@ -173,10 +172,20 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     return false
   }
 
+  override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
+    if (count > 1) {
+      updateZoom(TAP_ZOOM_AMOUNT)
+      return true
+    }
+    return false
+  }
+
   companion object {
     private const val MIN_MOVE_AMOUNT = 0
 
     const val MIN_ZOOM = 0.1f
     const val MAX_ZOOM = 3.0f
+
+    const val TAP_ZOOM_AMOUNT = -1.5f
   }
 }
