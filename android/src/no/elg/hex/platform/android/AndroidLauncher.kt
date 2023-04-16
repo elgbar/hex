@@ -28,12 +28,7 @@ class AndroidLauncher : AndroidApplication() {
 
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
     Hex.platform = AndroidPlatform(this)
-
-    if (Hex.launchPreference.contains(Settings.MSAA_SAMPLES_PATH)) {
-      config.numSamples = Hex.launchPreference.getInteger(Settings.MSAA_SAMPLES_PATH)
-    } else {
-      config.numSamples = 2 //default value
-    }
+    config.numSamples = 2 //default value
 
     config.depth = 0
 
@@ -49,7 +44,7 @@ class AndroidLauncher : AndroidApplication() {
     config.useAccelerometer = false
     config.useGyroscope = false
     config.useRotationVectorSensor = false
-    config.disableAudio = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
+    config.disableAudio = false
 
     Hex.audioDisabled = config.disableAudio
     initialize(Hex, config)

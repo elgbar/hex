@@ -20,7 +20,8 @@ object Settings {
     true,
     priority = 200,
     preferences = Hex.launchPreference,
-    requireRestart = true
+    requireRestart = true,
+    shouldHide = { !Hex.platform.canControlAudio }
   )
 
   const val VSYNC_PATH = "vsync" // Settings::vsync.name
@@ -35,7 +36,11 @@ object Settings {
     }
   )
 
-  var volume by PreferenceDelegate(1f, priority = 210) { it < 0f || it > 1f }
+  var volume by PreferenceDelegate(
+    1f,
+    priority = 210,
+    shouldHide = { !Hex.platform.canControlAudio }
+  ) { it < 0f || it > 1f }
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
@@ -61,7 +66,7 @@ object Settings {
   ) { it < 5 }
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
-  var MSAA by PreferenceDelegate(4, Hex.launchPreference, true) { it !in 0..16 }
+  var MSAA by PreferenceDelegate(4, Hex.launchPreference, true, shouldHide = { !Hex.platform.canSetMSAA }) { it !in 0..16 }
 
   var zoomSpeed by PreferenceDelegate(
     0.2f,

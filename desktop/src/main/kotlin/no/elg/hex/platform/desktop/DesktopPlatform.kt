@@ -12,6 +12,9 @@ class DesktopPlatform : Platform {
 
   override val canToggleVsync: Boolean = true
 
+  override val canSetMSAA: Boolean = true
+
+  override val canControlAudio: Boolean = true
   override fun setFps(fps: Int) {
     Gdx.graphics.setForegroundFPS(fps)
   }

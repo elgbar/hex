@@ -22,5 +22,9 @@ interface Platform {
    */
   val canToggleVsync: Boolean
 
+  val canSetMSAA: Boolean
+
+  val canControlAudio: Boolean
+
   fun platformInit() = Unit
 }
