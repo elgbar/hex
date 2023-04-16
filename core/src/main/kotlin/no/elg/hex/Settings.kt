@@ -44,7 +44,7 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
-  var allowAIToSurrender by PreferenceDelegate(true, priority = 100, hideLevel = LOG_DEBUG)
+  var allowAIToSurrender by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
 
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
   var enableStrengthHint by PreferenceDelegate(false, priority = 100)
@@ -79,7 +79,7 @@ object Settings {
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
     hideLevel = LOG_DEBUG,
-    priority = 91,
+    priority = 100_000,
     onChange = { _, _, new ->
       gotoLevelSelect()
       return@PreferenceDelegate new
