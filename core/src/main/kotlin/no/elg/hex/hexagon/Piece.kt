@@ -275,29 +275,53 @@ class Grave(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, 
 // TREE //
 // ////////
 
-sealed class TreePiece(data: HexagonData, placed: Boolean, var hasGrown: Boolean) : StationaryPiece(data, placed) {
+sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownRound: Int) : StationaryPiece(data, placed) {
 
   override val capitalReplacementResistance = 0
   override val strength = NO_STRENGTH
   override val income: Int = 0
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
-  fun grow(){
-    hasGrown = true
-  }
+  /**
+   * Create a new tree according to the tree types rules.
+   *
+   * The created tree should NOT be marked as grown
+   */
+  protected abstract fun propagate(island: Island, pieceHex: Hexagon<HexagonData>)
 
-  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    hasGrown = false
-  }
-}
-
-class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
-  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
+  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (hasGrown) {
       Gdx.app.trace("Pine", "Pine has already grown this round, skipping it")
       return
     }
-    super.newRound(island, pieceHex)
+    propagate(island, pieceHex)
+  }
+
+  fun markAsGrown() {
+    val round = Hex.island?.round ?: 0
+    lastGrownRound = round
+  }
+
+  val hasGrown: Boolean get() = Hex.island?.round == lastGrownRound
+
+  override fun toString() = "${this::class.simpleName}(placed? $placed, lastGrownRound: $lastGrownRound)"
+
+  override val serializationData: Int
+    get() = lastGrownRound
+
+  override fun handleDeserializationData(serializationData: Any?) {
+    if (serializationData is Int) {
+      Gdx.app.trace(DESER_TAG, "Updating moved of $this to $serializationData")
+      lastGrownRound = serializationData
+    } else if (serializationData != null) {
+      Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a int or null, but got ${serializationData::class}")
+    }
+  }
+}
+
+class PineTree(data: HexagonData, placed: Boolean = false, lastGrownRound: Int = 0) : TreePiece(data, placed, lastGrownRound) {
+
+  override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
     // Find all empty neighbor hexes that are empty
     val emptyNeighbors = island.getNeighbors(pieceHex).filter {
       island.getData(it).piece is Empty && island.treeType(it) == PineTree::class
@@ -314,10 +338,9 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
       if (otherPines.isNotEmpty()) {
         // Grow a tree between this pine and another pine
         val neighborPine = island.getData(otherPines.random()).piece as TreePiece
-        val placed = island.getData(hexagon).setPiece<PineTree> { it.grow() }
-        if (placed) {
-          this@PineTree.grow()
-          neighborPine.grow()
+        if (island.getData(hexagon).setPiece<PineTree>()) {
+          this@PineTree.markAsGrown()
+          neighborPine.markAsGrown()
           break
         }
       }
@@ -325,32 +348,25 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
   }
 
   override fun copyTo(newData: HexagonData): PineTree {
-    return PineTree(newData, placed, hasGrown)
+    return PineTree(newData, placed, lastGrownRound)
   }
 }
 
-class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
+class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownRound: Int = 0) : TreePiece(data, placed, lastGrownRound) {
 
-  override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
-    if (hasGrown) {
-      Gdx.app.trace("Tree", "Palm tree has already grown this round, skipping it")
-      return
-    }
-    super.newRound(island, pieceHex)
+  override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
     // Find all empty neighbor hexes that are empty along the cost
     val neighbour = island.getNeighbors(pieceHex)
       .filter { island.getData(it).piece is Empty && island.treeType(it) == PalmTree::class }
-      .randomOrNull()
-      ?: return
+      .randomOrNull() ?: return
 
     island.getData(neighbour).setPiece<PalmTree> {
-      it.grow()
-      this.grow()
+      this.markAsGrown()
     }
   }
 
   override fun copyTo(newData: HexagonData): PalmTree {
-    return PalmTree(newData, placed, hasGrown)
+    return PalmTree(newData, placed, lastGrownRound)
   }
 }
 

@@ -31,7 +31,6 @@ import no.elg.hex.hexagon.Team.FOREST
 import no.elg.hex.hexagon.Team.LEAF
 import no.elg.hex.hexagon.Team.STONE
 import no.elg.hex.hexagon.Team.SUN
-import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInputProcessor
@@ -175,10 +174,6 @@ class Island(
       for (hexagon in hexagons) {
         val data = this.getData(hexagon)
         if (data.invisible) continue
-        val hexPiece = data.piece
-        if (hexPiece is TreePiece) {
-          hexPiece.hasGrown = false
-        }
       }
     }
 

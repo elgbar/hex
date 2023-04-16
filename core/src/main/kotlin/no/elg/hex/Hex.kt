@@ -22,11 +22,13 @@ import no.elg.hex.event.Events
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
+import no.elg.hex.island.Island
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.jackson.serialization.HexagonDataDeserializerModifier
 import no.elg.hex.platform.Platform
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.SplashScreen
 import no.elg.hex.screens.TutorialScreen
@@ -95,6 +97,8 @@ object Hex : ApplicationAdapter() {
     if (args.scale <= 0) Assets.nativeScale else args.scale
   }
   val backgroundColor: Color by lazy { if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62") }
+
+  val island: Island? get() = (screen as? PreviewIslandScreen)?.island
 
   var screen: AbstractScreen = SplashScreen
     set(value) {
@@ -228,7 +232,7 @@ object Hex : ApplicationAdapter() {
       pause()
       screen.dispose()
       assets.dispose()
-    } catch (e: Exception) {
+    } catch (_: Exception) {
     }
   }
 

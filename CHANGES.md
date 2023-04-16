@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improve end turn warning to be less aggressive
   * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
 * Living pieces behave like capitals and will instantly become a grave when no longer a part of a territory
-* Only grow trees once a round
+* Trees will grow at the beginning of each players turn but the newly grown tree will now be able to grow again
 * Rename turn to round
 * Adjust team color to make them easier to distinguish
 * Flip the setting `disable audio` to `enable audio`
@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix merging two territories always keeps the capital of the selected territory
 * Fix players with no territories left still get to play
 * Fix double processing of pieces in a bankrupt territory at the beginning of a players turn
+* Fix trees not remember if they have grown or not
 
 ### Removed
 
