@@ -122,6 +122,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
           Hex.screen = LevelSelectScreen
         }
       }
+      Keys.BACK -> Hex.platform.pause()
 
       else -> return false
     }
