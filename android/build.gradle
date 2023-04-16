@@ -13,6 +13,8 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
+  namespace 'no.elg.hex'
+
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -27,10 +29,12 @@ android {
       jniLibs.srcDirs = ['libs']
     }
   }
-  packagingOptions {
-    exclude 'META-INF/robovm/ios/robovm.xml'
-  }
-  defaultConfig {
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/robovm/ios/robovm.xml']
+        }
+    }
+    defaultConfig {
     applicationId "no.elg.hex"
     minSdkVersion 26
     targetSdkVersion androidSdkVersion
@@ -51,6 +55,10 @@ android {
       resValue("string", "version", hexVersion)
     }
   }
+    buildFeatures {
+        renderScript true
+        aidl true
+    }
 }
 
 // called every time gradle gets executed, takes the native dependencies of

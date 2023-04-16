@@ -289,6 +289,10 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var hasGrown: Boolean
 
 class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
+    if (hasGrown) {
+      Gdx.app.trace("Pine", "Pine has already grown this round, skipping it")
+      return
+    }
     super.newRound(island, pieceHex)
     // Find all empty neighbor hexes that are empty
     val list = island.getNeighbors(pieceHex).filter {
@@ -328,6 +332,10 @@ class PineTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = t
 class PalmTree(data: HexagonData, placed: Boolean = false, hasGrown: Boolean = true) : TreePiece(data, placed, hasGrown) {
 
   override fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) {
+    if (hasGrown) {
+      Gdx.app.trace("Tree", "Palm has already grown this round, skipping it")
+      return
+    }
     super.newRound(island, pieceHex)
     // Find all empty neighbor hexes that are empty along the cost
     val hex =
