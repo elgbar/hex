@@ -14,14 +14,12 @@ import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
 import no.elg.hex.screens.LevelSelectScreen.camera
 import no.elg.hex.screens.LevelSelectScreen.mouseX
 import no.elg.hex.screens.LevelSelectScreen.mouseY
-import no.elg.hex.util.IslandFileType
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.getIslandJsonFileName
-import no.elg.hex.util.getIslandPreviewFileName
+import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
 import java.lang.Float.max
 
@@ -99,8 +97,8 @@ object LevelSelectInputProcessor : AbstractInput(true) {
           val index = getHoveringIslandIndex()
           if (index == INVALID_ISLAND_INDEX) return false
           Gdx.app.debug("SELECT", "Deleting island $index")
-          val file = getIslandFile(index, IslandFileType.JSON, allowInternal = false)
-          val filePreview = getIslandFile(index, IslandFileType.PREVIEW, allowInternal = false)
+          val file = getIslandFile(index, preview = false, allowInternal = false)
+          val filePreview = getIslandFile(index, preview = true, allowInternal = false)
 
           if (!file.delete()) {
             publishWarning("Failed to delete island $index")
@@ -116,8 +114,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
                 Thread.yield()
               }
             }
-            Hex.assets.unload(getIslandJsonFileName(index))
-            Hex.assets.unload(getIslandPreviewFileName(index))
+            Hex.assets.unload(getIslandFileName(index))
             IslandFiles.fullFilesSearch()
             LevelSelectScreen.renderPreviews()
             publishMessage("Deleted island $index", color = Color.GREEN)
