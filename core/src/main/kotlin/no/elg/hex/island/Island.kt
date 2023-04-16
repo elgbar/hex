@@ -75,11 +75,13 @@ class Island(
   round: Int = 1,
   initialLoad: Boolean = true,
   @JsonAlias("team")
-  startTeam: Team = Settings.startTeam,
+  private val startTeam: Team = Settings.startTeam,
   var authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
 ) {
   var round = round
     private set
+
+  val turn get() = (round - 1)* Team.values().size + (currentTeam.ordinal - startTeam.ordinal)
 
   lateinit var grid: HexagonalGrid<HexagonData>
     private set
