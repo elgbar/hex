@@ -62,9 +62,14 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     mouseY = unprojectVector.y
   }
 
+  private fun enforceCameraBounds() {
+    val (maxX, minX, maxY, minY) = screen.visibleGridSize
+    screen.camera.position.x = screen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+    screen.camera.position.y = screen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+  }
+
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable && pointer == 0) {
-      val (maxX, minX, maxY, minY) = screen.visibleGridSize
 
       val zoom = screen.camera.zoom
       val dx = -Gdx.input.deltaX * zoom
@@ -76,8 +81,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
       }
 
       screen.camera.translate(dx, dy)
-      screen.camera.position.x = screen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
-      screen.camera.position.y = screen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+      enforceCameraBounds()
       screen.camera.update()
       return false
     }
@@ -103,11 +107,11 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
       return
     }
     screen.camera.zoom = zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
-    screen.camera.update()
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
     updateZoom(amountY * Settings.zoomSpeed)
+    screen.camera.update()
     return true
   }
 
@@ -149,6 +153,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     Gdx.app.trace("pinch zoom") { "$sign * $distance * ${Gdx.graphics.deltaTime} -> $amount" }
 
     updateZoom(amount)
+    screen.camera.update()
 
     lastPointer1.set(currentPointer1)
     lastPointer2.set(currentPointer2)
@@ -174,7 +179,12 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
     if (count > 1) {
+      updateMouse()
+      screen.camera.position.x = mouseX
+      screen.camera.position.y = mouseY
+      enforceCameraBounds()
       updateZoom(TAP_ZOOM_AMOUNT)
+      screen.camera.update()
       return true
     }
     return false
@@ -184,7 +194,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     private const val MIN_MOVE_AMOUNT = 0
 
     const val MIN_ZOOM = 0.1f
-    const val MAX_ZOOM = 3.0f
+    const val MAX_ZOOM = 2.5f
 
     const val TAP_ZOOM_AMOUNT = -1.5f
   }
