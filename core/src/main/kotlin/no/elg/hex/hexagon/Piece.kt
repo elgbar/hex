@@ -2,6 +2,8 @@ package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
+import no.elg.hex.event.CapitalBalanceChanged
+import no.elg.hex.event.Events
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MAX_START_CAPITAL
 import no.elg.hex.util.createHandInstance
@@ -170,7 +172,20 @@ sealed class StationaryPiece(final override val data: HexagonData, protected var
   override fun toString() = "${this::class.simpleName}(placed? $placed)"
 }
 
-class Capital(data: HexagonData, placed: Boolean = false, var balance: Int = 0) : StationaryPiece(data, placed) {
+class Capital(
+  data: HexagonData,
+  placed: Boolean = false,
+  balance: Int = 0
+) : StationaryPiece(data, placed) {
+
+  var balance: Int = balance
+    set(value) {
+      if (field == value) return
+
+      val old = field
+      field = value
+      Events.fireEvent(CapitalBalanceChanged(data, old, value))
+    }
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Piece::class)
   override val strength = PEASANT_STRENGTH

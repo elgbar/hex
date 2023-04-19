@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
 import no.elg.hex.event.Events
+import no.elg.hex.event.HexagonChangedPieceEvent
 import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
@@ -56,6 +57,13 @@ class HexagonData(
    */
   @JsonIgnore
   var piece: Piece = Empty
+    set(value) {
+      if (field === value) return
+
+      val old = field
+      field = value
+      Events.fireEvent(HexagonChangedPieceEvent(this, old, value))
+    }
 
   /**
    * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type

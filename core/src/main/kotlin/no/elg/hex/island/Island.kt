@@ -16,6 +16,7 @@ import no.elg.hex.Settings
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.event.Events
+import no.elg.hex.event.HandChangedEvent
 import no.elg.hex.event.TeamEndTurnEvent
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -104,7 +105,9 @@ class Island(
         }
       }
       if (field != value) {
+        val old = field
         field = value
+        Events.fireEvent(HandChangedEvent(old?.piece, value?.piece))
         history.remember("Switch piece")
       }
     }
