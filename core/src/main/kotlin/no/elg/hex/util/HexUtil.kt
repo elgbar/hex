@@ -1,5 +1,6 @@
 package no.elg.hex.util
 
+import com.badlogic.gdx.Gdx
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
@@ -20,6 +21,7 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
+import kotlin.system.measureTimeMillis
 
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
@@ -207,13 +209,17 @@ fun Island.getAllTerritories(): HashMap<Team, Collection<Territory>> {
   val visitedHexagons = HashSet<Hexagon<HexagonData>>()
   val territories = HashMap<Team, Collection<Territory>>()
 
-  hexagons.withData(this) { hexagon, data ->
-    if (hexagon in visitedHexagons) return@withData
-
-    val set: MutableSet<Territory> = territories.computeIfAbsent(data.team) { HashSet() } as MutableSet<Territory>
-
-    findTerritory(hexagon)?.also { set.add(it) }
+  val ms = measureTimeMillis {
+    visibleHexagons.withData(this) { hexagon, data ->
+      if (hexagon in visitedHexagons) return@withData
+      val teamTerritories = territories.computeIfAbsent(data.team) { mutableSetOf() } as MutableSet<Territory>
+      findTerritory(hexagon)?.also {
+        visitedHexagons.addAll(it.hexagons)
+        teamTerritories += it
+      }
+    }
   }
+  Gdx.app.debug("TIME") { "Took ${ms / 1000f} to get all ${territories.map { it.value.size }.sum()} territories of island" }
 
   return territories
 }
