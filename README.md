@@ -112,7 +112,7 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
   * The reason for the lag is when there are a large amount of actions done there are lots of data
   * Ideas to mitigate this issue
     * Shrink the size of the island by
-      * Maybe non-visble hexagons can be shrunk in size?
+      * Maybe non-visible hexagons can be shrunk in size?
       * Re-encode the islands to fit in smaller island sizes
     * Make the history contain a delta not the who
 * Sometimes the text is rendering upside-down

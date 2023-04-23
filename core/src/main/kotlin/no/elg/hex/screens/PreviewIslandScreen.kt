@@ -7,6 +7,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
+import no.elg.hex.input.SmoothTransition
 import no.elg.hex.island.Island
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
@@ -21,6 +22,12 @@ import kotlin.math.max
 open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen() {
 
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
+
+  fun enforceCameraBounds() {
+    val (maxX, minX, maxY, minY) = visibleGridSize
+    camera.position.x = camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+    camera.position.y = camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+  }
 
   private fun calcVisibleGridSize(): DoubleArray {
     val visible = island.visibleHexagons
@@ -47,11 +54,19 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   val cursorHexagon: Hexagon<HexagonData>?
     get() = null
 
+  var smoothTransition: SmoothTransition? = null
+
   override fun render(delta: Float) {
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
+    smoothTransition?.zoom(delta)?.also { done ->
+      if (done) {
+        smoothTransition = null
+      }
+    }
   }
+
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)

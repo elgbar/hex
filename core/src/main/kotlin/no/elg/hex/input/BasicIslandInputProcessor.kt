@@ -17,6 +17,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
+
 /**
  * Handles input event related to the camera and other basic functiuons such as what
  *
@@ -62,12 +63,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     mouseY = unprojectVector.y
   }
 
-  private fun enforceCameraBounds() {
-    val (maxX, minX, maxY, minY) = screen.visibleGridSize
-    screen.camera.position.x = screen.camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
-    screen.camera.position.y = screen.camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
-  }
-
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable && pointer == 0) {
 
@@ -81,7 +76,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
       }
 
       screen.camera.translate(dx, dy)
-      enforceCameraBounds()
+      screen.enforceCameraBounds()
       screen.camera.update()
       return false
     }
@@ -100,17 +95,32 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     return true
   }
 
-  private fun updateZoom(amount: Float) {
+  private fun getTargetZoom(amount: Float): Float? {
+
     val zoom = amount * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
     if (zoom.isNaN()) {
       Gdx.app.error("Island Zoom", "Tried to update zoom to NaN!")
-      return
+      return null
     }
-    screen.camera.zoom = zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
+    return zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
+  }
+
+  private fun instantlyZoom(amount: Float) {
+    getTargetZoom(amount)?.also {
+      screen.smoothTransition = null
+      screen.camera.zoom = it
+    }
+  }
+
+  private fun smoothZoom(amount: Float) {
+    getTargetZoom(amount)?.also { zoom ->
+      updateMouse()
+      screen.smoothTransition = SmoothTransition(screen, zoom, mouseX, mouseY, 0.25f)
+    }
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
-    updateZoom(amountY * Settings.zoomSpeed)
+    instantlyZoom(amountY * Settings.zoomSpeed)
     screen.camera.update()
     return true
   }
@@ -152,7 +162,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     Gdx.app.trace("pinch zoom") { "Last distance $lastDistance | current distance $currentDistance | sign $sign -> we are zooming ${if (sign == 1) "in" else "out"}" }
     Gdx.app.trace("pinch zoom") { "$sign * $distance * ${Gdx.graphics.deltaTime} -> $amount" }
 
-    updateZoom(amount)
+    instantlyZoom(amount)
     screen.camera.update()
 
     lastPointer1.set(currentPointer1)
@@ -178,13 +188,8 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    if (count > 1) {
-      updateMouse()
-      screen.camera.position.x = mouseX
-      screen.camera.position.y = mouseY
-      enforceCameraBounds()
-      updateZoom(TAP_ZOOM_AMOUNT)
-      screen.camera.update()
+    if (count % 2 == 0 && screen.smoothTransition == null) {
+      smoothZoom(TAP_ZOOM_AMOUNT)
       return true
     }
     return false
