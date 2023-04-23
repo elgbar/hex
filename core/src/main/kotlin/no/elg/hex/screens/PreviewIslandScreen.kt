@@ -45,8 +45,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, maxInvY)
   }
 
-  val visibleGridSize by lazy { calcVisibleGridSize() }
-
+  private val visibleGridSize by lazy { calcVisibleGridSize() }
   private val verticesRenderer by lazy { VerticesRenderer(this) }
   private val outlineRenderer by lazy { OutlineRenderer(this) }
   private val spriteRenderer by lazy { SpriteRenderer(this) }
@@ -66,7 +65,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
       }
     }
   }
-
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)

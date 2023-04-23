@@ -14,10 +14,11 @@ data class SmoothTransition(
 
   private var timeToTarget = transitionDurationSeconds
 
-  private val camera get() = screen.camera
   private val cameraZoomOrigin: Float = camera.zoom
   private val xPositionOrigin: Float = camera.position.x
   private val yPositionOrigin: Float = camera.position.y
+
+  private val camera get() = screen.camera
 
   /**
    * @return If the zoom is complete
