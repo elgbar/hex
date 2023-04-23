@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Show a castle on the main menu when the AI is done with a game
 * Allow player to place castles on living pieces, the living piece will be in the players hand afterwards
 * A white line is drawn below whose turn it currently is on the strength bar
+* Add `--save-island-on-loading-it` program argument flag
 
 ### Changed
 
@@ -39,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Flip the setting `disable audio` to `enable audio`
 * Rendering now happens non-continuously, that is, only when needed
 * Pressing back on android when in the level select screen will exit the app
-* Double tapping while in-game will zoom the camera
+* Double tapping while in-game will smoothly zoom the camera
 
 ### Fixed
 
@@ -56,12 +57,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix players with no territories left still get to play
 * Fix double processing of pieces in a bankrupt territory at the beginning of a players turn
 * Fix trees not remember if they have grown or not
+* Fix map editor screen not handling pausing/resuming the app
+* Do not save invisible hexagons in the islandDTO
 
 ### Removed
 
 * Remove the old `easy` and `un_losable` AIs
 * Remove the AI end turn delay
-* [Android] Remove `limit fps`, `target fps`, and `vsync` settings due to the platform not supporting changing them
+* [Android] Remove `limit fps`, `target fps`, `vsync`, `msaa`, and `audio` settings due to the platform not supporting changing them or being badly supported
 
 ---
 
