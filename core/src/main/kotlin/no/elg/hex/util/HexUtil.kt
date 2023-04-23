@@ -1,6 +1,5 @@
 package no.elg.hex.util
 
-import com.badlogic.gdx.Gdx
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.Capital
@@ -21,7 +20,6 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
-import kotlin.system.measureTimeMillis
 
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {

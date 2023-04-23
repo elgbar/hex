@@ -40,7 +40,6 @@ import no.elg.hex.util.reportTiming
 import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
-import kotlin.system.measureTimeMillis
 
 @Suppress("GDXKotlinStaticResource")
 object Hex : ApplicationAdapter() {
@@ -104,7 +103,7 @@ object Hex : ApplicationAdapter() {
 
   var screen: AbstractScreen = SplashScreen
     set(value) {
-      reportTiming("change screen to ${field::class.simpleName}",) {
+      reportTiming("change screen to ${field::class.simpleName}") {
         val old = field
         Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
         old.hide()

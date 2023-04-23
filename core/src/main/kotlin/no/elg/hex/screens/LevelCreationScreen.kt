@@ -1,6 +1,7 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Color.BLACK
 import com.badlogic.gdx.graphics.Color.WHITE
@@ -20,8 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
 import com.kotcrab.vis.ui.util.form.FormInputValidator
-import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.CANCEL
-import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.OK
 import com.kotcrab.vis.ui.widget.VisImage
 import com.kotcrab.vis.ui.widget.VisTextField
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
@@ -33,8 +32,6 @@ import ktx.actors.onClick
 import ktx.assets.disposeSafely
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
-import ktx.scene2d.scene2d
-import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
@@ -48,6 +45,7 @@ import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_OCTAVES
 import no.elg.hex.island.IslandGeneration.INITIAL_FREQUENCY
+import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
 import no.elg.hex.util.value
 import org.hexworks.mixite.core.api.HexagonalGridLayout
@@ -63,7 +61,6 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
 
   private val disableables = mutableListOf<Disableable>()
   private val previewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
-
 
   private val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
   private val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
@@ -255,7 +252,6 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
           }
         }
       }
-
       row()
 
       fun layoutExplanation(): String =

@@ -6,7 +6,6 @@ import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.HexagonOrientation
 import org.hexworks.mixite.core.api.Point
 import org.hexworks.mixite.core.api.Rectangle
-import org.hexworks.mixite.core.api.contract.HexagonDataStorage
 import org.hexworks.mixite.core.api.contract.SatelliteData
 import org.hexworks.mixite.core.api.defaults.DefaultHexagonDataStorage
 import org.hexworks.mixite.core.internal.GridData

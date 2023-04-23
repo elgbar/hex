@@ -1,7 +1,6 @@
 package org.hexworks.mixite.core.api
 
 import org.hexworks.mixite.core.api.HexagonOrientation.POINTY_TOP
-import org.hexworks.mixite.core.api.contract.HexagonDataStorage
 import org.hexworks.mixite.core.api.contract.SatelliteData
 import org.hexworks.mixite.core.api.defaults.DefaultHexagonDataStorage
 import org.hexworks.mixite.core.internal.GridData

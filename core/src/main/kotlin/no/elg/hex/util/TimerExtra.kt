@@ -18,7 +18,7 @@ fun schedule(delaySeconds: Float, task: () -> Unit) {
 
 @OptIn(ExperimentalContracts::class)
 inline fun reportTiming(actionName: String, minSignificantTimeMs: Long = 10L, action: () -> Unit) {
-  contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE)  }
+  contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
   val time = measureTimeMillis(action)
   if (time > minSignificantTimeMs) {
     Gdx.app.debug("TIME") { "Took ${time / 1000f} seconds to $actionName" }

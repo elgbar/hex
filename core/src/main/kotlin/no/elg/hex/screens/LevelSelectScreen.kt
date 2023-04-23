@@ -39,8 +39,6 @@ import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
-import no.elg.hex.util.trace
-import kotlin.system.measureTimeMillis
 
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {

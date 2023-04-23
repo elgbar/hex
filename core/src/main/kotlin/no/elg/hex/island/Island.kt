@@ -174,10 +174,6 @@ class Island(
 
     if (initialLoad) {
       ensureCapitalStartFunds()
-      for (hexagon in hexagons) {
-        val data = this.getData(hexagon)
-        if (data.invisible) continue
-      }
     }
 
     val selectedHex = grid.getByCubeCoordinate(selectedCoordinate)

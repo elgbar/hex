@@ -24,14 +24,14 @@ data class TeamEndTurnEvent(val old: Team, val new: Team) : Event {
   companion object : EventListeners<TeamEndTurnEvent>()
 }
 
-class HandChangedEvent(val old: Piece?, val new: Piece?) : Event {
+data class HandChangedEvent(val old: Piece?, val new: Piece?) : Event {
   companion object : EventListeners<HandChangedEvent>()
 }
 
 /**
  * Called when the team of a [HexagonData] will be changed. Event is called after the change occur
  */
-class HexagonChangedTeamEvent(override val data: HexagonData, val old: Team, val new: Team) : HexagonDataEvent {
+data class HexagonChangedTeamEvent(override val data: HexagonData, val old: Team, val new: Team) : HexagonDataEvent {
   init {
     require(old !== new) { "There is no team change if the old and the new team are the same!" }
   }
@@ -46,6 +46,6 @@ data class HexagonChangedPieceEvent(override val data: HexagonData, val old: Pie
   companion object : EventListeners<HexagonChangedPieceEvent>()
 }
 
-class CapitalBalanceChanged(override val data: HexagonData, val old: Int, val new: Int) : HexagonDataEvent {
+data class CapitalBalanceChanged(override val data: HexagonData, val old: Int, val new: Int) : HexagonDataEvent {
   companion object : EventListeners<CapitalBalanceChanged>()
 }
