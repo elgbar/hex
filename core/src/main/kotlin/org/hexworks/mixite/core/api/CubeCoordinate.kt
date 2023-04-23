@@ -7,7 +7,7 @@ package org.hexworks.mixite.core.api
  * calculated.
  */
 @Suppress("DataClassPrivateConstructor")
-data class CubeCoordinate private constructor(val gridX: Int, val gridZ: Int) {
+data class CubeCoordinate private constructor(val gridX: Int, val gridZ: Int) : Comparable<CubeCoordinate> {
 
   val gridY: Int
     get() = -(gridX + gridZ)
@@ -21,6 +21,8 @@ data class CubeCoordinate private constructor(val gridX: Int, val gridZ: Int) {
   fun toAxialKey(): String {
     return gridX.toString() + SEP + gridZ
   }
+
+  override fun compareTo(other: CubeCoordinate): Int = comparator.compare(this, other)
 
   companion object {
 
@@ -59,5 +61,7 @@ data class CubeCoordinate private constructor(val gridX: Int, val gridZ: Int) {
     fun fromCoordinates(gridX: Int, gridZ: Int): CubeCoordinate {
       return CubeCoordinate(gridX, gridZ)
     }
+
+    val comparator: Comparator<CubeCoordinate> = Comparator.comparing(CubeCoordinate::gridX).thenComparing(CubeCoordinate::gridZ)
   }
 }

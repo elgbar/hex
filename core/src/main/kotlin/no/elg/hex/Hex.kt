@@ -11,8 +11,10 @@ import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.backends.lwjgl.LwjglGraphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.jsonMapper
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.kotcrab.vis.ui.VisUI
 import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
@@ -47,11 +49,11 @@ object Hex : ApplicationAdapter() {
   const val LAUNCH_PREF = "launchPref"
 
   @JvmStatic
-  val mapper = jacksonObjectMapper().also {
-    it.addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
-    it.registerModule(
-      SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) }
-    )
+  val mapper = jsonMapper {
+    addModule(kotlinModule())
+    configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+    addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
+    addModule(SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) })
   }
 
   val AA_BUFFER_CLEAR =
