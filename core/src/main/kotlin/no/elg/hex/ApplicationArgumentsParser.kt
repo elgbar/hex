@@ -22,12 +22,10 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val cheating by parser.flagging("--i-am-a-cheater", help = "Enable cheating")
   val `disable-island-loading` by parser.flagging("Don't load islands")
   val `draw-edges` by parser.flagging("Draw the edge hexagons to assists with debugging")
-  val `stage-debug` by parser.flagging("--stage-debug", help = "Enable debug overlay for UI using scene2d")
-  val `force-update-previews` by parser.flagging("--update-previews", help = "Update pre-rendered previews of islands")
-  val `load-all-islands` by parser.flagging(
-    "--load-all-islands",
-    help = "Load all islands at startup instead of when first played"
-  )
+  val `stage-debug` by parser.flagging("Enable debug overlay for UI using scene2d")
+  val `update-previews` by parser.flagging("Update pre-rendered previews of islands")
+  val `save-island-on-loading-it` by parser.flagging("Save islands when they are loaded")
+  val `load-all-islands` by parser.flagging("Load all islands at startup instead of when first played"  )
 
   val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toInt() }.default { 0 }
   val profile by parser.flagging("Enable GL profiling")

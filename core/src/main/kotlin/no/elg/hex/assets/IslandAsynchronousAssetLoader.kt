@@ -5,10 +5,12 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.utils.TimeUtils
+import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.util.regenerateCapitals
+import no.elg.hex.util.reportTiming
+import no.elg.hex.util.serialize
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 
 /** @author Elg */
@@ -34,35 +36,35 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
 
   override fun loadAsync(
     manager: AssetManager,
-    fileName: String,
+    fileNameOrJson: String,
     file: FileHandle,
     parameter: IslandAssetLoaderParameters?
   ) {
     island = null
-    val json: String =
-      if (parameter?.fileNameIsIsland == true) {
-        fileName
-      } else {
-        try {
-          val readStart = TimeUtils.millis()
-          requireNotNull(file.readString()).also {
-            Gdx.app.debug("ISLAND LOADING", "Reading file took ${TimeUtils.timeSinceMillis(readStart)} ms")
-          }
-        } catch (e: Exception) {
-          MessagesRenderer.publishError("Failed to load island the name '${file.name()}'")
-          "invalid island json"
-        }
-      }
-    island =
+    val json: String = if (parameter?.fileNameIsIsland == true) {
+      fileNameOrJson
+    } else {
       try {
-        val deserializeStart = TimeUtils.millis()
-        Island.deserialize(json).also {
-          Gdx.app.debug("ISLAND LOADING", "Deserialize file took ${TimeUtils.timeSinceMillis(deserializeStart)} ms")
+        reportTiming("read island file as string") {
+          file.readString()
         }
       } catch (e: Exception) {
-        MessagesRenderer.publishError("Invalid island save data for island '${file.name()}'")
-        Gdx.app.log("ISLAND LOADING", e.message)
-        Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
+        MessagesRenderer.publishError("Failed to load island the name '${file.name()}'")
+        "invalid island json"
       }
+    }
+    island = try {
+      val island = reportTiming("deserialize island json") {
+        Island.deserialize(json)
+      }
+      if(Hex.args.`save-island-on-loading-it`) {
+        Gdx.files.local(file.path()).writeString(island.createDto().serialize(), false)
+      }
+      island
+    } catch (e: Exception) {
+      MessagesRenderer.publishError("Invalid island save data for island '${file.name()}'")
+      Gdx.app.log("ISLAND LOADING", e.message)
+      Island(25, 25, HEXAGONAL).also { it.regenerateCapitals() }
+    }
   }
 }
