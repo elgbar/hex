@@ -26,7 +26,7 @@ import kotlin.system.measureTimeMillis
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
   return hexagon.satelliteData.orElseGet {
-    (if (isEdgeHexagon(hexagon)) EDGE_DATA else HexagonData()).also {
+    (if (isEdgeHexagon(hexagon) || !Hex.args.mapEditor) EDGE_DATA else HexagonData()).also {
       hexagon.setSatelliteData(it)
     }
   }
@@ -59,39 +59,35 @@ fun Island.connectedTerritoryHexagons(
   hexagon: Hexagon<HexagonData>,
   team: Team? = this.getData(hexagon).team
 ): Set<Hexagon<HexagonData>> {
-  return connectedTerritoryHexagons(hexagon, team, HashSet(), this)
-}
+  fun connectedTerritoryHexagons(
+    center: Hexagon<HexagonData>,
+    team: Team?,
+    visited: MutableSet<Hexagon<HexagonData>>,
+    island: Island
+  ): Set<Hexagon<HexagonData>> {
+    val data = island.getData(center)
+    // only check a hexagon if they have the same color and haven't been visited
+    if (center in visited || (team != null && data.team != team) || data.invisible) {
+      return visited
+    }
 
-/**
- * @param team The team to test, if null all teams are checked
- */
-private fun connectedTerritoryHexagons(
-  center: Hexagon<HexagonData>,
-  team: Team?,
-  visited: MutableSet<Hexagon<HexagonData>>,
-  island: Island
-): Set<Hexagon<HexagonData>> {
-  val data = island.getData(center)
-  // only check a hexagon if they have the same color and haven't been visited
-  if (center in visited || (team != null && data.team != team) || data.invisible) {
+    // add as visited
+    visited.add(center)
+
+    // check each neighbor
+    for (neighbor in island.grid.getNeighborsOf(center)) {
+      connectedTerritoryHexagons(neighbor, team, visited, island)
+    }
     return visited
   }
-
-  // add as visited
-  visited.add(center)
-
-  // check each neighbor
-  for (neighbor in island.grid.getNeighborsOf(center)) {
-    connectedTerritoryHexagons(neighbor, team, visited, island)
-  }
-  return visited
+  return connectedTerritoryHexagons(hexagon, team, HashSet(), this)
 }
 
 /**
  * If the given hexagon is NOT a part of a territory.
  * That is, the given hexagon does not have a neighbor hexagon which is in on the same team as the given hexagon
  */
-fun Hexagon<HexagonData>.isNotPartOfATerritory(island: Island): Boolean = !isPartOfATerritory(island)
+inline fun Hexagon<HexagonData>.isNotPartOfATerritory(island: Island): Boolean = !isPartOfATerritory(island)
 
 /**
  * If the given hexagon is a part of a territory.
@@ -151,8 +147,8 @@ fun Island.findIslands(): Set<Set<Hexagon<HexagonData>>> {
   val checkedHexagons = HashSet<Hexagon<HexagonData>>()
   val islands = HashSet<Set<Hexagon<HexagonData>>>()
 
-  for (hexagon in hexagons) {
-    if (hexagon in checkedHexagons || this.getData(hexagon).invisible) continue
+  for (hexagon in visibleHexagons) {
+    if (hexagon in checkedHexagons) continue
 
     val connectedHexes = this.connectedTerritoryHexagons(hexagon, team = null)
     checkedHexagons.addAll(connectedHexes)
@@ -163,10 +159,12 @@ fun Island.findIslands(): Set<Set<Hexagon<HexagonData>>> {
 }
 
 fun Island.ensureCapitalStartFunds() {
-  for (hexagon in hexagons) {
-    val (_, capital, territoryHexagons) = findTerritory(hexagon) ?: continue
-    if (capital.balance == 0) {
-      capital.balance = capital.calculateStartCapital(territoryHexagons, this)
+  reportTiming("ensure capital start funds", 100) {
+    for (hexagon in visibleHexagons) {
+      val (_, capital, territoryHexagons) = findTerritory(hexagon) ?: continue
+      if (capital.balance == 0) {
+        capital.balance = capital.calculateStartCapital(territoryHexagons, this)
+      }
     }
   }
 }
@@ -177,7 +175,7 @@ fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canA
 inline fun <reified T : Piece> Island.forEachPieceType(
   action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit
 ) {
-  for (hexagon in hexagons) {
+  for (hexagon in visibleHexagons) {
     val data = getData(hexagon)
     if (data.piece is T) action(hexagon, data, data.piece as T)
   }
@@ -185,21 +183,26 @@ inline fun <reified T : Piece> Island.forEachPieceType(
 
 fun Iterable<Hexagon<HexagonData>>.withData(
   island: Island,
-  ignoreInvisible: Boolean = true,
   action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit
 ) {
   for (hexagon in this) {
     val data = island.getData(hexagon)
-    if (ignoreInvisible && data.invisible) continue
+    if (data.invisible) continue
     action(hexagon, data)
   }
 }
 
 fun Island.getTerritories(team: Team): Collection<Territory> {
   val territories = HashSet<Territory>()
-  hexagons.withData(this) { hexagon, data ->
-    if (data.team == team) {
-      findTerritory(hexagon)?.also { territories.add(it) }
+  val visitedHexagons = HashSet<Hexagon<HexagonData>>()
+  reportTiming("get all ${territories.size} territories of team $team", 10) {
+    visibleHexagons.withData(this) { hexagon, data ->
+      if (data.team == team && hexagon !in visitedHexagons) {
+        findTerritory(hexagon)?.also {
+          territories.add(it)
+          visitedHexagons.addAll(it.hexagons)
+        }
+      }
     }
   }
   return territories
@@ -209,7 +212,7 @@ fun Island.getAllTerritories(): HashMap<Team, Collection<Territory>> {
   val visitedHexagons = HashSet<Hexagon<HexagonData>>()
   val territories = HashMap<Team, Collection<Territory>>()
 
-  val ms = measureTimeMillis {
+  reportTiming("get all ${territories.map { it.value.size }.sum()} territories of island", 100) {
     visibleHexagons.withData(this) { hexagon, data ->
       if (hexagon in visitedHexagons) return@withData
       val teamTerritories = territories.computeIfAbsent(data.team) { mutableSetOf() } as MutableSet<Territory>
@@ -219,8 +222,6 @@ fun Island.getAllTerritories(): HashMap<Team, Collection<Territory>> {
       }
     }
   }
-  Gdx.app.debug("TIME") { "Took ${ms / 1000f} to get all ${territories.map { it.value.size }.sum()} territories of island" }
-
   return territories
 }
 

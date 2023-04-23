@@ -36,9 +36,11 @@ import no.elg.hex.util.LOG_TRACE
 import no.elg.hex.util.debug
 import no.elg.hex.util.info
 import no.elg.hex.util.logLevelToName
+import no.elg.hex.util.reportTiming
 import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
+import kotlin.system.measureTimeMillis
 
 @Suppress("GDXKotlinStaticResource")
 object Hex : ApplicationAdapter() {
@@ -102,19 +104,21 @@ object Hex : ApplicationAdapter() {
 
   var screen: AbstractScreen = SplashScreen
     set(value) {
-      val old = field
-      Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
-      old.hide()
+      reportTiming("change screen to ${field::class.simpleName}",) {
+        val old = field
+        Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
+        old.hide()
 
-      // clean up any mess the previous screen have made
-      inputMultiplexer.clear()
-      Gdx.input.setOnscreenKeyboardVisible(false)
-      Events.clear()
+        // clean up any mess the previous screen have made
+        inputMultiplexer.clear()
+        Gdx.input.setOnscreenKeyboardVisible(false)
+        Events.clear()
 
-      Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
-      value.show()
-      value.resize(Gdx.graphics.width, Gdx.graphics.height)
-      field = value
+        Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
+        value.show()
+        value.resize(Gdx.graphics.width, Gdx.graphics.height)
+        field = value
+      }
       Gdx.graphics.requestRendering()
     }
 

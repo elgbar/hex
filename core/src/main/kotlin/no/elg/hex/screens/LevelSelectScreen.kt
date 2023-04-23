@@ -36,6 +36,7 @@ import no.elg.hex.util.component4
 import no.elg.hex.util.decodeStringToTexture
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.reportTiming
 import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
 import no.elg.hex.util.trace
@@ -150,7 +151,7 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   fun renderPreviews() {
-    val renderTime = measureTimeMillis {
+    reportTiming("render all island previews") {
       if (IslandFiles.islandIds.size == 0) {
         if (!Hex.args.`disable-island-loading`) {
           publishError("Failed to find any islands to load")
@@ -189,7 +190,6 @@ object LevelSelectScreen : AbstractScreen() {
         }
       }
     }
-    Gdx.app.trace("TIME") { "It took $renderTime ms to render all island previews" }
   }
 
   fun updateSelectPreview(slot: Int, save: Boolean, modifier: PreviewModifier = NOTHING, island: Island? = null) {
