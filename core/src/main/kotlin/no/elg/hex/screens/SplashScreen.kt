@@ -67,6 +67,8 @@ object SplashScreen : AbstractScreen() {
       play(screen.id, screen.island)
     } else if (screen is SplashIslandScreen) {
       play(screen.id)
+    } else if (screen is ReloadableScreen) {
+      Hex.screen = screen.recreate()
     } else {
       MessagesRenderer.publishError("Don't know how to restore the previous screen ${screen::class.simpleName}")
       Hex.screen = LevelSelectScreen

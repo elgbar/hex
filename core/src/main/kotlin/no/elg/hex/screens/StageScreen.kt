@@ -19,8 +19,9 @@ import kotlin.contracts.contract
 open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false) {
 
   val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
-  lateinit var rootTable: KVisTable
-    private set
+
+  val rootTable: KVisTable get() = internalRootTable
+  private lateinit var internalRootTable: KVisTable
 
   @Scene2dDsl
   @OptIn(ExperimentalContracts::class)
@@ -36,7 +37,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
     }
     if (useRootTable) {
       stage.actors {
-        rootTable = visTable {
+        internalRootTable = visTable {
           defaults().pad(20f)
           defaults().space(20f)
           setFillParent(true)
