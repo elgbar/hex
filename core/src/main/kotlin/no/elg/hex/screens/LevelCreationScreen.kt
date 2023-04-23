@@ -262,35 +262,30 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
           TRIANGULAR -> "A triangular layout must have equal width and height."
           else -> "Invalid layout: ${layoutSpinner.value}"
         }
-
       visLabel(layoutExplanation()) { spinner.onChange { setText(layoutExplanation()) } }
 
       row()
 
-      buttonBar {
-        setButton(
-          OK,
-          scene2d.visTextButton("Create island") {
-            disableables.add(this)
-
-            onClick {
-              if (this.isDisabled) return@onClick
-              val nextId = IslandFiles.nextIslandId
-              Gdx.app.debug(
-                "CREATOR",
-                "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value}"
-              )
-              play(nextId, createIsland())
-            }
+      horizontalGroup {
+        space(10f)
+        visTextButton("Create island") {
+          disableables.add(this)
+          onClick {
+            if (this.isDisabled) return@onClick
+            val nextId = IslandFiles.nextIslandId
+            Gdx.app.debug(
+              "CREATOR",
+              "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value}"
+            )
+            play(nextId, createIsland())
           }
-        )
+        }
 
-        setButton(
-          CANCEL,
-          scene2d.visTextButton("Cancel") { onClick { Hex.screen = LevelSelectScreen } }
-        )
-
-        createTable().pack()
+        visTextButton("Cancel") {
+          onInteract(stage, keyShortcut = intArrayOf(Keys.ESCAPE)) {
+            Hex.screen = LevelSelectScreen
+          }
+        }
       }
 
       pack()
