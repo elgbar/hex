@@ -54,12 +54,12 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
         prefixText(
           "Screen pos (",
           { "%4d,%4d".format(Gdx.input.x, Gdx.input.y) },
-          next = StaticScreenText(")")
+          next = END_PARENTHESIS
         ),
         prefixText(
           "Real pos (",
           { "% 5.0f,% 5.0f".format(basicInputHandler.mouseX, basicInputHandler.mouseY) },
-          next = StaticScreenText(")")
+          next = END_PARENTHESIS
         ),
         StaticScreenText(
           "Pointing at hex ",
@@ -82,6 +82,11 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
             color = Color.YELLOW,
             format = { territory -> "Size: ${territory.hexagons.count()} Bordering Enemies ${territory.enemyBorderHexes.size}" }
           )
+        ),
+        prefixText(
+          "Total Hexagons ",
+          islandScreen.island.allHexagons::size,
+          next = prefixText(" (visible ", islandScreen.island.visibleHexagons::size, next = END_PARENTHESIS)
         )
       )
     } else {
@@ -114,5 +119,9 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
 
   override fun dispose() {
     listener.disposeSafely()
+  }
+
+  companion object{
+    val END_PARENTHESIS = StaticScreenText(")")
   }
 }

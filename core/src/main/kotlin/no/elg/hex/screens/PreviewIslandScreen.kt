@@ -12,7 +12,6 @@ import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
-import no.elg.hex.util.getData
 import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.serialize
 import org.hexworks.mixite.core.api.Hexagon
@@ -24,7 +23,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
   private fun calcVisibleGridSize(): DoubleArray {
-    val visible = island.hexagons.filterNot { island.getData(it).invisible }
+    val visible = island.visibleHexagons
     if (visible.isEmpty()) return doubleArrayOf(.0, .0, .0, .0, .0, .0)
 
     val minX = visible.minOf { it.externalBoundingBox.x }
@@ -33,8 +32,8 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     val minY = visible.minOf { it.externalBoundingBox.y + it.externalBoundingBox.height }
     val maxY = visible.maxOf { it.externalBoundingBox.y }
 
-    val maxInvX = island.hexagons.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
-    val maxInvY = island.hexagons.maxOf { it.externalBoundingBox.y }
+    val maxInvX = island.allHexagons.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
+    val maxInvY = island.allHexagons.maxOf { it.externalBoundingBox.y }
 
     return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, maxInvY)
   }
@@ -57,7 +56,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     val data = island.grid.gridData
-    if (island.hexagons.isEmpty()) return
+    if (island.allHexagons.isEmpty()) return
 
     val (maxX, minX, maxY, minY, maxInvX, maxInvY) = if (Hex.args.mapEditor) {
       calcVisibleGridSize()

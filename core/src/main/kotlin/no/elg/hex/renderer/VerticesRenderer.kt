@@ -52,9 +52,8 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpd
 
   override fun frameUpdate() {
     // Render the hexagons
-    for (hexagon in islandScreen.island.hexagons) {
+    for (hexagon in islandScreen.island.visibleHexagons) {
       val data: HexagonData = islandScreen.island.getData(hexagon)
-      if (data.invisible) continue
       data.type.render(this, data.color, hexagon)
     }
     flush()

@@ -1,6 +1,7 @@
 package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
+import ktx.assets.load
 import no.elg.hex.Hex
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
@@ -49,7 +50,7 @@ object IslandFiles {
         nonExistentFilesInRow = 0
 
         if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded(fileName, Island::class.java)) {
-          Hex.assets.load(fileName, Island::class.java)
+          Hex.assets.load<Island>(fileName)
         }
         islandIds += slot
       } else {

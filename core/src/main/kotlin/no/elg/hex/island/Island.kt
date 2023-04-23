@@ -88,13 +88,17 @@ class Island(
 
   val history = IslandHistory(this)
 
+
   /**
    * Prefer this over calling [grid.hexagons] as this has better performance.
    *
    * During normal play it will only contain the visible hexagons but when [ApplicationArgumentsParser.mapEditor] is true this will contain all hexagons
    */
-  val allHexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
-  val visibleHexagons: MutableSet<Hexagon<HexagonData>> get() = allHexagons.filterNotTo(mutableSetOf()) { getData(it).invisible }
+  private val internalAllHexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
+  private val internalVisibleHexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
+
+  val allHexagons: Set<Hexagon<HexagonData>> get() = internalAllHexagons
+  val visibleHexagons: Set<Hexagon<HexagonData>> get() = internalVisibleHexagons
 
   var hand: Hand? = null
     set(value) {
@@ -156,13 +160,17 @@ class Island(
         grid.getByCubeCoordinate(coord).ifPresent { it.setSatelliteData(data) }
       }
     }
-    hexagons.clear()
-    hexagons.addAll(grid.hexagons.toSet())
+    internalAllHexagons.clear()
+    internalVisibleHexagons.clear()
+    internalAllHexagons.addAll(grid.hexagons)
 
-    for (hexagon in hexagons) {
+    for (hexagon in allHexagons) {
       val data = this.getData(hexagon)
       require(data.piece == Empty || data == data.piece.data) {
         "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
+      }
+      if(data.visible){
+        internalVisibleHexagons += hexagon
       }
     }
 
@@ -233,7 +241,7 @@ class Island(
   private var aiJob: Job? = null
 
   init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, initialLoad, startTeam)
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, !Hex.args.mapEditor, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
@@ -241,20 +249,30 @@ class Island(
   fun isCurrentTeamAI() = currentAI != null
   fun isCurrentTeamHuman() = currentAI == null
 
+  fun updateHexagonVisibility(data: HexagonData) {
+    if (data.isDisabled) {
+      val hex = internalVisibleHexagons.find { getData(it) === data } ?: error("Failed to find this data!")
+      internalVisibleHexagons -= hex
+    } else {
+      val hex = allHexagons.find { getData(it) === data } ?: error("Failed to find this data!")
+      internalVisibleHexagons += hex
+    }
+  }
+
   // ////////// //
   //  Gameplay  //
   // ////////// //
 
   private fun countHexagons(counter: ObjectIntMap<Team>) {
     counter.clear(Team.values().size)
-    hexagons.withData(this) { _, data ->
+    visibleHexagons.withData(this) { _, data ->
       counter.getAndIncrement(data.team, 0, 1)
     }
   }
 
   fun calculatePercentagesHexagons(): EnumMap<Team, Float> {
     val hexes = hexagonsPerTeam
-    val totalHexagons = visibleHexagons.toFloat()
+    val totalHexagons = visibleHexagons.count().toFloat()
     return Team.values().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {
       hexes.get(it, 0) / totalHexagons
     }
@@ -276,18 +294,17 @@ class Island(
       if (newTeam == Settings.startTeam) {
         Gdx.app.debug("TURN", "New round!")
         round++
-        for (hexagon in hexagons) {
+        for (hexagon in visibleHexagons) {
           val data = this@Island.getData(hexagon)
-          if (data.invisible) continue
           Gdx.app.trace("TURN") { "Handling new round of hex (${hexagon.gridX},${hexagon.gridZ})" }
           data.piece.newRound(this@Island, hexagon)
         }
       }
 
       val capitals = mutableSetOf<Hexagon<HexagonData>>()
-      for (hexagon in hexagons) {
+      for (hexagon in visibleHexagons) {
         val data = this@Island.getData(hexagon)
-        if (data.team != newTeam || data.invisible) continue
+        if (data.team != newTeam) continue
         if (data.piece is Capital) {
           capitals.add(hexagon)
           continue
@@ -342,7 +359,7 @@ class Island(
         history.clear()
 
         // Loose when no player have any capitals left
-        if (hexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }
+        if (visibleHexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }
         ) {
           gameInputProcessor.screen.gameEnded(false)
         }
@@ -510,7 +527,7 @@ class Island(
       for (radius in 1..maxRadius) {
         val isAnyEnemies = this.calculateRing(hex, radius).any {
           val data = this.getData(it)
-          data.team != hexTeam && !data.invisible && it.isPartOfATerritory(this)
+          data.team != hexTeam && data.visible && it.isPartOfATerritory(this)
         }
         if (isAnyEnemies) {
           return radius
@@ -586,7 +603,7 @@ class Island(
 
     val checkedHexagons = HashSet<Hexagon<HexagonData>>()
 
-    for (hexagon in hexagons) {
+    for (hexagon in visibleHexagons) {
       if (checkedHexagons.contains(hexagon) || this.getData(hexagon).invisible) continue
 
       val connectedHexes = this.connectedTerritoryHexagons(hexagon)
@@ -612,9 +629,9 @@ class Island(
 
     // check that every hexagon is connected
 
-    val visibleNeighbors = HashSet<Hexagon<HexagonData>>(hexagons.size)
-    val toCheck = Queue<Hexagon<HexagonData>>(hexagons.size * 2)
-    toCheck.addFirst(hexagons.first { !getData(it).invisible })
+    val visibleNeighbors = HashSet<Hexagon<HexagonData>>(visibleHexagons.size)
+    val toCheck = Queue<Hexagon<HexagonData>>(visibleHexagons.size * 2)
+    toCheck.addFirst(visibleHexagons.first())
 
     do {
       val curr: Hexagon<HexagonData> = toCheck.removeFirst()
@@ -628,9 +645,7 @@ class Island(
       visibleNeighbors += curr
     } while (!toCheck.isEmpty)
 
-    val allVisibleHexagons = hexagons.filterNot { getData(it).invisible }
-
-    if (!allVisibleHexagons.containsAll(visibleNeighbors) || !visibleNeighbors.containsAll(allVisibleHexagons)) {
+    if (!visibleHexagons.containsAll(visibleNeighbors) || !visibleNeighbors.containsAll(visibleHexagons)) {
       publishError("The visible hexagon grid is not connected.")
       valid = false
     }
@@ -658,13 +673,8 @@ class Island(
       return this?.piece?.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
     }
 
-    fun deserialize(json: String): Island {
-      return Hex.mapper.readValue(json)
-    }
-
-    fun deserialize(file: FileHandle): Island {
-      return deserialize(file.readString())
-    }
+    fun deserialize(json: String): Island = Hex.mapper.readValue(json)
+    fun deserialize(file: FileHandle): Island = deserialize(file.readString())
   }
 
   // ////////////////////////
@@ -675,12 +685,10 @@ class Island(
   internal fun createDto(): IslandDto {
     // prefer coordinates of held piece if nothing is held select any hexagon within the selected territory
     val coord: CubeCoordinate? =
-      (
-        hand?.piece?.data?.let { data ->
-          // slight edge case (pun intended) if we hold a piece that is a hand instance, do not record its coordinates
-          if (data.edge) null else hexagons.find { hex -> getData(hex) === data }
-        } ?: selected?.hexagons?.first()
-        )?.cubeCoordinate
+      hand?.piece?.data?.let { data ->
+        // slight edge case (pun intended) if we hold a piece that is a hand instance, do not record its coordinates
+        if (data.edge) null else visibleHexagons.find { hex -> getData(hex) === data }
+      }?.cubeCoordinate
 
     return IslandDto(
       grid.gridData.gridWidth,
@@ -688,7 +696,7 @@ class Island(
       grid.gridData.gridLayout.toEnumValue(),
       coord,
       hand?.createDtoPieceCopy(),
-      hexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
+      visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap(),
       round,
       false,
       currentTeam,
@@ -708,6 +716,11 @@ class Island(
     val team: Team = LEAF,
     val authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
   ) {
+
+    init {
+      require(hexagonData.values.none { it.invisible }) { "IslandDto was given invisible hexagon, all serialized hexagons must be visible" }
+    }
+
     fun copy(): IslandDto {
       return IslandDto(
         width,

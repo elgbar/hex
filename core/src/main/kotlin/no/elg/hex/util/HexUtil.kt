@@ -24,7 +24,7 @@ import kotlin.reflect.KClass
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
   return hexagon.satelliteData.orElseGet {
-    (if (isEdgeHexagon(hexagon) || !Hex.args.mapEditor) EDGE_DATA else HexagonData()).also {
+    (if (isEdgeHexagon(hexagon) || !Hex.args.mapEditor) EDGE_DATA else HexagonData(disabled = true, Team.EARTH)).also {
       hexagon.setSatelliteData(it)
     }
   }
@@ -106,7 +106,7 @@ fun Hexagon<HexagonData>.isPartOfATerritory(island: Island): Boolean {
 fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = true) =
   grid.getNeighborsOf(hexagon).let {
     if (onlyVisible) {
-      it.filterNot { hex -> getData(hex).invisible }
+      it.filter { hex -> getData(hex).visible }
     } else {
       it
     }

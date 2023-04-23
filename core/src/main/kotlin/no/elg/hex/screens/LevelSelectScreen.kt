@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import ktx.assets.load
 import ktx.graphics.center
 import ktx.graphics.use
 import no.elg.hex.Hex
@@ -165,7 +166,7 @@ object LevelSelectScreen : AbstractScreen() {
 
       for (slot in IslandFiles.islandIds) {
         val islandPreviewFile = getIslandFile(slot, true)
-        if (Hex.args.`force-update-previews`) {
+        if (Hex.args.`update-previews`) {
           updateSelectPreview(slot, true)
           continue
         }
@@ -200,7 +201,7 @@ object LevelSelectScreen : AbstractScreen() {
     val islandFileName = getIslandFileName(slot)
 
     if (!Hex.assets.isLoaded(islandFileName)) {
-      Hex.assets.load(islandFileName, Island::class.java)
+      Hex.assets.load<Island>(islandFileName)
     }
     val currIsland = island ?: Hex.assets.finishLoadingAsset(islandFileName)
 

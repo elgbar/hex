@@ -54,7 +54,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
       index == -PREVIEWS_PER_ROW -> Hex.screen = Hex.settingsScreen
       index == -PREVIEWS_PER_ROW + 1 -> {
         if (Hex.args.mapEditor) {
-          Hex.screen = LevelCreationScreen
+          Hex.screen = LevelCreationScreen()
         } else {
           return false
         }

@@ -17,7 +17,6 @@ import no.elg.hex.event.HexagonChangedPieceEvent
 import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
-import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.contract.SatelliteData
 import kotlin.contracts.ExperimentalContracts
@@ -30,6 +29,14 @@ import kotlin.reflect.KClass
 @JsonIgnoreProperties("id", "isPassable")
 class HexagonData(
   /**
+   * If this hexagon is disabled, meaning it will not be a part of the playable island
+   */
+  disabled: Boolean,
+  /**
+   * The initial team of this hexagon
+   */
+  team: Team? = null,
+  /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works
    * these hexagon would be returned even when the mouse is not inside the hexagon In order to
    * prevent that and gain pixel perfect hexagon accuracy the player should not know these exists.
@@ -38,15 +45,20 @@ class HexagonData(
    * @see no.elg.hex.renderer.OutlineRenderer
    * @see no.elg.hex.renderer.VerticesRenderer
    */
-  val edge: Boolean = false,
-  team: Team = if (edge || Hex.args.mapEditor) Team.SUN else Team.values().random()
+  val edge: Boolean = false
 ) : SatelliteData {
 
   @JsonAlias("isOpaque")
-  override var isDisabled: Boolean = edge
+  override var isDisabled: Boolean = disabled
+    set(disable) {
+      if (field != disable) {
+        field = disable
+        Hex.island?.updateHexagonVisibility(this)
+      }
+    }
 
   @JsonInclude(ALWAYS)
-  var team: Team = team
+  var team: Team = team ?: if (Hex.args.mapEditor) Team.values().random() else Team.STONE
     set(value) {
       if (field === value) return
 
@@ -55,11 +67,9 @@ class HexagonData(
       Events.fireEvent(HexagonChangedTeamEvent(this, old, value))
     }
 
-  /**
-   * DO NOT SET DIRECTLY!, use [setPiece]
-   */
   @JsonIgnore
   var piece: Piece = Empty
+    @Deprecated("Do not set directly! Use [setPiece]")
     set(value) {
       if (field === value) return
 
@@ -85,7 +95,8 @@ class HexagonData(
     val pieceToPlace = pieceType.createInstance(this)
 
     if (pieceToPlace.place(this)) {
-      piece = pieceToPlace
+      @Suppress("DEPRECATION") // OK to set directly here, this is the method we reference in the deprecation message!
+      this.piece = pieceToPlace
       require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) { "Pieces data does not point to this!" }
       init(pieceToPlace)
       return true
@@ -105,6 +116,11 @@ class HexagonData(
   val invisible: Boolean
     get() = edge || isDisabled
 
+  @get:JsonIgnore
+  val visible: Boolean
+    get() = !invisible
+
+
   // /////////////////
   // serialization //
   // /////////////////
@@ -123,8 +139,8 @@ class HexagonData(
 
   fun copy(): HexagonData {
     if (edge) return this
-    return HexagonData(false, team).also {
-      it.isDisabled = isDisabled
+    return HexagonData(isDisabled, team).also {
+      @Suppress("DEPRECATION") //OK to set directly when we
       it.piece = piece.copyTo(it)
     }
   }
@@ -166,6 +182,6 @@ class HexagonData(
 
     fun Island.isEdgeHexagon(hex: Hexagon<HexagonData>) = grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
 
-    val EDGE_DATA = HexagonData(edge = true)
+    val EDGE_DATA = HexagonData(disabled = true, team = Team.SUN, edge = true)
   }
 }

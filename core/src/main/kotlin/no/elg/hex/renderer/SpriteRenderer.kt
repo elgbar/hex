@@ -34,9 +34,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
     val island = islandScreen.island
     var minTimeToRender = Float.MAX_VALUE
     batch.use(islandScreen.camera) {
-      loop@ for (hexagon in island.hexagons) {
+      loop@ for (hexagon in island.visibleHexagons) {
         val data = island.getData(hexagon)
-        if (data.invisible) continue
 
         val drawable = when (val piece = data.piece) {
           is Capital -> {

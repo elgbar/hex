@@ -70,7 +70,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       }
     }
 
-    draw(islandScreen.island.hexagons, null, 0.25f)
+    draw(islandScreen.island.visibleHexagons, null, 0.25f)
 
     if (islandScreen.island.isCurrentTeamHuman()) {
       islandScreen.island.selected?.also {

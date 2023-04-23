@@ -225,7 +225,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         island.history.disable()
         island.history.clear()
 
-        for (hexagon in island.hexagons) {
+        for (hexagon in island.visibleHexagons) {
           val data = island.getData(hexagon)
           if (data.team == island.currentTeam) {
             continue
@@ -235,11 +235,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         }
 
         island.select(null)
-        island.select(
-          island.hexagons.first {
-            !island.getData(it).invisible
-          }
-        )
+        island.select(island.visibleHexagons.first())
         island.select(null)
         gameEnded(true)
       }
@@ -417,7 +413,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   fun checkEndedGame(): Boolean {
-    val capitalCount = island.hexagons.count { island.getData(it).piece is Capital }
+    val capitalCount = island.visibleHexagons.count { island.getData(it).piece is Capital }
     if (capitalCount <= 1) {
       gameEnded(island.isCurrentTeamHuman())
       return true
@@ -448,7 +444,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
       // only display the confirm button if the user have any action to do left
-      for (hexagon in island.hexagons) {
+      for (hexagon in island.visibleHexagons) {
         val data = island.getData(hexagon)
         val piece = data.piece
 

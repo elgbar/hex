@@ -63,21 +63,23 @@ object IslandGeneration {
       val random = Random(seed)
       val teams = Team.values()
 
-    for (hexagon in island.hexagons) {
+      for (hexagon in island.allHexagons) {
         val data = island.getData(hexagon)
         data.setPiece<Empty>()
         if (data.edge) continue
         val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
-        Gdx.app.trace("ISGEN", "${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise")
+        Gdx.app.trace("ISGEN"){"${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise"}
         if (noise <= 1) {
-        data.team = teams.random(random)
+          data.team = teams.random(random)
       } else {
         data.isOpaque = true
+        } else {
+          data.isDisabled = true
+        }
       }
     }
     return island
 
 //    island.regenerateCapitals()
-    return island
   }
 }

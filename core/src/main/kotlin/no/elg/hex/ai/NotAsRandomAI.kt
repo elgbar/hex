@@ -99,7 +99,7 @@ class NotAsRandomAI(
     )
 
   override suspend fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean {
-    island.select(island.hexagons.first())
+    island.select(island.visibleHexagons.first())
     val territories = island.getTerritories(team)
     for (territory in territories) {
       resetBlacklists()
