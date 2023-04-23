@@ -23,7 +23,6 @@ import com.kotcrab.vis.ui.util.form.FormInputValidator
 import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.CANCEL
 import com.kotcrab.vis.ui.widget.ButtonBar.ButtonType.OK
 import com.kotcrab.vis.ui.widget.VisImage
-import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisTextField
 import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
@@ -31,6 +30,7 @@ import com.kotcrab.vis.ui.widget.spinner.SimpleFloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
 import ktx.actors.onChange
 import ktx.actors.onClick
+import ktx.assets.disposeSafely
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.scene2d
@@ -49,6 +49,7 @@ import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_OCTAVES
 import no.elg.hex.island.IslandGeneration.INITIAL_FREQUENCY
 import no.elg.hex.util.play
+import no.elg.hex.util.value
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
 import org.hexworks.mixite.core.api.HexagonalGridLayout.RECTANGULAR
@@ -58,10 +59,36 @@ import kotlin.random.Random
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
-object LevelCreationScreen : StageScreen() {
+class LevelCreationScreen : StageScreen(), ReloadableScreen {
 
-  const val NOISE_SIZE = 512
-  const val NOISE_SIZE_F = 512f
+  private val disableables = mutableListOf<Disableable>()
+  private val previewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
+
+
+  private val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
+  private val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
+  private val heightSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
+  private val seedField = VisTextField(Random.nextLong().toString())
+
+  private val previewImage: VisImage
+  private var previewImageNoise: VisImage? = null
+  private var previewBuffer: FrameBuffer? = null
+  private val previewBufferNoise: FrameBuffer? = null
+  private var pixmap: Pixmap? = null
+
+  private val validator = object : FormInputValidator("Invalid width/height for given layout") {
+    override fun validate(input: String?): Boolean {
+      val valid =
+        layoutSpinner.value?.gridLayoutStrategy?.checkParameters(widthSpinner.value, heightSpinner.value)
+          ?: true
+
+      for (disableable in disableables) {
+        disableable.isDisabled = !valid
+      }
+
+      return valid
+    }
+  }
 
   init {
     if (Hex.debug) {
@@ -70,30 +97,8 @@ object LevelCreationScreen : StageScreen() {
 
     rootTable {
 
-      val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
-
       // arbitrary initial value
-      val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
-      val heightSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
-      val seedField = VisTextField(Random.nextLong().toString())
 
-      var previewBuffer: FrameBuffer? = null
-      val previewBufferNoise: FrameBuffer? = null
-      var pixmap: Pixmap? = null
-
-      fun createIsland(): Island {
-        return IslandGeneration.generate(
-          seedField.text.hashCode(),
-          widthSpinner.value + 2,
-          heightSpinner.value + 2,
-          layoutSpinner.current
-        )
-      }
-
-      val previewSize = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
-
-      val previewImage: VisImage
-      var previewImageNoise: VisImage? = null
       visTable { table ->
         table.fill()
         table.expand()
@@ -112,86 +117,6 @@ object LevelCreationScreen : StageScreen() {
         }
       }
 
-      val disableables = mutableListOf<Disableable>()
-
-      val validator =
-        object : FormInputValidator("Invalid width/height for given layout") {
-          override fun validate(input: String?): Boolean {
-            val valid =
-              layoutSpinner.current?.gridLayoutStrategy?.checkParameters(widthSpinner.value, heightSpinner.value)
-                ?: true
-
-            for (disableable in disableables) {
-              disableable.isDisabled = !valid
-            }
-
-            return valid
-          }
-        }
-
-      fun renderPreview() {
-        previewBuffer?.dispose()
-
-        validator.validateInput(null)
-
-        widthSpinner.setValue(widthSpinner.value, false)
-        heightSpinner.setValue(heightSpinner.value, false)
-        layoutSpinner.setCurrent(layoutSpinner.current, false)
-
-        if (layoutSpinner.current.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
-          // force update to imageWidth and imageHeight to make sure we have the correct size
-          this@rootTable.pack()
-
-          previewBuffer = LevelSelectScreen.renderPreview(
-            createIsland(),
-            previewImage.imageWidth.toInt(),
-            previewImage.imageHeight.toInt()
-          ).also {
-            val region = TextureRegion(it.colorBufferTexture)
-            region.flip(false, true)
-            previewImage.drawable = TextureRegionDrawable(region)
-          }
-        }
-
-        if (Hex.args.`stage-debug`) {
-          previewBufferNoise?.dispose()
-          val size = widthSpinner.value
-
-          if (pixmap == null) {
-            pixmap = Pixmap(size * 2, size * 2, RGB565).also {
-              it.blending = None
-              it.filter = NearestNeighbour
-            }
-          }
-          @Suppress("NAME_SHADOWING")
-          val pixmap = pixmap ?: return
-
-          for (x in -size until size) {
-            for (y in -size until size) {
-              val noise =
-                IslandGeneration.noiseAt(x.toFloat(), y.toFloat(), widthSpinner.value + 2, heightSpinner.value + 2)
-              val color = if (noise <= 1) BLACK else WHITE
-              pixmap.drawPixel(size + x, size + y, color.toIntBits())
-            }
-          }
-
-          val buffer = FrameBuffer(RGBA8888, NOISE_SIZE, NOISE_SIZE, false)
-          buffer.begin()
-          Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-          val a = Texture(pixmap).also {
-            it.setFilter(Nearest, Nearest)
-          }
-
-          batch.begin()
-          batch.draw(a, 0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
-          batch.end()
-
-          buffer.end()
-          previewImageNoise!!.drawable = TextureRegionDrawable(buffer.colorBufferTexture)
-        }
-      }
-
       row()
 
       var oldWidth = widthSpinner.value
@@ -199,9 +124,9 @@ object LevelCreationScreen : StageScreen() {
 
       fun syncValue(changed: IntSpinnerModel, other: IntSpinnerModel, oldValue: Int) {
         val currentValue = changed.value
-        if (layoutSpinner.current == TRIANGULAR) {
+        if (layoutSpinner.value == TRIANGULAR) {
           other.setValue(currentValue, false)
-        } else if (layoutSpinner.current == HEXAGONAL) {
+        } else if (layoutSpinner.value == HEXAGONAL) {
           val delta = (currentValue - oldValue).coerceIn(-1, 1)
           val newValue = currentValue + (1 - (currentValue % 2)) * delta
           changed.setValue(newValue, false)
@@ -231,17 +156,14 @@ object LevelCreationScreen : StageScreen() {
             renderPreview()
           }
         }
-        spinner =
-          spinner("Layout", layoutSpinner) {
-            val minWidth =
-              Hex.assets.fontSize *
-                HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
-            cells.get(1)?.minWidth(minWidth)
-            textField.addValidator(validator)
-            onChange { renderPreview() }
-
-//              layoutSpinner.current = HEXAGONAL
-          }
+        spinner = spinner("Layout", layoutSpinner) {
+          val minWidth =
+            Hex.assets.fontSize *
+              HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
+          cells.get(1)?.minWidth(minWidth)
+          textField.addValidator(validator)
+          onChange { renderPreview() }
+        }
       }
 
       row()
@@ -270,6 +192,15 @@ object LevelCreationScreen : StageScreen() {
           SimpleFloatSpinnerModel(IslandGeneration.offset, -1000f, 1000f, .1f, 2).also {
             onChange {
               IslandGeneration.offset = it.value
+              renderPreview()
+            }
+          }
+        )
+        spinner(
+          "Tree chance",
+          SimpleFloatSpinnerModel(IslandGeneration.treeChance, 0f, 1f, .01f, 3).also {
+            onChange {
+              IslandGeneration.treeChance = it.value
               renderPreview()
             }
           }
@@ -328,12 +259,12 @@ object LevelCreationScreen : StageScreen() {
       row()
 
       fun layoutExplanation(): String =
-        when (layoutSpinner.current) {
+        when (layoutSpinner.value) {
           RECTANGULAR -> "A rectangular layout has no special rules."
           HEXAGONAL -> "The hexagonal layout must have equal width and height and it must be odd."
           TRAPEZOID -> "A trapezoid layout has no special rules."
           TRIANGULAR -> "A triangular layout must have equal width and height."
-          else -> "Invalid layout: ${layoutSpinner.current}"
+          else -> "Invalid layout: ${layoutSpinner.value}"
         }
 
       visLabel(layoutExplanation()) { spinner.onChange { setText(layoutExplanation()) } }
@@ -351,7 +282,7 @@ object LevelCreationScreen : StageScreen() {
               val nextId = IslandFiles.nextIslandId
               Gdx.app.debug(
                 "CREATOR",
-                "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.current}"
+                "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value}"
               )
               play(nextId, createIsland())
             }
@@ -370,6 +301,17 @@ object LevelCreationScreen : StageScreen() {
     }
   }
 
+  override fun recreate(): AbstractScreen {
+    return LevelCreationScreen().also {
+      it.layoutSpinner.value = layoutSpinner.value
+      it.widthSpinner.value = widthSpinner.value
+      it.heightSpinner.value = heightSpinner.value
+      it.seedField.text = seedField.text
+      validator.validateInput(null)
+      renderPreview()
+    }
+  }
+
   override fun render(delta: Float) {
     stage.act(delta)
     stage.draw()
@@ -383,16 +325,93 @@ object LevelCreationScreen : StageScreen() {
     }
   }
 
-  override fun resize(width: Int, height: Int) {
-    super.resize(width, height)
-    val visTable = stage.actors.first() as VisTable
-    val spinner = visTable.findActor<Spinner>(WIDTH_SPINNER_NAME)
-
-    spinner.notifyValueChanged(true)
-    visTable.pack()
+  private fun createIsland(): Island {
+    return IslandGeneration.generate(
+      seedField.text.hashCode(),
+      widthSpinner.value + 2,
+      heightSpinner.value + 2,
+      layoutSpinner.value
+    )
   }
 
-  override fun hide() = Unit
+  private fun renderPreview() {
+    previewBuffer?.dispose()
 
-  private const val WIDTH_SPINNER_NAME = "width"
+    validator.validateInput(null)
+
+    widthSpinner.setValue(widthSpinner.value, false)
+    heightSpinner.setValue(heightSpinner.value, false)
+    layoutSpinner.setCurrent(layoutSpinner.value, false)
+
+    if (layoutSpinner.value.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
+      // force update to imageWidth and imageHeight to make sure we have the correct size
+      rootTable.pack()
+
+      previewBuffer = LevelSelectScreen.renderPreview(
+        createIsland(),
+        previewImage.imageWidth.toInt(),
+        previewImage.imageHeight.toInt()
+      ).also {
+        val region = TextureRegion(it.colorBufferTexture)
+        region.flip(false, true)
+        previewImage.drawable = TextureRegionDrawable(region)
+      }
+    }
+
+    if (Hex.args.`stage-debug`) {
+      previewBufferNoise?.dispose()
+      val size = widthSpinner.value
+
+      if (pixmap == null) {
+        pixmap = Pixmap(size * 2, size * 2, RGB565).also {
+          it.blending = None
+          it.filter = NearestNeighbour
+        }
+      }
+      val pixmap = pixmap ?: return
+
+      for (x in -size until size) {
+        for (y in -size until size) {
+          val noise =
+            IslandGeneration.noiseAt(x.toFloat(), y.toFloat(), widthSpinner.value + 2, heightSpinner.value + 2)
+          val color = if (noise <= 1) BLACK else WHITE
+          pixmap.drawPixel(size + x, size + y, color.toIntBits())
+        }
+      }
+
+      val buffer = FrameBuffer(RGBA8888, NOISE_SIZE, NOISE_SIZE, false)
+      buffer.begin()
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+      val a = Texture(pixmap).also {
+        it.setFilter(Nearest, Nearest)
+      }
+
+      batch.begin()
+      batch.draw(a, 0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
+      batch.end()
+
+      buffer.end()
+      previewImageNoise?.drawable = TextureRegionDrawable(buffer.colorBufferTexture)
+    }
+  }
+
+  override fun dispose() {
+    super.dispose()
+    pixmap.disposeSafely()
+    previewBufferNoise.disposeSafely()
+    previewBuffer.disposeSafely()
+  }
+
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    renderPreview()
+    rootTable.pack()
+  }
+
+  companion object {
+    private const val NOISE_SIZE = 512
+    private const val NOISE_SIZE_F = NOISE_SIZE.toFloat()
+    private const val WIDTH_SPINNER_NAME = "width"
+  }
 }
