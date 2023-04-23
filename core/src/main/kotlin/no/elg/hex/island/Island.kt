@@ -42,7 +42,6 @@ import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.ensureCapitalStartFunds
-import no.elg.hex.util.getAllTerritories
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -89,13 +88,13 @@ class Island(
 
   val history = IslandHistory(this)
 
-  /** Prefer this over calling [grid.hexagons] as this has better performance */
-  val hexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
-
   /**
-   * Number of visible hexagons on this island. Should not be used while in map editor mode as it is only counted once
+   * Prefer this over calling [grid.hexagons] as this has better performance.
+   *
+   * During normal play it will only contain the visible hexagons but when [ApplicationArgumentsParser.mapEditor] is true this will contain all hexagons
    */
-  private val visibleHexagons by lazy { hexagons.count { !getData(it).invisible } }
+  val allHexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
+  val visibleHexagons: MutableSet<Hexagon<HexagonData>> get() = allHexagons.filterNotTo(mutableSetOf()) { getData(it).invisible }
 
   var hand: Hand? = null
     set(value) {
@@ -171,7 +170,6 @@ class Island(
       countHexagons(hexagonsPerTeam)
     }
 
-    recountTotalTreasury()
     currentTeam = team
 
     if (initialLoad) {
@@ -203,19 +201,6 @@ class Island(
 
   val hexagonsPerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countHexagons(this) } }
   val winningTeam: Team get() = hexagonsPerTeam.maxBy { it.value }.key
-
-  val totalBalancePerTeam: ObjectIntMap<Team> = ObjectIntMap<Team>(Team.values().size)
-    get() {
-      synchronized(SYNC) {
-        return field
-      }
-    }
-  val totalIncomePerTeam: ObjectIntMap<Team> = ObjectIntMap<Team>(Team.values().size)
-    get() {
-      synchronized(SYNC) {
-        return field
-      }
-    }
 
   private val initialState: IslandDto
 
@@ -263,20 +248,6 @@ class Island(
   // ////////// //
   //  Gameplay  //
   // ////////// //
-
-  /**
-   * SLOW!
-   */
-  internal fun recountTotalTreasury() {
-    synchronized(SYNC) {
-      totalIncomePerTeam.clear(Team.values().size)
-      totalBalancePerTeam.clear(Team.values().size)
-      for ((team, territory) in getAllTerritories()) {
-        totalIncomePerTeam.getAndIncrement(team, 0, territory.sumOf { it.income })
-        totalBalancePerTeam.getAndIncrement(team, 0, territory.sumOf { it.capital.balance })
-      }
-    }
-  }
 
   private fun countHexagons(counter: ObjectIntMap<Team>) {
     counter.clear(Team.values().size)
