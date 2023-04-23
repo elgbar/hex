@@ -37,6 +37,11 @@ object IslandGeneration {
    */
   var offset = 0.4f
 
+  /**
+   * A value in the range 0 <= treeChance <= 1 of how likely there is to be a tree
+   */
+  var treeChance = 0.1f
+
   init {
     noise.setNoiseType(OPEN_SIMPLEX_2_S)
     noise.setFractalType(FBM)
@@ -71,8 +76,9 @@ object IslandGeneration {
         Gdx.app.trace("ISGEN"){"${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise"}
         if (noise <= 1) {
           data.team = teams.random(random)
-      } else {
-        data.isOpaque = true
+          if (noise <= treeChance) {
+            replaceWithTree(island, hexagon)
+          }
         } else {
           data.isDisabled = true
         }
