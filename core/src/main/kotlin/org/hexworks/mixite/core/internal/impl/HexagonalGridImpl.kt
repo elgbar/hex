@@ -9,13 +9,14 @@ import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.Point
 import org.hexworks.mixite.core.api.contract.HexagonDataStorage
 import org.hexworks.mixite.core.api.contract.SatelliteData
+import org.hexworks.mixite.core.api.defaults.DefaultHexagonDataStorage
 import org.hexworks.mixite.core.internal.GridData
 import kotlin.math.abs
 
 class HexagonalGridImpl<T : SatelliteData>(builder: HexagonalGridBuilder<T>) : HexagonalGrid<T> {
 
   override val gridData: GridData = builder.gridData
-  private val hexagonDataStorage: HexagonDataStorage<T> = builder.getHexagonDataStorage()
+  private val hexagonDataStorage: DefaultHexagonDataStorage<T> = builder.getHexagonDataStorage()
 
   override val hexagons: Iterable<Hexagon<T>>
     get() {

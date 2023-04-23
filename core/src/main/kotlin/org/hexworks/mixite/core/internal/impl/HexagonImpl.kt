@@ -8,6 +8,7 @@ import org.hexworks.mixite.core.api.Point
 import org.hexworks.mixite.core.api.Rectangle
 import org.hexworks.mixite.core.api.contract.HexagonDataStorage
 import org.hexworks.mixite.core.api.contract.SatelliteData
+import org.hexworks.mixite.core.api.defaults.DefaultHexagonDataStorage
 import org.hexworks.mixite.core.internal.GridData
 import kotlin.math.PI
 import kotlin.math.cos
@@ -19,7 +20,7 @@ import kotlin.math.sin
 class HexagonImpl<T : SatelliteData> internal constructor(
   private val sharedData: GridData,
   override val cubeCoordinate: CubeCoordinate,
-  private val hexagonDataStorage: HexagonDataStorage<T>
+  private val hexagonDataStorage: DefaultHexagonDataStorage<T>
 ) : Hexagon<T> {
 
   override val vertices: List<Double>

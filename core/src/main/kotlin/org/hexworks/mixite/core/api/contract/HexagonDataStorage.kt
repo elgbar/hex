@@ -8,48 +8,50 @@ import org.hexworks.mixite.core.api.CubeCoordinate
  * [HexagonalGrid].
  * @param <T> the type of the stored [SatelliteData] implementation
  */
-interface HexagonDataStorage<T : SatelliteData> {
+interface HexagonDataStorage<K, T : SatelliteData> {
 
   /**
    * Returns all coordinates which are stored in this object.
    */
-  val coordinates: Iterable<CubeCoordinate>
+  val coordinates: Iterable<K>
 
   /**
-   * Adds a [CubeCoordinate] for this grid without any [SatelliteData].
+   * Adds a [K] for this grid without any [SatelliteData].
    * Does not overwrite the coordinate if it is already present.
    */
-  fun addCoordinate(cubeCoordinate: CubeCoordinate)
+  fun addCoordinate(cubeCoordinate: K)
 
   /**
-   * Adds a [CubeCoordinate] for this grid with [SatelliteData].
+   * Adds a [K] for this grid with [SatelliteData].
    * Overwrites previous [SatelliteData] if it was present.
    * @return true if overwrote data false otherwise.
    */
-  fun addCoordinate(cubeCoordinate: CubeCoordinate, satelliteData: T): Boolean
+  fun addCoordinate(cubeCoordinate: K, satelliteData: T): Boolean
 
   /**
-   * Gets the [SatelliteData] stored on a [CubeCoordinate] if present.
+   * Gets the [SatelliteData] stored on a [K] if present.
    * Also returns empty [Maybe] when `cubeCoordinate` is not present.
    * @return optional [SatelliteData].
+   *
+   * TODO replace return type with T?
    */
-  fun getSatelliteDataBy(cubeCoordinate: CubeCoordinate): Maybe<T>
+  fun getSatelliteDataBy(cubeCoordinate: K): Maybe<T>
 
   /**
-   * Tells whether there is a [Hexagon] on the given [CubeCoordinate] or not.
+   * Tells whether there is a [Hexagon] on the given [K] or not.
    * @return true if present false if not
    */
-  fun containsCoordinate(cubeCoordinate: CubeCoordinate): Boolean
+  fun containsCoordinate(cubeCoordinate: K): Boolean
 
   /**
-   * Tells whether there is [SatelliteData] stored for a [CubeCoordinate] or not.
+   * Tells whether there is [SatelliteData] stored for a [K] or not.
    * Also returns false if `cubeCoordinate` is not present in the storage.
    */
-  fun hasDataFor(cubeCoordinate: CubeCoordinate): Boolean
+  fun hasDataFor(cubeCoordinate: K): Boolean
 
   /**
-   * Clears the [SatelliteData] for the given [CubeCoordinate].
+   * Clears the [SatelliteData] for the given [K].
    * @return true if the storage was changed false otherwise.
    */
-  fun clearDataFor(cubeCoordinate: CubeCoordinate): Boolean
+  fun clearDataFor(cubeCoordinate: K): Boolean
 }

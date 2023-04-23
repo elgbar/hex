@@ -5,7 +5,7 @@ import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.contract.HexagonDataStorage
 import org.hexworks.mixite.core.api.contract.SatelliteData
 
-class DefaultHexagonDataStorage<T : SatelliteData> : HexagonDataStorage<T> {
+class DefaultHexagonDataStorage<T : SatelliteData> : HexagonDataStorage<CubeCoordinate, T> {
 
   private val storage = LinkedHashMap<CubeCoordinate, Maybe<T>>()
 

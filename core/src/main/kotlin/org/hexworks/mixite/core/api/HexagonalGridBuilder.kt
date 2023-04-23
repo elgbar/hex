@@ -26,7 +26,7 @@ class HexagonalGridBuilder<T : SatelliteData> {
   private var gridWidth: Int = 0
   private var gridHeight: Int = 0
   private var radius: Double = 0.toDouble()
-  private val hexagonDataStorage: HexagonDataStorage<T> = DefaultHexagonDataStorage()
+  private val hexagonDataStorage: DefaultHexagonDataStorage<T> = DefaultHexagonDataStorage()
   private var orientation = POINTY_TOP
   private var gridLayout: GridLayoutStrategy = RectangularGridLayoutStrategy()
 
@@ -131,7 +131,7 @@ class HexagonalGridBuilder<T : SatelliteData> {
     this.orientation = orientation
   }
 
-  fun getHexagonDataStorage(): HexagonDataStorage<T> {
+  fun getHexagonDataStorage(): DefaultHexagonDataStorage<T> {
     return hexagonDataStorage
   }
 
