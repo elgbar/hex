@@ -242,7 +242,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
                 for (islandland in islands) {
                   if (islandland === maxIsland) continue
                   for (hexagon in islandland) {
-                    island.getData(hexagon).isOpaque = true
+                    island.getData(hexagon).isDisabled = true
                   }
                 }
               }

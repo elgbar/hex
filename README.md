@@ -99,10 +99,17 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 * Rank how difficult islands are to beat
 * Add a proper tutorial, nobody likes to read
 * Color-grade the border of attackable hexagons according to how beneficial it is to attack it
+* Reimplement `DefaultHexagonDataStorage` to use `IntMap` and where the key is a compacted key
 
 #### Known bugs
 
 * Lag when un/redoing after a long game
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
+  * The reason for the lag is when there are a large amount of actions done there are lots of data
+  * Ideas to mitigate this issue
+    * Shrink the size of the island by
+      * Maybe non-visble hexagons can be shrunk in size?
+      * Re-encode the islands to fit in smaller island sizes
+    * Make the history contain a delta not the who
 * Sometimes the text is rendering upside-down
   * Can be replicated on desktop by loading an island then minimizing the window

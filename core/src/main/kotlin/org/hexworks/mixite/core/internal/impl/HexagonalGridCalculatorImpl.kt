@@ -94,7 +94,7 @@ class HexagonalGridCalculatorImpl<T : SatelliteData>(override val hexagonalGrid:
       if (pathHexagon.equals(from) || pathHexagon.equals(to)) {
         continue
       }
-      if (pathHexagon.satelliteData.isPresent && pathHexagon.satelliteData.get().isOpaque) {
+      if (pathHexagon.satelliteData.isPresent && pathHexagon.satelliteData.get().isDisabled) {
         return false
       }
     }

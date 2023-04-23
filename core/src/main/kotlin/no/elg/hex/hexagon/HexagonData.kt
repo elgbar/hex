@@ -1,6 +1,7 @@
 package no.elg.hex.hexagon
 
 import com.badlogic.gdx.graphics.Color
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -16,8 +17,9 @@ import no.elg.hex.event.HexagonChangedPieceEvent
 import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
+import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
-import org.hexworks.mixite.core.api.defaults.DefaultSatelliteData
+import org.hexworks.mixite.core.api.contract.SatelliteData
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -25,7 +27,7 @@ import kotlin.reflect.KClass
 
 @JsonInclude(NON_DEFAULT)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
-@JsonIgnoreProperties("id")
+@JsonIgnoreProperties("id", "isPassable")
 class HexagonData(
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works
@@ -37,10 +39,11 @@ class HexagonData(
    * @see no.elg.hex.renderer.VerticesRenderer
    */
   val edge: Boolean = false,
-  override var isOpaque: Boolean = edge,
-  override var isPassable: Boolean = !edge,
-  team: Team = if (edge || !Hex.args.mapEditor) Team.SUN else Team.values().random()
-) : DefaultSatelliteData() {
+  team: Team = if (edge || Hex.args.mapEditor) Team.SUN else Team.values().random()
+) : SatelliteData {
+
+  @JsonAlias("isOpaque")
+  override var isDisabled: Boolean = edge
 
   @JsonInclude(ALWAYS)
   var team: Team = team
@@ -100,7 +103,7 @@ class HexagonData(
 
   @get:JsonIgnore
   val invisible: Boolean
-    get() = edge || isOpaque
+    get() = edge || isDisabled
 
   // /////////////////
   // serialization //
@@ -120,7 +123,8 @@ class HexagonData(
 
   fun copy(): HexagonData {
     if (edge) return this
-    return HexagonData(false, isOpaque, isPassable, team).also {
+    return HexagonData(false, team).also {
+      it.isDisabled = isDisabled
       it.piece = piece.copyTo(it)
     }
   }

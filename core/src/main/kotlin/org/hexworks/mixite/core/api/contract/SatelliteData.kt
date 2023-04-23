@@ -8,36 +8,7 @@ package org.hexworks.mixite.core.api.contract
 interface SatelliteData {
 
   /**
-   * Tells whether the Hexagon can be passed over when moving around the map or not.
-   *
-   * @return is passable?
+   * @return wether this hexagon should be interacted with in the map
    */
-  /**
-   * Sets whether the Hexagon is passable or not.
-   *
-   * @param passable passable?
-   */
-  var isPassable: Boolean
-
-  /**
-   * @return true if the [Hexagon] can bee seen through, false otherwise.
-   */
-  /**
-   * Set whether the [Hexagon] can be seen through.
-   *
-   * @param opaque is opaque?
-   */
-  var isOpaque: Boolean
-
-  /**
-   * Returns the movement cost when moving over the Hexagon.
-   *
-   * @return movement cost
-   */
-  /**
-   * Sets the movement cost.
-   *
-   * @param movementCost movement cost
-   */
-  var movementCost: Double
+  var isDisabled: Boolean
 }
