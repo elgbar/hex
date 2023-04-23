@@ -12,8 +12,6 @@ data class SmoothTransition(
   val transitionDurationSeconds: Float = .25f
 ) {
 
-//  val xTarget = Interpolation.sineOut.apply(xTarget, zoomTarget, 0.5f)
-
   private var timeToTarget = transitionDurationSeconds
 
   private val camera get() = screen.camera
