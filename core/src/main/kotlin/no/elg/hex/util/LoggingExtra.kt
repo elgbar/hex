@@ -22,7 +22,7 @@ fun logLevelToName(level: Int): String {
 }
 
 fun ApplicationLogger.trace(tag: String, message: String) {
-  debug(tag, message)
+  debug("TRACE | $tag", message)
 }
 
 fun ApplicationLogger.trace(tag: String, message: String, exception: Throwable) {
