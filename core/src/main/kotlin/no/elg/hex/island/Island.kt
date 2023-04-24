@@ -200,6 +200,8 @@ class Island(
           if (it is LivingPiece) it.moved = false
         }
       )
+    } else if (handPiece != null || territory != null) {
+      Gdx.app.error("restoreState", "Either handPiece: $handPiece or territory: $territory was null. Expected either both or none of them to be null")
     }
   }
 
@@ -241,7 +243,7 @@ class Island(
   private var aiJob: Job? = null
 
   init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, !Hex.args.mapEditor, startTeam)
+    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
@@ -669,8 +671,8 @@ class Island(
       return this?.let { it.copyTo(it.data.copy()) }
     }
 
-    internal fun Hand?.createDtoPieceCopy(): Piece? {
-      return this?.piece?.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
+    internal fun Hand.createDtoPieceCopy(): Piece {
+      return this.piece.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
     }
 
     fun deserialize(json: String): Island = Hex.mapper.readValue(json)
@@ -683,19 +685,24 @@ class Island(
 
   @JsonValue
   internal fun createDto(): IslandDto {
-    // prefer coordinates of held piece if nothing is held select any hexagon within the selected territory
-    val coord: CubeCoordinate? =
-      hand?.piece?.data?.let { data ->
+    val (handCoord: CubeCoordinate?, handPiece: Piece?) = hand?.let { hand ->
+      val heldPieceHexagon = hand.piece.data.let { data ->
         // slight edge case (pun intended) if we hold a piece that is a hand instance, do not record its coordinates
-        if (data.edge) null else visibleHexagons.find { hex -> getData(hex) === data }
-      }?.cubeCoordinate
+        if (data.edge) null else visibleHexagons.find { hex -> getData(hex) == data }
+      }
+
+      // prefer coordinates of held piece if nothing is held select any hexagon within the selected territory
+      val territoryHex = heldPieceHexagon ?: hand.territory.hexagons.first()
+
+      (territoryHex.cubeCoordinate to hand.createDtoPieceCopy())
+    } ?: (null to null)
 
     return IslandDto(
       grid.gridData.gridWidth,
       grid.gridData.gridHeight,
       grid.gridData.gridLayout.toEnumValue(),
-      coord,
-      hand?.createDtoPieceCopy(),
+      handCoord,
+      handPiece,
       visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
       round,
       false,
