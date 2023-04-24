@@ -40,6 +40,8 @@ fun saveIsland(id: Int, island: Island): Boolean {
     publishError("Island failed validation")
     return false
   }
+  island.ensureCapitalStartFunds()
+
   val file = getIslandFile(id, allowInternal = false)
 
   val existed = file.exists()

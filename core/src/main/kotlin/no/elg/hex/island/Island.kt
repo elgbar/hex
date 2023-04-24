@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.ObjectIntMap
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.CancellationException
@@ -41,7 +42,6 @@ import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
-import no.elg.hex.util.ensureCapitalStartFunds
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -63,6 +63,7 @@ import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 /** @author Elg */
+@JsonIgnoreProperties("initialLoad")
 class Island(
   width: Int,
   height: Int,
@@ -73,7 +74,6 @@ class Island(
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   @JsonAlias("turn")
   round: Int = 1,
-  initialLoad: Boolean = true,
   @JsonAlias("team")
   private val startTeam: Team = Settings.startTeam,
   var authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
@@ -130,7 +130,6 @@ class Island(
       dto.selectedCoordinate,
       dto.handPiece,
       dto.hexagonData,
-      false,
       dto.team
     )
   }
@@ -142,7 +141,6 @@ class Island(
     selectedCoordinate: CubeCoordinate? = null,
     handPiece: Piece? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
-    initialLoad: Boolean,
     team: Team
   ) {
     val builder =
@@ -179,10 +177,6 @@ class Island(
     }
 
     currentTeam = team
-
-    if (initialLoad) {
-      ensureCapitalStartFunds()
-    }
 
     val selectedHex = grid.getByCubeCoordinate(selectedCoordinate)
     select(selectedHex)
@@ -664,8 +658,6 @@ class Island(
 
     const val NO_ENEMY_HEXAGONS = -1
     const val UNKNOWN_ROUNDS_TO_BEAT = -1
-
-    private val SYNC = Any()
 
     internal fun Piece?.createDtoCopy(): Piece? {
       return this?.let { it.copyTo(it.data.copy()) }
