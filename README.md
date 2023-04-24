@@ -107,6 +107,7 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 
 #### Known bugs
 
+* Map editor preview not rendered properly
 * Lag when un/redoing after a long game
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
   * The reason for the lag is when there are a large amount of actions done there are lots of data
