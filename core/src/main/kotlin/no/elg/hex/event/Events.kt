@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Array
 import kotlinx.coroutines.runBlocking
 import ktx.async.onRenderingThread
-import no.elg.hex.util.debug
+import no.elg.hex.util.trace
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 
@@ -34,8 +34,8 @@ object Events {
   inline fun <reified T : Event> fireEvent(event: T) {
     val listeners: Array<(T) -> Unit> = getEventList(T::class)
 
+    Gdx.app.trace("Event") { "Firing event $event" }
     if (listeners.isEmpty) return
-    Gdx.app.debug("Event") { "Firing event $event" }
 
     runBlocking {
       onRenderingThread {

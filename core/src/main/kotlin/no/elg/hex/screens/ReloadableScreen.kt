@@ -11,5 +11,4 @@ interface ReloadableScreen : Screen {
    * Recreate this screen after a reload
    */
   fun recreate(): AbstractScreen
-
 }

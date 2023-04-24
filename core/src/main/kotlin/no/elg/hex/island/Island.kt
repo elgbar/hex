@@ -88,7 +88,6 @@ class Island(
 
   val history = IslandHistory(this)
 
-
   /**
    * Prefer this over calling [grid.hexagons] as this has better performance.
    *
@@ -167,7 +166,7 @@ class Island(
       require(data.piece == Empty || data == data.piece.data) {
         "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
       }
-      if(data.visible){
+      if (data.visible) {
         internalVisibleHexagons += hexagon
       }
     }

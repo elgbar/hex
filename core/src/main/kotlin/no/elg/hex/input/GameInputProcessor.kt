@@ -354,7 +354,6 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       super.tap(x, y, count, button)
     }
 
-
   companion object {
     fun keycodeToPiece(keycode: Int): Piece? {
       return when (keycode) {

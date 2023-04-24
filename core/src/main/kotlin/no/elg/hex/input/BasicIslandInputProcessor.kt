@@ -17,7 +17,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
-
 /**
  * Handles input event related to the camera and other basic functiuons such as what
  *
@@ -65,7 +64,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable && pointer == 0) {
-
       val zoom = screen.camera.zoom
       val dx = -Gdx.input.deltaX * zoom
       val dy = -Gdx.input.deltaY * zoom
@@ -96,7 +94,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   private fun getTargetZoom(amount: Float): Float? {
-
     val zoom = amount * (screen.camera.zoom / 3f).coerceAtMost(1f) + screen.camera.zoom
     if (zoom.isNaN()) {
       Gdx.app.error("Island Zoom", "Tried to update zoom to NaN!")

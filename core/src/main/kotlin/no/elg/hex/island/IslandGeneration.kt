@@ -60,7 +60,7 @@ object IslandGeneration {
   }
 
   fun generate(seed: Int, width: Int, height: Int, layout: HexagonalGridLayout): Island {
-    Gdx.app.info("ISGEN"){"Generating an island $layout of size $width x $height using seed $seed"}
+    Gdx.app.info("ISGEN") { "Generating an island $layout of size $width x $height using seed $seed" }
     val island: Island
     reportTiming("generate island") {
       noise.setSeed(seed)
@@ -73,7 +73,7 @@ object IslandGeneration {
         data.setPiece<Empty>()
         if (data.edge) continue
         val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
-        Gdx.app.trace("ISGEN"){"${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise"}
+        Gdx.app.trace("ISGEN") { "${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise" }
         if (noise <= 1) {
           data.team = teams.random(random)
           if (noise <= treeChance) {

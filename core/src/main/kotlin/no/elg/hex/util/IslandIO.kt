@@ -35,7 +35,7 @@ fun play(id: Int, island: Island? = null): Boolean {
   return SplashIslandScreen(id, island).loadable
 }
 
-fun saveIsland(id: Int, island: Island): Boolean {
+fun saveInitialIsland(id: Int, island: Island): Boolean {
   if (!island.validate()) {
     publishError("Island failed validation")
     return false

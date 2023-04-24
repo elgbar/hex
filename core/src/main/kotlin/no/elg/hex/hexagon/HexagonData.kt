@@ -120,7 +120,6 @@ class HexagonData(
   val visible: Boolean
     get() = !invisible
 
-
   // /////////////////
   // serialization //
   // /////////////////
@@ -140,7 +139,7 @@ class HexagonData(
   fun copy(): HexagonData {
     if (edge) return this
     return HexagonData(isDisabled, team).also {
-      @Suppress("DEPRECATION") //OK to set directly when we
+      @Suppress("DEPRECATION") // OK to set directly when we
       it.piece = piece.copyTo(it)
     }
   }

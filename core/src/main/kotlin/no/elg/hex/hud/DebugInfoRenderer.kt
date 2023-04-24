@@ -121,7 +121,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     listener.disposeSafely()
   }
 
-  companion object{
+  companion object {
     val END_PARENTHESIS = StaticScreenText(")")
   }
 }

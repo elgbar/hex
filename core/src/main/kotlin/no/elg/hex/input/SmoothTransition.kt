@@ -29,7 +29,7 @@ data class SmoothTransition(
 
       val progress: Float = if (timeToTarget < 0) 1f else 1f - timeToTarget / transitionDurationSeconds
       camera.zoom = Interpolation.smooth.apply(cameraZoomOrigin, zoomTarget, progress)
-      if(xTarget != null && yTarget != null) {
+      if (xTarget != null && yTarget != null) {
         camera.position.x = Interpolation.smooth.apply(xPositionOrigin, xTarget, progress)
         camera.position.y = Interpolation.smooth.apply(yPositionOrigin, yTarget, progress)
       }

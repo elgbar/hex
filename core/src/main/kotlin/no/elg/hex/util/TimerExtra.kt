@@ -15,7 +15,6 @@ fun schedule(delaySeconds: Float, task: () -> Unit) {
   Timer.schedule(realTask, delaySeconds)
 }
 
-
 /**
  * Executes the given [block] and returns elapsed time in milliseconds.
  *

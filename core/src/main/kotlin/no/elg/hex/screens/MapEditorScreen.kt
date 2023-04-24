@@ -46,7 +46,7 @@ import no.elg.hex.util.play
 import no.elg.hex.util.previous
 import no.elg.hex.util.previousOrNull
 import no.elg.hex.util.regenerateCapitals
-import no.elg.hex.util.saveIsland
+import no.elg.hex.util.saveInitialIsland
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
 import no.elg.hex.util.toggleShown
@@ -113,7 +113,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
               ButtonBar.ButtonType.YES,
               scene2d.visTextButton("Yes") {
                 onClick {
-                  if (saveIsland(id, island)) {
+                  if (saveInitialIsland(id, island)) {
                     Hex.screen = LevelSelectScreen
                   } else {
                     this@visWindow.fadeOut()
@@ -199,7 +199,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
           menu("Island") {
             menuItem("Save") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.S) {
-                saveIsland(id, island)
+                saveInitialIsland(id, island)
               }
             }
             menuItem("Reload") {
