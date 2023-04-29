@@ -2,6 +2,7 @@ package no.elg.hex.util.delegate
 
 import com.badlogic.gdx.audio.Sound
 import no.elg.hex.Hex
+import no.elg.hex.util.fetch
 import kotlin.reflect.KProperty
 
 /**
@@ -20,7 +21,7 @@ class SoundAlternativeDelegate(private val filePath: String, private val alterna
       if (!::alternativeSounds.isInitialized) {
         alternativeSounds = mutableListOf()
         for (i in alternatives) {
-          alternativeSounds.add(Hex.assets.get(filePath.format(i)))
+          alternativeSounds.add(Hex.assets.fetch(filePath.format(i)))
         }
         require(alternativeSounds.isNotEmpty()) { "Failed to load any sounds of $filePath. Expected ${alternatives.count()} alternatives" }
       }
