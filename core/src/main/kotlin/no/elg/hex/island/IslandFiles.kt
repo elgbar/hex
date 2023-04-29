@@ -5,6 +5,7 @@ import ktx.assets.load
 import no.elg.hex.Hex
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.isLoaded
 import no.elg.hex.util.trace
 
 object IslandFiles {
@@ -19,10 +20,6 @@ object IslandFiles {
    * Islands in order
    */
   val islandIds = ArrayList<Int>()
-
-  init {
-    fullFilesSearch()
-  }
 
   val nextIslandId: Int
     get() {
@@ -49,7 +46,7 @@ object IslandFiles {
         Gdx.app.trace(TAG, "Found island $fileName")
         nonExistentFilesInRow = 0
 
-        if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded(fileName, Island::class.java)) {
+        if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded<Island>(fileName)) {
           Hex.assets.load<Island>(fileName)
         }
         islandIds += slot

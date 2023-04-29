@@ -1,8 +1,8 @@
 package no.elg.hex.util.delegate
 
 import com.badlogic.gdx.audio.Sound
-import no.elg.hex.Assets
 import no.elg.hex.Hex
+import no.elg.hex.util.fetch
 import kotlin.reflect.KProperty
 
 /**
@@ -15,7 +15,7 @@ class SoundDelegate(private val filePath: String) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): Sound? {
     return if (Hex.assets.audioLoaded(false)) {
       if (!::sound.isInitialized) {
-        sound = Hex.assets.get(filePath, Assets.SOUND)
+        sound = Hex.assets.fetch(filePath)
       }
       sound
     } else {

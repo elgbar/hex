@@ -6,16 +6,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP_PINGPONG
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
@@ -26,6 +23,8 @@ import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
 import kotlinx.coroutines.launch
+import ktx.assets.load
+import ktx.assets.setLoader
 import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 import ktx.style.imageTextButton
@@ -49,6 +48,8 @@ import no.elg.hex.util.debug
 import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
+import no.elg.hex.util.fetch
+import no.elg.hex.util.isLoaded
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -70,13 +71,6 @@ class Assets : AssetManager() {
   var version: String? = null
 
   companion object {
-
-    private val TEXTURE_ATLAS = TextureAtlas::class.java
-    private val MUSIC = Music::class.java
-    val SOUND = Sound::class.java
-    private val PNG = PixmapIO.PNG::class.java
-    private val BITMAP_FONT = BitmapFont::class.java
-    private val FREE_TYPE_FONT_GEN = FreeTypeFontGenerator::class.java
 
     private val MIN_ISLAND =
       """{"width":3,"height":3,"layout":"HEXAGONAL","hexagonData":{
@@ -130,13 +124,13 @@ class Assets : AssetManager() {
     }
   }
 
-  val regularFont: BitmapFont by lazy { if (isLoaded(REGULAR_FONT)) get(REGULAR_FONT) else FALLBACK_FONT }
-  val regularItalicFont: BitmapFont by lazy { get(REGULAR_ITALIC_FONT) }
-  val boldFont: BitmapFont by lazy { get(BOLD_FONT) }
-  val boldItalicFont: BitmapFont by lazy { get(BOLD_ITALIC_FONT) }
+  val regularFont: BitmapFont by lazy { if (isLoaded<BitmapFont>(REGULAR_FONT)) fetch(REGULAR_FONT) else FALLBACK_FONT }
+  val regularItalicFont: BitmapFont by lazy { fetch(REGULAR_ITALIC_FONT) }
+  val boldFont: BitmapFont by lazy { fetch(BOLD_FONT) }
+  val boldItalicFont: BitmapFont by lazy { fetch(BOLD_ITALIC_FONT) }
 
-  private val sprites: TextureAtlas by lazy { get(SPRITE_ATLAS) }
-  val tutorialScreenShots: TextureAtlas by lazy { get(TUTORIAL_ATLAS) }
+  private val sprites: TextureAtlas by lazy { fetch(SPRITE_ATLAS) }
+  val tutorialScreenShots: TextureAtlas by lazy { fetch(TUTORIAL_ATLAS) }
 
   val fontSize by lazy { FONT_SIZE * scale }
 
@@ -216,7 +210,7 @@ class Assets : AssetManager() {
 
     Gdx.app.debug("ASSET", "loading font '$name'")
     if (fileHandleResolver.resolve(parameter.fontFileName).exists()) {
-      load(name, BITMAP_FONT, parameter)
+      load<BitmapFont>(name, parameter)
     } else {
       Gdx.app.log("ASSET", "Failed to find font file for '$name'")
     }
@@ -241,8 +235,8 @@ class Assets : AssetManager() {
     }
     resolver = InternalFileHandleResolver()
 
-    setLoader(BITMAP_FONT, ".ttf", FreetypeFontLoader(resolver))
-    setLoader(FREE_TYPE_FONT_GEN, FreeTypeFontGeneratorLoader(resolver))
+    setLoader(FreeTypeFontGeneratorLoader(resolver), null)
+    setLoader(FreetypeFontLoader(resolver), ".ttf")
 
     loadFont(bold = false, italic = false)
 
@@ -253,8 +247,8 @@ class Assets : AssetManager() {
   }
 
   fun loadAssets() {
-    setLoader(Island::class.java, ".$ISLAND_FILE_ENDING", IslandAsynchronousAssetLoader(resolver))
-    setLoader(Island::class.java, IslandAsynchronousAssetLoader(resolver))
+    setLoader(IslandAsynchronousAssetLoader(resolver), ".$ISLAND_FILE_ENDING")
+    setLoader(IslandAsynchronousAssetLoader(resolver))
 
     loadingInfo = "fonts"
     // rest of the fonts
@@ -310,14 +304,14 @@ class Assets : AssetManager() {
 
     loadingInfo = "sprites"
 
-    load(SPRITE_ATLAS, TEXTURE_ATLAS)
-    load(TUTORIAL_ATLAS, TEXTURE_ATLAS)
+    load<TextureAtlas>(SPRITE_ATLAS)
+    load<TextureAtlas>(TUTORIAL_ATLAS)
 
     audioLoaded(true)
 
     loadingInfo = "islands"
 
-    IslandFiles // find all island files
+    IslandFiles.fullFilesSearch() // find all island files
   }
 
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
@@ -363,12 +357,12 @@ class Assets : AssetManager() {
     audioLoaded = true
 
     loadingInfo = "Sounds"
-    load(UNDO_ALL_SOUND, SOUND)
-    load(CLICK_SOUND, SOUND)
+    load<Sound>(UNDO_ALL_SOUND)
+    load<Sound>(CLICK_SOUND)
 
     fun loadSoundVariations(path: String, range: IntRange) {
       for (i in range) {
-        load(path.format(i), SOUND)
+        load<Sound>(path.format(i))
       }
     }
 
@@ -380,5 +374,10 @@ class Assets : AssetManager() {
     if (wait) {
       update()
     }
+  }
+
+  @Deprecated("Does not care about type", replaceWith = ReplaceWith("fetch(fileName)"), level = DeprecationLevel.ERROR)
+  override fun <T : Any?> get(fileName: String?): T {
+    return super.get(fileName)
   }
 }

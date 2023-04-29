@@ -37,6 +37,7 @@ import no.elg.hex.util.component4
 import no.elg.hex.util.decodeStringToTexture
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.isLoaded
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
@@ -200,7 +201,7 @@ object LevelSelectScreen : AbstractScreen() {
 
     val islandFileName = getIslandFileName(slot)
 
-    if (!Hex.assets.isLoaded(islandFileName)) {
+    if (!Hex.assets.isLoaded<Island>(islandFileName)) {
       Hex.assets.load<Island>(islandFileName)
     }
     val currIsland = island ?: Hex.assets.finishLoadingAsset(islandFileName)
