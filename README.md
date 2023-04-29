@@ -30,39 +30,39 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
        [--draw-edges] [--stage-debug] [--update-previews]
-       [--save-island-on-loading-it] [--load-all-islands] [--scale SCALE]
-       [--profile]
+       [--update-saved-islands] [--load-all-islands] [--scale SCALE] [--profile]
 
 optional arguments:
-  -h, --help                    show this help message and exit
+  -h, --help                 show this help message and exit
 
-  -d, --debug                   Enable debug logging
+  -d, --debug                Enable debug logging
 
-  -t, --trace                   Enable even more logging
+  -t, --trace                Enable even more logging
 
-  -s, --silent                  Do not print anything to stdout or stderr
+  -s, --silent               Do not print anything to stdout or stderr
 
-  -e, --map-editor              Start the program in map editor mode
+  -e, --map-editor           Start the program in map editor mode
 
-  --i-am-a-cheater              Enable cheating
+  --i-am-a-cheater           Enable cheating
 
-  --disable-island-loading      Don't load islands
+  --disable-island-loading   Don't load islands
 
-  --draw-edges                  Draw the edge hexagons to assists with
-                                debugging
+  --draw-edges               Draw the edge hexagons to assists with debugging
 
-  --stage-debug                 Enable debug overlay for UI using scene2d
+  --stage-debug              Enable debug overlay for UI using scene2d
 
-  --update-previews             Update pre-rendered previews of islands
+  --update-previews          Update pre-rendered previews of islands
 
-  --save-island-on-loading-it   Save islands when they are loaded
+  --update-saved-islands     Update the saved islands by saving them again
+                             after loading them. Only really useful when
+                             changing the save format
 
-  --load-all-islands            Load all islands at startup instead of when
-                                first played
+  --load-all-islands         Load all islands at startup instead of when first
+                             played
 
-  --scale SCALE                 Scale of UI, if <= 0 default scale apply
+  --scale SCALE              Scale of UI, if <= 0 default scale apply
 
-  --profile                     Enable GL profiling
+  --profile                  Enable GL profiling
 ```
 
 ## Hints

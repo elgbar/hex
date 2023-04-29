@@ -24,7 +24,7 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val `draw-edges` by parser.flagging("Draw the edge hexagons to assists with debugging")
   val `stage-debug` by parser.flagging("Enable debug overlay for UI using scene2d")
   val `update-previews` by parser.flagging("Update pre-rendered previews of islands")
-  val `save-island-on-loading-it` by parser.flagging("Save islands when they are loaded")
+  val `update-saved-islands` by parser.flagging("Update the saved islands by saving them again after loading them. Only really useful when changing the save format")
   val `load-all-islands` by parser.flagging("Load all islands at startup instead of when first played")
 
   val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toInt() }.default { 0 }

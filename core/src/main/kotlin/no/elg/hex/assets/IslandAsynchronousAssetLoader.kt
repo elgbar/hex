@@ -57,8 +57,13 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
       val island = reportTiming("deserialize island json") {
         Island.deserialize(json)
       }
-      if (Hex.args.`save-island-on-loading-it`) {
-        Gdx.files.local(file.path()).writeString(island.createDto().serialize(), false)
+      if (Hex.args.`update-saved-islands`) {
+        Gdx.files.local(file.path()).writeString(
+          island.also {
+            it.regenerateCapitals()
+          }.createDto().serialize(),
+          false
+        )
       }
       island
     } catch (e: Exception) {

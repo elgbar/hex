@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rendering now happens non-continuously, that is, only when needed
 * Pressing back on android when in the level select screen will exit the app
 * Double tapping while in-game will smoothly zoom the camera
+* Only call ensureCapitalStartFunds when saving, this speeds up loading drastically
 
 ### Fixed
 

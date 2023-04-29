@@ -379,8 +379,6 @@ class Island(
       }
     }
     Hex.screen = LevelSelectScreen
-    // only restore state after surrender to make sure the preview is last known state
-    restoreState(initialState.copy())
   }
 
   fun surrender() {
