@@ -64,6 +64,6 @@ class IslandFiles {
     /**
      * Stop searching for new island files when not finding this many files in a row
      */
-    private const val FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH = 500
+    private const val FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH = 10
   }
 }
