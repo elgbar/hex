@@ -37,15 +37,19 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
       loop@ for (hexagon in island.visibleHexagons) {
         val data = island.getData(hexagon)
 
+        fun shouldAnimate(): Boolean {
+          return data.team == island.currentTeam && island.isCurrentTeamHuman() && !Hex.args.mapEditor
+        }
+
         val drawable = when (val piece = data.piece) {
           is Capital -> {
-            if (data.team != island.currentTeam || piece.balance < PEASANT_PRICE || island.isCurrentTeamAI()) {
-              Hex.assets.capital
-            } else {
+            if (piece.balance >= PEASANT_PRICE && shouldAnimate()) {
               piece.elapsedAnimationTime += Gdx.graphics.deltaTime
               val capitalFlag = Hex.assets.capitalFlag
               minTimeToRender = minTimeToRender.coerceAtMost(capitalFlag.frameDuration)
               capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
+            } else {
+              Hex.assets.capital
             }
           }
 
@@ -60,7 +64,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
               is Knight -> Hex.assets.knight
               is Baron -> Hex.assets.baron
             }
-            if (data.team == island.currentTeam && island.isCurrentTeamHuman() && !piece.moved) {
+            if (!piece.moved && shouldAnimate()) {
               minTimeToRender = minTimeToRender.coerceAtMost(pieceAnimation.frameDuration)
               pieceAnimation.getKeyFrame(piece.updateAnimationTime())
             } else {
