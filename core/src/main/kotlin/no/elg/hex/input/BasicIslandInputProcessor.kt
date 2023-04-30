@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys.BACK
 import com.badlogic.gdx.Input.Keys.ESCAPE
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.math.Vector3
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hexagon.HexagonData
@@ -24,23 +23,8 @@ import kotlin.math.sqrt
  */
 class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : AbstractInput(true) {
 
-  var mouseX: Float = 0f
-    private set
-    get() {
-      updateMouse()
-      return field
-    }
-  var mouseY: Float = 0f
-    private set
-    get() {
-      updateMouse()
-      return field
-    }
-
-  private val unprojectVector = Vector3()
   private var draggable = false
   private var pinching = false
-  private var lastMouseFrame: Long = -1
 
   private val lastPointer1 = Vector2()
   private val lastPointer2 = Vector2()
@@ -48,19 +32,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   private val currentPointer2 = Vector2()
 
   val cursorHex: Hexagon<HexagonData>? get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
-
-  /**
-   * Update the world mouse position. Will only update if the frame has changed since last called
-   */
-  private fun updateMouse() {
-    if (lastMouseFrame == Gdx.graphics.frameId) return
-    unprojectVector.x = Gdx.input.x.toFloat()
-    unprojectVector.y = Gdx.input.y.toFloat()
-
-    screen.camera.unproject(unprojectVector)
-    mouseX = unprojectVector.x
-    mouseY = unprojectVector.y
-  }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable && pointer == 0) {

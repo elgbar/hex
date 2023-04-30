@@ -1,7 +1,9 @@
 package no.elg.hex.input
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.input.GestureDetector
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import ktx.app.KtxInputAdapter
 import no.elg.hex.Hex
 
@@ -19,7 +21,35 @@ abstract class AbstractInput(private val useGesture: Boolean = false) :
     )
   }
 
-  fun show() {
+  private val unprojectVector = Vector3()
+  private var lastMouseFrame: Long = -1
+  var mouseX: Float = 0f
+    private set
+    get() {
+      updateMouse()
+      return field
+    }
+  var mouseY: Float = 0f
+    private set
+    get() {
+      updateMouse()
+      return field
+    }
+
+  /**
+   * Update the world mouse position. Will only update if the frame has changed since last called
+   */
+  fun updateMouse() {
+    if (lastMouseFrame == Gdx.graphics.frameId) return
+    unprojectVector.x = Gdx.input.x.toFloat()
+    unprojectVector.y = Gdx.input.y.toFloat()
+
+    Hex.screen.camera.unproject(unprojectVector)
+    mouseX = unprojectVector.x
+    mouseY = unprojectVector.y
+  }
+
+  open fun show() {
     Hex.inputMultiplexer.addProcessor(this)
     if (useGesture) {
       Hex.inputMultiplexer.addProcessor(detector)

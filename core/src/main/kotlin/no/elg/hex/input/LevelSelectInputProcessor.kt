@@ -11,8 +11,6 @@ import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
 import no.elg.hex.screens.LevelSelectScreen.camera
-import no.elg.hex.screens.LevelSelectScreen.mouseX
-import no.elg.hex.screens.LevelSelectScreen.mouseY
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -20,13 +18,14 @@ import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
+import no.elg.hex.util.trace
 import java.lang.Float.max
 
 /** @author Elg */
-object LevelSelectInputProcessor : AbstractInput(true) {
+class LevelSelectInputProcessor : AbstractInput(true) {
 
-  private const val SCROLL_SPEED = 50f
-  private const val INVALID_ISLAND_INDEX = Int.MIN_VALUE
+  var lastY = camera.position.y
+    private set
 
   private fun getHoveringIslandIndex(): Int {
     for (i in 0..PREVIEWS_PER_ROW) {
@@ -46,7 +45,6 @@ object LevelSelectInputProcessor : AbstractInput(true) {
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    LevelSelectScreen.projectCoordinates(x, y)
     val index = getHoveringIslandIndex()
     Gdx.app.debug("SELECT", "Clicked on index $index")
     when {
@@ -71,11 +69,13 @@ object LevelSelectInputProcessor : AbstractInput(true) {
   private fun scroll(delta: Float) {
     val (_, y, _, height) = LevelSelectScreen.rect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
-    val oldY = camera.position.y
     val minimum = screenHeight / 2f
     val maximum = max(minimum, y + height - screenHeight / 2f + LevelSelectScreen.padding)
 
-    camera.position.y = (oldY + delta).coerceIn(minimum..maximum)
+    val newY = (lastY + delta).coerceIn(minimum..maximum)
+    Gdx.app.trace("LSIP scroll", "lastY $lastY camera.position.y ${camera.position.y} newY $newY")
+    camera.position.y = newY
+    lastY = newY
     LevelSelectScreen.updateCamera()
   }
 
@@ -115,7 +115,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
             }
             Hex.assets.unload(getIslandFileName(index))
             Hex.assets.islandFiles.fullFilesSearch()
-            LevelSelectScreen.renderPreviews()
+            LevelSelectScreen.dispose()
             publishMessage("Deleted island $index", color = Color.GREEN)
           }
           Hex.screen = LevelSelectScreen
@@ -127,5 +127,19 @@ object LevelSelectInputProcessor : AbstractInput(true) {
       else -> return false
     }
     return true
+  }
+
+  override fun show() {
+    super.show()
+    restoreScrollPosition()
+  }
+
+  fun restoreScrollPosition() {
+    scroll(0f)
+  }
+
+  companion object {
+    private const val SCROLL_SPEED = 50f
+    private const val INVALID_ISLAND_INDEX = Int.MIN_VALUE
   }
 }
