@@ -116,5 +116,3 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
       * Maybe non-visible hexagons can be shrunk in size?
       * Re-encode the islands to fit in smaller island sizes
     * Make the history contain a delta not the who
-* Sometimes the text is rendering upside-down
-  * Can be replicated on desktop by loading an island then minimizing the window

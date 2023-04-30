@@ -372,7 +372,9 @@ object ScreenRenderer : Disposable, Resizable {
   }
 
   fun resume() {
+    batch.disposeSafely()
     batch = SpriteBatch()
+    resize(0, 0)
   }
 
   override fun resize(width: Int, height: Int) {
