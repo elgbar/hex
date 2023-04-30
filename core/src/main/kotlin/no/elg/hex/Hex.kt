@@ -161,8 +161,11 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun render() {
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+    if (paused) {
+      return
+    }
     try {
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
       screen.render(Gdx.graphics.deltaTime)
       ScreenRenderer.camera.resetHdpi()
       MessagesRenderer.frameUpdate()
