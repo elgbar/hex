@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Pool.Poolable
+import ktx.assets.disposeSafely
 import ktx.assets.pool
 import no.elg.hex.Hex
 import no.elg.hex.api.Resizable
@@ -21,6 +22,9 @@ import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.BOTTOM
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.TOP
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.VERTICAL_CENTER
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.math.sign
 
 enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: HorizontalPosition) {
@@ -285,8 +289,7 @@ object ScreenRenderer : Disposable, Resizable {
 
   private val spacing: Float by lazy { if (Hex.assetsAvailable) Hex.assets.fontSize / 2f else 20f }
 
-  @Suppress("LibGDXStaticResource")
-  private lateinit var batch: SpriteBatch
+  private var batch: SpriteBatch? = null
   internal val camera = OrthographicCamera().also { it.setToOrtho(true) }
 
   var draws = 0
@@ -347,28 +350,19 @@ object ScreenRenderer : Disposable, Resizable {
     }
     val offset = if (position.vertical == TOP) 0 else 1
 
-    begin()
-    for ((line, screenText) in screenTexts.withIndex()) {
-      screenText.draw(line + offset + lineOffset, position, lines = screenTexts.size)
+    use {
+      for ((line, screenText) in screenTexts.withIndex()) {
+        screenText.draw(line + offset + lineOffset, position, lines = screenTexts.size)
+      }
     }
-    end()
-  }
-
-  fun begin() {
-    draws++
-    batch.begin()
   }
 
   fun resetDraws() {
     draws = 0
   }
 
-  fun end() {
-    batch.end()
-  }
-
   override fun dispose() {
-    batch.dispose()
+    batch.disposeSafely()
   }
 
   fun resume() {
@@ -379,6 +373,17 @@ object ScreenRenderer : Disposable, Resizable {
 
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(true)
-    batch.projectionMatrix = camera.combined
+    batch?.projectionMatrix = camera.combined
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  fun use(block: (SpriteBatch) -> Unit) {
+    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+    batch?.also {
+      draws++
+      it.begin()
+      block(it)
+      it.end()
+    }
   }
 }

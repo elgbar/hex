@@ -108,9 +108,9 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
 
   override fun frameUpdate() {
     if (Settings.showFps || Hex.debug && Settings.enableDebugHUD) {
-      ScreenRenderer.begin()
-      fpsText.draw(1, TOP_LEFT)
-      ScreenRenderer.end()
+      ScreenRenderer.use {
+        fpsText.draw(1, TOP_LEFT)
+      }
     }
     if (Hex.debug && Settings.enableDebugHUD) {
       drawAll(*debugLines, lineOffset = 2)

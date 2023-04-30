@@ -28,7 +28,7 @@ object MessagesRenderer : FrameUpdatable {
     publishMessage(message, durationSeconds, YELLOW)
   }
 
-  fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS, exception: Exception? = null) {
+  fun publishError(message: String, durationSeconds: Float = DEFAULT_DURATION_SECONDS, exception: Throwable? = null) {
     val sst = staticTextPool.obtain()
     sst.text = message
     sst.color = RED
@@ -57,26 +57,25 @@ object MessagesRenderer : FrameUpdatable {
     if (messages.isEmpty()) return
     val newMessages = ArrayList<Pair<ScreenText, Float>>()
 
-    ScreenRenderer.begin()
-    for ((index, pair) in messages.withIndex()) {
-      val (message, timeLeft) = pair
+    ScreenRenderer.use {
+      for ((index, pair) in messages.withIndex()) {
+        val (message, timeLeft) = pair
 
-      if (timeLeft < FADE_START) {
-        val alpha = timeLeft / FADE_START
-        message.setAlpha(alpha)
-      } else {
-        message
-      }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
+        if (timeLeft < FADE_START) {
+          val alpha = timeLeft / FADE_START
+          message.setAlpha(alpha)
+        } else {
+          message
+        }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
 
-      val newTime = timeLeft - Gdx.graphics.deltaTime
-      if (newTime > 0f) {
-        newMessages.add(message to newTime)
-      } else if (message is StaticScreenText) {
-        staticTextPool.free(message)
+        val newTime = timeLeft - Gdx.graphics.deltaTime
+        if (newTime > 0f) {
+          newMessages.add(message to newTime)
+        } else if (message is StaticScreenText) {
+          staticTextPool.free(message)
+        }
       }
     }
-    ScreenRenderer.end()
-
     messages.clear()
     messages.addAll(newMessages)
   }
