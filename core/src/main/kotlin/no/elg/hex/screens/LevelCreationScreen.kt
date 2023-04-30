@@ -39,7 +39,6 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.island.IslandFiles
 import no.elg.hex.island.IslandGeneration
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
@@ -272,7 +271,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
           disableables.add(this)
           onClick {
             if (this.isDisabled) return@onClick
-            val nextId = IslandFiles.nextIslandId
+            val nextId = Hex.assets.islandFiles.nextIslandId
             Gdx.app.debug(
               "CREATOR",
               "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value}"
@@ -326,8 +325,6 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   }
 
   private fun renderPreview() {
-    previewBuffer?.dispose()
-
     validator.validateInput(null)
 
     widthSpinner.setValue(widthSpinner.value, false)
@@ -338,11 +335,13 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       // force update to imageWidth and imageHeight to make sure we have the correct size
       rootTable.pack()
 
-      previewBuffer = LevelSelectScreen.renderPreview(
+      LevelSelectScreen.renderPreview(
         createIsland(),
         previewImage.imageWidth.toInt(),
         previewImage.imageHeight.toInt()
-      ).also {
+      ) {
+        previewBuffer?.dispose()
+        previewBuffer = it
         val region = TextureRegion(it.colorBufferTexture)
         region.flip(false, true)
         previewImage.drawable = TextureRegionDrawable(region)

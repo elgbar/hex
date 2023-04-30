@@ -13,7 +13,9 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import kotlinx.coroutines.launch
 import ktx.assets.load
+import ktx.async.KtxAsync
 import ktx.graphics.center
 import ktx.graphics.use
 import no.elg.hex.Hex
@@ -21,7 +23,6 @@ import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
-import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.AI_DONE
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
 import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
@@ -35,12 +36,15 @@ import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.decodeStringToTexture
+import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.isLoaded
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
+import no.elg.hex.util.trace
+import java.util.concurrent.atomic.AtomicInteger
 
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen() {
@@ -79,75 +83,83 @@ object LevelSelectScreen : AbstractScreen() {
     camera.unproject(unprojectVector)
   }
 
+  private val renderingCount = AtomicInteger(0)
+  val renderingPreviews: Boolean get() = renderingCount.get() > 0
+
   fun renderPreview(
     island: Island,
     previewWidth: Int,
     previewHeight: Int,
-    modifier: PreviewModifier = NOTHING
-  ): FrameBuffer {
-    val islandScreen = PreviewIslandScreen(-1, island)
-    islandScreen.resize(previewWidth, previewHeight)
-    val buffer = FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
-    buffer.begin()
-    renderingPreview = true
-    Hex.setClearColorAlpha(0f)
-    Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-    updateCamera()
-    islandScreen.render(0f)
-    camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
-    val widthOffset = camera.viewportWidth / 5
-    val heightOffset = camera.viewportHeight / 5
-    batch.use(camera) {
-      fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
-        batch.draw(
-          textureRegion,
-          widthOffset,
-          heightOffset,
-          camera.viewportWidth - widthOffset * 2,
-          camera.viewportHeight - heightOffset * 2
-        )
-      }
-
-      when (modifier) {
-        SURRENDER -> drawAsset(Hex.assets.surrender)
-        LOST -> drawAsset(Hex.assets.grave)
-        AI_DONE -> drawAsset(Hex.assets.castle)
-
-        WON -> {
-          val text = "${island.round}"
-
-          val font = Hex.assets.regularFont
-
-          camera.setToOrtho(yDown, widthOffset, heightOffset)
-          camera.center(widthOffset, heightOffset)
-
-          batch.projectionMatrix = camera.combined
-
-          font.color = WHITE
-          font.draw(
-            batch,
-            text,
-            0f,
-            (camera.viewportHeight - font.data.capHeight) / 2f,
-            camera.viewportWidth,
-            Align.center,
-            false
+    modifier: PreviewModifier = NOTHING,
+    onComplete: (preview: FrameBuffer) -> Unit
+  ) {
+    renderingCount.incrementAndGet()
+    Gdx.app.postRunnable {
+      val islandScreen = PreviewIslandScreen(-1, island)
+      islandScreen.resize(previewWidth, previewHeight)
+      val buffer = FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
+      buffer.begin()
+      renderingPreview = true
+      Hex.setClearColorAlpha(0f)
+      Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
+      updateCamera()
+      islandScreen.render(0f)
+      camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
+      val widthOffset = camera.viewportWidth / 5
+      val heightOffset = camera.viewportHeight / 5
+      batch.use(camera) {
+        fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
+          batch.draw(
+            textureRegion,
+            widthOffset,
+            heightOffset,
+            camera.viewportWidth - widthOffset * 2,
+            camera.viewportHeight - heightOffset * 2
           )
         }
 
-        NOTHING -> Unit
+        when (modifier) {
+          SURRENDER -> drawAsset(Hex.assets.surrender)
+          LOST -> drawAsset(Hex.assets.grave)
+          AI_DONE -> drawAsset(Hex.assets.castle)
+
+          WON -> {
+            val text = "${island.round}"
+
+            val font = Hex.assets.regularFont
+
+            camera.setToOrtho(yDown, widthOffset, heightOffset)
+            camera.center(widthOffset, heightOffset)
+
+            batch.projectionMatrix = camera.combined
+
+            font.color = WHITE
+            font.draw(
+              batch,
+              text,
+              0f,
+              (camera.viewportHeight - font.data.capHeight) / 2f,
+              camera.viewportWidth,
+              Align.center,
+              false
+            )
+          }
+
+          NOTHING -> Unit
+        }
       }
+      camera.setToOrtho(yDown)
+      updateCamera()
+
+      Hex.setClearColorAlpha(1f)
+
+      renderingPreview = false
+      buffer.end()
+      islandScreen.dispose()
+      onComplete(buffer)
+      renderingCount.decrementAndGet()
     }
-    camera.setToOrtho(yDown)
-    updateCamera()
-
-    Hex.setClearColorAlpha(1f)
-
-    renderingPreview = false
-    buffer.end()
-    islandScreen.dispose()
-    return buffer
   }
 
   fun renderPreviews() {
@@ -174,13 +186,12 @@ object LevelSelectScreen : AbstractScreen() {
 
         val progress = getProgress(slot, true)
         when {
-          progress != null ->
-            try {
-              islandPreviews.add(null to decodeStringToTexture(progress))
-            } catch (e: Exception) {
-              publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
-              updateSelectPreview(slot, false)
-            }
+          progress != null -> try {
+            islandPreviews.add(null to decodeStringToTexture(progress))
+          } catch (e: Exception) {
+            publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
+            updateSelectPreview(slot, false)
+          }
 
           islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
           else -> {
@@ -192,36 +203,46 @@ object LevelSelectScreen : AbstractScreen() {
     }
   }
 
-  fun updateSelectPreview(slot: Int, save: Boolean, modifier: PreviewModifier = NOTHING, island: Island? = null) {
-    val index = IslandFiles.islandIds.indexOf(slot)
-    if (index == -1) {
-      publishWarning("Failed to find file index of island with a slot at $slot")
-      return
-    }
+  fun updateSelectPreview(id: Int, save: Boolean, modifier: PreviewModifier = NOTHING, island: Island? = null) {
+    KtxAsync.launch(Hex.asyncThread) {
+      val index = Hex.assets.islandFiles.islandIds.indexOf(id)
+      if (index == -1) {
+        publishWarning("Failed to find file index of island with a slot at $id")
+        return@launch
+      }
 
-    val islandFileName = getIslandFileName(slot)
+      val currIsland = if (island == null) {
+        val islandFileName = getIslandFileName(id)
+        if (!Hex.assets.isLoaded<Island>(islandFileName)) {
+          Gdx.app.trace("Update preview", "Island $id was not loaded, waiting for it to be loaded now...")
+          val asset = Hex.assets.load<Island>(islandFileName)
+          while (!asset.isLoaded()) {
+            Thread.yield()
+          }
+        }
+        Hex.assets.fetch(islandFileName)
+      } else {
+        island
+      }
 
-    if (!Hex.assets.isLoaded<Island>(islandFileName)) {
-      Hex.assets.load<Island>(islandFileName)
-    }
-    val currIsland = island ?: Hex.assets.finishLoadingAsset(islandFileName)
-
-    val preview = renderPreview(currIsland, rendereredPreviewSize, rendereredPreviewSize, modifier)
-    if (save) {
-      val islandPreviewFile = getIslandFile(slot, preview = true, allowInternal = false)
-      preview.takeScreenshot(islandPreviewFile)
-    }
-    if (Hex.args.mapEditor) {
-      islandPreferences.remove(getPrefName(slot, true))
-    } else {
-      Gdx.app.debug("IS PREVIEW", "Saving preview of island $slot")
-      islandPreferences.putString(getPrefName(slot, true), preview.saveScreenshotAsString())
-    }
-    islandPreferences.flush()
-    if (index == islandPreviews.size) {
-      islandPreviews.add(preview to preview.colorBufferTexture)
-    } else {
-      islandPreviews.set(index, preview to preview.colorBufferTexture)
+      renderPreview(currIsland, rendereredPreviewSize, rendereredPreviewSize, modifier) { preview ->
+        if (save) {
+          val islandPreviewFile = getIslandFile(id, preview = true, allowInternal = false)
+          preview.takeScreenshot(islandPreviewFile)
+        }
+        if (Hex.args.mapEditor) {
+          islandPreferences.remove(getPrefName(id, true))
+        } else {
+          Gdx.app.debug("IS PREVIEW", "Saving preview of island $id")
+          islandPreferences.putString(getPrefName(id, true), preview.saveScreenshotAsString())
+        }
+        islandPreferences.flush()
+        if (index == islandPreviews.size) {
+          islandPreviews.add(preview to preview.colorBufferTexture)
+        } else {
+          islandPreviews.set(index, preview to preview.colorBufferTexture)
+        }
+      }
     }
   }
 
@@ -257,13 +278,11 @@ object LevelSelectScreen : AbstractScreen() {
 
     val (sx, sy, swidth, sheight) = rect(0, NON_ISLAND_SCALE, 0f)
     if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
-      val settingsSprite =
-        if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
+      val settingsSprite = if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
       batch.draw(settingsSprite, sx, sy, swidth, sheight)
 
       val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
-      val helpSprite =
-        if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
+      val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
       batch.draw(helpSprite, hx, hy, hwidth, hheight)
 
       if (Hex.args.mapEditor) {
@@ -331,10 +350,6 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   enum class PreviewModifier {
-    NOTHING,
-    SURRENDER,
-    WON,
-    LOST,
-    AI_DONE
+    NOTHING, SURRENDER, WON, LOST, AI_DONE
   }
 }

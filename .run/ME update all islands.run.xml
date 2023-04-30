@@ -2,7 +2,7 @@
   <configuration default="false" name="ME update all islands" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="no.elg.hex.platform.desktop.DesktopLauncherKt" />
     <module name="hex.desktop.main" />
-    <option name="PROGRAM_PARAMETERS" value="--update-previews --update-saved-islands --map-editor --load-all-islands --debug" />
+    <option name="PROGRAM_PARAMETERS" value="--update-previews --update-saved-islands --map-editor --load-all-islands --trace" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
