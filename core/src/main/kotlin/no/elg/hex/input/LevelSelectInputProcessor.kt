@@ -3,14 +3,18 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Rectangle
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.LevelSelectScreen.NON_ISLAND_SCALE
 import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
 import no.elg.hex.screens.LevelSelectScreen.camera
+import no.elg.hex.screens.LevelSelectScreen.padding
+import no.elg.hex.screens.LevelSelectScreen.shownPreviewSize
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -27,16 +31,35 @@ class LevelSelectInputProcessor : AbstractInput(true) {
   var lastY = camera.position.y
     private set
 
+  /**
+   * @param scale in range 0..1
+   * @param horzOffset in range 0..1
+   */
+  fun rect(index: Int, scale: Float = 1f, horzOffset: Float = 0.5f): Rectangle {
+    val gridX = index % PREVIEWS_PER_ROW
+    val gridY = index / PREVIEWS_PER_ROW
+
+    val size = shownPreviewSize
+    val paddedSize = padding + size
+
+    return Rectangle(
+      padding + paddedSize * gridX + size * horzOffset * (1f - scale),
+      padding + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale),
+      size * scale,
+      size * scale
+    )
+  }
+
   private fun getHoveringIslandIndex(): Int {
     for (i in 0..PREVIEWS_PER_ROW) {
-      val (x, y, width, height) = LevelSelectScreen.rect(i)
+      val (x, y, width, height) = rect(i)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i - PREVIEWS_PER_ROW
       }
     }
 
     for ((index, i) in Hex.assets.islandFiles.islandIds.withIndex()) {
-      val (x, y, width, height) = LevelSelectScreen.rect(index + PREVIEWS_PER_ROW)
+      val (x, y, width, height) = rect(index + PREVIEWS_PER_ROW)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i
       }
@@ -67,10 +90,10 @@ class LevelSelectInputProcessor : AbstractInput(true) {
   }
 
   private fun scroll(delta: Float) {
-    val (_, y, _, height) = LevelSelectScreen.rect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
+    val (_, y, _, height) = rect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
     val minimum = screenHeight / 2f
-    val maximum = max(minimum, y + height - screenHeight / 2f + LevelSelectScreen.padding)
+    val maximum = max(minimum, y + height - screenHeight / 2f + padding)
 
     val newY = (lastY + delta).coerceIn(minimum..maximum)
     Gdx.app.trace("LSIP scroll", "lastY $lastY camera.position.y ${camera.position.y} newY $newY")
@@ -115,7 +138,7 @@ class LevelSelectInputProcessor : AbstractInput(true) {
             }
             Hex.assets.unload(getIslandFileName(index))
             Hex.assets.islandFiles.fullFilesSearch()
-            LevelSelectScreen.dispose()
+            LevelSelectScreen.previews.dispose()
             publishMessage("Deleted island $index", color = Color.GREEN)
           }
           Hex.screen = LevelSelectScreen

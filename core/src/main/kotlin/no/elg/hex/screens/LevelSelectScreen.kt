@@ -3,7 +3,6 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
-import com.badlogic.gdx.math.Rectangle
 import no.elg.hex.Hex
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.preview.IslandPreviewCollection
@@ -15,35 +14,11 @@ import no.elg.hex.util.component4
 /** @author Elg */
 object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
-  private val levelSelectInputProcessor by lazy { LevelSelectInputProcessor() }
-  private val mouseX get() = levelSelectInputProcessor.mouseX
-  private val mouseY get() = levelSelectInputProcessor.mouseY
+  internal val input = LevelSelectInputProcessor()
+  private val mouseX get() = input.mouseX
+  private val mouseY get() = input.mouseY
 
   val previews = IslandPreviewCollection()
-
-  val padding: Float
-    get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
-  val shownPreviewSize
-    get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
-
-  /**
-   * @param scale in range 0..1
-   * @param horzOffset in range 0..1
-   */
-  fun rect(index: Int, scale: Float = 1f, horzOffset: Float = 0.5f): Rectangle {
-    val gridX = index % PREVIEWS_PER_ROW
-    val gridY = index / PREVIEWS_PER_ROW
-
-    val size = this.shownPreviewSize
-    val paddedSize = padding + size
-
-    return Rectangle(
-      padding + paddedSize * gridX + size * horzOffset * (1f - scale),
-      padding + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale),
-      size * scale,
-      size * scale
-    )
-  }
 
   private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
     lineRenderer.color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
@@ -54,17 +29,17 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     lineRenderer.begin(Line)
     batch.begin()
 
-    val (sx, sy, swidth, sheight) = rect(0, NON_ISLAND_SCALE, 0f)
+    val (sx, sy, swidth, sheight) = input.rect(0, NON_ISLAND_SCALE, 0f)
     if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
       val settingsSprite = if (mouseX in sx..sx + swidth && mouseY in sy..sy + sheight) Hex.assets.settingsDown else Hex.assets.settings
       batch.draw(settingsSprite, sx, sy, swidth, sheight)
 
-      val (hx, hy, hwidth, hheight) = rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
+      val (hx, hy, hwidth, hheight) = input.rect(PREVIEWS_PER_ROW - 1, NON_ISLAND_SCALE, 1f)
       val helpSprite = if (mouseX in hx..hx + hwidth && mouseY in hy..hy + hheight) Hex.assets.helpDown else Hex.assets.help
       batch.draw(helpSprite, hx, hy, hwidth, hheight)
 
       if (Hex.args.mapEditor) {
-        val (x, y, width, height) = rect(1, NON_ISLAND_SCALE)
+        val (x, y, width, height) = input.rect(1, NON_ISLAND_SCALE)
 
         drawBox(x, y, width, height)
         val color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
@@ -88,7 +63,7 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     }
 
     for ((i, preview) in previews.islandPreviews.withIndex()) {
-      val (x, y, width, height) = rect(i + PREVIEWS_PER_ROW)
+      val (x, y, width, height) = input.rect(i + PREVIEWS_PER_ROW)
 
       if (y + height < camera.position.y - camera.viewportHeight / 2f) {
         // island is above camera, no need to render
@@ -113,12 +88,12 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   }
 
   override fun show() {
-    levelSelectInputProcessor.show()
+    input.show()
   }
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
-    levelSelectInputProcessor.restoreScrollPosition()
+    input.restoreScrollPosition()
   }
 
   override fun hide() = Unit
@@ -129,10 +104,15 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   }
 
 //  companion object {
-  private const val NON_ISLAND_SCALE = 0.4f
-  private const val PREVIEW_PADDING_PERCENT = 0.025f
+  const val NON_ISLAND_SCALE = 0.4f
   const val PREVIEWS_PER_ROW = 4
   private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
   private val SELECT_COLOR: Color = Color.GREEN
+  private const val PREVIEW_PADDING_PERCENT = 0.025f
+
+  val padding: Float
+    get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
+  val shownPreviewSize
+    get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
 //  }
 }
