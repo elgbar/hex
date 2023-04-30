@@ -18,7 +18,7 @@ import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
-import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.LevelSelectScreen.Companion.shownPreviewSize
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.decodeStringToTexture
 import no.elg.hex.util.fetch
@@ -33,10 +33,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class IslandPreviewCollection : Disposable {
 
-  private val renderingCount = AtomicInteger(0)
   internal val islandPreviews = Array<Pair<FrameBuffer?, Texture>>()
 
-  val renderingPreviews: Boolean get() = LevelSelectScreen.previews.renderingCount.get() > 0
+  private val screen get() = Hex.screen
 
   fun renderPreview(
     island: Island,
@@ -55,19 +54,19 @@ class IslandPreviewCollection : Disposable {
         Hex.setClearColorAlpha(0f)
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-        LevelSelectScreen.updateCamera()
+        screen.updateCamera()
         islandScreen.render(0f)
-        LevelSelectScreen.camera.setToOrtho(LevelSelectScreen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
-        val widthOffset = LevelSelectScreen.camera.viewportWidth / 5
-        val heightOffset = LevelSelectScreen.camera.viewportHeight / 5
-        LevelSelectScreen.batch.use(LevelSelectScreen.camera) {
+        screen.camera.setToOrtho(screen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
+        val widthOffset = screen.camera.viewportWidth / 5
+        val heightOffset = screen.camera.viewportHeight / 5
+        screen.batch.use(screen.camera) {
           fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
-            LevelSelectScreen.batch.draw(
+            screen.batch.draw(
               textureRegion,
               widthOffset,
               heightOffset,
-              LevelSelectScreen.camera.viewportWidth - widthOffset * 2,
-              LevelSelectScreen.camera.viewportHeight - heightOffset * 2
+              screen.camera.viewportWidth - widthOffset * 2,
+              screen.camera.viewportHeight - heightOffset * 2
             )
           }
 
@@ -81,18 +80,18 @@ class IslandPreviewCollection : Disposable {
 
               val font = Hex.assets.regularFont
 
-              LevelSelectScreen.camera.setToOrtho(LevelSelectScreen.yDown, widthOffset, heightOffset)
-              LevelSelectScreen.camera.center(widthOffset, heightOffset)
+              screen.camera.setToOrtho(screen.yDown, widthOffset, heightOffset)
+              screen.camera.center(widthOffset, heightOffset)
 
-              LevelSelectScreen.batch.projectionMatrix = LevelSelectScreen.camera.combined
+              screen.batch.projectionMatrix = screen.camera.combined
 
               font.color = Color.WHITE
               font.draw(
-                LevelSelectScreen.batch,
+                screen.batch,
                 text,
                 0f,
-                (LevelSelectScreen.camera.viewportHeight - font.data.capHeight) / 2f,
-                LevelSelectScreen.camera.viewportWidth,
+                (screen.camera.viewportHeight - font.data.capHeight) / 2f,
+                screen.camera.viewportWidth,
                 Align.center,
                 false
               )
@@ -101,8 +100,8 @@ class IslandPreviewCollection : Disposable {
             PreviewModifier.NOTHING -> Unit
           }
         }
-        LevelSelectScreen.camera.setToOrtho(LevelSelectScreen.yDown)
-        LevelSelectScreen.updateCamera()
+        screen.camera.setToOrtho(screen.yDown)
+        screen.updateCamera()
 
         Hex.setClearColorAlpha(1f)
 
@@ -128,7 +127,7 @@ class IslandPreviewCollection : Disposable {
         }
         return
       }
-      dispose()
+      disposePreviews()
 
       for (slot in Hex.assets.islandFiles.islandIds) {
         val islandPreviewFile = getIslandFile(slot, true)
@@ -178,7 +177,7 @@ class IslandPreviewCollection : Disposable {
         island
       }
 
-      val rendereredPreviewSize = (2 * LevelSelectScreen.shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
+      val rendereredPreviewSize = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
       renderPreview(currIsland, rendereredPreviewSize, rendereredPreviewSize, modifier) { preview ->
         if (save) {
           val islandPreviewFile = getIslandFile(id, preview = true, allowInternal = false)
@@ -200,7 +199,7 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  override fun dispose() {
+  private fun disposePreviews() {
     for (buffer in islandPreviews) {
       buffer.first?.dispose()
       buffer.second.dispose()
@@ -208,7 +207,15 @@ class IslandPreviewCollection : Disposable {
     islandPreviews.clear()
   }
 
+  override fun dispose() {
+    Gdx.app.trace("Island Previews", "Disposing all previews")
+    disposePreviews()
+  }
+
   companion object {
     private const val MIN_PREVIEW_SIZE = 512
+
+    private val renderingCount = AtomicInteger(0)
+    val renderingPreviews: Boolean get() = renderingCount.get() > 0
   }
 }

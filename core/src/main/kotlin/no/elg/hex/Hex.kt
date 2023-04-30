@@ -86,7 +86,7 @@ object Hex : ApplicationAdapter() {
 
   val island: Island? get() = (screen as? PreviewIslandScreen)?.island
 
-  var screen: AbstractScreen = SplashScreen
+  var screen: AbstractScreen = SplashScreen(LevelSelectScreen())
     set(value) {
       reportTiming("change screen to ${field::class.simpleName}") {
         val old = field
@@ -101,6 +101,7 @@ object Hex : ApplicationAdapter() {
         Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
         value.show()
         value.resize(Gdx.graphics.width, Gdx.graphics.height)
+        // Keep this last
         field = value
       }
       Gdx.graphics.requestRendering()
@@ -168,11 +169,10 @@ object Hex : ApplicationAdapter() {
       GLProfilerRenderer.frameUpdate()
     } catch (e: Throwable) {
       e.printStackTrace()
-      MessagesRenderer.publishError("Threw when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
+      MessagesRenderer.publishError("Threw exception when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
 
       Gdx.app.postRunnable {
-        SplashScreen.nextScreen = LevelSelectScreen
-        screen = SplashScreen
+        screen = LevelSelectScreen()
       }
     }
   }
@@ -186,7 +186,6 @@ object Hex : ApplicationAdapter() {
 
     assets = Assets()
     updateTitle()
-    screen = SplashScreen
 
     assets.loadAssets()
 
@@ -196,8 +195,7 @@ object Hex : ApplicationAdapter() {
 
   override fun pause() {
     paused = true
-    SplashScreen.nextScreen = screen
-    screen = SplashScreen
+    screen = SplashScreen(screen)
     inputMultiplexer.clear()
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     assets.dispose()

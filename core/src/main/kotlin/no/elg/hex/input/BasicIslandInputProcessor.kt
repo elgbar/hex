@@ -55,7 +55,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   override fun keyDown(keycode: Int): Boolean {
     when (keycode) {
       ESCAPE, BACK -> {
-        Hex.screen = LevelSelectScreen
+        Hex.screen = LevelSelectScreen()
         Hex.assets.clickSound?.play(Settings.volume)
       }
 

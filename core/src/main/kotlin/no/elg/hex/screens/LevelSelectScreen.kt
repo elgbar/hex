@@ -5,20 +5,18 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import no.elg.hex.Hex
 import no.elg.hex.input.LevelSelectInputProcessor
-import no.elg.hex.preview.IslandPreviewCollection
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.isLazyInitialized
 
 /** @author Elg */
-object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
+class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
-  internal val input = LevelSelectInputProcessor()
+  internal val input by lazy { LevelSelectInputProcessor(this) }
   private val mouseX get() = input.mouseX
   private val mouseY get() = input.mouseY
-
-  val previews = IslandPreviewCollection()
 
   private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
     lineRenderer.color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
@@ -62,7 +60,7 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
       }
     }
 
-    for ((i, preview) in previews.islandPreviews.withIndex()) {
+    for ((i, preview) in Hex.assets.islandPreviews.islandPreviews.withIndex()) {
       val (x, y, width, height) = input.rect(i + PREVIEWS_PER_ROW)
 
       if (y + height < camera.position.y - camera.viewportHeight / 2f) {
@@ -84,7 +82,11 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   }
 
   override fun recreate(): AbstractScreen {
-    return LevelSelectScreen
+    return LevelSelectScreen().also {
+      if (::input.isLazyInitialized) {
+        it.input.lastY = input.lastY
+      }
+    }
   }
 
   override fun show() {
@@ -96,23 +98,16 @@ object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     input.restoreScrollPosition()
   }
 
-  override fun hide() = Unit
+  companion object {
+    const val NON_ISLAND_SCALE = 0.4f
+    const val PREVIEWS_PER_ROW = 4
+    private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
+    private val SELECT_COLOR: Color = Color.GREEN
+    private const val PREVIEW_PADDING_PERCENT = 0.025f
 
-  override fun dispose() {
-    super.dispose()
-    previews.dispose()
+    val padding: Float
+      get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
+    val shownPreviewSize
+      get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
   }
-
-//  companion object {
-  const val NON_ISLAND_SCALE = 0.4f
-  const val PREVIEWS_PER_ROW = 4
-  private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
-  private val SELECT_COLOR: Color = Color.GREEN
-  private const val PREVIEW_PADDING_PERCENT = 0.025f
-
-  val padding: Float
-    get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
-  val shownPreviewSize
-    get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
-//  }
 }

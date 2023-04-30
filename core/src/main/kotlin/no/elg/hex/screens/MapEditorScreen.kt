@@ -114,7 +114,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
               scene2d.visTextButton("Yes") {
                 onClick {
                   if (saveInitialIsland(id, island)) {
-                    Hex.screen = LevelSelectScreen
+                    Hex.screen = LevelSelectScreen()
                   } else {
                     this@visWindow.fadeOut()
                   }
@@ -124,7 +124,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
 
             setButton(
               ButtonBar.ButtonType.NO,
-              scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen } }
+              scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen() } }
             )
 
             setButton(

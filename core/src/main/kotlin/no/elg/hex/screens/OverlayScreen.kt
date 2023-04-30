@@ -18,7 +18,7 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
   fun backToPreviousScreen() {
     if (!::previousScreen.isInitialized) {
       MessagesRenderer.publishError("Previous screen is not initialized")
-      Hex.screen = LevelSelectScreen
+      Hex.screen = LevelSelectScreen()
       return
     }
     SplashScreen.refreshAndSetScreen(previousScreen)
@@ -40,7 +40,7 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
     previousScreen = Hex.screen
     Gdx.app.debug("SETTINGS", "Previous screen is ${previousScreen::class.simpleName}")
     if (previousScreen is OverlayScreen) {
-      previousScreen = LevelSelectScreen
+      previousScreen = LevelSelectScreen()
       MessagesRenderer.publishError("Previous screen cannot be an Overlay screen")
     }
   }

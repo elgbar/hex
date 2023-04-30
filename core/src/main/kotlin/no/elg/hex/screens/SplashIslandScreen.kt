@@ -53,7 +53,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
                 "Failed to load island $id due to a ${e::class.simpleName}: ${e.message}",
                 exception = e
               )
-              Hex.screen = LevelSelectScreen
+              Hex.screen = LevelSelectScreen()
             }
           }
         }

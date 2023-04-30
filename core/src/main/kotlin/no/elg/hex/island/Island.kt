@@ -378,7 +378,7 @@ class Island(
         it.clearProgress()
       }
     }
-    Hex.screen = LevelSelectScreen
+    Hex.screen = LevelSelectScreen()
   }
 
   fun surrender() {

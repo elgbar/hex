@@ -8,7 +8,7 @@ import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
-import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.preview.IslandPreviewCollection
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
@@ -24,7 +24,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
     lineRenderer.projectionMatrix = islandScreen.camera.combined
 
     val currHex = islandScreen.cursorHexagon
-    val canDrawEdged = Hex.args.`draw-edges` || Hex.args.mapEditor && !LevelSelectScreen.previews.renderingPreviews
+    val canDrawEdged = Hex.args.`draw-edges` || Hex.args.mapEditor && !IslandPreviewCollection.renderingPreviews
 
     fun draw(
       hexes: Iterable<Hexagon<HexagonData>>,

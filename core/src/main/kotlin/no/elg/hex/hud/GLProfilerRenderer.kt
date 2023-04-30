@@ -31,13 +31,12 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
       GLErrorListener.LOGGING_LISTENER.onError(it)
       if (changeLevel.getAndSet(false)) {
         Gdx.app.postRunnable {
-          if (Hex.screen != LevelSelectScreen) {
-            Hex.screen = LevelSelectScreen
+          if (Hex.screen !is LevelSelectScreen) {
+            Hex.screen = LevelSelectScreen()
           }
         }
 
         Gdx.app.error("GL ERROR", FrameBuffer.getManagedStatus())
-        LevelSelectScreen.previews.dispose()
 
         MessagesRenderer.publishError(
           """

@@ -570,7 +570,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       saveProgress()
     }
 
-    LevelSelectScreen.previews.updateSelectPreview(id, false, modifier, island)
+    Hex.assets.islandPreviews.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
     teamChangedListener.disposeSafely()
 

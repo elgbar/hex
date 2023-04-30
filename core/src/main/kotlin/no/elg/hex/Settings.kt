@@ -169,7 +169,7 @@ object Settings {
       if (new.equals(DELETE_ALL_PROGRESS_STRING, true)) {
         resetAllIslandProgress()
         MessagesRenderer.publishWarning("All progress have been deleted")
-        Hex.screen = LevelSelectScreen
+        Hex.screen = LevelSelectScreen()
         return@PreferenceDelegate delegate.initialValue
       }
       return@PreferenceDelegate new
@@ -197,7 +197,7 @@ object Settings {
         }
 
         MessagesRenderer.publishWarning("All settings have been reset")
-        Hex.screen = LevelSelectScreen
+        Hex.screen = LevelSelectScreen()
         return@PreferenceDelegate delegate.initialValue
       }
       return@PreferenceDelegate new
@@ -215,7 +215,7 @@ object Settings {
     if (lastGotoCalled != frameId) {
       lastGotoCalled = frameId
       // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen }
+      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen() }
     }
   }
 }

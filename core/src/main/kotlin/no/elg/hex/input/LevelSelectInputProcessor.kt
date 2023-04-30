@@ -10,10 +10,10 @@ import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
-import no.elg.hex.screens.LevelSelectScreen.NON_ISLAND_SCALE
-import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
-import no.elg.hex.screens.LevelSelectScreen.camera
-import no.elg.hex.screens.LevelSelectScreen.padding
+import no.elg.hex.screens.LevelSelectScreen.Companion.NON_ISLAND_SCALE
+import no.elg.hex.screens.LevelSelectScreen.Companion.PREVIEWS_PER_ROW
+import no.elg.hex.screens.LevelSelectScreen.Companion.padding
+import no.elg.hex.screens.LevelSelectScreen.Companion.shownPreviewSize
 import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.TutorialScreen
 import no.elg.hex.util.component1
@@ -27,10 +27,9 @@ import no.elg.hex.util.trace
 import java.lang.Float.max
 
 /** @author Elg */
-class LevelSelectInputProcessor : AbstractInput(true) {
+class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : AbstractInput(true) {
 
-  var lastY = camera.position.y
-    private set
+  var lastY: Float = screen.camera.position.y
 
   /**
    * @param scale in range 0..1
@@ -97,10 +96,10 @@ class LevelSelectInputProcessor : AbstractInput(true) {
     val maximum = max(minimum, y + height - screenHeight / 2f + padding)
 
     val newY = (lastY + delta).coerceIn(minimum..maximum)
-    Gdx.app.trace("LSIP scroll", "lastY $lastY camera.position.y ${camera.position.y} newY $newY")
-    camera.position.y = newY
+    Gdx.app.trace("LSIP scroll", "lastY $lastY camera.position.y ${screen.camera.position.y} newY $newY")
+    screen.camera.position.y = newY
     lastY = newY
-    LevelSelectScreen.updateCamera()
+    screen.updateCamera()
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
@@ -139,10 +138,10 @@ class LevelSelectInputProcessor : AbstractInput(true) {
             }
             Hex.assets.unload(getIslandFileName(index))
             Hex.assets.islandFiles.fullFilesSearch()
-            LevelSelectScreen.previews.dispose()
+            screen.dispose()
             publishMessage("Deleted island $index", color = Color.GREEN)
           }
-          Hex.screen = LevelSelectScreen
+          Hex.screen = screen
         }
       }
 

@@ -282,7 +282,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
 
         visTextButton("Cancel") {
           onInteract(stage, keyShortcut = intArrayOf(Keys.ESCAPE)) {
-            Hex.screen = LevelSelectScreen
+            Hex.screen = LevelSelectScreen()
           }
         }
       }
@@ -335,7 +335,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       // force update to imageWidth and imageHeight to make sure we have the correct size
       rootTable.pack()
 
-      LevelSelectScreen.previews.renderPreview(
+      Hex.assets.islandPreviews.renderPreview(
         createIsland(),
         previewImage.imageWidth.toInt(),
         previewImage.imageHeight.toInt()

@@ -12,7 +12,6 @@ import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.IslandDto
-import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SplashIslandScreen
 
@@ -54,7 +53,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
     if (!existed) {
       Hex.assets.islandFiles.fullFilesSearch()
     }
-    LevelSelectScreen.previews.updateSelectPreview(id, true)
+    Hex.assets.islandPreviews.updateSelectPreview(id, true)
     true
   } catch (e: Throwable) {
     publishError("Failed to saved island '${file.name()}'")
@@ -66,9 +65,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
 fun resetAllIslandProgress() {
   PreviewIslandScreen.islandPreferences.clear()
   PreviewIslandScreen.islandPreferences.flush()
-  if (Hex.screen == LevelSelectScreen) {
-    LevelSelectScreen.previews.renderPreviews()
-  }
+  Hex.assets.islandPreviews.renderPreviews()
 }
 
 fun IslandDto.serialize(): String = Hex.mapper.writeValueAsString(this)
