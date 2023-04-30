@@ -335,7 +335,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       // force update to imageWidth and imageHeight to make sure we have the correct size
       rootTable.pack()
 
-      LevelSelectScreen.renderPreview(
+      LevelSelectScreen.previews.renderPreview(
         createIsland(),
         previewImage.imageWidth.toInt(),
         previewImage.imageHeight.toInt()

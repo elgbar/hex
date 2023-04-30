@@ -225,7 +225,7 @@ object Hex : ApplicationAdapter() {
     settingsScreen.dispose()
     internalTutorialScreen?.dispose()
     internalTutorialScreen = null
-    LevelSelectScreen.disposePreviews()
+    LevelSelectScreen.previews.dispose()
     VisUI.dispose(false)
   }
 

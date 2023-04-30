@@ -54,7 +54,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
     if (!existed) {
       Hex.assets.islandFiles.fullFilesSearch()
     }
-    LevelSelectScreen.updateSelectPreview(id, true)
+    LevelSelectScreen.previews.updateSelectPreview(id, true)
     true
   } catch (e: Throwable) {
     publishError("Failed to saved island '${file.name()}'")
@@ -67,7 +67,7 @@ fun resetAllIslandProgress() {
   PreviewIslandScreen.islandPreferences.clear()
   PreviewIslandScreen.islandPreferences.flush()
   if (Hex.screen == LevelSelectScreen) {
-    LevelSelectScreen.renderPreviews()
+    LevelSelectScreen.previews.renderPreviews()
   }
 }
 

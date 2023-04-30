@@ -2,249 +2,29 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Color.WHITE
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Array
-import kotlinx.coroutines.launch
-import ktx.assets.load
-import ktx.async.KtxAsync
-import ktx.graphics.center
-import ktx.graphics.use
 import no.elg.hex.Hex
-import no.elg.hex.hud.MessagesRenderer.publishError
-import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.input.LevelSelectInputProcessor
-import no.elg.hex.island.Island
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.AI_DONE
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
-import no.elg.hex.screens.PreviewIslandScreen.Companion.getPrefName
-import no.elg.hex.screens.PreviewIslandScreen.Companion.getProgress
-import no.elg.hex.screens.PreviewIslandScreen.Companion.islandPreferences
+import no.elg.hex.preview.IslandPreviewCollection
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import no.elg.hex.util.decodeStringToTexture
-import no.elg.hex.util.fetch
-import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.getIslandFileName
-import no.elg.hex.util.isLoaded
-import no.elg.hex.util.reportTiming
-import no.elg.hex.util.saveScreenshotAsString
-import no.elg.hex.util.takeScreenshot
-import no.elg.hex.util.trace
-import java.util.concurrent.atomic.AtomicInteger
 
 /** @author Elg */
-object LevelSelectScreen : AbstractScreen() {
+object LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
-  const val PREVIEWS_PER_ROW = 4
-  private const val PREVIEW_PADDING_PERCENT = 0.025f
-  private const val MIN_PREVIEW_SIZE = 512
+  private val levelSelectInputProcessor by lazy { LevelSelectInputProcessor() }
+  private val mouseX get() = levelSelectInputProcessor.mouseX
+  private val mouseY get() = levelSelectInputProcessor.mouseY
 
-  private const val NON_ISLAND_SCALE = 0.4f
-
-  private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
-  private val SELECT_COLOR: Color = Color.GREEN
-
-  private val islandPreviews = Array<Pair<FrameBuffer?, Texture>>()
-  private val unprojectVector = Vector3()
-
-  var renderingPreview: Boolean = false
-    private set
-
-  val mouseX
-    get() = unprojectVector.x
-  val mouseY
-    get() = unprojectVector.y
+  val previews = IslandPreviewCollection()
 
   val padding: Float
     get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
-  private val shownPreviewSize
+  val shownPreviewSize
     get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * padding) / PREVIEWS_PER_ROW
-
-  private val rendereredPreviewSize get() = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
-
-  fun projectCoordinates(inputX: Float, inputY: Float) {
-    unprojectVector.x = inputX
-    unprojectVector.y = inputY
-
-    camera.unproject(unprojectVector)
-  }
-
-  private val renderingCount = AtomicInteger(0)
-  val renderingPreviews: Boolean get() = renderingCount.get() > 0
-
-  fun renderPreview(
-    island: Island,
-    previewWidth: Int,
-    previewHeight: Int,
-    modifier: PreviewModifier = NOTHING,
-    onComplete: (preview: FrameBuffer) -> Unit
-  ) {
-    renderingCount.incrementAndGet()
-    Gdx.app.postRunnable {
-      val islandScreen = PreviewIslandScreen(-1, island)
-      islandScreen.resize(previewWidth, previewHeight)
-      val buffer = FrameBuffer(RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
-      buffer.begin()
-      renderingPreview = true
-      Hex.setClearColorAlpha(0f)
-      Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-      updateCamera()
-      islandScreen.render(0f)
-      camera.setToOrtho(yDown, previewWidth.toFloat(), previewHeight.toFloat())
-      val widthOffset = camera.viewportWidth / 5
-      val heightOffset = camera.viewportHeight / 5
-      batch.use(camera) {
-        fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
-          batch.draw(
-            textureRegion,
-            widthOffset,
-            heightOffset,
-            camera.viewportWidth - widthOffset * 2,
-            camera.viewportHeight - heightOffset * 2
-          )
-        }
-
-        when (modifier) {
-          SURRENDER -> drawAsset(Hex.assets.surrender)
-          LOST -> drawAsset(Hex.assets.grave)
-          AI_DONE -> drawAsset(Hex.assets.castle)
-
-          WON -> {
-            val text = "${island.round}"
-
-            val font = Hex.assets.regularFont
-
-            camera.setToOrtho(yDown, widthOffset, heightOffset)
-            camera.center(widthOffset, heightOffset)
-
-            batch.projectionMatrix = camera.combined
-
-            font.color = WHITE
-            font.draw(
-              batch,
-              text,
-              0f,
-              (camera.viewportHeight - font.data.capHeight) / 2f,
-              camera.viewportWidth,
-              Align.center,
-              false
-            )
-          }
-
-          NOTHING -> Unit
-        }
-      }
-      camera.setToOrtho(yDown)
-      updateCamera()
-
-      Hex.setClearColorAlpha(1f)
-
-      renderingPreview = false
-      buffer.end()
-      islandScreen.dispose()
-      onComplete(buffer)
-      renderingCount.decrementAndGet()
-    }
-  }
-
-  fun renderPreviews() {
-    reportTiming("render all island previews") {
-      if (Hex.assets.islandFiles.islandIds.size == 0) {
-        if (!Hex.args.`disable-island-loading`) {
-          publishError("Failed to find any islands to load")
-          if (Hex.args.mapEditor) {
-            publishWarning("Do you have the correct island symbolic link in the project?")
-            publishWarning("There should be a error printed in the gradle logs")
-            publishWarning("To fix on windows you can enable Developer Mode")
-          }
-        }
-        return
-      }
-      disposePreviews()
-
-      for (slot in Hex.assets.islandFiles.islandIds) {
-        val islandPreviewFile = getIslandFile(slot, true)
-        if (Hex.args.`update-previews`) {
-          updateSelectPreview(slot, true)
-          continue
-        }
-
-        val progress = getProgress(slot, true)
-        when {
-          progress != null -> try {
-            islandPreviews.add(null to decodeStringToTexture(progress))
-          } catch (e: Exception) {
-            publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
-            updateSelectPreview(slot, false)
-          }
-
-          islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
-          else -> {
-            publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
-            updateSelectPreview(slot, true)
-          }
-        }
-      }
-    }
-  }
-
-  fun updateSelectPreview(id: Int, save: Boolean, modifier: PreviewModifier = NOTHING, island: Island? = null) {
-    KtxAsync.launch(Hex.asyncThread) {
-      val index = Hex.assets.islandFiles.islandIds.indexOf(id)
-      if (index == -1) {
-        publishWarning("Failed to find file index of island with a slot at $id")
-        return@launch
-      }
-
-      val currIsland = if (island == null) {
-        val islandFileName = getIslandFileName(id)
-        if (!Hex.assets.isLoaded<Island>(islandFileName)) {
-          Gdx.app.trace("Update preview", "Island $id was not loaded, waiting for it to be loaded now...")
-          val asset = Hex.assets.load<Island>(islandFileName)
-          while (!asset.isLoaded()) {
-            Thread.yield()
-          }
-        }
-        Hex.assets.fetch(islandFileName)
-      } else {
-        island
-      }
-
-      renderPreview(currIsland, rendereredPreviewSize, rendereredPreviewSize, modifier) { preview ->
-        if (save) {
-          val islandPreviewFile = getIslandFile(id, preview = true, allowInternal = false)
-          preview.takeScreenshot(islandPreviewFile)
-        }
-        if (Hex.args.mapEditor) {
-          islandPreferences.remove(getPrefName(id, true))
-        } else {
-          Gdx.app.debug("IS PREVIEW", "Saving preview of island $id")
-          islandPreferences.putString(getPrefName(id, true), preview.saveScreenshotAsString())
-        }
-        islandPreferences.flush()
-        if (index == islandPreviews.size) {
-          islandPreviews.add(preview to preview.colorBufferTexture)
-        } else {
-          islandPreviews.set(index, preview to preview.colorBufferTexture)
-        }
-      }
-    }
-  }
 
   /**
    * @param scale in range 0..1
@@ -271,8 +51,6 @@ object LevelSelectScreen : AbstractScreen() {
   }
 
   override fun render(delta: Float) {
-    projectCoordinates(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
-
     lineRenderer.begin(Line)
     batch.begin()
 
@@ -309,7 +87,7 @@ object LevelSelectScreen : AbstractScreen() {
       }
     }
 
-    for ((i, preview) in islandPreviews.withIndex()) {
+    for ((i, preview) in previews.islandPreviews.withIndex()) {
       val (x, y, width, height) = rect(i + PREVIEWS_PER_ROW)
 
       if (y + height < camera.position.y - camera.viewportHeight / 2f) {
@@ -330,26 +108,31 @@ object LevelSelectScreen : AbstractScreen() {
     lineRenderer.end()
   }
 
+  override fun recreate(): AbstractScreen {
+    return LevelSelectScreen
+  }
+
   override fun show() {
-    LevelSelectInputProcessor.show()
+    levelSelectInputProcessor.show()
+  }
+
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    levelSelectInputProcessor.restoreScrollPosition()
   }
 
   override fun hide() = Unit
 
   override fun dispose() {
     super.dispose()
-    disposePreviews()
+    previews.dispose()
   }
 
-  fun disposePreviews() {
-    for (buffer in islandPreviews) {
-      buffer.first?.dispose()
-      buffer.second.dispose()
-    }
-    islandPreviews.clear()
-  }
-
-  enum class PreviewModifier {
-    NOTHING, SURRENDER, WON, LOST, AI_DONE
-  }
+//  companion object {
+  private const val NON_ISLAND_SCALE = 0.4f
+  private const val PREVIEW_PADDING_PERCENT = 0.025f
+  const val PREVIEWS_PER_ROW = 4
+  private val NOT_SELECTED_COLOR: Color = Color.LIGHT_GRAY
+  private val SELECT_COLOR: Color = Color.GREEN
+//  }
 }

@@ -316,7 +316,7 @@ class Assets : AssetManager() {
     loadingInfo = "islands"
 
     islandFiles.fullFilesSearch() // find all island files
-    LevelSelectScreen.renderPreviews()
+    LevelSelectScreen.previews.renderPreviews()
   }
 
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {

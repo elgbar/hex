@@ -37,7 +37,7 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
         }
 
         Gdx.app.error("GL ERROR", FrameBuffer.getManagedStatus())
-        LevelSelectScreen.disposePreviews()
+        LevelSelectScreen.previews.dispose()
 
         MessagesRenderer.publishError(
           """

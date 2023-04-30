@@ -45,14 +45,14 @@ import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.preview.PreviewModifier
+import no.elg.hex.preview.PreviewModifier.AI_DONE
+import no.elg.hex.preview.PreviewModifier.LOST
+import no.elg.hex.preview.PreviewModifier.NOTHING
+import no.elg.hex.preview.PreviewModifier.SURRENDER
+import no.elg.hex.preview.PreviewModifier.WON
 import no.elg.hex.renderer.DebugGraphRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.AI_DONE
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.LOST
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.NOTHING
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.SURRENDER
-import no.elg.hex.screens.LevelSelectScreen.PreviewModifier.WON
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
@@ -570,7 +570,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       saveProgress()
     }
 
-    LevelSelectScreen.updateSelectPreview(id, false, modifier, island)
+    LevelSelectScreen.previews.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
     teamChangedListener.disposeSafely()
 

@@ -24,7 +24,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
     lineRenderer.projectionMatrix = islandScreen.camera.combined
 
     val currHex = islandScreen.cursorHexagon
-    val canDrawEdged = Hex.args.`draw-edges` || Hex.args.mapEditor && !LevelSelectScreen.renderingPreview
+    val canDrawEdged = Hex.args.`draw-edges` || Hex.args.mapEditor && !LevelSelectScreen.previews.renderingPreviews
 
     fun draw(
       hexes: Iterable<Hexagon<HexagonData>>,
