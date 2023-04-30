@@ -624,9 +624,15 @@ class Island(
 
     val visibleNeighbors = HashSet<Hexagon<HexagonData>>(visibleHexagons.size)
     val toCheck = Queue<Hexagon<HexagonData>>(visibleHexagons.size * 2)
-    toCheck.addFirst(visibleHexagons.first())
+    val firstVisible = visibleHexagons.firstOrNull()
+    if (firstVisible == null) {
+      publishError("There are no visible hexagons")
+      valid = false
+    } else {
+      toCheck.addFirst(firstVisible)
+    }
 
-    do {
+    while (!toCheck.isEmpty) {
       val curr: Hexagon<HexagonData> = toCheck.removeFirst()
       if (visibleNeighbors.contains(curr)) continue
       val neighbors = getNeighbors(curr)
@@ -636,7 +642,7 @@ class Island(
         toCheck.addLast(neighbor)
       }
       visibleNeighbors += curr
-    } while (!toCheck.isEmpty)
+    }
 
     if (!visibleHexagons.containsAll(visibleNeighbors) || !visibleNeighbors.containsAll(visibleHexagons)) {
       publishError("The visible hexagon grid is not connected.")

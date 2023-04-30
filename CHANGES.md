@@ -60,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix trees not remember if they have grown or not
 * Fix map editor screen not handling pausing/resuming the app
 * Do not save invisible hexagons in the islandDTO
+* Fix crash when there are no visible hexagons
 
 ### Removed
 
