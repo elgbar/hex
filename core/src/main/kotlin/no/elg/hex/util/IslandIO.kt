@@ -12,7 +12,6 @@ import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.IslandDto
-import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SplashIslandScreen
@@ -53,7 +52,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
     file.writeString(island.createDto().serialize(), false)
     publishMessage("Successfully saved island '${file.name()}'", color = Color.GREEN)
     if (!existed) {
-      IslandFiles.fullFilesSearch()
+      Hex.assets.islandFiles.fullFilesSearch()
     }
     LevelSelectScreen.updateSelectPreview(id, true)
     true

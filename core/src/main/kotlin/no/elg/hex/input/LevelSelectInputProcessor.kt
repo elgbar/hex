@@ -7,7 +7,6 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
-import no.elg.hex.island.IslandFiles
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
@@ -37,7 +36,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
       }
     }
 
-    for ((index, i) in IslandFiles.islandIds.withIndex()) {
+    for ((index, i) in Hex.assets.islandFiles.islandIds.withIndex()) {
       val (x, y, width, height) = LevelSelectScreen.rect(index + PREVIEWS_PER_ROW)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i
@@ -70,7 +69,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
   }
 
   private fun scroll(delta: Float) {
-    val (_, y, _, height) = LevelSelectScreen.rect(IslandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
+    val (_, y, _, height) = LevelSelectScreen.rect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
     val oldY = camera.position.y
     val minimum = screenHeight / 2f
@@ -115,7 +114,7 @@ object LevelSelectInputProcessor : AbstractInput(true) {
               }
             }
             Hex.assets.unload(getIslandFileName(index))
-            IslandFiles.fullFilesSearch()
+            Hex.assets.islandFiles.fullFilesSearch()
             LevelSelectScreen.renderPreviews()
             publishMessage("Deleted island $index", color = Color.GREEN)
           }

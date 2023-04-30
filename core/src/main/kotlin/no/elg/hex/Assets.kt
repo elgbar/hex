@@ -134,6 +134,8 @@ class Assets : AssetManager() {
 
   val fontSize by lazy { FONT_SIZE * scale }
 
+  val islandFiles: IslandFiles = IslandFiles()
+
   private val resolver: FileHandleResolver
 
   private fun findSprite(regionName: String): AtlasRegion {
@@ -311,7 +313,7 @@ class Assets : AssetManager() {
 
     loadingInfo = "islands"
 
-    IslandFiles.fullFilesSearch() // find all island files
+    islandFiles.fullFilesSearch() // find all island files
   }
 
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
