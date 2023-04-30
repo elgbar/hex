@@ -247,6 +247,7 @@ class Assets : AssetManager() {
 
     // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
     finishLoading()
+    Gdx.app.debug("Assets", "Initial assets loaded")
   }
 
   fun loadAssets() {

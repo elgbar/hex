@@ -22,18 +22,13 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
 
   private val layout by lazy { GlyphLayout() }
 
-  companion object {
-    var loading = false
-      private set
-  }
-
   init {
     require(!loading) { "Two island splash screens should not be active at the same time!" }
     loading = true
     val islandFile = getIslandFile(id)
     val initIsland = island
     if (initIsland == null && !islandFile.exists()) {
-      MessagesRenderer.publishWarning("Tried to play island $id, but no such island is loaded")
+      MessagesRenderer.publishWarning("Tried to play island $id, but island does not exist")
       loading = false
       loadable = false
     } else {
@@ -42,9 +37,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
         createIslandScreen(initIsland)
       } else {
         KtxAsync.launch(Hex.asyncThread) {
-
           try {
-
             val progress = PreviewIslandScreen.getProgress(id)
             Gdx.app.trace("IS SPLASH") { "progress: $progress" }
             island = if (!Hex.args.mapEditor && !progress.isNullOrBlank()) {
@@ -106,5 +99,10 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
 
   override fun show() {
     startTime = System.currentTimeMillis()
+  }
+
+  companion object {
+    var loading = false
+      private set
   }
 }
