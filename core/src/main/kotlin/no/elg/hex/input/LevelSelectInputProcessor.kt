@@ -23,13 +23,10 @@ import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
-import no.elg.hex.util.trace
 import java.lang.Float.max
 
 /** @author Elg */
 class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : AbstractInput(true) {
-
-  var lastY: Float = screen.camera.position.y
 
   /**
    * @param scale in range 0..1
@@ -96,7 +93,6 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     val maximum = max(minimum, y + height - screenHeight / 2f + padding)
 
     val newY = (lastY + delta).coerceIn(minimum..maximum)
-    Gdx.app.trace("LSIP scroll", "lastY $lastY camera.position.y ${screen.camera.position.y} newY $newY")
     screen.camera.position.y = newY
     lastY = newY
     screen.updateCamera()
@@ -152,11 +148,6 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     return true
   }
 
-  override fun show() {
-    super.show()
-    restoreScrollPosition()
-  }
-
   fun restoreScrollPosition() {
     scroll(0f)
   }
@@ -164,5 +155,8 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   companion object {
     private const val SCROLL_SPEED = 50f
     private const val INVALID_ISLAND_INDEX = Int.MIN_VALUE
+
+    var lastY: Float = 0f
+      private set
   }
 }

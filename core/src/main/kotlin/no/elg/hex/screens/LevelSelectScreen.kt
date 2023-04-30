@@ -9,7 +9,6 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import no.elg.hex.util.isLazyInitialized
 
 /** @author Elg */
 class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
@@ -24,6 +23,9 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   }
 
   override fun render(delta: Float) {
+    if (LevelSelectInputProcessor.lastY != camera.position.y) {
+      input.restoreScrollPosition()
+    }
     lineRenderer.begin(Line)
     batch.begin()
 
@@ -82,11 +84,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   }
 
   override fun recreate(): AbstractScreen {
-    return LevelSelectScreen().also {
-      if (::input.isLazyInitialized) {
-        it.input.lastY = input.lastY
-      }
-    }
+    return LevelSelectScreen()
   }
 
   override fun show() {

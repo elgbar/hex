@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Allow player to place castles on living pieces, the living piece will be in the players hand afterwards
 * A white line is drawn below whose turn it currently is on the strength bar
 * Add `--save-island-on-loading-it` program argument flag
+* Level select screen now remember where you last left it off
 
 ### Changed
 
