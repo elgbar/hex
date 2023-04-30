@@ -208,7 +208,6 @@ object Hex : ApplicationAdapter() {
     assets.loadAssets()
 
     settingsScreen = SettingsScreen()
-    LevelSelectScreen.renderPreviews()
 
     // must be last
     assets.finishMain()

@@ -44,6 +44,7 @@ import no.elg.hex.assets.IslandAsynchronousAssetLoader
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.debug
 import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
@@ -314,6 +315,7 @@ class Assets : AssetManager() {
     loadingInfo = "islands"
 
     islandFiles.fullFilesSearch() // find all island files
+    LevelSelectScreen.renderPreviews()
   }
 
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
