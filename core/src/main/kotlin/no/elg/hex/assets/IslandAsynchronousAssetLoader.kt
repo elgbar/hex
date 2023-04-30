@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.util.regenerateCapitals
@@ -61,6 +62,7 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
         Gdx.files.local(file.path()).writeString(
           island.also {
             it.regenerateCapitals()
+            it.currentTeam = Settings.startTeam
           }.createDto().serialize(),
           false
         )

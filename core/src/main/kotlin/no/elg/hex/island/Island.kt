@@ -219,7 +219,7 @@ class Island(
   val currentAI: AI? get() = teamToPlayer[currentTeam]
 
   var currentTeam: Team = Settings.startTeam
-    private set
+    internal set
 
   private val teamToPlayer =
     EnumMap<Team, AI?>(Team::class.java).apply {
