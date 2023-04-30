@@ -208,15 +208,16 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun resize(width: Int, height: Int) {
-    ScreenRenderer.resize(width, height)
-    screen.resize(width, height)
+    if (width > 0 && height > 0) {
+      ScreenRenderer.resize(width, height)
+      screen.resize(width, height)
+    }
   }
 
   override fun dispose() {
     try {
       pause()
       screen.dispose()
-      assets.dispose()
     } catch (_: Exception) {
     }
   }
