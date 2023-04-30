@@ -14,7 +14,8 @@ import no.elg.hex.screens.LevelSelectScreen.NON_ISLAND_SCALE
 import no.elg.hex.screens.LevelSelectScreen.PREVIEWS_PER_ROW
 import no.elg.hex.screens.LevelSelectScreen.camera
 import no.elg.hex.screens.LevelSelectScreen.padding
-import no.elg.hex.screens.LevelSelectScreen.shownPreviewSize
+import no.elg.hex.screens.SettingsScreen
+import no.elg.hex.screens.TutorialScreen
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -71,7 +72,7 @@ class LevelSelectInputProcessor : AbstractInput(true) {
     val index = getHoveringIslandIndex()
     Gdx.app.debug("SELECT", "Clicked on index $index")
     when {
-      index == -PREVIEWS_PER_ROW -> Hex.screen = Hex.settingsScreen
+      index == -PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
       index == -PREVIEWS_PER_ROW + 1 -> {
         if (Hex.args.mapEditor) {
           Hex.screen = LevelCreationScreen()
@@ -80,7 +81,7 @@ class LevelSelectInputProcessor : AbstractInput(true) {
         }
       }
 
-      index == -1 -> Hex.screen = Hex.tutorialScreen
+      index == -1 -> Hex.screen = TutorialScreen()
       index in -PREVIEWS_PER_ROW..-1 -> return false
       index != INVALID_ISLAND_INDEX -> play(index)
       else -> return false

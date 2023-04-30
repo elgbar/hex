@@ -35,8 +35,6 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
     }
   }
 
-  override fun hide() = Unit
-
   override fun show() {
     super.show()
     previousScreen = Hex.screen

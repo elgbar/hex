@@ -20,7 +20,6 @@ import no.elg.hex.Hex
 class TutorialScreen : OverlayScreen(false) {
 
   init {
-
     fun tutorialImage(regionName: String): AtlasRegion {
       try {
         return Hex.assets.tutorialScreenShots.findRegion(regionName)

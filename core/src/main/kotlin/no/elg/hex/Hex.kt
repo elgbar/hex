@@ -31,9 +31,7 @@ import no.elg.hex.platform.Platform
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
-import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.SplashScreen
-import no.elg.hex.screens.TutorialScreen
 import no.elg.hex.util.LOG_TRACE
 import no.elg.hex.util.debug
 import no.elg.hex.util.info
@@ -73,21 +71,6 @@ object Hex : ApplicationAdapter() {
   val assetsAvailable: Boolean get() = Hex::assets.isInitialized
 
   val inputMultiplexer = InputMultiplexer()
-
-  private var internalTutorialScreen: TutorialScreen? = null
-  val tutorialScreen: TutorialScreen
-    get() {
-      val its = internalTutorialScreen
-      if (its == null || its.isDisposed) {
-        val newITS = TutorialScreen()
-        internalTutorialScreen = TutorialScreen()
-        return newITS
-      }
-      return its
-    }
-
-  lateinit var settingsScreen: SettingsScreen
-    private set
 
   lateinit var platform: Platform
 
@@ -207,8 +190,6 @@ object Hex : ApplicationAdapter() {
 
     assets.loadAssets()
 
-    settingsScreen = SettingsScreen()
-
     // must be last
     assets.finishMain()
   }
@@ -222,10 +203,6 @@ object Hex : ApplicationAdapter() {
     assets.dispose()
     asyncThread.dispose()
     ScreenRenderer.dispose()
-    settingsScreen.dispose()
-    internalTutorialScreen?.dispose()
-    internalTutorialScreen = null
-    LevelSelectScreen.previews.dispose()
     VisUI.dispose(false)
   }
 
