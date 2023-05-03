@@ -66,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix pieces being animated when in map editor mode
 * Fix reason for upside down text
 * Fix rendering a few frames when resuming with disposed screen causing crashes sometimes
+* Fix resizing stage screens
 
 ### Removed
 

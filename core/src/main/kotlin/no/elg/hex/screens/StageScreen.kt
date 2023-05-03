@@ -61,6 +61,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
+    stage.viewport.setWorldSize(width.toFloat(), height.toFloat())
     stage.viewport.update(width, height, true)
     updateCamera()
 
