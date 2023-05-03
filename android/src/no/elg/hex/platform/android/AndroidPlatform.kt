@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.WindowManager
 import no.elg.hex.R
 import no.elg.hex.platform.Platform
+import no.elg.hex.platform.PlatformType
 
 
 class AndroidPlatform(private val activity: Activity) : Platform {
@@ -32,4 +33,6 @@ class AndroidPlatform(private val activity: Activity) : Platform {
       activity.onBackPressed()
     }
   }
+
+  override val type: PlatformType = PlatformType.MOBILE
 }

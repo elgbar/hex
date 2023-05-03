@@ -28,4 +28,6 @@ interface Platform {
 
   fun platformInit() = Unit
   fun pause() = Unit
+
+  val type: PlatformType
 }
