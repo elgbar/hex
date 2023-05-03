@@ -106,6 +106,7 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 * Reimplement `DefaultHexagonDataStorage` to use `IntMap` and where the key is a compacted key
 * Add fling support in the level select screen
 * Add a visible number to the island
+* When clicking an island to play it, zoom into the sprite while loading the island
 
 #### Known bugs
 

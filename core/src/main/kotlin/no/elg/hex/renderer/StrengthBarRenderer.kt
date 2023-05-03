@@ -68,6 +68,7 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
       offsetX += drawRect(offsetX, percent, team, island.currentTeam == team)
     }
     end()
+    Gdx.graphics.requestRendering()
   }
 
   private fun drawRect(xOffset: Int, percent: Float, team: Team, currentTeam: Boolean): Int {
