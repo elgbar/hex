@@ -167,7 +167,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     private const val MIN_MOVE_AMOUNT = 0
 
     const val MIN_ZOOM = 0.1f
-    const val MAX_ZOOM = 2.5f
+    const val MAX_ZOOM = 2f
 
     const val TAP_ZOOM_AMOUNT = -1.5f
   }
