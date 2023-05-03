@@ -44,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Double tapping while in-game will smoothly zoom the camera
 * Only call ensureCapitalStartFunds when saving, this speeds up loading drastically
 * Reorder teams from `SUN`, `LEAF`, `FOREST`, `EARTH`, `STONE` to `LEAF`, `FOREST`, `STONE`, `EARTH`, `SUN`
+* Move the non-islands buttons in the level select screen closer to the center of the screen
+* Make the interaction with non-island buttons on the level select screen accurate
 
 ### Fixed
 
@@ -67,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix reason for upside down text
 * Fix rendering a few frames when resuming with disposed screen causing crashes sometimes
 * Fix resizing stage screens
+* Fix exceptions being thrown if an island had no hexagons loaded
 
 ### Removed
 

@@ -104,6 +104,8 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 * Add a proper tutorial, nobody likes to read
 * Color-grade the border of attackable hexagons according to how beneficial it is to attack it
 * Reimplement `DefaultHexagonDataStorage` to use `IntMap` and where the key is a compacted key
+* Add fling support in the level select screen
+* Add a visible number to the island
 
 #### Known bugs
 

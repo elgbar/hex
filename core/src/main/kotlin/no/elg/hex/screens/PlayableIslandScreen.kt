@@ -166,7 +166,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
           isMovable = false
           isModal = true
           this.hide()
-          val label = visLabel(text())
+          val label = visLabel("")
 
           labelUpdater[this] = {
             label.setText(text())
