@@ -1,6 +1,5 @@
 package no.elg.hex
 
-import com.badlogic.gdx.Application.LOG_DEBUG
 import com.badlogic.gdx.Gdx
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
@@ -44,7 +43,7 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
-  var allowAIToSurrender by PreferenceDelegate(true, priority = 100_000, hideLevel = LOG_DEBUG)
+  var allowAIToSurrender by PreferenceDelegate(true, priority = 100_000, shouldHide = { Hex.debug })
 
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
   var enableStrengthHint by PreferenceDelegate(false, priority = 100)
@@ -71,14 +70,14 @@ object Settings {
   var zoomSpeed by PreferenceDelegate(
     0.2f,
     priority = 100_000,
-    hideLevel = LOG_DEBUG
+    shouldHide = { Hex.debug }
   ) { it < 0.001f || it > 1f }
 
   var startTeam by PreferenceDelegate(
     Team.LEAF,
     runOnChangeOnInit = false,
     applyOnChangeOnSettingsHide = true,
-    hideLevel = LOG_DEBUG,
+    shouldHide = { Hex.debug },
     priority = 100_000,
     onChange = { _, _, new ->
       gotoLevelSelect()
@@ -143,7 +142,7 @@ object Settings {
   var enableGLDebugging by PreferenceDelegate(
     false,
     priority = 100_000,
-    hideLevel = LOG_DEBUG,
+    shouldHide = { Hex.debug },
     onChange = { _, old, new ->
       if (new != old) {
         if (new) {
@@ -157,8 +156,8 @@ object Settings {
     }
   )
 
-  var enableDebugHUD by PreferenceDelegate(false, priority = 100_000, hideLevel = LOG_DEBUG)
-  var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, hideLevel = LOG_DEBUG)
+  var enableDebugHUD by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug })
+  var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug })
 
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
   var deleteAllProgress by PreferenceDelegate(
