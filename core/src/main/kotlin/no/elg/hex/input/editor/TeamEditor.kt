@@ -15,7 +15,7 @@ sealed class TeamEditor(val mapEditorScreen: MapEditorScreen) : Editor {
       TeamEditor::class.sealedSubclasses.map {
         it.primaryConstructor?.call(mapEditorScreen)
           ?: error("Failed to create new instance of ${it.simpleName}")
-      }
+      }.sortedBy { it.order }
   }
 
   class SetTeam(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
@@ -25,6 +25,9 @@ sealed class TeamEditor(val mapEditorScreen: MapEditorScreen) : Editor {
   }
 
   class RandomizeTeam(mapEditorScreen: MapEditorScreen) : TeamEditor(mapEditorScreen) {
+
+    override val order: Int = 0
+
     override fun edit(hexagon: Hexagon<HexagonData>) {
       mapEditorScreen.island.getData(hexagon).team = Team.values().random()
     }

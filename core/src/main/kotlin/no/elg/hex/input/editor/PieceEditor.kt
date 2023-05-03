@@ -15,7 +15,7 @@ sealed class PieceEditor(val mapEditorScreen: MapEditorScreen) : Editor {
       PieceEditor::class.sealedSubclasses.map {
         it.primaryConstructor?.call(mapEditorScreen)
           ?: error("Failed to create new instance of ${it.simpleName}")
-      }
+      }.sortedBy { it.order }
   }
 
   class SetPiece(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {

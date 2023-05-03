@@ -14,7 +14,7 @@ sealed class OpaquenessEditor(val mapEditorScreen: MapEditorScreen) : Editor {
       OpaquenessEditor::class.sealedSubclasses.map {
         it.primaryConstructor?.call(mapEditorScreen)
           ?: error("Failed to create new instance of ${it.simpleName}")
-      }
+      }.sortedBy { it.order }
   }
 
   class SetOpaque(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
@@ -30,6 +30,9 @@ sealed class OpaquenessEditor(val mapEditorScreen: MapEditorScreen) : Editor {
   }
 
   class ToggleOpaqueness(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
+
+    override val order: Int = 0
+
     override fun edit(hexagon: Hexagon<HexagonData>) {
       val data = mapEditorScreen.island.getData(hexagon)
       data.isDisabled = !data.isDisabled

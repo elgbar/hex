@@ -12,6 +12,9 @@ interface Editor {
         "Subclass of ${Editor::class::simpleName} cannot be anonymous"
       }
 
+  val order: Int
+    get() = Int.MAX_VALUE
+
   val isNOP
     get() = false
 
