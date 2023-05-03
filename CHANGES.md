@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] You will not get the `you lost` message when only AIs are playing against each other
 * [technical] Flip the setting `disable audio` to `enable audio`
 * [technical] Only call `ensureCapitalStartFunds` when saving, this speeds up loading drastically
+* [technical] On desktop, only move/ the camera when pressing the right mouse button
 
 ### Fixed
 

@@ -1,12 +1,14 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Input.Keys.BACK
 import com.badlogic.gdx.Input.Keys.ESCAPE
 import com.badlogic.gdx.math.Vector2
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.platform.PlatformType
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getHexagon
@@ -33,8 +35,9 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
   val cursorHex: Hexagon<HexagonData>? get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
+
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    if (draggable && pointer == 0) {
+    if (draggable && pointer == 0 && isCorrectButtonPressed()) {
       val zoom = screen.camera.zoom
       val dx = -Gdx.input.deltaX * zoom
       val dy = -Gdx.input.deltaY * zoom
@@ -156,7 +159,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    if (count % 2 == 0 && screen.smoothTransition == null) {
+    if (count % 2 == 0 && screen.smoothTransition == null && isCorrectButtonPressed()) {
       smoothZoom(TAP_ZOOM_AMOUNT)
       return true
     }
@@ -170,5 +173,12 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     const val MAX_ZOOM = 2f
 
     const val TAP_ZOOM_AMOUNT = -1.5f
+
+    fun isCorrectButtonPressed(): Boolean {
+      return when(Hex.platform.type){
+        PlatformType.MOBILE -> true
+        PlatformType.DESKTOP -> Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)
+      }
+    }
   }
 }
