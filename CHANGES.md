@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `--save-island-on-loading-it` program argument flag
 * Level select screen now remember where you last left it off
 * Render a grid of disabled hexagons when in map editor mode
+* Render relative strength bar in map editor mode
 
 ### Changed
 

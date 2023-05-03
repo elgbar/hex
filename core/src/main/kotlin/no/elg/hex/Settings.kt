@@ -156,7 +156,7 @@ object Settings {
     }
   )
 
-  var enableDebugHUD by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug })
+  var enableDebugHUD by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug || Hex.args.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug })
 
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
