@@ -18,26 +18,6 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   private val mouseX get() = input.mouseX
   private val mouseY get() = input.mouseY
 
-  fun color(x: Float, y: Float, width: Float, height: Float): Color {
-    return if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else NOT_SELECTED_COLOR
-  }
-
-  private fun drawBox(x: Float, y: Float, width: Float, height: Float) {
-    lineRenderer.color = color(x, y, width, height)
-    lineRenderer.rect(x, y, width, height)
-  }
-
-  private fun drawSpriteType(selected: TextureRegion, notSelected: TextureRegion, index: Int) {
-    val (x, y, width, height) = input.slotRect(index, NON_ISLAND_SCALE)
-    val sprite = if (mouseX in x..x + width && mouseY in y..y + height) selected else notSelected
-    batch.draw(sprite, x, y, width, height)
-    if (Hex.debugStage) {
-      //Show the interaction area of these buttons
-      val (inputX, inputY, inputWidth, inputHeight) = input.slotRect(index, 1f)
-      drawBox(inputX, inputY, inputWidth, inputHeight)
-    }
-  }
-
   override fun render(delta: Float) {
     if (LevelSelectInputProcessor.lastY != camera.position.y) {
       input.restoreScrollPosition()
@@ -49,31 +29,11 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
     // Draw the first row of non-islands
     if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
-      drawSpriteType(Hex.assets.settingsDown, Hex.assets.settings, 0)
-      drawSpriteType(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
+      drawScreenSprite(Hex.assets.settingsDown, Hex.assets.settings, 0)
+      drawScreenSprite(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
 
       if (Hex.args.mapEditor) {
-        val (x, y, width, height) = input.slotRect(1, NON_ISLAND_SCALE)
-
-        drawBox(x, y, width, height)
-        // Draw crosshair in the center of the box
-        val color = color(x, y, width, height)
-        lineRenderer.line(
-          x + width / 2f,
-          y + height / 2f + height / 10f,
-          x + width / 2f,
-          y + height / 2f - height / 10f,
-          color,
-          color
-        )
-        lineRenderer.line(
-          x + width / 2f + width / 10f,
-          y + height / 2f,
-          x + width / 2f - width / 10f,
-          y + height / 2f,
-          color,
-          color
-        )
+        drawLevelCreationIcon()
       }
     }
 
@@ -98,6 +58,59 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     batch.end()
 
     lineRenderer.end()
+  }
+
+  fun color(x: Float, y: Float, width: Float, height: Float, notSelectedColor: Color = NOT_SELECTED_COLOR): Color {
+    return if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else notSelectedColor
+  }
+
+  private fun drawBox(x: Float, y: Float, width: Float, height: Float, notSelectedColor: Color = NOT_SELECTED_COLOR) {
+    lineRenderer.color = color(x, y, width, height, notSelectedColor)
+    lineRenderer.rect(x, y, width, height)
+  }
+
+  private fun drawSlotBox(slot: Int) {
+    val (inputX, inputY, inputWidth, inputHeight) = input.slotRect(slot, 1f)
+    drawBox(inputX, inputY, inputWidth, inputHeight, Color.GRAY)
+  }
+
+  private fun drawScreenSprite(selected: TextureRegion, notSelected: TextureRegion, index: Int) {
+    val (x, y, width, height) = input.slotRect(index, NON_ISLAND_SCALE)
+    val sprite = if (mouseX in x..x + width && mouseY in y..y + height) selected else notSelected
+    batch.draw(sprite, x, y, width, height)
+    if (Hex.debugStage) {
+      // Show the interaction area of these buttons
+      drawSlotBox(index)
+    }
+  }
+
+  private fun drawLevelCreationIcon() {
+    val newMapIndex = 1
+    val (x, y, width, height) = input.slotRect(newMapIndex, NON_ISLAND_SCALE)
+
+    drawBox(x, y, width, height)
+    // Draw crosshair in the center of the box
+    val color = color(x, y, width, height)
+    lineRenderer.line(
+      x + width / 2f,
+      y + height / 2f + height / 10f,
+      x + width / 2f,
+      y + height / 2f - height / 10f,
+      color,
+      color
+    )
+    lineRenderer.line(
+      x + width / 2f + width / 10f,
+      y + height / 2f,
+      x + width / 2f - width / 10f,
+      y + height / 2f,
+      color,
+      color
+    )
+
+    if (Hex.debugStage) {
+      drawSlotBox(newMapIndex)
+    }
   }
 
   override fun recreate(): AbstractScreen {

@@ -177,7 +177,7 @@ class Island(
         grid.getByCubeCoordinate(coord).ifPresent { it.setSatelliteData(data) }
       }
     }
-    //This must be after
+    // This must be after
     recalculateVisibleIslands()
 
     currentTeam = team
