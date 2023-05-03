@@ -147,6 +147,10 @@ class Island(
         internalVisibleHexagons += hexagon
       }
     }
+
+    if (::hexagonsPerTeam.isLazyInitialized) {
+      countHexagons(hexagonsPerTeam)
+    }
   }
 
   private fun restoreState(
@@ -167,17 +171,14 @@ class Island(
         .setRadius(GRID_RADIUS)
 
     grid = builder.build()
-    recalculateVisibleIslands()
 
     if (hexagonData.isNotEmpty()) {
       for ((coord, data) in hexagonData) {
         grid.getByCubeCoordinate(coord).ifPresent { it.setSatelliteData(data) }
       }
     }
-
-    if (::hexagonsPerTeam.isLazyInitialized) {
-      countHexagons(hexagonsPerTeam)
-    }
+    //This must be after
+    recalculateVisibleIslands()
 
     currentTeam = team
 
