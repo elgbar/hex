@@ -141,6 +141,17 @@ fun Island.regenerateCapitals() {
   select(null)
 }
 
+fun Island.removeSmallerIslands() {
+  val islands = findIslands()
+  val maxIsland = islands.maxByOrNull { it.size } ?: return
+  for (islandland in islands) {
+    if (islandland === maxIsland) continue
+    for (hexagon in islandland) {
+      getData(hexagon).isDisabled = true
+    }
+  }
+}
+
 fun Island.findIslands(): Set<Set<Hexagon<HexagonData>>> {
   val checkedHexagons = HashSet<Hexagon<HexagonData>>()
   val islands = HashSet<Set<Hexagon<HexagonData>>>()

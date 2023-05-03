@@ -46,6 +46,7 @@ import no.elg.hex.util.play
 import no.elg.hex.util.previous
 import no.elg.hex.util.previousOrNull
 import no.elg.hex.util.regenerateCapitals
+import no.elg.hex.util.removeSmallerIslands
 import no.elg.hex.util.saveInitialIsland
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
@@ -237,14 +238,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
             }
             menuItem("Remove Smaller Islands") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.K) {
-                val islands = island.findIslands()
-                val maxIsland = islands.maxByOrNull { it.size } ?: return@onInteract
-                for (islandland in islands) {
-                  if (islandland === maxIsland) continue
-                  for (hexagon in islandland) {
-                    island.getData(hexagon).isDisabled = true
-                  }
-                }
+                island.removeSmallerIslands()
               }
             }
 
