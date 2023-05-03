@@ -9,76 +9,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* New `normal` and `easy` AI
+* [gameplay] New `normal` and `easy` AI
   * These are all the same underlying AI different kind of restrictions
   * Placing castles are disallowed until a few turns in for `normal` and never allowed for `easy` AI
   * The chance of different AIs to just end their turn without considering all their options are depending on the difficultly
-* Show a castle on the main menu when the AI is done with a game
-* Allow player to place castles on living pieces, the living piece will be in the players hand afterwards
-* A white line is drawn below whose turn it currently is on the strength bar
-* Add `--save-island-on-loading-it` program argument flag
-* Level select screen now remember where you last left it off
-* Render a grid of disabled hexagons when in map editor mode
-* Render relative strength bar in map editor mode
+* [input] Allow player to place castles on living pieces, the living piece will be in the players hand afterward
+* [visual] Show a castle on the main menu when the AI is done with a game
+* [visual] A white line is drawn below whose turn it currently is on the strength bar
+* [visual] Level select screen now remember where you last left it off
+* [visual] Render a grid of disabled hexagons when in map editor mode
+* [visual] Render relative strength bar in map editor mode
+
+* [technical] Add `--save-island-on-loading-it` program argument flag
 
 ### Changed
 
-* Minimum android SDK version have been reduced to 26
-  * Turns out not everyone have the latest android version :surprised_pikachu:
-* Improve enum sorting in the settings screen
-* Limit the maximum start capital to be 25
-* Improve which piece will be replaced by a capital when there is no capital in a territory
+* [gameplay] Limit the maximum start capital to be 25
+* [gameplay] Living pieces behave like capitals and will instantly become a grave when no longer a part of a territory
+* [gameplay] Reorder teams from `SUN`, `LEAF`, `FOREST`, `EARTH`, `STONE` to `LEAF`, `FOREST`, `STONE`, `EARTH`, `SUN`
+* [gameplay] Improve which piece will be replaced by a capital when there is no capital in a territory
   * The order of selection is as follows `empty`, `trees`/`graves`, `baron`, `knight`, `spearman`, `peasant`, `castle`
   * E.g., if there is a peasant and a castle to choose from the algorithm will choose the peasant
-* Change calculation of best capital placement
+* [gameplay] Change calculation of best capital placement
   * Count invisible hexagons as slight more (i.e, 10%) valuable then friendly hexagons
   * Count the surrounding hexagons of a castle as twice as valuable
-* You will not get the `you lost` message when only AIs are playing against each other
-* Improve end turn warning to be less aggressive
-  * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
-* Living pieces behave like capitals and will instantly become a grave when no longer a part of a territory
-* Trees will grow at the beginning of each players turn but the newly grown tree will now be able to grow again
-* Rename turn to round
-* Adjust team color to make them easier to distinguish
-* Flip the setting `disable audio` to `enable audio`
-* Rendering now happens non-continuously, that is, only when needed
-* Pressing back on android when in the level select screen will exit the app
-* Double tapping while in-game will smoothly zoom the camera
-* Only call ensureCapitalStartFunds when saving, this speeds up loading drastically
-* Reorder teams from `SUN`, `LEAF`, `FOREST`, `EARTH`, `STONE` to `LEAF`, `FOREST`, `STONE`, `EARTH`, `SUN`
-* Move the non-islands buttons in the level select screen closer to the center of the screen
-* Make the interaction with non-island buttons on the level select screen accurate
+* [gameplay] Trees will grow at the beginning of each players turn but the newly grown tree will now be able to grow again
+* [input] Double tapping while in-game will smoothly zoom the camera
+* [input] Improve enum sorting in the settings screen
+* [input] Pressing back on android when in the level select screen will exit the app
+* [visual] Adjust team color to make them easier to distinguish
+* [visual] Reduce maximum zoom from 2.5 to 2
+* [visual] Move the non-islands buttons in the level select screen closer to the center of the screen
+* [technical] Rendering now happens non-continuously, that is, only when needed
+  * This drastically reduces the amount of power the game uses
+* [technical] Minimum android SDK version have been reduced to 26
+  * Turns out not everyone have the latest android version :surprised_pikachu:
+* [technical] Rename `turn` to `round`
+* [technical] You will not get the `you lost` message when only AIs are playing against each other
+* [technical] Flip the setting `disable audio` to `enable audio`
+* [technical] Only call `ensureCapitalStartFunds` when saving, this speeds up loading drastically
 
 ### Fixed
 
-* Fix capitals rendering "buy" flag when it is an AIs turn
-* Fix graves taking too long to become trees
-* Fix estimated income not updating when buying pieces
-* Fix unlimited fps is not really unlimited
-* Fix starting capital was higher for the player who didn't start
-* Fix map editor no finding the island folder on a fresh clone
-* Fix saving while holding piece threw a serialization exception
-* Fix double recording of selecting territory event
-* Fix living pieces getting killed at the end of round and not start of turn
-* Fix merging two territories always keeps the capital of the selected territory
-* Fix players with no territories left still get to play
-* Fix double processing of pieces in a bankrupt territory at the beginning of a players turn
-* Fix trees not remember if they have grown or not
-* Fix map editor screen not handling pausing/resuming the app
-* Do not save invisible hexagons in the islandDTO
-* Fix crash when there are no visible hexagons
-* Fix pieces being animated when in map editor mode
-* Fix reason for upside down text
-* Fix rendering a few frames when resuming with disposed screen causing crashes sometimes
-* Fix resizing stage screens
-* Fix exceptions being thrown if an island had no hexagons loaded
+* [gameplay] Fix estimated income not updating when buying pieces
+* [gameplay] Fix starting capital was higher for the player who didn't start
+* [gameplay] Fix living pieces getting killed at the end of round and not start of turn
+* [gameplay] Fix merging two territories always keeps the capital of the selected territory
+* [gameplay] Fix double processing of pieces in a bankrupt territory at the beginning of a players turn
+* [gameplay] Fix false positive `end turn` warnings
+  * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
+* [visual] Fix capitals rendering "buy" flag when it is an AIs turn
+* [visual] Fix pieces being animated when in map editor mode
+* [technical] Fix map editor not finding the island folder on a fresh clone
+* [technical] Fix saving while holding piece threw a serialization exception
+* [technical] Fix double recording of selecting territory event
+* [technical] Fix players with no territories left still get to play
+* [technical] Fix trees not remember if they have grown or not after deserialization
+* [technical] Fix map editor screen not handling pausing/resuming the app
+* [technical] Do not save invisible hexagons in the islandDTO
+* [technical] Fix text sometimes being rendered upside down
+* [technical] Fix rendering a few frames when resuming with disposed screen causing crashes sometimes
+* [technical] Fix resizing stage screens did not scale properly
+* [technical] Fix crash when there are no visible hexagons
+* [technical] Fix exceptions being thrown if an island had no hexagons loaded
 
 ### Removed
 
-* Remove the old `easy` and `un_losable` AIs
-* Remove the AI end turn delay
-* Remove the boxes around islands on the level select screen
-* [Android] Remove `limit fps`, `target fps`, `vsync`, `msaa`, and `audio` settings due to the platform not supporting changing them or being badly supported
+* [gameplay] Remove the old `easy` and `un_losable` AIs
+* [visual] Remove the boxes around islands on the level select screen
+* [technical] Remove the AI end turn delay
+* [technical] Remove `limit fps`, `target fps`, `vsync`, `msaa`, and `audio` settings on android due to the platform not supporting changing them or being badly supported
 
 ---
 
