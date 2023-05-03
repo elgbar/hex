@@ -24,7 +24,9 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
     lineRenderer.projectionMatrix = islandScreen.camera.combined
 
     val currHex = islandScreen.cursorHexagon
-    val canDrawEdged = Hex.args.`draw-edges` || Hex.args.mapEditor && !IslandPreviewCollection.renderingPreviews
+    val allowedToDrawInvisible = !IslandPreviewCollection.renderingPreviews
+    val shouldDrawEdges = Hex.args.`draw-edges` && allowedToDrawInvisible
+    val shouldDrawInvisible = Hex.args.mapEditor && allowedToDrawInvisible
 
     fun draw(
       hexes: Iterable<Hexagon<HexagonData>>,
@@ -35,20 +37,21 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       for (hexagon in hexes) {
         val points = hexagon.points
         val data = islandScreen.island.getData(hexagon)
-        val drawEdges = canDrawEdged && data.edge
 
-        if (data.invisible && !drawEdges) continue
+        val brightness = HexagonData.BRIGHTNESS + if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) {
+          HexagonData.SELECTED
+        } else {
+          0f
+        }
 
-        val brightness =
-          HexagonData.BRIGHTNESS +
-            if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) {
-              HexagonData.SELECTED
-            } else {
-              0f
-            }
-
-        if (drawEdges) {
-          lineRenderer.color.set(Color.WHITE)
+        if (data.edge) {
+          if (shouldDrawEdges) {
+            lineRenderer.color.set(Color.WHITE)
+          } else {
+            continue
+          }
+        } else if (shouldDrawInvisible && data.invisible) {
+          lineRenderer.color.set(Color.GRAY)
         } else {
           lineRenderer.color.set(color ?: data.color).mul(brightness, brightness, brightness, alpha)
         }
@@ -70,7 +73,8 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       }
     }
 
-    draw(islandScreen.island.visibleHexagons, null, 0.25f)
+    val hexagonsToRender = if (shouldDrawEdges || shouldDrawInvisible) islandScreen.island.allHexagons else islandScreen.island.visibleHexagons
+    draw(hexagonsToRender, null, 0.25f)
 
     if (islandScreen.island.isCurrentTeamHuman()) {
       islandScreen.island.selected?.also {
