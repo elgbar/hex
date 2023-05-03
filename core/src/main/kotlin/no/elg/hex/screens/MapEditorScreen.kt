@@ -33,6 +33,7 @@ import no.elg.hex.input.editor.NOOPEditor
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
+import no.elg.hex.input.editor.generateEditors
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.IslandDto
@@ -60,9 +61,9 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
   private val debugInfoRenderer = DebugInfoRenderer(this)
   private lateinit var quickSavedIsland: IslandDto
 
-  private val opaquenessEditors = OpaquenessEditor.generateOpaquenessEditors(this)
-  private val teamEditors = TeamEditor.generateTeamEditors(this)
-  private val pieceEditors = PieceEditor.generatePieceEditors(this)
+  private val opaquenessEditors = generateEditors<OpaquenessEditor>()
+  private val teamEditors = generateEditors<TeamEditor>()
+  private val pieceEditors = generateEditors<PieceEditor>()
 
   private val editorsWindow: KVisWindow
   private val confirmExit: KVisWindow

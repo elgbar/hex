@@ -2,31 +2,19 @@ package no.elg.hex.input.editor
 
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
-import no.elg.hex.screens.MapEditorScreen
-import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.reflect.full.primaryConstructor
 
-sealed class PieceEditor(val mapEditorScreen: MapEditorScreen) : Editor {
+sealed interface PieceEditor : Editor {
 
-  companion object {
-
-    fun generatePieceEditors(mapEditorScreen: MapEditorScreen): List<PieceEditor> =
-      PieceEditor::class.sealedSubclasses.map {
-        it.primaryConstructor?.call(mapEditorScreen)
-          ?: error("Failed to create new instance of ${it.simpleName}")
-      }.sortedBy { it.order }
-  }
-
-  class SetPiece(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
-    override fun edit(hexagon: Hexagon<HexagonData>) {
-      mapEditorScreen.island.getData(hexagon).setPiece(mapEditorScreen.selectedPiece)
+  object SetPiece : PieceEditor {
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
+      data.setPiece(metadata.selectedPiece)
     }
   }
 
-  class RandomizePiece(mapEditorScreen: MapEditorScreen) : PieceEditor(mapEditorScreen) {
-    override fun edit(hexagon: Hexagon<HexagonData>) {
-      mapEditorScreen.island.getData(hexagon).setPiece(PIECES.random())
+  object RandomizePiece : PieceEditor {
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
+      data.setPiece(PIECES.random())
     }
   }
 }

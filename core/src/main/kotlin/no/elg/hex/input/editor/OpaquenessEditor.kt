@@ -1,41 +1,35 @@
+@file:Suppress("unused")
+
 package no.elg.hex.input.editor
 
 import no.elg.hex.hexagon.HexagonData
-import no.elg.hex.screens.MapEditorScreen
-import no.elg.hex.util.getData
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.reflect.full.primaryConstructor
 
-sealed class OpaquenessEditor(val mapEditorScreen: MapEditorScreen) : Editor {
+sealed interface OpaquenessEditor : Editor {
 
-  companion object {
-
-    fun generateOpaquenessEditors(mapEditorScreen: MapEditorScreen): List<OpaquenessEditor> =
-      OpaquenessEditor::class.sealedSubclasses.map {
-        it.primaryConstructor?.call(mapEditorScreen)
-          ?: error("Failed to create new instance of ${it.simpleName}")
-      }.sortedBy { it.order }
+  override fun postEdit(metadata: EditMetadata) {
+//    metadata.island.recalculateVisibleIslands()
   }
 
-  class SetOpaque(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
-    override fun edit(hexagon: Hexagon<HexagonData>) {
-      mapEditorScreen.island.getData(hexagon).isDisabled = false
+  object SetOpaque : OpaquenessEditor {
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
+      data.isDisabled = false
     }
   }
 
-  class SetTransparent(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
-    override fun edit(hexagon: Hexagon<HexagonData>) {
-      mapEditorScreen.island.getData(hexagon).isDisabled = true
+  object SetTransparent : OpaquenessEditor {
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
+      data.isDisabled = true
     }
   }
 
-  class ToggleOpaqueness(mapEditorScreen: MapEditorScreen) : OpaquenessEditor(mapEditorScreen) {
+  object ToggleOpaqueness : OpaquenessEditor {
 
     override val order: Int = 0
 
-    override fun edit(hexagon: Hexagon<HexagonData>) {
-      val data = mapEditorScreen.island.getData(hexagon)
-      data.isDisabled = !data.isDisabled
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
+      val shouldDisable = metadata.clickedHexagonData.invisible
+      data.isDisabled = !shouldDisable
     }
   }
 }
