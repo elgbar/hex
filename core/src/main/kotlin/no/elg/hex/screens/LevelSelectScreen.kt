@@ -76,7 +76,9 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
       }
 
       batch.draw(preview.second, x, y, width, height)
-      drawBox(x, y, width, height)
+      if (Hex.debug || Hex.args.`stage-debug`) {
+        drawBox(x, y, width, height)
+      }
     }
     batch.end()
 

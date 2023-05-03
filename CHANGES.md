@@ -72,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Remove the old `easy` and `un_losable` AIs
 * Remove the AI end turn delay
+* Remove the boxes around islands on the level select screen
 * [Android] Remove `limit fps`, `target fps`, `vsync`, `msaa`, and `audio` settings due to the platform not supporting changing them or being badly supported
 
 ---
