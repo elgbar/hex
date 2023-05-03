@@ -9,8 +9,10 @@ import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.input.SmoothTransition
 import no.elg.hex.island.Island
+import no.elg.hex.preview.IslandPreviewCollection.Companion.renderingPreviews
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
+import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.isLazyInitialized
@@ -49,6 +51,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
   private val verticesRenderer by lazy { VerticesRenderer(this) }
   private val outlineRenderer by lazy { OutlineRenderer(this) }
   private val spriteRenderer by lazy { SpriteRenderer(this) }
+  private val strengthBarRenderer by lazy { StrengthBarRenderer(this.island) }
 
   val cursorHexagon: Hexagon<HexagonData>?
     get() = null
@@ -59,9 +62,15 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     verticesRenderer.frameUpdate()
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
-    smoothTransition?.zoom(delta)?.also { done ->
-      if (done) {
-        smoothTransition = null
+
+    if (!renderingPreviews) {
+      if (StrengthBarRenderer.isEnabled) {
+        strengthBarRenderer.frameUpdate()
+      }
+      smoothTransition?.zoom(delta)?.also { done ->
+        if (done) {
+          smoothTransition = null
+        }
       }
     }
   }
@@ -75,6 +84,10 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
       calcVisibleGridSize()
     } else {
       visibleGridSize
+    }
+
+    if (StrengthBarRenderer.isEnabled) {
+      strengthBarRenderer.resize(width, height)
     }
 
     // Sum the distance from the edge of the grid to the first visible hexagon
@@ -113,6 +126,9 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     }
     if (::spriteRenderer.isLazyInitialized) {
       spriteRenderer.dispose()
+    }
+    if (::strengthBarRenderer.isLazyInitialized) {
+      strengthBarRenderer.dispose()
     }
   }
 

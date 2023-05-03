@@ -58,7 +58,7 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
     Hex.resetClearColor()
   }
 
-  fun redrawBar() {
+  private fun redrawBar() {
     begin()
     val percentagesHexagons = island.calculatePercentagesHexagons()
     // inverse height
@@ -74,7 +74,7 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
     val color = team.color
     val endX = (fboWidth * percent).roundToInt()
 
-    if (currentTeam) {
+    if (currentTeam && !Hex.args.mapEditor) {
       Gdx.gl.glScissor(xOffset, (fboHeight * RELATIVE_HIGHLIGHT_BORDER_PERCENT).toInt(), xOffset + endX, fboHeight)
       val highlight = Color.WHITE
       Gdx.gl.glClearColor(highlight.r, highlight.g, highlight.b, 1f)

@@ -52,12 +52,10 @@ import no.elg.hex.preview.PreviewModifier.NOTHING
 import no.elg.hex.preview.PreviewModifier.SURRENDER
 import no.elg.hex.preview.PreviewModifier.WON
 import no.elg.hex.renderer.DebugGraphRenderer
-import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.hide
-import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.onAnyKeysDownEvent
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
@@ -72,7 +70,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
-  private val strengthBarRenderer by lazy { StrengthBarRenderer(this.island) }
 
   private val confirmEndTurn: VisWindow
   private val confirmSurrender: VisWindow
@@ -523,9 +520,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     if (DebugGraphRenderer.isEnabled) {
       DebugGraphRenderer.frameUpdate()
     }
-    if (StrengthBarRenderer.isEnabled) {
-      strengthBarRenderer.frameUpdate()
-    }
     debugRenderer.frameUpdate()
     frameUpdatable.frameUpdate()
     stageScreen.render(delta)
@@ -541,9 +535,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     frameUpdatable.resize(width, height)
     if (DebugGraphRenderer.isEnabled) {
       DebugGraphRenderer.resize(width, height)
-    }
-    if (StrengthBarRenderer.isEnabled) {
-      strengthBarRenderer.resize(width, height)
     }
   }
 
@@ -575,10 +566,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     teamChangedListener.disposeSafely()
 
     DebugGraphRenderer.dispose()
-
-    if (::strengthBarRenderer.isLazyInitialized) {
-      strengthBarRenderer.dispose()
-    }
     debugRenderer.dispose()
   }
 
