@@ -32,7 +32,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   }
 
   init {
-    if (Hex.args.`stage-debug` || Hex.trace) {
+    if (Hex.debugStage) {
       stage.isDebugAll = true
     }
     if (useRootTable) {

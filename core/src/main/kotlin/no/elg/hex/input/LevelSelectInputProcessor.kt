@@ -12,7 +12,8 @@ import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.LevelSelectScreen.Companion.NON_ISLAND_SCALE
 import no.elg.hex.screens.LevelSelectScreen.Companion.PREVIEWS_PER_ROW
-import no.elg.hex.screens.LevelSelectScreen.Companion.padding
+import no.elg.hex.screens.LevelSelectScreen.Companion.paddingX
+import no.elg.hex.screens.LevelSelectScreen.Companion.paddingY
 import no.elg.hex.screens.LevelSelectScreen.Companion.shownPreviewSize
 import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.TutorialScreen
@@ -32,16 +33,16 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
    * @param scale in range 0..1
    * @param horzOffset in range 0..1
    */
-  fun rect(index: Int, scale: Float = 1f, horzOffset: Float = 0.5f): Rectangle {
+  fun slotRect(index: Int, scale: Float = 1f, horzOffset: Float = 0.5f): Rectangle {
     val gridX = index % PREVIEWS_PER_ROW
     val gridY = index / PREVIEWS_PER_ROW
 
     val size = shownPreviewSize
-    val paddedSize = padding + size
+    val paddedSize = paddingX + size
 
     return Rectangle(
-      padding + paddedSize * gridX + size * horzOffset * (1f - scale),
-      padding + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale),
+      paddingX + paddedSize * gridX + size * horzOffset * (1f - scale),
+      paddingY + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale),
       size * scale,
       size * scale
     )
@@ -49,14 +50,14 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
 
   private fun getHoveringIslandIndex(): Int {
     for (i in 0..PREVIEWS_PER_ROW) {
-      val (x, y, width, height) = rect(i)
+      val (x, y, width, height) = slotRect(i)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i - PREVIEWS_PER_ROW
       }
     }
 
     for ((index, i) in Hex.assets.islandFiles.islandIds.withIndex()) {
-      val (x, y, width, height) = rect(index + PREVIEWS_PER_ROW)
+      val (x, y, width, height) = slotRect(index + PREVIEWS_PER_ROW)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i
       }
@@ -87,10 +88,10 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   private fun scroll(delta: Float) {
-    val (_, y, _, height) = rect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
+    val (_, y, _, height) = slotRect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
     val minimum = screenHeight / 2f
-    val maximum = max(minimum, y + height - screenHeight / 2f + padding)
+    val maximum = max(minimum, y + height - screenHeight / 2f + paddingX)
 
     val newY = (lastY + delta).coerceIn(minimum..maximum)
     screen.camera.position.y = newY

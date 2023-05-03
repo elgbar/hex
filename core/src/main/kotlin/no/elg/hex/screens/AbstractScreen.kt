@@ -59,10 +59,7 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
     try {
       dispose()
     } catch (e: Exception) {
-      Gdx.app.error(
-        "DISPOSE WARN",
-        "Exception thrown when disposing ${this::class.simpleName}: ${e::class.jvmName}: ${e.message}"
-      )
+      Gdx.app.error("DISPOSE WARN", "Exception thrown when disposing ${this::class.simpleName}: ${e::class.jvmName}: ${e.message}")
       e.printStackTrace()
     }
   }

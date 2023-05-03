@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ME debug" type="JetRunConfigurationType">
+  <configuration default="false" name="ME debug draw-edges" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="no.elg.hex.platform.desktop.DesktopLauncherKt" />
     <module name="hex.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="--map-editor --debug" />

@@ -36,8 +36,6 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.IslandDto
-import no.elg.hex.util.findIslands
-import no.elg.hex.util.getData
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
 import no.elg.hex.util.nextOrNull
@@ -100,98 +98,95 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
     quicksave()
     stageScreen.stage.actors {
 
-      confirmExit =
-        visWindow("Confirm exit") {
-          isMovable = false
-          isModal = true
-          hide()
+      confirmExit = visWindow("Confirm exit") {
+        isMovable = false
+        isModal = true
+        hide()
 
-          visLabel("Do you want to save before exiting?")
-          row()
+        visLabel("Do you want to save before exiting?")
+        row()
 
-          buttonBar {
-            setButton(
-              ButtonBar.ButtonType.YES,
-              scene2d.visTextButton("Yes") {
-                onClick {
-                  if (saveInitialIsland(id, island)) {
-                    Hex.screen = LevelSelectScreen()
-                  } else {
-                    this@visWindow.fadeOut()
-                  }
+        buttonBar {
+          setButton(
+            ButtonBar.ButtonType.YES,
+            scene2d.visTextButton("Yes") {
+              onClick {
+                if (saveInitialIsland(id, island)) {
+                  Hex.screen = LevelSelectScreen()
+                } else {
+                  this@visWindow.fadeOut()
                 }
               }
-            )
+            }
+          )
 
-            setButton(
-              ButtonBar.ButtonType.NO,
-              scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen() } }
-            )
+          setButton(
+            ButtonBar.ButtonType.NO,
+            scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen() } }
+          )
 
-            setButton(
-              ButtonBar.ButtonType.CANCEL,
-              scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } }
-            )
-            createTable().pack()
-          }
-          pack()
-          centerWindow()
+          setButton(
+            ButtonBar.ButtonType.CANCEL,
+            scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } }
+          )
+          createTable().pack()
         }
+        pack()
+        centerWindow()
+      }
 
       fun exit() {
         confirmExit.centerWindow()
         confirmExit.toggleShown(stage)
       }
 
-      editorsWindow =
-        visWindow("Editors") {
-          addCloseButton()
-          isResizable = false
+      editorsWindow = visWindow("Editors") {
+        addCloseButton()
+        isResizable = false
 
-          if (Hex.args.`stage-debug` || Hex.trace) {
-            debug()
-          }
-          defaults().space(5f)
-
-          fun createEditorButton(name: String, key: Int) {
-            visImageTextButton(name) {
-              onClick { Hex.inputMultiplexer.keyDown(key) }
-              it.fillX()
-              visTextTooltip("Hotkey: ${Keys.toString(key)}")
-            }
-          }
-          createEditorButton("Opaqueness", OPAQUENESS_KEY)
-          row()
-          createEditorButton("Team", TEAM_KEY)
-          row()
-          createEditorButton("Piece", PIECE_KEY)
-          pack()
+        if (Hex.debugStage) {
+          debug()
         }
+        defaults().space(5f)
 
-      val infoWindow =
-        visWindow("Island editor information") {
-          closeOnEscape()
-          addCloseButton()
-          isModal = true
-          visLabel(
-            """
-              |Tips and Tricks:
-              |* Holding SHIFT will reverse iteration order, unless otherwise stated
-              |
-              |Island Validation rules:
-              |
-              |* All visible hexagons must be reachable from all other visible hexagons 
-              |  (ie there can only be one island)
-              |* No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
-              |* There must be exactly one capital per territory
-            """.trimMargin()
-          ) {
-            it.expand().fill()
+        fun createEditorButton(name: String, key: Int) {
+          visImageTextButton(name) {
+            onClick { Hex.inputMultiplexer.keyDown(key) }
+            it.fillX()
+            visTextTooltip("Hotkey: ${Keys.toString(key)}")
           }
-          pack()
-          centerWindow()
-          this.hide()
         }
+        createEditorButton("Opaqueness", OPAQUENESS_KEY)
+        row()
+        createEditorButton("Team", TEAM_KEY)
+        row()
+        createEditorButton("Piece", PIECE_KEY)
+        pack()
+      }
+
+      val infoWindow = visWindow("Island editor information") {
+        closeOnEscape()
+        addCloseButton()
+        isModal = true
+        visLabel(
+          """
+            |Tips and Tricks:
+            |* Holding SHIFT will reverse iteration order, unless otherwise stated
+            |
+            |Island Validation rules:
+            |
+            |* All visible hexagons must be reachable from all other visible hexagons 
+            |  (ie there can only be one island)
+            |* No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
+            |* There must be exactly one capital per territory
+          """.trimMargin()
+        ) {
+          it.expand().fill()
+        }
+        pack()
+        centerWindow()
+        this.hide()
+      }
 
       visTable {
         menuBar { cell ->
@@ -246,15 +241,13 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
 
             menuItem("Next Editor") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.RIGHT) {
-                editor =
-                  editors.nextOrNull(editor) ?: NOOPEditor
+                editor = editors.nextOrNull(editor) ?: NOOPEditor
               }
             }
 
             menuItem("Previous Editor") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.LEFT) {
-                editor =
-                  editors.previousOrNull(editor) ?: NOOPEditor
+                editor = editors.previousOrNull(editor) ?: NOOPEditor
               }
             }
 
@@ -324,11 +317,11 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island)
     }
   }
 
-  fun quicksave() {
+  private fun quicksave() {
     quickSavedIsland = island.createDto()
   }
 
-  fun quickload() {
+  private fun quickload() {
     if (!::quickSavedIsland.isInitialized) {
       publishError("No quick save found")
       return

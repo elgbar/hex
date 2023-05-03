@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
@@ -30,6 +29,7 @@ import com.kotcrab.vis.ui.widget.spinner.Spinner
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.assets.disposeSafely
+import ktx.graphics.use
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
@@ -87,28 +87,20 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   }
 
   init {
-    if (Hex.debug) {
-      batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
-    }
-
     rootTable {
-
       // arbitrary initial value
 
       visTable { table ->
-        table.fill()
-        table.expand()
         previewImage = visImage(Texture(previewSize, previewSize, RGBA8888)) {
-          it.fill()
-          it.expand()
-          it.center()
+          this.setScaling(Scaling.fit)
+          it.fillX()
         }
 
-        if (Hex.args.`stage-debug`) {
-          previewImageNoise = visImage(TextureRegionDrawable(Texture(NOISE_SIZE, NOISE_SIZE, RGB565)), Scaling.fillY) {
-            it.fill()
-            it.expand()
-            it.center()
+        if (Hex.debugStage) {
+          previewImageNoise = visImage(Texture(NOISE_SIZE, NOISE_SIZE, RGB565)) {
+            this.setScaling(Scaling.fillY)
+            it.right()
+            it.width(0f)
           }
         }
       }
@@ -303,10 +295,9 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   }
 
   override fun render(delta: Float) {
-    stage.act(delta)
-    stage.draw()
+    super.render(delta)
 
-    if (Hex.args.`stage-debug` || Hex.trace) {
+    if (Hex.debugStage) {
       lineRenderer.begin(ShapeType.Line)
       lineRenderer.color = Color.LIGHT_GRAY
       lineRenderer.line(Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f, Gdx.graphics.height.toFloat())
@@ -332,13 +323,10 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
     layoutSpinner.setCurrent(layoutSpinner.value, false)
 
     if (layoutSpinner.value.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
-      // force update to imageWidth and imageHeight to make sure we have the correct size
-      rootTable.pack()
-
       Hex.assets.islandPreviews.renderPreview(
         createIsland(),
-        previewImage.imageWidth.toInt(),
-        previewImage.imageHeight.toInt()
+        previewSize,
+        previewSize
       ) {
         previewBuffer?.dispose()
         previewBuffer = it
@@ -348,7 +336,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       }
     }
 
-    if (Hex.args.`stage-debug`) {
+    if (Hex.debugStage) {
       previewBufferNoise?.dispose()
       val size = widthSpinner.value
 
@@ -370,19 +358,20 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       }
 
       val buffer = FrameBuffer(RGBA8888, NOISE_SIZE, NOISE_SIZE, false)
-      buffer.begin()
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+      buffer.use {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-      val a = Texture(pixmap).also {
-        it.setFilter(Nearest, Nearest)
+        val texture = Texture(pixmap).also { texture ->
+          texture.setFilter(Nearest, Nearest)
+        }
+
+        batch.use { batch ->
+          batch.draw(texture, 0f, 0f, NOISE_SIZE.toFloat(), NOISE_SIZE.toFloat())
+        }
       }
-
-      batch.begin()
-      batch.draw(a, 0f, 0f, NOISE_SIZE_F, NOISE_SIZE_F)
-      batch.end()
-
-      buffer.end()
-      previewImageNoise?.drawable = TextureRegionDrawable(buffer.colorBufferTexture)
+      previewImageNoise?.also {
+        it.drawable = TextureRegionDrawable(buffer.colorBufferTexture)
+      }
     }
   }
 
@@ -396,12 +385,10 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     renderPreview()
-    rootTable.pack()
   }
 
   companion object {
     private const val NOISE_SIZE = 512
-    private const val NOISE_SIZE_F = NOISE_SIZE.toFloat()
     private const val WIDTH_SPINNER_NAME = "width"
   }
 }
