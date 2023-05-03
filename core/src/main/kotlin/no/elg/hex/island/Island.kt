@@ -133,6 +133,22 @@ class Island(
     )
   }
 
+  fun recalculateVisibleIslands() {
+    internalAllHexagons.clear()
+    internalVisibleHexagons.clear()
+    internalAllHexagons.addAll(grid.hexagons)
+
+    for (hexagon in allHexagons) {
+      val data = this.getData(hexagon)
+      require(data.piece == Empty || data == data.piece.data) {
+        "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
+      }
+      if (data.visible) {
+        internalVisibleHexagons += hexagon
+      }
+    }
+  }
+
   private fun restoreState(
     width: Int,
     height: Int,
@@ -151,23 +167,11 @@ class Island(
         .setRadius(GRID_RADIUS)
 
     grid = builder.build()
+    recalculateVisibleIslands()
 
     if (hexagonData.isNotEmpty()) {
       for ((coord, data) in hexagonData) {
         grid.getByCubeCoordinate(coord).ifPresent { it.setSatelliteData(data) }
-      }
-    }
-    internalAllHexagons.clear()
-    internalVisibleHexagons.clear()
-    internalAllHexagons.addAll(grid.hexagons)
-
-    for (hexagon in allHexagons) {
-      val data = this.getData(hexagon)
-      require(data.piece == Empty || data == data.piece.data) {
-        "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
-      }
-      if (data.visible) {
-        internalVisibleHexagons += hexagon
       }
     }
 

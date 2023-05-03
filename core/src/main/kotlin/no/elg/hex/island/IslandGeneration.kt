@@ -75,6 +75,7 @@ object IslandGeneration {
         val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
         Gdx.app.trace("ISGEN") { "${hexagon.gridX}, ${hexagon.gridZ} has the noise of $noise" }
         if (noise <= 1) {
+          data.isDisabled = false
           data.team = teams.random(random)
           if (noise <= treeChance) {
             replaceWithTree(island, hexagon)
@@ -83,9 +84,16 @@ object IslandGeneration {
           data.isDisabled = true
         }
       }
+
+      island.recalculateVisibleIslands()
+
+      for (hexagon in island.visibleHexagons) {
+        val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
+        if (noise <= treeChance) {
+          replaceWithTree(island, hexagon)
+        }
+      }
     }
     return island
-
-//    island.regenerateCapitals()
   }
 }
