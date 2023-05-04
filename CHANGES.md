@@ -20,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Level select screen now remember where you last left it off
 * [visual] Render a grid of disabled hexagons when in map editor mode
 * [visual] Render relative strength bar in map editor mode
-
 * [technical] Add `--save-island-on-loading-it` program argument flag
 
 ### Changed
@@ -38,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [input] Double tapping while in-game will smoothly zoom the camera
 * [input] Improve enum sorting in the settings screen
 * [input] Pressing back on android when in the level select screen will exit the app
+* [visual] Visual strength hint is enabled by default
 * [visual] Adjust team color to make them easier to distinguish
 * [visual] Reduce maximum zoom from 2.5 to 2
 * [visual] Move the non-islands buttons in the level select screen closer to the center of the screen

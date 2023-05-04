@@ -46,7 +46,7 @@ object Settings {
   var allowAIToSurrender by PreferenceDelegate(true, priority = 100_000, shouldHide = { Hex.debug })
 
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
-  var enableStrengthHint by PreferenceDelegate(false, priority = 100)
+  var enableStrengthHint by PreferenceDelegate(true, priority = 100)
   var enableStrengthBar by PreferenceDelegate(true, priority = 100)
 
   var showFps by PreferenceDelegate(false, priority = 109)
@@ -156,7 +156,7 @@ object Settings {
     }
   )
 
-  var enableDebugHUD by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug || Hex.args.mapEditor })
+  var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { Hex.debug || Hex.args.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { Hex.debug })
 
   private const val DELETE_ALL_PROGRESS_STRING = "delete all"
