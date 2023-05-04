@@ -1,6 +1,7 @@
 package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.utils.Align
@@ -8,7 +9,9 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.graphics.use
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.input.AbstractInput
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.trace
@@ -99,10 +102,25 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
 
   override fun show() {
     startTime = System.currentTimeMillis()
+    SplashIslandInputProcessor.show()
   }
 
   companion object {
     var loading = false
       private set
+
+    object SplashIslandInputProcessor : AbstractInput() {
+      override fun keyDown(keycode: Int): Boolean {
+        when (keycode) {
+          Input.Keys.ESCAPE, Input.Keys.BACK -> {
+            Hex.screen = LevelSelectScreen()
+            Hex.assets.clickSound?.play(Settings.volume)
+          }
+
+          else -> return false
+        }
+        return true
+      }
+    }
   }
 }

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Placing castles are disallowed until a few turns in for `normal` and never allowed for `easy` AI
   * The chance of different AIs to just end their turn without considering all their options are depending on the difficultly
 * [input] Allow player to place castles on living pieces, the living piece will be in the players hand afterward
+* [input] Pressing escape/back in the island load screen changes the screen to the level select screen 
 * [visual] Show a castle on the main menu when the AI is done with a game
 * [visual] A white line is drawn below whose turn it currently is on the strength bar
 * [visual] Level select screen now remember where you last left it off
