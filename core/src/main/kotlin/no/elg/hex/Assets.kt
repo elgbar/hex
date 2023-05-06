@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.badlogic.gdx.utils.Logger.DEBUG
 import com.badlogic.gdx.utils.TimeUtils
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
@@ -222,6 +223,10 @@ class Assets : AssetManager() {
 
   init {
     Gdx.app.debug("ASSET", "Using ${scale}x scale")
+
+    if (Hex.debug) {
+      super.getLogger().level = DEBUG
+    }
 
     KtxAsync.launch(Hex.asyncThread) {
       val warmUpStart = TimeUtils.millis()
