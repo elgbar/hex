@@ -167,8 +167,8 @@ class IslandPreviewCollection : Disposable {
         val islandFileName = getIslandFileName(id)
         if (!Hex.assets.isLoaded<Island>(islandFileName)) {
           Gdx.app.trace("Update preview", "Island $id was not loaded, waiting for it to be loaded now...")
-          val asset = Hex.assets.load<Island>(islandFileName)
-          while (!asset.isLoaded()) {
+          Hex.assets.load<Island>(islandFileName)
+          while (!Hex.assets.update()) {
             Thread.yield()
           }
         }
