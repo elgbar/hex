@@ -50,19 +50,6 @@ object Settings {
   var enableStrengthBar by PreferenceDelegate(true, priority = 100)
 
   var showFps by PreferenceDelegate(false, priority = 109)
-  var limitFps by PreferenceDelegate(
-    false,
-    priority = 110,
-    shouldHide = { !Hex.platform.canLimitFps },
-    onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }
-  )
-  var targetFps by PreferenceDelegate(
-    30,
-    priority = 111,
-    runOnChangeOnInit = false,
-    shouldHide = { !Hex.platform.canLimitFps },
-    onChange = { _, _, new -> updateForegroundFPS(); return@PreferenceDelegate new }
-  ) { it < 5 }
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
   var MSAA by PreferenceDelegate(4, Hex.launchPreference, true, shouldHide = { !Hex.platform.canSetMSAA }) { it !in 0..16 }
@@ -202,11 +189,6 @@ object Settings {
       return@PreferenceDelegate new
     }
   )
-
-  private fun updateForegroundFPS() {
-    val maxFps = if (limitFps) targetFps else 0
-    Hex.platform.setFps(maxFps)
-  }
 
   private var lastGotoCalled = 0L
   private fun gotoLevelSelect() {

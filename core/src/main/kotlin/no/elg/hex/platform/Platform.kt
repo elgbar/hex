@@ -13,11 +13,6 @@ interface Platform {
   val canLimitFps: Boolean
 
   /**
-   * Only supported when [canLimitFps] is `true`
-   */
-  fun setFps(fps: Int) = Unit
-
-  /**
    * Whether toggling of vsync is supported on this platform
    */
   val canToggleVsync: Boolean
@@ -27,6 +22,10 @@ interface Platform {
   val canControlAudio: Boolean
 
   fun platformInit() = Unit
+
+  /**
+   * Platform specific method to enable pause
+   */
   fun pause() = Unit
 
   val type: PlatformType
