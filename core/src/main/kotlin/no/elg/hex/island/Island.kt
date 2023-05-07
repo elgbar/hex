@@ -685,23 +685,14 @@ class Island(
 
   @JsonValue
   internal fun createDto(): IslandDto {
-    val (handCoord: CubeCoordinate?, handPiece: Piece?) = hand?.let { hand ->
-      val heldPieceHexagon = hand.piece.data.let { data ->
-        // slight edge case (pun intended) if we hold a piece that is a hand instance, do not record its coordinates
-        if (data.edge) null else visibleHexagons.find { hex -> getData(hex) == data }
-      }
-
-      // prefer coordinates of held piece if nothing is held select any hexagon within the selected territory
-      val territoryHex = heldPieceHexagon ?: hand.territory.hexagons.first()
-
-      (territoryHex.cubeCoordinate to hand.createDtoPieceCopy())
-    } ?: (null to null)
+    val handPiece = hand?.createDtoPieceCopy()
+    val territoryCoord = selected?.hexagons?.first()?.cubeCoordinate
 
     return IslandDto(
       grid.gridData.gridWidth,
       grid.gridData.gridHeight,
       grid.gridData.gridLayout.toEnumValue(),
-      handCoord,
+      territoryCoord,
       handPiece,
       visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
       round,
