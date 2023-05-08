@@ -1,5 +1,6 @@
 package no.elg.hex.hexagon
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonGetter
@@ -54,6 +55,7 @@ class HexagonData(
       if (field != disable) {
         field = disable
         Hex.island?.updateHexagonVisibility(this)
+        Gdx.graphics.requestRendering()
       }
     }
 
@@ -65,6 +67,7 @@ class HexagonData(
       val old = field
       field = value
       Events.fireEvent(HexagonChangedTeamEvent(this, old, value))
+      Gdx.graphics.requestRendering()
     }
 
   @JsonIgnore
@@ -76,11 +79,11 @@ class HexagonData(
       val old = field
       field = value
       Events.fireEvent(HexagonChangedPieceEvent(this, old, value))
+      Gdx.graphics.requestRendering()
     }
 
   /**
-   * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type
-   * [pieceType].
+   * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type [T].
    */
   @OptIn(ExperimentalContracts::class)
   inline fun <reified T : Piece> setPiece(crossinline init: (T) -> Unit = { }): Boolean {
@@ -99,6 +102,7 @@ class HexagonData(
       this.piece = pieceToPlace
       require(pieceToPlace is Empty || pieceToPlace.data === pieceToPlace.data.piece.data) { "Pieces data does not point to this!" }
       init(pieceToPlace)
+      Gdx.graphics.requestRendering()
       return true
     }
     return false

@@ -165,8 +165,7 @@ class NotAsRandomAI(
         // No upkeep for castles so as long as there is an empty hexagon, we can buy a castle
         return@run Castle::class.createHandInstance()
       } else {
-        for (piece in LivingPiece::class.sealedSubclasses.sortedBy { it.createHandInstance().strength }) {
-          val living = piece.createHandInstance()
+        for (living in LivingPiece::class.sealedSubclasses.map { it.createHandInstance() }.sortedBy { it.strength }) {
           if (isEconomicalToBuyPiece(territory, living) && canAttackOrMergePiece(territory, living)) {
             // If we can do something with a lower strength piece, then it is preferred
             return@run living
