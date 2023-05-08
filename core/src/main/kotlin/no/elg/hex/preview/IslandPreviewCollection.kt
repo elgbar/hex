@@ -47,7 +47,7 @@ class IslandPreviewCollection : Disposable {
     renderingCount.incrementAndGet()
     Gdx.app.postRunnable {
       try {
-        val islandScreen = PreviewIslandScreen(-1, island)
+        val islandScreen = PreviewIslandScreen(-1, island, true)
         islandScreen.resize(previewWidth, previewHeight)
         val buffer = FrameBuffer(Pixmap.Format.RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
         buffer.begin()

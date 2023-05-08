@@ -21,7 +21,7 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 
 /** @author Elg */
-open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen() {
+open class PreviewIslandScreen(val id: Int, val island: Island, private val isPreviewRenderer: Boolean) : AbstractScreen() {
 
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
@@ -63,7 +63,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island) : AbstractScreen
     outlineRenderer.frameUpdate()
     spriteRenderer.frameUpdate()
 
-    if (!renderingPreviews) {
+    if (!isPreviewRenderer) {
       if (StrengthBarRenderer.isEnabled) {
         strengthBarRenderer.frameUpdate()
       }

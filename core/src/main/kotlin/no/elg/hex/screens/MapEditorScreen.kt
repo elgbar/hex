@@ -53,7 +53,7 @@ import no.elg.hex.util.toggleShown
 import kotlin.reflect.KClass
 
 /** @author Elg */
-class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
+class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
 
   private val stageScreen = StageScreen()
   private val mapInputProcessor = MapEditorInputProcessor(this)

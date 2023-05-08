@@ -61,7 +61,7 @@ import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
 
 /** @author Elg */
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
+class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
   private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>

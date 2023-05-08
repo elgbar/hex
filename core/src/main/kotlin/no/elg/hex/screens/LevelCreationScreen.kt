@@ -318,7 +318,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   private var lastRequestedReRender = 0L
 
   private fun renderPreview() {
-    if(Gdx.graphics.frameId == lastRequestedReRender){
+    if (Gdx.graphics.frameId == lastRequestedReRender) {
       return
     }
     lastRequestedReRender = Gdx.graphics.frameId
