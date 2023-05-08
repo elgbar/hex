@@ -692,8 +692,9 @@ class Island(
 
   @JsonValue
   internal fun createDto(): IslandDto {
+    val hand = hand
     val handPiece = hand?.createDtoPieceCopy()
-    val handCoordinate = hand?.territory?.hexagons?.first()?.cubeCoordinate
+    val handCoordinate = hand?.territory?.hexagons?.find { getData(it) === hand.piece.data }?.cubeCoordinate
     val territoryCoord = selected?.hexagons?.first()?.cubeCoordinate
 
     return IslandDto(
