@@ -18,6 +18,7 @@ import no.elg.hex.ai.AI
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.event.Events
 import no.elg.hex.event.HandChangedEvent
+import no.elg.hex.event.HexagonVisibilityChanged
 import no.elg.hex.event.TeamEndTurnEvent
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -68,7 +69,9 @@ class Island(
   width: Int,
   height: Int,
   layout: HexagonalGridLayout,
-  selectedCoordinate: CubeCoordinate? = null,
+  territoryCoordinate: CubeCoordinate? = null,
+  @JsonAlias("selectedCoordinate")
+  handCoordinate: CubeCoordinate? = null,
   @JsonAlias("piece")
   handPiece: Piece? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
@@ -99,6 +102,7 @@ class Island(
   val allHexagons: Set<Hexagon<HexagonData>> get() = internalAllHexagons
   val visibleHexagons: Set<Hexagon<HexagonData>> get() = internalVisibleHexagons
 
+
   var hand: Hand? = null
     set(value) {
       field?.also {
@@ -111,6 +115,7 @@ class Island(
         field = value
         Events.fireEvent(HandChangedEvent(old?.piece, value?.piece))
         history.remember("Switch piece")
+        Gdx.graphics.requestRendering()
       }
     }
     get() {
@@ -123,13 +128,14 @@ class Island(
 
   internal fun restoreState(dto: IslandDto) {
     restoreState(
-      dto.width,
-      dto.height,
-      dto.layout,
-      dto.selectedCoordinate,
-      dto.handPiece,
-      dto.hexagonData,
-      dto.team
+      width = dto.width,
+      height = dto.height,
+      layout = dto.layout,
+      territoryCoordinate = dto.territoryCoordinate,
+      handCoordinate = dto.handCoordinate,
+      handPiece = dto.handPiece,
+      hexagonData = dto.hexagonData,
+      team = dto.team
     )
   }
 
@@ -157,7 +163,8 @@ class Island(
     width: Int,
     height: Int,
     layout: HexagonalGridLayout,
-    selectedCoordinate: CubeCoordinate? = null,
+    territoryCoordinate: CubeCoordinate? = null,
+    handCoordinate: CubeCoordinate? = null,
     handPiece: Piece? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     team: Team
@@ -182,15 +189,15 @@ class Island(
 
     currentTeam = team
 
-    val selectedHex = grid.getByCubeCoordinate(selectedCoordinate)
-    select(selectedHex)
+    val territoryHex = grid.getByCubeCoordinate(territoryCoordinate)
+    val successfulSelect = select(territoryHex)
     val territory = selected
-    if (handPiece != null && territory != null) {
-      val handData = if (handPiece.data.edge) {
+    if (successfulSelect && handPiece != null && territory != null) {
+      val handHex = territory.hexagons.find { it.cubeCoordinate == handCoordinate }
+      val handData = if (handHex == null) {
         EDGE_DATA
       } else {
-        val newHex = selectedHex ?: error("Failed to find the correct data of hand piece within the territory")
-        getData(newHex)
+        getData(handHex)
       }
       hand = Hand(
         territory,
@@ -198,8 +205,6 @@ class Island(
           if (it is LivingPiece) it.moved = false
         }
       )
-    } else if (handPiece != null || territory != null) {
-      Gdx.app.error("restoreState", "Either handPiece: $handPiece or territory: $territory was null. Expected either both or none of them to be null")
     }
   }
 
@@ -241,7 +246,7 @@ class Island(
   private var aiJob: Job? = null
 
   init {
-    restoreState(width, height, layout, selectedCoordinate, handPiece, hexagonData, startTeam)
+    restoreState(width, height, layout, territoryCoordinate, handCoordinate, handPiece, hexagonData, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
@@ -402,7 +407,7 @@ class Island(
       selected = null
     }
 
-    Gdx.app.trace("SELECT", "Selecting hexagon ${hexagon?.cubeCoordinate}")
+    Gdx.app.debug("SELECT", "Selecting hexagon ${hexagon?.cubeCoordinate}")
 
     if (hexagon == null) {
       if (oldSelected != null) {
@@ -688,13 +693,15 @@ class Island(
   @JsonValue
   internal fun createDto(): IslandDto {
     val handPiece = hand?.createDtoPieceCopy()
+    val handCoordinate = hand?.territory?.hexagons?.first()?.cubeCoordinate
     val territoryCoord = selected?.hexagons?.first()?.cubeCoordinate
 
     return IslandDto(
       grid.gridData.gridWidth,
       grid.gridData.gridHeight,
       grid.gridData.gridLayout.toEnumValue(),
-      territoryCoord,
+      territoryCoordinate = territoryCoord,
+      handCoordinate = handCoordinate,
       handPiece,
       visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
       round,
@@ -708,7 +715,8 @@ class Island(
     val width: Int,
     val height: Int,
     val layout: HexagonalGridLayout,
-    val selectedCoordinate: CubeCoordinate? = null,
+    val territoryCoordinate: CubeCoordinate? = null,
+    val handCoordinate: CubeCoordinate? = null,
     val handPiece: Piece? = null,
     val hexagonData: SortedMap<CubeCoordinate, HexagonData>,
     val round: Int,
@@ -723,16 +731,17 @@ class Island(
 
     fun copy(): IslandDto {
       return IslandDto(
-        width,
-        height,
-        layout,
-        selectedCoordinate,
-        handPiece?.createDtoCopy(),
-        hexagonData.mapValues { (_, data) -> data.copy() }.toSortedMap(),
-        round,
-        false,
-        team,
-        authorRoundsToBeat
+        width = width,
+        height = height,
+        layout = layout,
+        territoryCoordinate = territoryCoordinate,
+        handCoordinate = handCoordinate,
+        handPiece = handPiece?.createDtoCopy(),
+        hexagonData = hexagonData.mapValues { (_, data) -> data.copy() }.toSortedMap(),
+        round = round,
+        initialLoad = false,
+        team = team,
+        authorRoundsToBeat = authorRoundsToBeat
       )
     }
   }
