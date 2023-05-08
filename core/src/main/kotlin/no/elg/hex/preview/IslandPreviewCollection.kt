@@ -147,8 +147,8 @@ class IslandPreviewCollection : Disposable {
 
           islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
           else -> {
-            MessagesRenderer.publishWarning("Failed to read preview of island ${islandPreviewFile.name()}")
-            updateSelectPreview(slot, true)
+            MessagesRenderer.publishWarning("Failed to load preview of island $slot")
+            updateSelectPreview(slot, Hex.args.mapEditor)
           }
         }
       }
