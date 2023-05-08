@@ -13,6 +13,7 @@ import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
 import no.elg.hex.event.HexagonChangedTeamEvent
+import no.elg.hex.event.HexagonVisibilityChanged
 import no.elg.hex.event.SimpleEventListener
 import no.elg.hex.event.TeamEndTurnEvent
 import no.elg.hex.hexagon.Team
@@ -23,6 +24,7 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
 
   private val hexagonChangeListener: SimpleEventListener<HexagonChangedTeamEvent>
   private val endTurnListener: SimpleEventListener<TeamEndTurnEvent>
+  private val visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>?
 
   private lateinit var fbo: FrameBuffer
   private var batch = SpriteBatch()
@@ -119,6 +121,13 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
   init {
     hexagonChangeListener = SimpleEventListener.create { redrawBar() }
     endTurnListener = SimpleEventListener.create { redrawBar() }
+    visibilityChangedListener = if (Hex.args.mapEditor) {
+      SimpleEventListener.create {
+        redrawBar()
+      }
+    } else {
+      null
+    }
   }
 
   companion object {

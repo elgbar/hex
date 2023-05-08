@@ -49,3 +49,9 @@ data class HexagonChangedPieceEvent(override val data: HexagonData, val old: Pie
 data class CapitalBalanceChanged(override val data: HexagonData, val old: Int, val new: Int) : HexagonDataEvent {
   companion object : EventListeners<CapitalBalanceChanged>()
 }
+
+data class HexagonVisibilityChanged(override val data: HexagonData, val isDisabled: Boolean) : HexagonDataEvent {
+
+  val wasDisabled get() = !isDisabled
+  companion object : EventListeners<HexagonVisibilityChanged>()
+}

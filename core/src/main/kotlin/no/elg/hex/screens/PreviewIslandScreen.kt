@@ -2,14 +2,17 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
+import ktx.assets.disposeSafely
 import no.elg.hex.Hex
+import no.elg.hex.event.HexagonChangedTeamEvent
+import no.elg.hex.event.HexagonVisibilityChanged
+import no.elg.hex.event.SimpleEventListener
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.input.SmoothTransition
 import no.elg.hex.island.Island
-import no.elg.hex.preview.IslandPreviewCollection.Companion.renderingPreviews
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
@@ -52,6 +55,8 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
   private val outlineRenderer by lazy { OutlineRenderer(this) }
   private val spriteRenderer by lazy { SpriteRenderer(this) }
   private val strengthBarRenderer by lazy { StrengthBarRenderer(this.island) }
+  private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
+  private lateinit var visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>
 
   val cursorHexagon: Hexagon<HexagonData>?
     get() = null
@@ -112,6 +117,16 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
 
   override fun show() {
     basicIslandInputProcessor.show()
+
+    if (!isPreviewRenderer) {
+      teamChangedListener = SimpleEventListener.create {
+        island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
+        island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
+      }
+      visibilityChangedListener = SimpleEventListener.create {
+        island.hexagonsPerTeam.getAndIncrement(it.data.team, 0, if(it.isDisabled) -1 else 1)
+      }
+    }
   }
 
   override fun dispose() {
@@ -129,6 +144,12 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
     }
     if (::strengthBarRenderer.isLazyInitialized) {
       strengthBarRenderer.dispose()
+    }
+    if (::teamChangedListener.isInitialized) {
+      teamChangedListener.dispose()
+    }
+    if (::visibilityChangedListener.isInitialized) {
+      visibilityChangedListener.dispose()
     }
   }
 

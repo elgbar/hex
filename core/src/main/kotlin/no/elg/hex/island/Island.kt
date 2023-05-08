@@ -250,13 +250,15 @@ class Island(
   fun isCurrentTeamHuman() = currentAI == null
 
   fun updateHexagonVisibility(data: HexagonData) {
-    if (data.isDisabled) {
-      val hex = internalVisibleHexagons.find { getData(it) === data } ?: error("Failed to find this data!")
+    val disabled = data.isDisabled
+    if (disabled) {
+      val hex = internalVisibleHexagons.find { getData(it) === data } ?: error("Failed to find this data! $data")
       internalVisibleHexagons -= hex
     } else {
-      val hex = allHexagons.find { getData(it) === data } ?: error("Failed to find this data!")
+      val hex = allHexagons.find { getData(it) === data } ?: error("Failed to find this data! $data")
       internalVisibleHexagons += hex
     }
+    Events.fireEvent(HexagonVisibilityChanged(data, disabled))
   }
 
   // ////////// //

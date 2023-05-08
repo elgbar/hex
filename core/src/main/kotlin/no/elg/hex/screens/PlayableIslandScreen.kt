@@ -62,9 +62,7 @@ import no.elg.hex.util.show
 
 /** @author Elg */
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
-class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island) {
 
-  private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private val stageScreen = StageScreen()
   val inputProcessor by lazy { GameInputProcessor(this) }
 
@@ -543,10 +541,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     inputProcessor.show()
     super.show()
 
-    teamChangedListener = SimpleEventListener.create {
-      island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
-      island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
-    }
     if (island.isCurrentTeamAI()) {
       island.beginTurn(inputProcessor)
     }
@@ -563,7 +557,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
     Hex.assets.islandPreviews.updateSelectPreview(id, false, modifier, island)
     modifier = NOTHING
-    teamChangedListener.disposeSafely()
 
     DebugGraphRenderer.dispose()
     debugRenderer.dispose()
