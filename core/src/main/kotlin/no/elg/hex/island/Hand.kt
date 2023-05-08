@@ -16,7 +16,7 @@ data class Hand(
    * If the held piece should be refunded/returned when disposing.
    * This is useful when modifying the held piece without duplicating money/pieces
    */
-  var refund: Boolean = true
+  var restore: Boolean = true
 ) : Disposable {
 
   init {
@@ -35,8 +35,8 @@ data class Hand(
   override fun dispose() {
     require(currentHand) { "Hand already disposed " }
     currentHand = false
-    Gdx.app.trace("HAND") { "Disposing hand $this, refund? $refund" }
-    if (refund) {
+    Gdx.app.trace("HAND") { "Disposing hand $this, refund? $restore" }
+    if (restore) {
       if (piece.data === HexagonData.EDGE_DATA) {
         // refund when placing it back
         territory.capital.balance += piece.price

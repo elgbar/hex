@@ -74,6 +74,7 @@ class Island(
   handCoordinate: CubeCoordinate? = null,
   @JsonAlias("piece")
   handPiece: Piece? = null,
+  handRestore: Boolean? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   @JsonAlias("turn")
   round: Int = 1,
@@ -134,6 +135,7 @@ class Island(
       territoryCoordinate = dto.territoryCoordinate,
       handCoordinate = dto.handCoordinate,
       handPiece = dto.handPiece,
+      handRestore = dto.handRestore,
       hexagonData = dto.hexagonData,
       team = dto.team
     )
@@ -166,6 +168,7 @@ class Island(
     territoryCoordinate: CubeCoordinate? = null,
     handCoordinate: CubeCoordinate? = null,
     handPiece: Piece? = null,
+    handRestore: Boolean? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     team: Team
   ) {
@@ -203,7 +206,8 @@ class Island(
         territory,
         handPiece::class.createInstance(handData).also {
           if (it is LivingPiece) it.moved = false
-        }
+        },
+        handRestore ?: true
       )
     }
   }
@@ -246,7 +250,7 @@ class Island(
   private var aiJob: Job? = null
 
   init {
-    restoreState(width, height, layout, territoryCoordinate, handCoordinate, handPiece, hexagonData, startTeam)
+    restoreState(width, height, layout, territoryCoordinate, handCoordinate, handPiece, handRestore, hexagonData, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
@@ -679,7 +683,7 @@ class Island(
     }
 
     internal fun Hand.createDtoPieceCopy(): Piece {
-      return this.piece.let { it.copyTo(if (refund) it.data.copy() else EDGE_DATA) }
+      return this.piece.let { it.copyTo(if (restore) it.data.copy() else EDGE_DATA) }
     }
 
     fun deserialize(json: String): Island = Hex.mapper.readValue(json)
@@ -695,20 +699,22 @@ class Island(
     val hand = hand
     val handPiece = hand?.createDtoPieceCopy()
     val handCoordinate = hand?.territory?.hexagons?.find { getData(it) === hand.piece.data }?.cubeCoordinate
+    val handRestore = hand?.restore
     val territoryCoord = selected?.hexagons?.first()?.cubeCoordinate
 
     return IslandDto(
-      grid.gridData.gridWidth,
-      grid.gridData.gridHeight,
-      grid.gridData.gridLayout.toEnumValue(),
+      width = grid.gridData.gridWidth,
+      height = grid.gridData.gridHeight,
+      layout = grid.gridData.gridLayout.toEnumValue(),
       territoryCoordinate = territoryCoord,
       handCoordinate = handCoordinate,
-      handPiece,
-      visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
-      round,
-      false,
-      currentTeam,
-      authorRoundsToBeat
+      handPiece = handPiece,
+      handRestore = handRestore,
+      hexagonData = visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
+      round = round,
+      initialLoad = false,
+      team = currentTeam,
+      authorRoundsToBeat = authorRoundsToBeat
     )
   }
 
@@ -719,6 +725,7 @@ class Island(
     val territoryCoordinate: CubeCoordinate? = null,
     val handCoordinate: CubeCoordinate? = null,
     val handPiece: Piece? = null,
+    val handRestore: Boolean? = null,
     val hexagonData: SortedMap<CubeCoordinate, HexagonData>,
     val round: Int,
     val initialLoad: Boolean,

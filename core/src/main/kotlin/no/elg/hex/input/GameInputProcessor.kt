@@ -88,7 +88,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     if (oldPiece is LivingPiece && newPiece is Castle && hexData.team == territory.team) {
       if (!oldPiece.moved && hexData.setPiece(Castle::class)) {
         island.history.remember("Swapping castle for living piece") {
-          island.hand = Hand(territory, oldPiece, refund = false)
+          island.hand = Hand(territory, oldPiece, restore = false)
         }
         return true
       }
@@ -128,7 +128,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       island.history.remember("Placing piece") {
         hexData.team = territory.team
         // Never refund as we are placing the unit down right now
-        island.hand?.refund = false
+        island.hand?.restore = false
         island.hand = null
 
         val updatedPiece = hexData.piece
@@ -260,7 +260,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
           val data = hand.piece.data
 
-          hand.refund = false
+          hand.restore = false
           screen.island.hand = null
 
           val newPiece = newType.createInstance(data)
