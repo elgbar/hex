@@ -1,7 +1,6 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.Input.Buttons
 import no.elg.hex.input.editor.EditMetadata
 import no.elg.hex.input.editor.Editor
@@ -49,7 +48,7 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : AbstractInp
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     val metadata = currentMetadata
-    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && metadata != null) {
+    if (Gdx.input.isButtonPressed(Buttons.LEFT) && metadata != null) {
       if (isEditorChanged) {
         currentMetadata = null
         return false

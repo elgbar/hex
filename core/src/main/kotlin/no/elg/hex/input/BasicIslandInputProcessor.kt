@@ -35,7 +35,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
   val cursorHex: Hexagon<HexagonData>? get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
-
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
     if (draggable && pointer == 0 && isCorrectButtonPressed()) {
       val zoom = screen.camera.zoom
@@ -175,7 +174,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     const val TAP_ZOOM_AMOUNT = -1.5f
 
     fun isCorrectButtonPressed(): Boolean {
-      return when(Hex.platform.type){
+      return when (Hex.platform.type) {
         PlatformType.MOBILE -> true
         PlatformType.DESKTOP -> Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)
       }

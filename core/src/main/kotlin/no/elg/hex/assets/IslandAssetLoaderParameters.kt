@@ -4,4 +4,4 @@ import com.badlogic.gdx.assets.AssetLoaderParameters
 import no.elg.hex.island.Island
 
 /** @author Elg */
-data class IslandAssetLoaderParameters(val fileNameIsIsland: Boolean = false) : AssetLoaderParameters<Island>()
+class IslandAssetLoaderParameters : AssetLoaderParameters<Island>()

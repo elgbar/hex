@@ -13,8 +13,6 @@ import kotlin.reflect.full.companionObjectInstance
  */
 object Events {
 
-  private const val EXPECTED_LISTENERS_FIELD_NAME = "listeners"
-
   /**
    * Removes all listeners from all events
    */

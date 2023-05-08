@@ -38,12 +38,8 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
 
         Gdx.app.error("GL ERROR", FrameBuffer.getManagedStatus())
 
-        MessagesRenderer.publishError(
-          """
-        An gl error occurred.
-        Please contact the maintainer, with what you did.
-          """.trimIndent()
-        )
+        MessagesRenderer.publishError("An gl error occurred")
+        MessagesRenderer.publishError("Please contact the maintainer with what you did")
       }
     }
   }

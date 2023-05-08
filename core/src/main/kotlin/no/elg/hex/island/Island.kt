@@ -101,9 +101,9 @@ class Island(
 
   var hand: Hand? = null
     set(value) {
-      field?.apply {
-        if (currentHand) {
-          dispose()
+      field?.also {
+        if (it.currentHand) {
+          it.dispose()
         }
       }
       if (field != value) {

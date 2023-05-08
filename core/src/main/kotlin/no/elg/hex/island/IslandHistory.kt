@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.island.Island.IslandDto
+import no.elg.hex.util.debug
 
 /**
  * @author Elg
@@ -97,10 +98,10 @@ class IslandHistory(val island: Island) {
 
   private fun changeHistory(pointer: Int, prefix: String) {
     if (pointer !in history.indices) {
-      Gdx.app.debug("HISTORY", "Nothing left to ${prefix}do")
+      Gdx.app.debug("HISTORY") { "Nothing left to ${prefix}do" }
       return
     }
-    Gdx.app.debug("HISTORY", "${prefix}do ${historyNotes[historyPointer]}")
+    Gdx.app.debug("HISTORY") { "${prefix}do ${historyNotes[historyPointer]}" }
     val wasEnabled = enabled
     enabled = false
     historyPointer = pointer

@@ -69,8 +69,7 @@ sealed class ScreenText(
         !bold && !italic -> Hex.assets.regularFont
         !bold && italic -> Hex.assets.regularItalicFont
         bold && !italic -> Hex.assets.boldFont
-        bold && italic -> Hex.assets.boldItalicFont
-        else -> error("This should really not happen")
+        else -> Hex.assets.boldItalicFont
       }
 
   fun <T : Any> format(

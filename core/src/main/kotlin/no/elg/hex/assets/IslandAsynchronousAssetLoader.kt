@@ -37,24 +37,15 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
 
   override fun loadAsync(
     manager: AssetManager,
-    fileNameOrJson: String,
+    fileName: String,
     file: FileHandle,
     parameter: IslandAssetLoaderParameters?
   ) {
     island = null
-    val json: String = if (parameter?.fileNameIsIsland == true) {
-      fileNameOrJson
-    } else {
-      try {
-        reportTiming("read island file as string") {
-          file.readString()
-        }
-      } catch (e: Exception) {
-        MessagesRenderer.publishError("Failed to load island the name '${file.name()}'")
-        "invalid island json"
-      }
+    val json: String = reportTiming("read island file as string") {
+      file.readString()
     }
-    island = try {
+    island =
       val island = reportTiming("deserialize island json") {
         Island.deserialize(json)
       }
