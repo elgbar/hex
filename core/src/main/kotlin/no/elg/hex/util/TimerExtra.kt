@@ -37,7 +37,7 @@ inline fun <T> reportTiming(actionName: String, minSignificantTimeMs: Long = 10L
   if (time > minSignificantTimeMs) {
     Gdx.app.debug("TIME") { "Took ${time / 1000f} seconds to $actionName" }
   } else {
-    Gdx.app.trace("TIME") { "Took less then minimum significant time seconds ${minSignificantTimeMs / 1000f}; ${time / 1000f} seconds to $actionName" }
+    Gdx.app.trace("TIME") { "Took less then minimum significant time of ${minSignificantTimeMs / 1000f} seconds, ${time / 1000f} seconds, to $actionName" }
   }
   return returned
 }

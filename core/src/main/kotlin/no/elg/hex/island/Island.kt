@@ -103,7 +103,6 @@ class Island(
   val allHexagons: Set<Hexagon<HexagonData>> get() = internalAllHexagons
   val visibleHexagons: Set<Hexagon<HexagonData>> get() = internalVisibleHexagons
 
-
   var hand: Hand? = null
     set(value) {
       field?.also {
@@ -411,7 +410,7 @@ class Island(
       selected = null
     }
 
-    Gdx.app.debug("SELECT", "Selecting hexagon ${hexagon?.cubeCoordinate}")
+    Gdx.app.trace("SELECT") { "Selecting hexagon ${hexagon?.cubeCoordinate}" }
 
     if (hexagon == null) {
       if (oldSelected != null) {

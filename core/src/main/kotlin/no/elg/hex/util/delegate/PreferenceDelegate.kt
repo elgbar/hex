@@ -120,20 +120,20 @@ class PreferenceDelegate<T : Any>(
   operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
     val propertyName = property.name
     if (invalidate(value)) {
-      Gdx.app.trace("PREF", "Will not set $propertyName to $value as it is invalid")
+      Gdx.app.trace("PREF") { "Will not set $propertyName to $value as it is invalid" }
       return
     }
 
     val old = currentValue ?: initialValue
     val newValue = if (onChange != null && !applyOnChangeOnSettingsHide) {
-      Gdx.app.trace("PREF", "Calling on change for setting $propertyName")
+      Gdx.app.trace("PREF") { "Calling on change for setting $propertyName" }
       onChange.invoke(this, old, value)
     } else {
       value
     }
 
     if (invalidate(newValue)) {
-      Gdx.app.trace("PREF", "Will not set $propertyName to $value as it is invalid")
+      Gdx.app.trace("PREF") { "Will not set $propertyName to $value as it is invalid" }
       return
     }
 
@@ -177,7 +177,7 @@ class PreferenceDelegate<T : Any>(
     private val preferences: Preferences by lazy {
       val name = this::class.qualifiedName
 
-      Gdx.app.trace("PREFS", "Using preference name $name")
+      Gdx.app.trace("PREFS") { "Using preference name $name" }
       Gdx.app.getPreferences(name)
     }
   }

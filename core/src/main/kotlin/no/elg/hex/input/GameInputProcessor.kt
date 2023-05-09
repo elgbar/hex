@@ -62,7 +62,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         island.hand = Hand(territory, cursorPiece)
         pieceChanged = hexData.setPiece(Empty::class)
       }
-      Gdx.app.trace("PLACE", "Hand was null, now it is ${island.hand}")
+      Gdx.app.trace("PLACE") { "Hand was null, now it is ${island.hand}" }
       return pieceChanged
     }
     return false
@@ -295,7 +295,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         pieces += it.piece as LivingPiece
         it.setPiece(Empty::class)
       }
-      Gdx.app.trace("MARCH", "Marching ${pieces.size} pieces")
+      Gdx.app.trace("MARCH") { "Marching ${pieces.size} pieces" }
       if (pieces.isEmpty()) return false
 
       pieces.sortByDescending { it.strength }

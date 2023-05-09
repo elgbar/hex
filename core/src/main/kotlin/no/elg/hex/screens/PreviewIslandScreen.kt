@@ -2,7 +2,6 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
-import ktx.assets.disposeSafely
 import no.elg.hex.Hex
 import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.event.HexagonVisibilityChanged
@@ -124,7 +123,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
         island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
       }
       visibilityChangedListener = SimpleEventListener.create {
-        island.hexagonsPerTeam.getAndIncrement(it.data.team, 0, if(it.isDisabled) -1 else 1)
+        island.hexagonsPerTeam.getAndIncrement(it.data.team, 0, if (it.isDisabled) -1 else 1)
       }
     }
   }

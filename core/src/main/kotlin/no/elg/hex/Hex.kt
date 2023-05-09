@@ -91,7 +91,7 @@ object Hex : ApplicationAdapter() {
     set(value) {
       reportTiming("change screen to ${field::class.simpleName}") {
         val old = field
-        Gdx.app.trace("SCREEN", "Unloading old screen ${old::class.simpleName}")
+        Gdx.app.trace("SCREEN") { "Unloading old screen ${old::class.simpleName}" }
         old.hide()
 
         // clean up any mess the previous screen have made

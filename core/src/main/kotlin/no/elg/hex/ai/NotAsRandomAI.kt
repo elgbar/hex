@@ -67,7 +67,7 @@ class NotAsRandomAI(
 ) : AI {
 
   private fun think(words: () -> String) {
-    Gdx.app.trace("NARAI-$team", words)
+    Gdx.app.trace("NARAI-$team", message = words)
   }
 
   /**

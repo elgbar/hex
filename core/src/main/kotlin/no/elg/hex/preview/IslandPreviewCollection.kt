@@ -49,7 +49,12 @@ class IslandPreviewCollection : Disposable {
       try {
         val islandScreen = PreviewIslandScreen(-1, island, true)
         islandScreen.resize(previewWidth, previewHeight)
-        val buffer = FrameBuffer(Pixmap.Format.RGBA8888, previewWidth.coerceAtLeast(1), previewHeight.coerceAtLeast(1), false)
+        val buffer = FrameBuffer(
+          Pixmap.Format.RGBA8888,
+          previewWidth.coerceAtLeast(1),
+          previewHeight.coerceAtLeast(1),
+          false
+        )
         buffer.begin()
         Hex.setClearColorAlpha(0f)
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
@@ -146,6 +151,7 @@ class IslandPreviewCollection : Disposable {
           }
 
           islandPreviewFile.exists() -> islandPreviews.add(null to Texture(islandPreviewFile))
+
           else -> {
             MessagesRenderer.publishWarning("Failed to load preview of island $slot")
             updateSelectPreview(slot, Hex.args.mapEditor)
@@ -155,7 +161,12 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  fun updateSelectPreview(id: Int, save: Boolean, modifier: PreviewModifier = PreviewModifier.NOTHING, island: Island? = null) {
+  fun updateSelectPreview(
+    id: Int,
+    save: Boolean,
+    modifier: PreviewModifier = PreviewModifier.NOTHING,
+    island: Island? = null
+  ) {
     KtxAsync.launch(Hex.asyncThread) {
       val index = Hex.assets.islandFiles.islandIds.indexOf(id)
       if (index == -1) {
@@ -166,7 +177,7 @@ class IslandPreviewCollection : Disposable {
       val currIsland = if (island == null) {
         val islandFileName = getIslandFileName(id)
         if (!Hex.assets.isLoaded<Island>(islandFileName)) {
-          Gdx.app.trace("Update preview", "Island $id was not loaded, waiting for it to be loaded now...")
+          Gdx.app.trace("Update preview") { "Island $id was not loaded, waiting for it to be loaded now..." }
           Hex.assets.load<Island>(islandFileName)
           while (!Hex.assets.update()) {
             Thread.yield()
@@ -184,10 +195,15 @@ class IslandPreviewCollection : Disposable {
           preview.takeScreenshot(islandPreviewFile)
         }
         if (Hex.args.mapEditor) {
-          PreviewIslandScreen.islandPreferences.remove(PreviewIslandScreen.getPrefName(id, true))
+          PreviewIslandScreen.islandPreferences.remove(
+            PreviewIslandScreen.getPrefName(id, true)
+          )
         } else {
           Gdx.app.debug("IS PREVIEW", "Saving preview of island $id")
-          PreviewIslandScreen.islandPreferences.putString(PreviewIslandScreen.getPrefName(id, true), preview.saveScreenshotAsString())
+          PreviewIslandScreen.islandPreferences.putString(
+            PreviewIslandScreen.getPrefName(id, true),
+            preview.saveScreenshotAsString()
+          )
         }
         PreviewIslandScreen.islandPreferences.flush()
         if (index == islandPreviews.size) {
@@ -208,7 +224,7 @@ class IslandPreviewCollection : Disposable {
   }
 
   override fun dispose() {
-    Gdx.app.trace("Island Previews", "Disposing all previews")
+    Gdx.app.trace("Island Previews") { "Disposing all previews" }
     disposePreviews()
   }
 

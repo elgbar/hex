@@ -5,8 +5,7 @@ import com.badlogic.gdx.Application.LOG_DEBUG
 import com.badlogic.gdx.Application.LOG_ERROR
 import com.badlogic.gdx.Application.LOG_INFO
 import com.badlogic.gdx.Application.LOG_NONE
-import com.badlogic.gdx.ApplicationLogger
-import com.badlogic.gdx.Gdx
+import no.elg.hex.Hex
 
 const val LOG_TRACE = LOG_DEBUG + 1
 
@@ -21,27 +20,8 @@ fun logLevelToName(level: Int): String {
   }
 }
 
-fun ApplicationLogger.trace(tag: String, message: String) {
-  debug("TRACE | $tag", message)
-}
-
-fun ApplicationLogger.trace(tag: String, message: String, exception: Throwable) {
-  if (Gdx.app.logLevel >= LOG_TRACE) {
-    debug(tag, message)
-    exception.printStackTrace(System.out)
-  }
-}
-
-fun Application.trace(tag: String, message: String) {
-  if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message)
-}
-
-fun Application.trace(tag: String, message: () -> String) {
-  if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message())
-}
-
-fun Application.trace(tag: String, message: String, exception: Throwable) {
-  if (logLevel >= LOG_TRACE) applicationLogger.trace(tag, message, exception)
+fun Application.trace(tag: String, exception: Throwable? = null, message: () -> String) {
+  if (logLevel >= LOG_TRACE) Hex.platform.trace(tag, exception, message())
 }
 
 fun Application.debug(tag: String, message: () -> String) {

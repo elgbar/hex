@@ -5,6 +5,7 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.WindowManager
 import no.elg.hex.R
 import no.elg.hex.platform.Platform
@@ -32,6 +33,10 @@ class AndroidPlatform(private val activity: Activity) : Platform {
       @Suppress("DEPRECATION")
       activity.onBackPressed()
     }
+  }
+
+  override fun trace(tag: String, exception: Throwable?, message: String) {
+    Log.v(tag, message, exception)
   }
 
   override val type: PlatformType = PlatformType.MOBILE

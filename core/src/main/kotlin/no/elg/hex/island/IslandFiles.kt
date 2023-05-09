@@ -3,6 +3,7 @@ package no.elg.hex.island
 import com.badlogic.gdx.Gdx
 import ktx.assets.load
 import no.elg.hex.Hex
+import no.elg.hex.util.debug
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.isLoaded
@@ -36,10 +37,12 @@ class IslandFiles {
         if (file.exists()) {
           if (file.isDirectory) continue
           if (nonExistentFilesInRow > 0) {
-            Gdx.app.debug(TAG, "Missing the islands ${(slot - nonExistentFilesInRow until slot).map { getIslandFileName(it) }}")
+            Gdx.app.debug(TAG) {
+              "Missing the islands ${(slot - nonExistentFilesInRow until slot).map { getIslandFileName(it) }}"
+            }
           }
           val fileName = getIslandFileName(slot)
-          Gdx.app.trace(TAG, "Found island $fileName")
+          Gdx.app.trace(TAG) { "Found island $fileName" }
           nonExistentFilesInRow = 0
 
           if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded<Island>(fileName)) {
@@ -49,7 +52,9 @@ class IslandFiles {
         } else {
           nonExistentFilesInRow++
           if (nonExistentFilesInRow >= FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH) {
-            Gdx.app.trace(TAG, "Did not find any existing files for $FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH files after island ${slot - FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH}")
+            Gdx.app.trace(TAG) {
+              "Did not find any existing files for $FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH files after island ${slot - FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH}"
+            }
             break
           }
         }

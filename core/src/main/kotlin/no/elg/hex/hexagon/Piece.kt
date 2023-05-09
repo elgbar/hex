@@ -304,7 +304,7 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
 
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (hasGrown) {
-      Gdx.app.trace("Tree", "Tree has already grown this round, skipping it")
+      Gdx.app.trace("Tree") { "Tree has already grown this round, skipping it" }
       return
     }
     propagate(island, pieceHex)
@@ -323,7 +323,7 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
 
   override fun handleDeserializationData(serializationData: Any?) {
     if (serializationData is Int) {
-      Gdx.app.trace(DESER_TAG, "Updating moved of $this to $serializationData")
+      Gdx.app.trace(DESER_TAG) { "Updating moved of $this to $serializationData" }
       lastGrownTurn = serializationData
     } else if (serializationData != null) {
       Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a int or null, but got ${serializationData::class}")
@@ -431,7 +431,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
 
   override fun handleDeserializationData(serializationData: Any?) {
     if (serializationData is Boolean) {
-      Gdx.app.trace(DESER_TAG, "Updating moved of $this to $serializationData")
+      Gdx.app.trace(DESER_TAG) { "Updating moved of $this to $serializationData" }
       moved = serializationData
     } else if (serializationData != null) {
       Gdx.app.error(

@@ -28,5 +28,12 @@ interface Platform {
    */
   fun pause() = Unit
 
+  /**
+   * Provide platform specific way of logging as trace, i.e., log level below debug.
+   *
+   * No check for whether trace logging is enable is expected to be done
+   */
+  fun trace(tag: String, exception: Throwable?, message: String)
+
   val type: PlatformType
 }

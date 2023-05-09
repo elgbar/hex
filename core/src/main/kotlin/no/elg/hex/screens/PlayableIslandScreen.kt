@@ -14,7 +14,6 @@ import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
 import ktx.actors.onClick
-import ktx.assets.disposeSafely
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -29,8 +28,6 @@ import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.event.HexagonChangedTeamEvent
-import no.elg.hex.event.SimpleEventListener
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle

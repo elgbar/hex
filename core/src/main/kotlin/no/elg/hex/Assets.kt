@@ -338,7 +338,7 @@ class Assets : AssetManager() {
   }
 
   fun finishMain() {
-    Gdx.app.trace("ASSET", "Main finished")
+    Gdx.app.trace("ASSET") { "Main finished" }
     mainFinishedLoading = true
   }
 
