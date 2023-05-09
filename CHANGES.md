@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Level select screen now remember where you last left it off
 * [visual] Render a grid of disabled hexagons when in map editor mode
 * [visual] Render relative strength bar in map editor mode
+* [visual] Attackable hexagons blink periodically
+* [visual] Attackable hexagons outline color is now based on the strength difference between the held piece and the hexagon to attack
 * [technical] Add `--save-island-on-loading-it` program argument flag
 
 ### Changed
