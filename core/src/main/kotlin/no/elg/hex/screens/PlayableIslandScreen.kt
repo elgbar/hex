@@ -40,6 +40,7 @@ import no.elg.hex.hexagon.SPEARMAN_STRENGTH
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
+import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.preview.PreviewModifier
@@ -61,7 +62,7 @@ import no.elg.hex.util.show
 class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
 
   private val stageScreen = StageScreen()
-  val inputProcessor by lazy { GameInputProcessor(this) }
+  private val inputProcessor by lazy { GameInputProcessor(this) }
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
@@ -83,7 +84,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   val stage: Stage get() = stageScreen.stage
 
   init {
-
+    island.gameInteraction = GameInteraction(island, endGame = ::endGame)
     stageScreen.stage.actors {
 
       @Scene2dDsl
@@ -200,7 +201,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         "Confirm End Turn",
         "There still are actions to perform.\nAre you sure you want to end your turn?"
       ) {
-        island.endTurn(inputProcessor)
+        island.endTurn()
       }
 
       confirmSurrender = confirmWindow("Confirm Surrender", "Are you sure you want to surrender?") {
@@ -229,7 +230,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
         island.select(null)
         island.select(island.visibleHexagons.first())
         island.select(null)
-        gameEnded(true)
+        endGame(true)
       }
 
       table {
@@ -303,7 +304,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             cell.left()
 
             fun buyDisable(cost: Int): ((Territory?) -> Boolean) = { territory ->
-              territory == null || (!inputProcessor.cheating && territory.capital.balance < cost) || interactDisabled()
+              territory == null || (!island.gameInteraction.cheating && territory.capital.balance < cost) || interactDisabled()
             }
 
             interactButton(
@@ -312,7 +313,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               disableCheck = buyDisable(PEASANT_PRICE),
               keyShortcut = intArrayOf(Keys.NUM_1)
             ) {
-              inputProcessor.buyUnit(Peasant::class.createHandInstance())
+              island.gameInteraction.buyUnit(Peasant::class.createHandInstance())
             }
 
             interactButton(
@@ -321,7 +322,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               disableCheck = buyDisable(CASTLE_PRICE),
               keyShortcut = intArrayOf(Keys.NUM_2)
             ) {
-              inputProcessor.buyUnit(Castle::class.createHandInstance())
+              island.gameInteraction.buyUnit(Castle::class.createHandInstance())
             }
           }
 
@@ -393,7 +394,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     island.surrender()
   }
 
-  internal fun gameEnded(win: Boolean) {
+  private fun endGame(win: Boolean) {
     for ((window, action) in labelUpdater) {
       window.action()
     }
@@ -402,15 +403,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       win -> youWon.show(stage)
       else -> youLost.show(stage)
     }
-  }
-
-  fun checkEndedGame(): Boolean {
-    val capitalCount = island.visibleHexagons.count { island.getData(it).piece is Capital }
-    if (capitalCount <= 1) {
-      gameEnded(island.isCurrentTeamHuman())
-      return true
-    }
-    return false
   }
 
   private fun endTurn(allowAISurrender: Boolean = true) {
@@ -502,12 +494,13 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       }
     }
 
-    if (checkEndedGame()) {
+    if (island.checkGameEnded()) {
+      island.gameInteraction.endGame()
       return
     }
     saveProgress()
 
-    island.endTurn(inputProcessor)
+    island.endTurn()
   }
 
   override fun render(delta: Float) {
@@ -539,7 +532,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     super.show()
 
     if (island.isCurrentTeamAI()) {
-      island.beginTurn(inputProcessor)
+      island.beginTurn()
     }
   }
 

@@ -47,7 +47,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
       VariableScreenText({ "Round ${screen.island.round}" })
     },
     IfScreenText {
-      if (screen.inputProcessor.cheating) {
+      if (screen.island.gameInteraction.cheating) {
         StaticScreenText("Cheating enabled!", color = Color.GOLD)
       } else {
         emptyText()

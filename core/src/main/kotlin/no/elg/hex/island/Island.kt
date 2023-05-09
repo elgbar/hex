@@ -36,7 +36,7 @@ import no.elg.hex.hexagon.Team.STONE
 import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer.publishError
-import no.elg.hex.input.GameInputProcessor
+import no.elg.hex.input.GameInteraction
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
@@ -91,6 +91,7 @@ class Island(
     private set
 
   val history = IslandHistory(this)
+  lateinit var gameInteraction: GameInteraction
 
   /**
    * Prefer this over calling [grid.hexagons] as this has better performance.
@@ -288,7 +289,7 @@ class Island(
     }
   }
 
-  fun endTurn(gameInputProcessor: GameInputProcessor) {
+  fun endTurn() {
     history.disable()
     history.clear()
 
@@ -332,26 +333,27 @@ class Island(
       }
       Gdx.graphics.requestRendering()
 
-      if (gameInputProcessor.screen.checkEndedGame()) {
+      if (checkGameEnded()) {
+        gameInteraction.endGame()
         return@launch
       }
 
       if (getTerritories(newTeam).isNotEmpty()) {
-        beginTurn(gameInputProcessor)
+        beginTurn()
       } else {
         Gdx.app.debug("TURN", "Team $newTeam have no territories, skipping their turn")
-        endTurn(gameInputProcessor)
+        endTurn()
       }
     }
   }
 
-  fun beginTurn(gameInputProcessor: GameInputProcessor) {
+  fun beginTurn() {
     KtxAsync.launch(Hex.asyncThread) {
       val cai = currentAI
       if (cai != null) {
         val time = measureTimeMillis {
           try {
-            cai.action(this@Island, gameInputProcessor)
+            cai.action(this@Island, gameInteraction)
           } catch (cancel: CancellationException) {
             // Ignore cancel exceptions
           } catch (e: RuntimeException) {
@@ -361,7 +363,7 @@ class Island(
         }
         Gdx.app.debug("AI") { "${cai.team} AI's turn took $time ms" }
         if (Hex.screen is PreviewIslandScreen) {
-          endTurn(gameInputProcessor)
+          endTurn()
         }
       } else {
         // enable history only when it's a humans turn
@@ -371,7 +373,7 @@ class Island(
         // Loose when no player have any capitals left
         if (visibleHexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }
         ) {
-          gameInputProcessor.screen.gameEnded(false)
+          gameInteraction.endGame(false)
         }
       }
     }
@@ -589,6 +591,14 @@ class Island(
     Gdx.app.trace("ISLAND") { "Best capital found was ${getData(currBest!!)}@${currBest.cubeCoordinate} with a score of $currBestScore" }
 
     return currBest ?: error("No best!?")
+  }
+
+  fun checkGameEnded(): Boolean {
+    val capitalCount = visibleHexagons.count { getData(it).piece is Capital }
+    if (capitalCount <= 1) {
+      return true
+    }
+    return false
   }
 
   // /////////////////

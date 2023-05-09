@@ -20,7 +20,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.mergedType
 import no.elg.hex.hexagon.strengthToType
-import no.elg.hex.input.GameInputProcessor
+import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.util.calculateStrength
@@ -98,7 +98,7 @@ class NotAsRandomAI(
 //      Baron::class,
     )
 
-  override suspend fun action(island: Island, gameInputProcessor: GameInputProcessor): Boolean {
+  override suspend fun action(island: Island, gameInteraction: GameInteraction): Boolean {
     island.select(island.visibleHexagons.first())
     val territories = island.getTerritories(team)
     for (territory in territories) {
@@ -108,10 +108,10 @@ class NotAsRandomAI(
         island.select(territory.hexagons.first())
         val sel = territory.island.selected ?: continue
 
-        if (!pickUp(sel, gameInputProcessor)) {
+        if (!pickUp(sel, gameInteraction)) {
           break
         }
-        place(sel, gameInputProcessor)
+        place(sel, gameInteraction)
       } while (random.nextFloat() > endTurnChance)
     }
     island.select(null)
@@ -119,7 +119,7 @@ class NotAsRandomAI(
     return territories.isNotEmpty()
   }
 
-  private fun pickUp(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
+  private fun pickUp(territory: Territory, gameInteraction: GameInteraction): Boolean {
     think { "Picking up a piece" }
     if (territory.island.hand?.piece != null) {
       think { "Already holding a piece! (${territory.island.hand?.piece})" }
@@ -132,7 +132,7 @@ class NotAsRandomAI(
         val data = territory.island.getData(hex)
         "Picking up priority piece ${data.piece} at ${hex.cubeCoordinate.toAxialKey()}"
       }
-      gameInputProcessor.click(hex)
+      gameInteraction.click(hex)
       return true
     }
 
@@ -148,16 +148,16 @@ class NotAsRandomAI(
     // only buy if there are no more units to move
     val isHolding = if (pickUpHexes.isNotEmpty()) {
       think { "There is something to pick up in the current territory!" }
-      gameInputProcessor.click(pickUpHexes.random())
+      gameInteraction.click(pickUpHexes.random())
       true
     } else {
-      buy(territory, gameInputProcessor)
+      buy(territory, gameInteraction)
     }
     think { "I am now holding ${territory.island.hand?.piece}" }
     return isHolding
   }
 
-  private fun buy(territory: Territory, gameInputProcessor: GameInputProcessor): Boolean {
+  private fun buy(territory: Territory, gameInteraction: GameInteraction): Boolean {
     think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
 
     val pieceToBuy = kotlin.run {
@@ -181,12 +181,12 @@ class NotAsRandomAI(
     }
 
     think { "Buying the unit ${pieceToBuy::class.simpleName} " }
-    gameInputProcessor.buyUnit(pieceToBuy)
+    gameInteraction.buyUnit(pieceToBuy)
     think { "New balance ${territory.capital.balance}" }
     return true
   }
 
-  private fun place(territory: Territory, gameInputProcessor: GameInputProcessor) {
+  private fun place(territory: Territory, gameInteraction: GameInteraction) {
     val island = territory.island
     val handPiece = island.hand?.piece
     think { "Placing held piece $handPiece" }
@@ -202,7 +202,7 @@ class NotAsRandomAI(
         return
       }
       think { "Best placement for this castle is ${hexagon.cubeCoordinate.toAxialKey()}" }
-      gameInputProcessor.click(hexagon)
+      gameInteraction.click(hexagon)
     } else if (handPiece is LivingPiece) {
       val treeHexagons =
         territory.hexagons.filter { island.getData(it).piece is TreePiece }
@@ -280,7 +280,7 @@ class NotAsRandomAI(
         "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} " +
           "(which is a ${island.getData(hexagon).piece} of team ${island.getData(hexagon).team})"
       }
-      gameInputProcessor.click(hexagon)
+      gameInteraction.click(hexagon)
     }
   }
 
