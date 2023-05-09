@@ -43,6 +43,7 @@ import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
+import no.elg.hex.util.forEachPieceType
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -594,11 +595,13 @@ class Island(
   }
 
   fun checkGameEnded(): Boolean {
-    val capitalCount = visibleHexagons.count { getData(it).piece is Capital }
-    if (capitalCount <= 1) {
-      return true
+    val currentTeam = currentTeam
+    forEachPieceType<Capital> { _, data, _ ->
+      if (data.team != currentTeam) {
+        return false
+      }
     }
-    return false
+    return true
   }
 
   // /////////////////

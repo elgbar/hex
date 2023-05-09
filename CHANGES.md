@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [gameplay] Fix merging two territories always keeps the capital of the selected territory
 * [gameplay] Fix double processing of pieces in a bankrupt territory at the beginning of a players turn
 * [gameplay] Fix false positive `end turn` warnings
+* [gameplay] Fix game not ending when there is only a single team alive, while it has two territories
   * If you cannot attack hexagons by buying new units the warning will not be displayed (unless you can buy and place a castle)
 * [visual] Fix capitals rendering "buy" flag when it is an AIs turn
 * [visual] Fix pieces being animated when in map editor mode
