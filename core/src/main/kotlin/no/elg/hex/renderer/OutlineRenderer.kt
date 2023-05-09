@@ -1,6 +1,8 @@
 package no.elg.hex.renderer
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled
 import com.badlogic.gdx.utils.Disposable
@@ -20,16 +22,17 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
   override fun frameUpdate() {
-    lineRenderer.begin(Filled)
     lineRenderer.projectionMatrix = islandScreen.camera.combined
+    lineRenderer.begin(Filled)
+    Gdx.gl.glEnable(GL20.GL_BLEND)
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    val currHex = islandScreen.cursorHexagon
     val allowedToDrawInvisible = !IslandPreviewCollection.renderingPreviews
     val shouldDrawEdges = Hex.args.`draw-edges` && allowedToDrawInvisible
     val shouldDrawInvisible = Hex.args.mapEditor && allowedToDrawInvisible
 
     fun draw(
-      hexes: Iterable<Hexagon<HexagonData>>,
+      hexes: Collection<Hexagon<HexagonData>>,
       color: Color?,
       alpha: Float,
       lineWidth: Float = DEFAULT_RECT_LINE_WIDTH
@@ -37,12 +40,6 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       for (hexagon in hexes) {
         val points = hexagon.points
         val data = islandScreen.island.getData(hexagon)
-
-        val brightness = HexagonData.BRIGHTNESS + if (hexagon.cubeCoordinate == currHex?.cubeCoordinate) {
-          HexagonData.SELECTED
-        } else {
-          0f
-        }
 
         if (data.edge) {
           if (shouldDrawEdges) {
@@ -53,7 +50,8 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
         } else if (shouldDrawInvisible && data.invisible) {
           lineRenderer.color.set(Color.GRAY)
         } else {
-          lineRenderer.color.set(color ?: data.color).mul(brightness, brightness, brightness, alpha)
+          lineRenderer.color.set(color ?: data.color)
+          lineRenderer.color.a = alpha
         }
 
         for (i in points.indices) {
@@ -65,16 +63,14 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
             point.coordinateY.toFloat(),
             nextPoint.coordinateX.toFloat(),
             nextPoint.coordinateY.toFloat(),
-            lineWidth,
-            lineRenderer.color,
-            lineRenderer.color
+            lineWidth
           )
         }
       }
     }
 
     val hexagonsToRender = if (shouldDrawEdges || shouldDrawInvisible) islandScreen.island.allHexagons else islandScreen.island.visibleHexagons
-    draw(hexagonsToRender, null, 0.25f)
+    draw(hexagonsToRender, null, 0.5f)
 
     if (islandScreen.island.isCurrentTeamHuman()) {
       islandScreen.island.selected?.also {

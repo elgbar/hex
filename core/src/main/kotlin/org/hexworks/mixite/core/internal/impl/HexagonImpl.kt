@@ -40,8 +40,10 @@ class HexagonImpl<T : SatelliteData> internal constructor(
   override val gridZ: Int
     get() = cubeCoordinate.gridZ
 
+  @Deprecated("use center")
   override val centerX = center.coordinateX
 
+  @Deprecated("use center")
   override val centerY = center.coordinateY
 
   override val satelliteData: Maybe<T>
@@ -70,7 +72,7 @@ class HexagonImpl<T : SatelliteData> internal constructor(
   }
 
   private fun calculateCenter(): Point {
-    return if (HexagonOrientation.FLAT_TOP.equals(sharedData.orientation)) {
+    return if (HexagonOrientation.FLAT_TOP == sharedData.orientation) {
       Point.fromPosition(
         cubeCoordinate.gridX * sharedData.hexagonWidth + sharedData.radius,
         cubeCoordinate.gridZ * sharedData.hexagonHeight + cubeCoordinate.gridX * sharedData.hexagonHeight / 2 + sharedData.hexagonHeight / 2
