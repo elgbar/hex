@@ -291,9 +291,6 @@ class Island(
   }
 
   fun endTurn() {
-    history.disable()
-    history.clear()
-
     aiJob = KtxAsync.launch(Hex.asyncThread) {
       select(null)
 
@@ -350,8 +347,10 @@ class Island(
 
   fun beginTurn() {
     KtxAsync.launch(Hex.asyncThread) {
+      history.clear()
       val cai = currentAI
       if (cai != null) {
+        history.disable()
         val time = measureTimeMillis {
           try {
             cai.action(this@Island, gameInteraction)
@@ -369,7 +368,6 @@ class Island(
       } else {
         // enable history only when it's a humans turn
         history.enable()
-        history.clear()
 
         // Loose when no player have any capitals left
         if (visibleHexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }

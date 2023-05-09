@@ -213,7 +213,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
 
         // reselect territory to update its values
         island.select(placeOn)
-        if(island.checkGameEnded()){
+        if (island.checkGameEnded()) {
           endGame()
         }
       }

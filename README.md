@@ -110,12 +110,8 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 
 #### Known bugs
 
-* Map editor preview not rendered properly
 * Lag when un/redoing after a long game
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
   * The reason for the lag is when there are a large amount of actions done there are lots of data
   * Ideas to mitigate this issue
-    * Shrink the size of the island by
-      * Maybe non-visible hexagons can be shrunk in size?
-      * Re-encode the islands to fit in smaller island sizes
-    * Make the history contain a delta not the who
+    * Make the history contain a delta not the whole history
