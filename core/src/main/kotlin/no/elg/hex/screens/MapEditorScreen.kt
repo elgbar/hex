@@ -2,6 +2,7 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.ButtonBar
 import ktx.actors.isShown
 import ktx.actors.minusAssign
@@ -17,7 +18,6 @@ import ktx.scene2d.vis.visImageTextButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
@@ -33,17 +33,14 @@ import no.elg.hex.input.editor.NOOPEditor
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
-import no.elg.hex.input.editor.generateEditors
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.IslandDto
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
-import no.elg.hex.util.nextOrNull
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
 import no.elg.hex.util.previous
-import no.elg.hex.util.previousOrNull
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.removeSmallerIslands
 import no.elg.hex.util.saveInitialIsland
@@ -61,10 +58,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   private val debugInfoRenderer = DebugInfoRenderer(this)
   private lateinit var quickSavedIsland: IslandDto
 
-  private val opaquenessEditors = generateEditors<OpaquenessEditor>()
-  private val teamEditors = generateEditors<TeamEditor>()
-  private val pieceEditors = generateEditors<PieceEditor>()
-
   private val editorsWindow: KVisWindow
   private val confirmExit: KVisWindow
 
@@ -79,21 +72,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   var selectedPiece: KClass<out Piece> = PIECES.first()
     private set
 
-  var editors: List<Editor> = emptyList()
-    private set(value) {
-      field = value
-      editor = value.firstOrNull() ?: NOOPEditor
-    }
-
   var editor: Editor = NOOPEditor
-    private set(value) {
-      if (value == NOOPEditor || value in editors) {
-        field = value
-      } else {
-        field = NOOPEditor
-        publishError("Wrong editor type given: $value. Expected one of $editors or $NOOPEditor")
-      }
-    }
 
   init {
     quicksave()
@@ -142,26 +121,36 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       }
 
       editorsWindow = visWindow("Editors") {
-        addCloseButton()
         isResizable = false
 
+        titleLabel.setAlignment(Align.center)
         if (Hex.debugStage) {
           debug()
         }
         defaults().space(5f)
 
-        fun createEditorButton(name: String, key: Int) {
-          visImageTextButton(name) {
-            onClick { Hex.inputMultiplexer.keyDown(key) }
-            it.fillX()
-            visTextTooltip("Hotkey: ${Keys.toString(key)}")
+        fun <T : Editor> createEditorButton(editorClass: KClass<T>) {
+          for (editor in editorClass.sealedSubclasses.map { it.objectInstance ?: error("Editor ${it.simpleName} is not an object") }) {
+            visImageTextButton(editor.name) {
+              onClick {
+                this@MapEditorScreen.editor = editor
+              }
+
+              it.fillX()
+            }
           }
         }
-        createEditorButton("Opaqueness", OPAQUENESS_KEY)
+
+        visImageTextButton("Disabled") {
+          onClick { editor = NOOPEditor }
+          it.fillX()
+        }
         row()
-        createEditorButton("Team", TEAM_KEY)
+        createEditorButton(OpaquenessEditor::class)
         row()
-        createEditorButton("Piece", PIECE_KEY)
+        createEditorButton(TeamEditor::class)
+        row()
+        createEditorButton(PieceEditor::class)
         pack()
       }
 
@@ -240,20 +229,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
 
             separator()
 
-            menuItem("Next Editor") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.RIGHT) {
-                editor = editors.nextOrNull(editor) ?: NOOPEditor
-              }
-            }
-
-            menuItem("Previous Editor") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.LEFT) {
-                editor = editors.previousOrNull(editor) ?: NOOPEditor
-              }
-            }
-
-            separator()
-
             menuItem("Increase Brush Size") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.PAGE_UP) {
                 brushRadius++
@@ -287,24 +262,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             menuItem("Toggle Editor Types") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F1) {
                 editorsWindow.toggleShown(this@MapEditorScreen.stageScreen.stage)
-              }
-            }
-
-            separator()
-
-            menuItem("Opaqueness Editor Type") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, OPAQUENESS_KEY) {
-                editors = opaquenessEditors
-              }
-            }
-            menuItem("Team Editor Type") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, TEAM_KEY) {
-                editors = teamEditors
-              }
-            }
-            menuItem("Piece Editor Type") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, PIECE_KEY) {
-                editors = pieceEditors
               }
             }
           }
@@ -364,11 +321,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   companion object {
     const val MAX_BRUSH_SIZE = 10
     const val MIN_BRUSH_SIZE = 1
-
-    const val OPAQUENESS_KEY = Keys.O
-    const val TEAM_KEY = Keys.T
-    const val PIECE_KEY = Keys.P
-
     private val shiftPressed get() = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)
   }
 }
