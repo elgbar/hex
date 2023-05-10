@@ -96,8 +96,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     fun updatePercentages() {
       teamPercent.clear()
       teamHexagons.clear()
-      islandScreen.island.calculatePercentagesHexagons()
-        .mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
+      islandScreen.island.calculatePercentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
       islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
     }
 

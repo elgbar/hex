@@ -418,7 +418,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       // either you own more than 75% of all hexagons
       // or all enemies have less than 12,5% of the hexagons
       val percentagesHexagons = island.calculatePercentagesHexagons()
-      if ((percentagesHexagons[currentTeam] ?: 0f) >= PERCENT_HEXES_OWNED_TO_WIN ||
+      val teamPercentages = percentagesHexagons[currentTeam] ?: 0f
+      if (teamPercentages >= PERCENT_HEXES_OWNED_TO_WIN ||
         percentagesHexagons.all { (team, percent) -> team === currentTeam || percent < MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER }
       ) {
         acceptAISurrender.show(stageScreen.stage)

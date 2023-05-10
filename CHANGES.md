@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [input] Pressing back on android when in the level select screen will exit the app
 * [visual] Visual strength hint is enabled by default
 * [visual] Adjust team color to make them easier to distinguish
-* [visual] Reduce maximum zoom from 2.5 to 2
+* [visual] Reduce maximum zoom from `2.5` to `2`
 * [visual] Move the non-islands buttons in the level select screen closer to the center of the screen
 * [technical] Rendering now happens non-continuously, that is, only when needed
   * This drastically reduces the amount of power the game uses
@@ -77,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] Fix resizing stage screens did not scale properly
 * [technical] Fix crash when there are no visible hexagons
 * [technical] Fix exceptions being thrown if an island had no hexagons loaded
+* [technical] Fix wrong AI team being announced as the winner when you loose
 
 ### Removed
 

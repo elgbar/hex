@@ -2,7 +2,6 @@ package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.utils.ObjectIntMap
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -158,7 +157,7 @@ class Island(
     }
 
     if (::hexagonsPerTeam.isLazyInitialized) {
-      countHexagons(hexagonsPerTeam)
+      recountHexagons()
     }
   }
 
@@ -213,7 +212,7 @@ class Island(
     }
   }
 
-  val hexagonsPerTeam by lazy { ObjectIntMap<Team>(Team.values().size).apply { countHexagons(this) } }
+  val hexagonsPerTeam by lazy { EnumMap<Team, Int>(Team::class.java).also { recountHexagons(it) } }
   val winningTeam: Team get() = hexagonsPerTeam.maxBy { it.value }.key
 
   private val initialState: IslandDto
@@ -275,18 +274,18 @@ class Island(
   //  Gameplay  //
   // ////////// //
 
-  private fun countHexagons(counter: ObjectIntMap<Team>) {
-    counter.clear(Team.values().size)
+  private fun recountHexagons(hexagonsPerTeam: EnumMap<Team, Int> = this.hexagonsPerTeam) {
+    hexagonsPerTeam.clear()
     visibleHexagons.withData(this) { _, data ->
-      counter.getAndIncrement(data.team, 0, 1)
+      hexagonsPerTeam.compute(data.team) { _, old -> 1 + (old ?: 0) }
     }
   }
 
   fun calculatePercentagesHexagons(): EnumMap<Team, Float> {
-    val hexes = hexagonsPerTeam
     val totalHexagons = visibleHexagons.count().toFloat().coerceAtLeast(1f)
     return Team.values().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {
-      hexes.get(it, 0) / totalHexagons
+      val current = hexagonsPerTeam.getOrDefault(it, 0)
+      current / totalHexagons
     }
   }
 

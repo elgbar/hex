@@ -119,11 +119,11 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
 
     if (!isPreviewRenderer) {
       teamChangedListener = SimpleEventListener.create {
-        island.hexagonsPerTeam.getAndIncrement(it.old, 0, -1)
-        island.hexagonsPerTeam.getAndIncrement(it.new, 0, 1)
+        island.hexagonsPerTeam.compute(it.old) { _, old -> (old ?: 0) - 1 }
+        island.hexagonsPerTeam.compute(it.new) { _, old -> (old ?: 0) + 1 }
       }
       visibilityChangedListener = SimpleEventListener.create {
-        island.hexagonsPerTeam.getAndIncrement(it.data.team, 0, if (it.isDisabled) -1 else 1)
+        island.hexagonsPerTeam.compute(it.data.team) { _, old -> (old ?: 0) + if (it.isDisabled) -1 else 1 }
       }
     }
   }
