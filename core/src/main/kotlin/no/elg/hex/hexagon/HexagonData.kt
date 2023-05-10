@@ -66,7 +66,9 @@ class HexagonData(
 
       val old = field
       field = value
-      Events.fireEvent(HexagonChangedTeamEvent(this, old, value))
+      if (visible) {
+        Events.fireEvent(HexagonChangedTeamEvent(this, old, value))
+      }
       Gdx.graphics.requestRendering()
     }
 
@@ -78,7 +80,10 @@ class HexagonData(
 
       val old = field
       field = value
-      Events.fireEvent(HexagonChangedPieceEvent(this, old, value))
+
+      if (visible) {
+        Events.fireEvent(HexagonChangedPieceEvent(this, old, value))
+      }
       Gdx.graphics.requestRendering()
     }
 
