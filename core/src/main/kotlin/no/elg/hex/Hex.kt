@@ -29,6 +29,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.jackson.serialization.HexagonDataDeserializerModifier
 import no.elg.hex.platform.Platform
+import no.elg.hex.platform.PlatformType
 import no.elg.hex.screens.AbstractScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
@@ -41,6 +42,7 @@ import no.elg.hex.util.reportTiming
 import no.elg.hex.util.resetHdpi
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.CubeCoordinate
+import kotlin.system.exitProcess
 
 @Suppress("GDXKotlinStaticResource")
 object Hex : ApplicationAdapter() {
@@ -219,9 +221,13 @@ object Hex : ApplicationAdapter() {
 
   override fun dispose() {
     try {
-      pause()
+      VisUI.dispose(true)
       screen.dispose()
-    } catch (_: Exception) {
+      if (platform.type == PlatformType.DESKTOP) {
+        exitProcess(0)
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
   }
 
