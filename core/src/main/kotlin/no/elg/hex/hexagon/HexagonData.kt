@@ -138,7 +138,7 @@ class HexagonData(
   internal var serializationDataToLoad: Any? = null
 
   @JsonGetter("pieceType")
-  fun getPieceTypeName() = piece::class.qualifiedName
+  fun getPieceTypeName() = piece::class.simpleName
 
   @JsonGetter("data")
   private fun getSerializationData() = piece.serializationData

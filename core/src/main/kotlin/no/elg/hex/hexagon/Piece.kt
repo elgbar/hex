@@ -138,7 +138,9 @@ val PIECES: List<KClass<out Piece>> by lazy {
   return@lazy subclasses
 }
 
-val PIECES_MAP: Map<String?, KClass<out Piece>> by lazy { PIECES.associateBy { it.qualifiedName } }
+val PIECES_MAP: Map<String?, KClass<out Piece>> by lazy {
+  PIECES.associateBy { it.simpleName } + PIECES.associateBy { it.qualifiedName }
+}
 
 // /////////
 // Empty //
