@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
@@ -37,8 +35,8 @@ class HexagonData(
   team: Team? = null,
   /**
    * Edge hexagons are hexagons along the edge of the grid. Due to how hexagon detection works
-   * these hexagon would be returned even when the mouse is not inside the hexagon In order to
-   * prevent that and gain pixel perfect hexagon accuracy the player should not know these exists.
+   * these hexagon would be returned even when the mouse is not inside the hexagon. In order to
+   * prevent that and gain pixel perfect hexagon accuracy the player should not know these exist.
    *
    * @see no.elg.hex.util.getHexagon
    * @see no.elg.hex.renderer.OutlineRenderer
@@ -57,7 +55,6 @@ class HexagonData(
       }
     }
 
-  @JsonInclude(ALWAYS)
   var team: Team = team ?: if (Hex.args.mapEditor) Team.values().random() else Team.STONE
     set(value) {
       if (field === value) return
@@ -138,7 +135,7 @@ class HexagonData(
   internal var serializationDataToLoad: Any? = null
 
   @JsonGetter("pieceType")
-  fun getPieceTypeName() = piece::class.simpleName
+  fun getPieceTypeName() = if (piece == Empty) null else piece::class.simpleName
 
   @JsonGetter("data")
   private fun getSerializationData() = piece.serializationData

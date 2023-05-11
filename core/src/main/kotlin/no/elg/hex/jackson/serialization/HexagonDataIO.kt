@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.deser.BeanDeserializer
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES_MAP
 
@@ -26,7 +27,7 @@ class HexagonDataDeserializer(defaultSerializer: BeanDeserializer) :
       // Jacksons default ordering is not reliable enough to allow loading of piece then the data for that piece.
       // A less hacky solution would be to serialize the pieces themself, but this is hard to do (see the #setPiece(class) method)
       if (loadedTypeName != null) {
-        val pieceClass = PIECES_MAP[loadedTypeName] ?: error("Unknown piece with the name $loadedTypeName")
+        val pieceClass = PIECES_MAP[loadedTypeName ?: Empty::class.simpleName] ?: error("Unknown piece with the name $loadedTypeName")
         val pieceUpdated = setPiece(pieceClass) {
           it.handleDeserializationData(serializationDataToLoad)
         }
