@@ -33,6 +33,7 @@ import ktx.style.label
 import ktx.style.menu
 import ktx.style.menuItem
 import ktx.style.set
+import ktx.style.sizes
 import ktx.style.textButton
 import ktx.style.textField
 import ktx.style.visCheckBox
@@ -309,6 +310,11 @@ class Assets : AssetManager() {
 
       menuItem(extend = "default") { font = notFlippedFont }
       menu { openButtonStyle = newOpenButtonStyle }
+
+      sizes {
+        this.spinnerFieldSize = 100f
+        this.spinnerButtonHeight = 10f
+      }
     }
     Scene2DSkin.defaultSkin = VisUI.getSkin()
 

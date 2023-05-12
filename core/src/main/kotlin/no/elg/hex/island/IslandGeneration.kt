@@ -40,7 +40,7 @@ object IslandGeneration {
   /**
    * A value in the range 0 <= treeChance <= 1 of how likely there is to be a tree
    */
-  var treeChance = 0.1f
+  var treeChance = 0.05f
 
   init {
     noise.setNoiseType(OPEN_SIMPLEX_2_S)
