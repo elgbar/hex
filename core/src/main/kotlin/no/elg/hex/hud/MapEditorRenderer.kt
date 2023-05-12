@@ -8,6 +8,7 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.screens.MapEditorScreen.Companion.MAX_BRUSH_SIZE
 import no.elg.hex.screens.MapEditorScreen.Companion.MIN_BRUSH_SIZE
+import no.elg.hex.util.toTitleCase
 
 /** @author Elg */
 class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpdatable {
@@ -15,18 +16,14 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
   private val teamText by lazy {
     prefixText(
       "Selected team: ",
-      callable = { mapEditorScreen.editor as TeamEditor },
+      callable = { mapEditorScreen.editor },
       format = { editor ->
-        when (editor) {
-          is TeamEditor.SetTeam -> {
-            color = Color.YELLOW
-            mapEditorScreen.selectedTeam.name
-          }
-
-          is TeamEditor.RandomizeTeam -> {
-            color = Color.PURPLE
-            "Random"
-          }
+        if (editor is TeamEditor.RandomizeTeam) {
+          color = Color.PURPLE
+          "Random"
+        } else {
+          color = Color.YELLOW
+          mapEditorScreen.selectedTeam.name.lowercase().toTitleCase()
         }
       }
     )
@@ -35,18 +32,14 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
   private val pieceText by lazy {
     prefixText(
       "Selected piece: ",
-      callable = { mapEditorScreen.editor as PieceEditor },
+      callable = { mapEditorScreen.editor },
       format = { editor ->
-        when (editor) {
-          is PieceEditor.SetPiece -> {
-            color = Color.YELLOW
-            mapEditorScreen.selectedPiece.simpleName ?: "Unknown"
-          }
-
-          is PieceEditor.RandomizePiece -> {
-            color = Color.PURPLE
-            "Random"
-          }
+        if (editor is PieceEditor.RandomizePiece) {
+          color = Color.PURPLE
+          "Random"
+        } else {
+          color = Color.YELLOW
+          mapEditorScreen.selectedPiece.simpleName?.toTitleCase() ?: "Unknown"
         }
       }
     )
@@ -77,13 +70,8 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
     emptyText(),
     brushText,
     editorText,
-    IfScreenText {
-      when (mapEditorScreen.editor) {
-        is TeamEditor -> teamText
-        is PieceEditor -> pieceText
-        else -> emptyText()
-      }
-    }
+    teamText,
+    pieceText
   )
 
   override fun frameUpdate() {
