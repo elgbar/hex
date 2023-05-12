@@ -264,12 +264,12 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             separator()
 
             menuItem("Increase Brush Size") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.PAGE_UP) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.UP) {
                 brushRadius++
               }
             }
             menuItem("Decrease Brush Size") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.PAGE_DOWN) {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.DOWN) {
                 brushRadius--
               }
             }
