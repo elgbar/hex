@@ -23,6 +23,7 @@ import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.hexagon.forEachPieceSubClass
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.MessagesRenderer.publishError
@@ -46,8 +47,10 @@ import no.elg.hex.util.removeSmallerIslands
 import no.elg.hex.util.saveInitialIsland
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
+import no.elg.hex.util.toTitleCase
 import no.elg.hex.util.toggleShown
 import kotlin.reflect.KClass
+import kotlin.reflect.jvm.jvmName
 
 /** @author Elg */
 class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
@@ -58,7 +61,8 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   private val debugInfoRenderer = DebugInfoRenderer(this)
   private lateinit var quickSavedIsland: IslandDto
 
-  private val editorsWindow: KVisWindow
+  private val editorsWindows: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
+
   private val confirmExit: KVisWindow
 
   var brushRadius: Int = 1
@@ -100,15 +104,9 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             }
           )
 
-          setButton(
-            ButtonBar.ButtonType.NO,
-            scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen() } }
-          )
+          setButton(ButtonBar.ButtonType.NO, scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen() } })
 
-          setButton(
-            ButtonBar.ButtonType.CANCEL,
-            scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } }
-          )
+          setButton(ButtonBar.ButtonType.CANCEL, scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } })
           createTable().pack()
         }
         pack()
@@ -120,7 +118,42 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         confirmExit.toggleShown(stage)
       }
 
-      editorsWindow = visWindow("Editors") {
+      visWindow("Team") {
+        isResizable = false
+        defaults().space(5f).padLeft(5f).padRight(5f)
+        for (team in Team.values()) {
+          visImageTextButton(team.name.lowercase().toTitleCase()) {
+            onClick { this@MapEditorScreen.selectedTeam = team }
+            it.fillX()
+          }
+          row()
+        }
+        pack()
+      }.also {
+        editorsWindows[it] = {
+          centerWindow()
+          setPosition(0f, y)
+        }
+      }
+
+      visWindow("Piece") {
+        defaults().space(5f)
+        titleLabel.setAlignment(Align.center)
+        forEachPieceSubClass({ row() }) { piece ->
+          visImageTextButton((piece.simpleName ?: piece.jvmName).toTitleCase()) {
+            onClick { this@MapEditorScreen.selectedPiece = piece }
+            it.fillX()
+          }
+        }
+        pack()
+      }.also {
+        editorsWindows[it] = {
+          centerWindow()
+          setPosition(0f, y / 2)
+        }
+      }
+
+      visWindow("Editors") {
         isResizable = false
 
         titleLabel.setAlignment(Align.center)
@@ -132,10 +165,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         fun <T : Editor> createEditorButton(editorClass: KClass<T>) {
           for (editor in editorClass.sealedSubclasses.map { it.objectInstance ?: error("Editor ${it.simpleName} is not an object") }) {
             visImageTextButton(editor.name) {
-              onClick {
-                this@MapEditorScreen.editor = editor
-              }
-
+              onClick { this@MapEditorScreen.editor = editor }
               it.fillX()
             }
           }
@@ -152,6 +182,10 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         row()
         createEditorButton(PieceEditor::class)
         pack()
+      }.also {
+        editorsWindows[it] = {
+          setPosition(parent.width, 0f)
+        }
       }
 
       val infoWindow = visWindow("Island editor information") {
@@ -245,15 +279,13 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             menuItem("Editor Type Specific") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.Q) {
                 if (editor is TeamEditor) {
-                  selectedTeam =
-                    Team.values().let {
-                      if (shiftPressed) it.previous(selectedTeam) else it.next(selectedTeam)
-                    }
+                  selectedTeam = Team.values().let {
+                    if (shiftPressed) it.previous(selectedTeam) else it.next(selectedTeam)
+                  }
                 } else if (editor is PieceEditor) {
-                  selectedPiece =
-                    PIECES.let {
-                      if (shiftPressed) it.previous(selectedPiece) else it.next(selectedPiece)
-                    }
+                  selectedPiece = PIECES.let {
+                    if (shiftPressed) it.previous(selectedPiece) else it.next(selectedPiece)
+                  }
                 }
               }
             }
@@ -261,7 +293,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
           menu("Tools") {
             menuItem("Toggle Editor Types") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F1) {
-                editorsWindow.toggleShown(this@MapEditorScreen.stageScreen.stage)
+                editorsWindows.forEach { it.key.toggleShown(this@MapEditorScreen.stageScreen.stage) }
               }
             }
           }
@@ -302,13 +334,15 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
-    val editorsShown = editorsWindow.isShown()
-    if (editorsShown) {
-      stageScreen.stage -= editorsWindow
+
+    val editorsWindow1 = editorsWindows.filter {
+      val window = it.key
+      window.isShown().also { b -> if (b) stageScreen.stage -= window }
     }
     stageScreen.resize(width, height)
-    if (editorsShown) {
-      editorsWindow.show(stageScreen.stage, false, 0f)
+    editorsWindow1.forEach {
+      it.key.show(stageScreen.stage, false, 0f)
+      it.value(it.key)
     }
   }
 

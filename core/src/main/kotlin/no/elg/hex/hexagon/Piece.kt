@@ -123,19 +123,21 @@ sealed class Piece {
 
 val PIECES: List<KClass<out Piece>> by lazy {
   val subclasses = ArrayList<KClass<out Piece>>()
+  forEachPieceSubClass { subclasses += it }
+  return@lazy subclasses
+}
 
-  fun addAllSubclasses(it: KClass<out Piece>) {
-    if (it.isSealed) {
-      for (subclass in it.sealedSubclasses) {
-        addAllSubclasses(subclass)
+fun forEachPieceSubClass(sealed: (KClass<out Piece>) -> Unit = {}, instance: (KClass<out Piece>) -> Unit) {
+  fun addAllSubclasses(pieceKClass: KClass<out Piece>) {
+    when {
+      pieceKClass.isSealed -> {
+        sealed(pieceKClass)
+        pieceKClass.sealedSubclasses.forEach { addAllSubclasses(it) }
       }
-    } else {
-      subclasses += it
+      else -> instance(pieceKClass)
     }
   }
-
   addAllSubclasses(Piece::class)
-  return@lazy subclasses
 }
 
 val PIECES_MAP: Map<String?, KClass<out Piece>> by lazy {
