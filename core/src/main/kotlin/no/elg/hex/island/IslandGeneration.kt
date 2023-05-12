@@ -77,9 +77,6 @@ object IslandGeneration {
         if (noise <= 1) {
           data.isDisabled = false
           data.team = teams.random(random)
-          if (noise <= treeChance) {
-            replaceWithTree(island, hexagon)
-          }
         } else {
           data.isDisabled = true
         }
@@ -88,8 +85,7 @@ object IslandGeneration {
       island.recalculateVisibleIslands()
 
       for (hexagon in island.visibleHexagons) {
-        val noise = noiseAt(hexagon.gridX.toFloat(), hexagon.gridZ.toFloat(), width, height)
-        if (noise <= treeChance) {
+        if (random.nextFloat() <= treeChance) {
           replaceWithTree(island, hexagon)
         }
       }
