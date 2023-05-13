@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.kotcrab.vis.ui.util.OsUtils
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
@@ -455,16 +454,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     const val PERCENT_HEXES_OWNED_TO_WIN = 0.75f
     const val MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER = 0.125f
 
-    private const val MOBILE_BUTTON_PADDING = 45f
-    private const val DESKTOP_BUTTON_PADDING = 10f
-
-    private const val MOBILE_SPACING = 20f
-    private const val DESKTOP_SPACING = 5f
-
     val PEASANT_PRICE = Peasant::class.createHandInstance().price
     val CASTLE_PRICE = Castle::class.createHandInstance().price
-
-    val buttonPadding: Float get() = if (OsUtils.isAndroid() || OsUtils.isIos()) MOBILE_BUTTON_PADDING else DESKTOP_BUTTON_PADDING
-    val platformSpacing: Float get() = if (OsUtils.isAndroid() || OsUtils.isIos()) MOBILE_SPACING else DESKTOP_SPACING
   }
 }

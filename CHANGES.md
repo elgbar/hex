@@ -86,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] Remove the AI end turn delay
 * [technical] Remove `vsync`, `msaa`, and `audio` settings on android due to the platform not supporting changing them or being badly supported
 * [technical] Remove `limit fps`, `target fps` settings from all platforms, as they are now irrelevant
+* [technical] Remove no-op editor
 
 ---
 

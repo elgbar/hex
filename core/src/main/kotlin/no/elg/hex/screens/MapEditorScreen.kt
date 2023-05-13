@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.Align
 import ktx.actors.isShown
 import ktx.actors.minusAssign
 import ktx.actors.onClick
+import ktx.scene2d.Scene2dDsl
+import ktx.scene2d.StageWidget
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.menu
@@ -17,19 +19,19 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
+import no.elg.hex.hexagon.PIECES_ORGANIZED
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
-import no.elg.hex.hexagon.forEachPieceSubClass
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.input.MapEditorInputProcessor
 import no.elg.hex.input.editor.Editor
-import no.elg.hex.input.editor.NOOPEditor
 import no.elg.hex.input.editor.OpaquenessEditor
 import no.elg.hex.input.editor.PieceEditor
 import no.elg.hex.input.editor.TeamEditor
+import no.elg.hex.input.editor.editorsList
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.IslandDto
@@ -73,7 +75,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   var selectedPiece: KClass<out Piece> = PIECES.first()
     private set
 
-  var editor: Editor = NOOPEditor
+  var editor: Editor = OpaquenessEditor.ToggleOpaqueness
 
   init {
     quicksave()
@@ -97,74 +99,58 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         confirmExit.toggleShown(stage)
       }
 
-      visWindow("Team") {
-        isResizable = false
-        defaults().space(5f).padLeft(5f).padRight(5f)
-        for (team in Team.values()) {
-          visImageTextButton(team.name.lowercase().toTitleCase()) {
-            onClick { this@MapEditorScreen.selectedTeam = team }
-            it.fillX()
-          }
-          row()
-        }
-        pack()
-      }.also {
-        editorsWindows[it] = {
-          centerWindow()
-          setPosition(0f, y)
-        }
-      }
-
-      visWindow("Piece") {
-        titleLabel.setAlignment(Align.center)
-        forEachPieceSubClass({ row() }) { piece ->
-          visImageTextButton((piece.simpleName ?: piece.jvmName).toTitleCase()) {
-            onClick { this@MapEditorScreen.selectedPiece = piece }
-            it.fillX()
-          }
-        }
-        pack()
-      }.also {
-        editorsWindows[it] = {
-          centerWindow()
-          setPosition(0f, y / 2)
-        }
-      }
-
-      visWindow("Editors") {
-        isResizable = false
-
-        titleLabel.setAlignment(Align.center)
-        if (Hex.debugStage) {
-          debug()
-        }
-        defaults().space(5f)
-
-        fun <T : Editor> createEditorButton(editorClass: KClass<T>) {
-          for (editor in editorClass.sealedSubclasses.map { it.objectInstance ?: error("Editor ${it.simpleName} is not an object") }) {
-            visImageTextButton(editor.name) {
-              onClick { this@MapEditorScreen.editor = editor }
-              it.fillX()
+      @Scene2dDsl
+      fun <T> StageWidget.itemsWindow(
+        title: String,
+        items: Iterable<Iterable<T>>,
+        stringifyItem: (T) -> String,
+        onResize: KVisWindow.() -> Unit,
+        onButtonClick: (T) -> Unit
+      ): KVisWindow =
+        visWindow(title) {
+          isResizable = false
+          titleLabel.setAlignment(Align.center)
+          defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+          for (itemRow in items) {
+            for (item in itemRow) {
+              visImageTextButton(stringifyItem(item).toTitleCase()) {
+                pad(5f)
+                onClick { onButtonClick(item) }
+                it.fillX()
+              }
             }
+            row()
+          }
+          pack()
+        }.also {
+          editorsWindows[it] = {
+            centerWindow()
+            onResize()
           }
         }
+      itemsWindow(
+        title = "Team",
+        items = listOf(Team.values().toList()),
+        stringifyItem = { it.name.lowercase() },
+        onResize = { setPosition(0f, y) },
+        onButtonClick = { this@MapEditorScreen.selectedTeam = it }
+      )
 
-        visImageTextButton("Disabled") {
-          onClick { editor = NOOPEditor }
-          it.fillX()
-        }
-        row()
-        createEditorButton(OpaquenessEditor::class)
-        row()
-        createEditorButton(TeamEditor::class)
-        row()
-        createEditorButton(PieceEditor::class)
-        pack()
-      }.also {
-        editorsWindows[it] = {
-          setPosition(parent.width, 0f)
-        }
-      }
+      itemsWindow(
+        title = "Piece",
+        items = PIECES_ORGANIZED,
+        stringifyItem = { it.simpleName ?: it.jvmName },
+        onResize = { setPosition(0f, y / 2) },
+        onButtonClick = { this@MapEditorScreen.selectedPiece = it }
+      )
+
+      itemsWindow(
+        title = "Editors",
+        items = editorsList,
+        stringifyItem = { it::class.simpleName ?: it::class.jvmName },
+        onResize = { setPosition(parent.width, 0f) },
+        onButtonClick = { this@MapEditorScreen.editor = it }
+      )
 
       val infoWindow = visWindow("Island editor information") {
         closeOnEscape()

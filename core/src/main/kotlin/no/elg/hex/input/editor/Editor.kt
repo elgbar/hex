@@ -9,7 +9,7 @@ import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.KClass
 
 /** @author Elg */
-interface Editor {
+sealed interface Editor {
   val name: String
     get() =
       requireNotNull(this::class.simpleName?.toTitleCase()) {
@@ -26,8 +26,15 @@ interface Editor {
 
   fun postEdit(metadata: EditMetadata) = Unit
 }
-inline fun <reified T : Editor> generateEditors(): List<T> {
-  return T::class.sealedSubclasses.map { it.objectInstance ?: error("Failed to create new instance of ${it.simpleName}") }.sortedBy { it.order }
+
+val editorsList: List<List<Editor>> by lazy {
+  Editor::class.sealedSubclasses.map { subclass ->
+    if (subclass.isSealed) {
+      subclass.sealedSubclasses.map { it.objectInstance ?: error("Failed to create new instance of ${it.simpleName}") }.sortedBy { it.order }
+    } else {
+      listOf(subclass.objectInstance ?: error("Failed to create new instance of ${subclass.simpleName}"))
+    }
+  }
 }
 
 data class EditMetadata(
@@ -46,12 +53,3 @@ data class EditMetadata(
   val selectedPiece: KClass<out Piece>,
   val selectedTeam: Team
 )
-
-object NOOPEditor : Editor {
-  override val isNOP
-    get() = true
-
-  override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-    /*NO OP*/
-  }
-}

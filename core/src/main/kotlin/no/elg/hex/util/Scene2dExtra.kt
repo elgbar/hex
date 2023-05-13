@@ -22,7 +22,17 @@ import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visWindow
-import no.elg.hex.screens.PlayableIslandScreen
+import no.elg.hex.Hex
+import no.elg.hex.platform.PlatformType
+
+private const val MOBILE_BUTTON_PADDING = 45f
+private const val DESKTOP_BUTTON_PADDING = 10f
+
+private const val MOBILE_SPACING = 20f
+private const val DESKTOP_SPACING = 5f
+
+val buttonPadding: Float get() = if (Hex.platform.type == PlatformType.MOBILE) MOBILE_BUTTON_PADDING else DESKTOP_BUTTON_PADDING
+val platformSpacing: Float get() = if (Hex.platform.type == PlatformType.MOBILE) MOBILE_SPACING else DESKTOP_SPACING
 
 /**
  * Alias for [PopupMenu.addSeparator] to make it blend better in with the scene 2d DSL, but without
@@ -33,7 +43,6 @@ fun PopupMenu.separator() {
   add(Separator("menu")).fill().expand().row()
 }
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 fun Button.onInteract(
   stage: Stage,
   vararg keyShortcut: Int,
@@ -176,7 +185,7 @@ fun StageWidget.confirmWindow(
       cell.fillX()
       cell.expandX()
       cell.space(10f)
-      cell.pad(PlayableIslandScreen.platformSpacing)
+      cell.pad(platformSpacing)
 
       row()
 
@@ -186,7 +195,7 @@ fun StageWidget.confirmWindow(
       }
 
       visTextButton("Yes") {
-        pad(PlayableIslandScreen.buttonPadding)
+        pad(buttonPadding)
         it.expandX()
         it.center()
         onClick {
@@ -200,7 +209,7 @@ fun StageWidget.confirmWindow(
       }
 
       visTextButton("No") {
-        pad(PlayableIslandScreen.buttonPadding)
+        pad(buttonPadding)
         it.expandX()
         it.center()
         onClick {
@@ -244,11 +253,11 @@ fun StageWidget.okWindow(
     row()
 
     visTextButton("OK") {
-      this.pad(PlayableIslandScreen.buttonPadding)
+      this.pad(buttonPadding)
       it.expandX()
       it.center()
       it.space(10f)
-      it.pad(PlayableIslandScreen.platformSpacing)
+      it.pad(platformSpacing)
       onClick {
         this@visWindow.whenConfirmed()
         this@visWindow.fadeOut()
