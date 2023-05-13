@@ -381,8 +381,11 @@ object ScreenRenderer : Disposable, Resizable {
     batch?.also {
       draws++
       it.begin()
-      block(it)
-      it.end()
+      try {
+        block(it)
+      } finally {
+        it.end()
+      }
     }
   }
 }
