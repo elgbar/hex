@@ -21,11 +21,9 @@ import ktx.scene2d.horizontalGroup
 import ktx.scene2d.table
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visImageButton
-import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
-import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hexagon.BARON_STRENGTH
@@ -51,10 +49,10 @@ import no.elg.hex.preview.PreviewModifier.SURRENDER
 import no.elg.hex.preview.PreviewModifier.WON
 import no.elg.hex.renderer.DebugGraphRenderer
 import no.elg.hex.util.canAttack
+import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
-import no.elg.hex.util.hide
-import no.elg.hex.util.onAnyKeysDownEvent
+import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.show
 
@@ -87,115 +85,15 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     island.gameInteraction = GameInteraction(island, endGame = ::endGame)
     stageScreen.stage.actors {
 
-      @Scene2dDsl
-      fun confirmWindow(
-        title: String,
-        text: String,
-        whenDenied: KVisWindow.() -> Unit = {},
-        whenConfirmed: KVisWindow.() -> Unit
-      ): VisWindow {
-        return this.visWindow(title) {
-          isMovable = false
-          isModal = true
-          hide()
-
-          visLabel(text)
-          row()
-
-          table { cell ->
-
-            cell.fillX()
-            cell.expandX()
-            cell.space(10f)
-            cell.pad(platformSpacing)
-
-            row()
-
-            visLabel("") {
-              it.expandX()
-              it.center()
-            }
-
-            visTextButton("Yes") {
-              pad(buttonPadding)
-              it.expandX()
-              it.center()
-              onClick {
-                this@visWindow.whenConfirmed()
-                this@visWindow.fadeOut()
-              }
-            }
-            visLabel("") {
-              it.expandX()
-              it.center()
-            }
-
-            visTextButton("No") {
-              pad(buttonPadding)
-              it.expandX()
-              it.center()
-              onClick {
-                this@visWindow.whenDenied()
-                this@visWindow.fadeOut()
-              }
-            }
-            visLabel("") {
-              it.expandX()
-              it.center()
-            }
-          }
-          centerWindow()
-          onAnyKeysDownEvent(Keys.ESCAPE, Keys.BACK, catchEvent = true) {
-            this@visWindow.fadeOut()
-          }
-          pack()
-          fadeOut(0f)
-        }
-      }
-
-      @Scene2dDsl
-      fun okWindow(title: String, text: () -> String, whenConfirmed: KVisWindow.() -> Unit): VisWindow {
-        return visWindow(title) {
-          isMovable = false
-          isModal = true
-          this.hide()
-          val label = visLabel("")
-
-          labelUpdater[this] = {
-            label.setText(text())
-            pack()
-            centerWindow()
-          }
-
-          row()
-
-          visTextButton("OK") {
-            this.pad(buttonPadding)
-            it.expandX()
-            it.center()
-            it.space(10f)
-            it.pad(platformSpacing)
-            onClick {
-              this@visWindow.whenConfirmed()
-              this@visWindow.fadeOut()
-            }
-          }
-
-          pack()
-          centerWindow()
-          fadeOut(0f)
-        }
-      }
-
       fun endGame(modifier: PreviewModifier): KVisWindow.() -> Unit = {
         island.history.disable()
         this@PlayableIslandScreen.modifier = modifier
         island.restoreInitialState()
       }
 
-      youWon = okWindow("You Won!", { "Congratulations! You won in ${island.round} rounds" }, endGame(WON))
-      youLost = okWindow("You Lost", { "Too bad! You lost in ${island.round} rounds to ${island.winningTeam.name}" }, endGame(LOST))
-      aiDone = okWindow("Game Over", { "The AI ${island.winningTeam.name} won in ${island.round} rounds" }, endGame(AI_DONE))
+      youWon = okWindow("You Won!", labelUpdater, endGame(WON)) { "Congratulations! You won in ${island.round} rounds" }
+      youLost = okWindow("You Lost", labelUpdater, endGame(LOST)) { "Too bad! You lost in ${island.round} rounds to ${island.winningTeam.name}" }
+      aiDone = okWindow("Game Over", labelUpdater, endGame(AI_DONE)) { "The AI ${island.winningTeam.name} won in ${island.round} rounds" }
 
       confirmEndTurn = confirmWindow(
         "Confirm End Turn",

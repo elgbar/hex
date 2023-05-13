@@ -3,21 +3,17 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.utils.Align
-import com.kotcrab.vis.ui.widget.ButtonBar
 import ktx.actors.isShown
 import ktx.actors.minusAssign
 import ktx.actors.onClick
 import ktx.scene2d.actors
-import ktx.scene2d.scene2d
 import ktx.scene2d.vis.KVisWindow
-import ktx.scene2d.vis.buttonBar
 import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
 import ktx.scene2d.vis.menuItem
 import ktx.scene2d.vis.visImageTextButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
-import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
@@ -37,6 +33,7 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.IslandDto
+import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
 import no.elg.hex.util.onInteract
@@ -82,36 +79,18 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
     quicksave()
     stageScreen.stage.actors {
 
-      confirmExit = visWindow("Confirm exit") {
-        isMovable = false
-        isModal = true
-        hide()
-
-        visLabel("Do you want to save before exiting?")
-        row()
-
-        buttonBar {
-          setButton(
-            ButtonBar.ButtonType.YES,
-            scene2d.visTextButton("Yes") {
-              onClick {
-                if (saveInitialIsland(id, island)) {
-                  Hex.screen = LevelSelectScreen()
-                } else {
-                  this@visWindow.fadeOut()
-                }
-              }
-            }
-          )
-
-          setButton(ButtonBar.ButtonType.NO, scene2d.visTextButton("No") { onClick { Hex.screen = LevelSelectScreen() } })
-
-          setButton(ButtonBar.ButtonType.CANCEL, scene2d.visTextButton("Cancel") { onClick { this@visWindow.fadeOut() } })
-          createTable().pack()
+      confirmExit = confirmWindow(
+        "Confirm exit",
+        "Do you want to save before exiting?",
+        whenDenied = { Hex.screen = LevelSelectScreen() },
+        whenConfirmed = {
+          if (saveInitialIsland(id, island)) {
+            Hex.screen = LevelSelectScreen()
+          } else {
+            this@confirmWindow.fadeOut()
+          }
         }
-        pack()
-        centerWindow()
-      }
+      )
 
       fun exit() {
         confirmExit.centerWindow()
@@ -137,7 +116,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       }
 
       visWindow("Piece") {
-        defaults().space(5f)
         titleLabel.setAlignment(Align.center)
         forEachPieceSubClass({ row() }) { piece ->
           visImageTextButton((piece.simpleName ?: piece.jvmName).toTitleCase()) {
