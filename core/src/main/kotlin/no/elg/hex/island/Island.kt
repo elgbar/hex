@@ -721,7 +721,6 @@ class Island(
       handRestore = handRestore,
       hexagonData = visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
       round = round,
-      initialLoad = false,
       team = currentTeam,
       authorRoundsToBeat = authorRoundsToBeat
     )
@@ -737,7 +736,6 @@ class Island(
     val handRestore: Boolean? = null,
     val hexagonData: SortedMap<CubeCoordinate, HexagonData>,
     val round: Int,
-    val initialLoad: Boolean,
     val team: Team = LEAF,
     val authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
   ) {
@@ -756,7 +754,6 @@ class Island(
         handPiece = handPiece?.createDtoCopy(),
         hexagonData = hexagonData.mapValues { (_, data) -> data.copy() }.toSortedMap(),
         round = round,
-        initialLoad = false,
         team = team,
         authorRoundsToBeat = authorRoundsToBeat
       )
