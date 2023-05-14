@@ -114,7 +114,6 @@ object Hex : ApplicationAdapter() {
 
   override fun create() {
     Gdx.graphics.isContinuousRendering = false
-    platform.platformInit()
     paused = false
 
     try {

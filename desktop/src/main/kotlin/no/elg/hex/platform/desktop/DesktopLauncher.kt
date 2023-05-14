@@ -39,5 +39,6 @@ fun main(args: Array<String>) {
   config.setInitialBackgroundColor(Hex.backgroundColor)
   config.title = "Hex"
 
+  Hex.platform.platformInit()
   Lwjgl3Application(Hex, config)
 }
