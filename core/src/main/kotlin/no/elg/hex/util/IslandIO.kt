@@ -7,17 +7,21 @@ import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
 import no.elg.hex.Assets.Companion.ISLAND_PREVIEWS_DIR
 import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.IslandDto
+import no.elg.hex.model.IslandDto
+import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SplashIslandScreen
 
 fun getIslandFileName(slot: Int, preview: Boolean = false): String {
   return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$slot.${if (preview) "png" else ISLAND_FILE_ENDING}"
 }
+
+fun getIslandLevelFileName(id: Int): String = "$ISLAND_SAVES_DIR.json"
 
 fun getIslandFile(slot: Int, preview: Boolean = false, allowInternal: Boolean = true): FileHandle {
   val path = getIslandFileName(slot, preview)
@@ -53,12 +57,35 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
     if (!existed) {
       Hex.assets.islandFiles.fullFilesSearch()
     }
-    Hex.assets.islandPreviews.updateSelectPreview(id, true)
+    Hex.assets.islandPreviews.updateSelectPreview(id)
     true
   } catch (e: Throwable) {
     publishError("Failed to saved island '${file.name()}'")
     e.printStackTrace()
     false
+  }
+}
+
+fun loadIslandSync(id: Int): Island {
+  try {
+    val progress = PreviewIslandScreen.getProgress(id)
+    Gdx.app.trace("IS SPLASH") { "progress: $progress" }
+    return if (!Hex.args.mapEditor && !progress.isNullOrBlank()) {
+      Gdx.app.debug("IS SPLASH", "Found progress for island $id")
+      Island.deserialize(progress)
+    } else {
+      Gdx.app.debug("IS SPLASH", "No progress found for island $id")
+      Island.deserialize(getIslandFile(id))
+    }
+  } catch (e: Exception) {
+    Gdx.app.postRunnable {
+      MessagesRenderer.publishError(
+        "Failed to load island $id due to a ${e::class.simpleName}: ${e.message}",
+        exception = e
+      )
+      Hex.screen = LevelSelectScreen()
+    }
+    throw IllegalStateException("Failed to load island $id", e)
   }
 }
 

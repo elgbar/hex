@@ -3,7 +3,7 @@ package no.elg.hex.island
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.island.Island.IslandDto
+import no.elg.hex.model.IslandDto
 import no.elg.hex.util.debug
 
 /**

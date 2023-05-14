@@ -443,7 +443,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
       saveProgress()
     }
 
-    Hex.assets.islandPreviews.updateSelectPreview(id, false, modifier, island)
+    Hex.assets.islandPreviews.updateSelectPreview(id, modifier, island)
     modifier = NOTHING
 
     DebugGraphRenderer.dispose()

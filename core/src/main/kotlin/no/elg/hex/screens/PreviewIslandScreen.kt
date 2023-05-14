@@ -6,7 +6,6 @@ import no.elg.hex.Hex
 import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.event.HexagonVisibilityChanged
 import no.elg.hex.event.SimpleEventListener
-import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
@@ -19,7 +18,6 @@ import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.util.component6
 import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.serialize
-import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
 
 /** @author Elg */
@@ -56,9 +54,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
   private val strengthBarRenderer by lazy { StrengthBarRenderer(this.island) }
   private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private lateinit var visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>
-
-  val cursorHexagon: Hexagon<HexagonData>?
-    get() = null
 
   var smoothTransition: SmoothTransition? = null
 

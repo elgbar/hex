@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Render relative strength bar in map editor mode
 * [visual] Attackable hexagons blink periodically
 * [visual] Attackable hexagons outline color is now based on the strength difference between the held piece and the hexagon to attack
+* [visual] Add background to the android icon
 * [technical] Add `--save-island-on-loading-it` program argument flag
 
 ### Changed

@@ -36,6 +36,7 @@ import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInteraction
+import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
@@ -687,11 +688,7 @@ class Island(
     const val NO_ENEMY_HEXAGONS = -1
     const val UNKNOWN_ROUNDS_TO_BEAT = -1
 
-    internal fun Piece?.createDtoCopy(): Piece? {
-      return this?.let { it.copyTo(it.data.copy()) }
-    }
-
-    internal fun Hand.createDtoPieceCopy(): Piece {
+    fun Hand.createDtoPieceCopy(): Piece {
       return this.piece.let { it.copyTo(if (restore) it.data.copy() else EDGE_DATA) }
     }
 
@@ -704,7 +701,7 @@ class Island(
   // ////////////////////////
 
   @JsonValue
-  internal fun createDto(): IslandDto {
+  fun createDto(): IslandDto {
     val hand = hand
     val handPiece = hand?.createDtoPieceCopy()
     val handCoordinate = hand?.territory?.hexagons?.find { getData(it) === hand.piece.data }?.cubeCoordinate
@@ -724,39 +721,5 @@ class Island(
       team = currentTeam,
       authorRoundsToBeat = authorRoundsToBeat
     )
-  }
-
-  data class IslandDto(
-    val width: Int,
-    val height: Int,
-    val layout: HexagonalGridLayout,
-    val territoryCoordinate: CubeCoordinate? = null,
-    val handCoordinate: CubeCoordinate? = null,
-    val handPiece: Piece? = null,
-    val handRestore: Boolean? = null,
-    val hexagonData: SortedMap<CubeCoordinate, HexagonData>,
-    val round: Int,
-    val team: Team = LEAF,
-    val authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
-  ) {
-
-    init {
-      require(hexagonData.values.none { it.invisible }) { "IslandDto was given invisible hexagon, all serialized hexagons must be visible" }
-    }
-
-    fun copy(): IslandDto {
-      return IslandDto(
-        width = width,
-        height = height,
-        layout = layout,
-        territoryCoordinate = territoryCoordinate,
-        handCoordinate = handCoordinate,
-        handPiece = handPiece?.createDtoCopy(),
-        hexagonData = hexagonData.mapValues { (_, data) -> data.copy() }.toSortedMap(),
-        round = round,
-        team = team,
-        authorRoundsToBeat = authorRoundsToBeat
-      )
-    }
   }
 }

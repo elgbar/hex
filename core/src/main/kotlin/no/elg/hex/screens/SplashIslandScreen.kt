@@ -14,7 +14,7 @@ import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.AbstractInput
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.trace
+import no.elg.hex.util.loadIslandSync
 
 class SplashIslandScreen(val id: Int, private var island: Island? = null) : AbstractScreen() {
 
@@ -40,25 +40,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
         createIslandScreen(initIsland)
       } else {
         KtxAsync.launch(Hex.asyncThread) {
-          try {
-            val progress = PreviewIslandScreen.getProgress(id)
-            Gdx.app.trace("IS SPLASH") { "progress: $progress" }
-            island = if (!Hex.args.mapEditor && !progress.isNullOrBlank()) {
-              Gdx.app.debug("IS SPLASH", "Found progress for island $id")
-              Island.deserialize(progress)
-            } else {
-              Gdx.app.debug("IS SPLASH", "No progress found for island $id")
-              Island.deserialize(getIslandFile(id))
-            }
-          } catch (e: Exception) {
-            Gdx.app.postRunnable {
-              MessagesRenderer.publishError(
-                "Failed to load island $id due to a ${e::class.simpleName}: ${e.message}",
-                exception = e
-              )
-              Hex.screen = LevelSelectScreen()
-            }
-          }
+          island = loadIslandSync(id)
         }
         this
       }

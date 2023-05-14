@@ -34,7 +34,7 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.input.editor.editorsList
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
-import no.elg.hex.island.Island.IslandDto
+import no.elg.hex.model.IslandDto
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
