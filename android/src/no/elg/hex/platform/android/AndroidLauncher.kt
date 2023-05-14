@@ -47,6 +47,7 @@ class AndroidLauncher : AndroidApplication() {
     config.disableAudio = false
 
     Hex.audioDisabled = config.disableAudio
+    Hex.platform.platformInit()
     initialize(Hex, config)
   }
 }
