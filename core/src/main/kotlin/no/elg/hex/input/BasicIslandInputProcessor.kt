@@ -25,7 +25,6 @@ import kotlin.math.sqrt
  */
 class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : AbstractInput(true) {
 
-  private var draggable = false
   private var pinching = false
 
   private val lastPointer1 = Vector2()
@@ -36,7 +35,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   val cursorHex: Hexagon<HexagonData>? get() = screen.island.getHexagon(mouseX.toDouble(), mouseY.toDouble())
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    if (draggable && pointer == 0 && isCorrectButtonPressed()) {
+    if (pointer == 0 && isCorrectButtonPressed()) {
       val zoom = screen.camera.zoom
       val dx = -Gdx.input.deltaX * zoom
       val dy = -Gdx.input.deltaY * zoom
@@ -145,16 +144,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     Gdx.app.debug("pinch zoom", "Pinch end")
     lastPointer1.set(0f, 0f)
     lastPointer2.set(0f, 0f)
-  }
-
-  override fun pan(x: Float, y: Float, deltaX: Float, deltaY: Float): Boolean {
-    draggable = true
-    return false
-  }
-
-  override fun panStop(x: Float, y: Float, pointer: Int, button: Int): Boolean {
-    draggable = false
-    return false
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
