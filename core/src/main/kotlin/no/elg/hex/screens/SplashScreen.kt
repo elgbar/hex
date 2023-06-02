@@ -28,7 +28,9 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
   }
 
   override fun render(delta: Float) {
-    if (!Hex.paused && Hex.assets.mainFinishedLoading && !IslandPreviewCollection.renderingPreviews && Hex.assets.update(10)) {
+    val assetsDone = Hex.assets.update(10)
+    val renderingLeft = IslandPreviewCollection.renderingCount.get()
+    if (!Hex.paused && Hex.assets.mainFinishedLoading && renderingLeft == 0 && assetsDone) {
       val realNextScreen = nextScreen
       if (realNextScreen != null && realNextScreen !== this) {
         refreshAndSetScreen(realNextScreen)
@@ -38,7 +40,16 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
       Gdx.app.log("SPLASH", "All assets finished loading in ${System.currentTimeMillis() - startTime} ms")
     } else {
       batch.use {
-        val txt =
+        val txt = if (assetsDone) {
+          val totalIslands = Hex.assets.islandFiles.islandIds.size
+          """
+          |Rendering island previews
+          |
+          |${totalIslands - renderingLeft} / $totalIslands
+          |
+          |${System.currentTimeMillis() - startTime} ms
+          """.trimMargin()
+        } else {
           """
           |Loading ${Hex.assets.loadingInfo}
           |
@@ -46,6 +57,7 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
           |
           |${System.currentTimeMillis() - startTime} ms
           """.trimMargin()
+        }
 
         layout.setText(
           Hex.assets.regularFont,

@@ -37,7 +37,29 @@ class IslandPreviewCollection : Disposable {
 
   internal val islandPreviews = GdxArray<IslandMetadata>()
 
+  private val internalPreviewRendererQueue = GdxArray<Runnable>()
+  private var lastPostedFrameId = 0L
   private val screen get() = Hex.screen
+
+  private fun renderNextPreview(ignoreCheck: Boolean) {
+    synchronized(internalPreviewRendererQueue) {
+      if (ignoreCheck || Gdx.graphics.frameId > lastPostedFrameId) {
+        if (internalPreviewRendererQueue.isEmpty) {
+          return
+        }
+        lastPostedFrameId = Gdx.graphics.frameId
+        val runnable = internalPreviewRendererQueue.pop()
+        Gdx.app.postRunnable {
+          try {
+            runnable.run()
+          } finally {
+            renderingCount.decrementAndGet()
+            renderNextPreview(true)
+          }
+        }
+      }
+    }
+  }
 
   fun renderPreview(
     island: Island,
@@ -47,78 +69,86 @@ class IslandPreviewCollection : Disposable {
     onComplete: (preview: FrameBuffer) -> Unit
   ) {
     renderingCount.incrementAndGet()
-    Gdx.app.postRunnable {
-      try {
-        val islandScreen = PreviewIslandScreen(-1, island, true)
-        islandScreen.resize(previewWidth, previewHeight)
-        val buffer = FrameBuffer(
-          Pixmap.Format.RGBA8888,
-          previewWidth.coerceAtLeast(1),
-          previewHeight.coerceAtLeast(1),
-          false
+    val runnable = doRenderPreview(island, previewWidth, previewHeight, modifier, onComplete)
+    synchronized(internalPreviewRendererQueue) {
+      internalPreviewRendererQueue.add(runnable)
+    }
+    renderNextPreview(false)
+  }
+
+  private fun doRenderPreview(
+    island: Island,
+    previewWidth: Int,
+    previewHeight: Int,
+    modifier: PreviewModifier = PreviewModifier.NOTHING,
+    onComplete: (preview: FrameBuffer) -> Unit
+  ) = Runnable {
+    val islandScreen = PreviewIslandScreen(-1, island, true)
+    islandScreen.resize(previewWidth, previewHeight)
+    val buffer = FrameBuffer(
+      Pixmap.Format.RGBA8888,
+      previewWidth.coerceAtLeast(1),
+      previewHeight.coerceAtLeast(1),
+      false
+    )
+    buffer.begin()
+    Hex.setClearColorAlpha(0f)
+    Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
+    screen.updateCamera()
+    islandScreen.render(0f)
+    screen.camera.setToOrtho(screen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
+    val widthOffset = screen.camera.viewportWidth / 5
+    val heightOffset = screen.camera.viewportHeight / 5
+    screen.batch.use(screen.camera) {
+      fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
+        screen.batch.draw(
+          textureRegion,
+          widthOffset,
+          heightOffset,
+          screen.camera.viewportWidth - widthOffset * 2,
+          screen.camera.viewportHeight - heightOffset * 2
         )
-        buffer.begin()
-        Hex.setClearColorAlpha(0f)
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-        screen.updateCamera()
-        islandScreen.render(0f)
-        screen.camera.setToOrtho(screen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
-        val widthOffset = screen.camera.viewportWidth / 5
-        val heightOffset = screen.camera.viewportHeight / 5
-        screen.batch.use(screen.camera) {
-          fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
-            screen.batch.draw(
-              textureRegion,
-              widthOffset,
-              heightOffset,
-              screen.camera.viewportWidth - widthOffset * 2,
-              screen.camera.viewportHeight - heightOffset * 2
-            )
-          }
+      }
 
-          when (modifier) {
-            PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
-            PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
-            PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
+      when (modifier) {
+        PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
+        PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
+        PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
 
-            PreviewModifier.WON -> {
-              val text = "${island.round}"
+        PreviewModifier.WON -> {
+          val text = "${island.round}"
 
-              val font = Hex.assets.regularFont
+          val font = Hex.assets.regularFont
 
-              screen.camera.setToOrtho(screen.yDown, widthOffset, heightOffset)
-              screen.camera.center(widthOffset, heightOffset)
+          screen.camera.setToOrtho(screen.yDown, widthOffset, heightOffset)
+          screen.camera.center(widthOffset, heightOffset)
 
-              screen.batch.projectionMatrix = screen.camera.combined
+          screen.batch.projectionMatrix = screen.camera.combined
 
-              font.color = Color.WHITE
-              font.draw(
-                screen.batch,
-                text,
-                0f,
-                (screen.camera.viewportHeight - font.data.capHeight) / 2f,
-                screen.camera.viewportWidth,
-                Align.center,
-                false
-              )
-            }
-
-            PreviewModifier.NOTHING -> Unit
-          }
+          font.color = Color.WHITE
+          font.draw(
+            screen.batch,
+            text,
+            0f,
+            (screen.camera.viewportHeight - font.data.capHeight) / 2f,
+            screen.camera.viewportWidth,
+            Align.center,
+            false
+          )
         }
-        screen.camera.setToOrtho(screen.yDown)
-        screen.updateCamera()
 
-        Hex.setClearColorAlpha(1f)
-
-        buffer.end()
-        islandScreen.dispose()
-        onComplete(buffer)
-      } finally {
-        renderingCount.decrementAndGet()
+        PreviewModifier.NOTHING -> Unit
       }
     }
+    screen.camera.setToOrtho(screen.yDown)
+    screen.updateCamera()
+
+    Hex.setClearColorAlpha(1f)
+
+    buffer.end()
+    islandScreen.dispose()
+    onComplete(buffer)
   }
 
   fun renderPreviews() {
@@ -150,9 +180,11 @@ class IslandPreviewCollection : Disposable {
             previewProgress != null -> {
               islandPreviews.add(IslandMetadata(id, island, decodeStringToTexture(previewProgress)))
             }
+
             islandPreviewFile.exists() -> {
               islandPreviews.add(IslandMetadata(id, island, Texture(islandPreviewFile)))
             }
+
             else -> {
               MessagesRenderer.publishWarning("Failed to load preview of island $id")
               updateSelectPreview(id)
@@ -204,11 +236,7 @@ class IslandPreviewCollection : Disposable {
           PreviewIslandScreen.islandPreferences.putString(previewName, preview.saveScreenshotAsString())
         }
         PreviewIslandScreen.islandPreferences.flush()
-        if (index == islandPreviews.size) {
-          islandPreviews.add(IslandMetadata(id, island, preview.colorBufferTexture))
-        } else {
-          islandPreviews.set(index, IslandMetadata(id, island, preview.colorBufferTexture))
-        }
+        islandPreviews.add(IslandMetadata(id, island, preview.colorBufferTexture))
       }
     }
   }
@@ -228,7 +256,7 @@ class IslandPreviewCollection : Disposable {
   companion object {
     private const val MIN_PREVIEW_SIZE = 512
 
-    private val renderingCount = AtomicInteger(0)
+    val renderingCount = AtomicInteger(0)
     val renderingPreviews: Boolean get() = renderingCount.get() > 0
   }
 }
