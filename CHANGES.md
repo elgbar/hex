@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [input] Double tapping while in-game will smoothly zoom the camera
 * [input] Improve enum sorting in the settings screen
 * [input] Pressing back on android when in the level select screen will exit the app
+* [input] Allow dragging while zooming
 * [visual] Visual strength hint is enabled by default
 * [visual] Adjust team color to make them easier to distinguish
 * [visual] Reduce maximum zoom from `2.5` to `2`
