@@ -36,6 +36,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.confirmWindow
+import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
 import no.elg.hex.util.onInteract
@@ -222,6 +223,12 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             menuItem("Remove Smaller Islands") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.K) {
                 island.removeSmallerIslands()
+              }
+            }
+
+            menuItem("Fix wrong tree types") {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.T) {
+                island.fixWrongTreeTypes()
               }
             }
 

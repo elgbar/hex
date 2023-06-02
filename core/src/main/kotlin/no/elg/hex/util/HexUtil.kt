@@ -13,6 +13,7 @@ import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
+import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -139,6 +140,10 @@ fun Island.regenerateCapitals() {
   forEachPieceType<Capital> { _, data, _ -> data.setPiece(Empty::class) }
   ensureCapitalStartFunds()
   select(null)
+}
+
+fun Island.fixWrongTreeTypes() {
+  forEachPieceType<TreePiece> { hex, _, _ -> replaceWithTree(this, hex) }
 }
 
 fun Island.removeSmallerIslands() {
