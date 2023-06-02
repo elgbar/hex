@@ -33,6 +33,7 @@ import no.elg.hex.hexagon.Team.FOREST
 import no.elg.hex.hexagon.Team.LEAF
 import no.elg.hex.hexagon.Team.STONE
 import no.elg.hex.hexagon.Team.SUN
+import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInteraction
@@ -53,6 +54,7 @@ import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.next
 import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
+import no.elg.hex.util.treeType
 import no.elg.hex.util.withData
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
@@ -620,18 +622,20 @@ class Island(
   fun validate(): Boolean {
     var valid = true
 
-    val checkedHexagons = HashSet<Hexagon<HexagonData>>()
-
+    // Check rules which apply to whole territories
+    val territoryHexagons = HashSet<Hexagon<HexagonData>>()
     for (hexagon in visibleHexagons) {
-      if (checkedHexagons.contains(hexagon) || this.getData(hexagon).invisible) continue
+      if (territoryHexagons.contains(hexagon)) continue
 
       val connectedHexes = this.connectedTerritoryHexagons(hexagon)
-      checkedHexagons.addAll(connectedHexes)
+      territoryHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
-        if (this.getData(hexagon).piece is Capital) {
-          publishError("Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is a capital, even though it has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
-          valid = false
+        for (invalidTerrHex in connectedHexes) {
+          if (this.getData(invalidTerrHex).piece is Capital) {
+            publishError("Hexagon ${invalidTerrHex.cubeCoordinate.toAxialKey()} is a capital, even though its territory has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
+            valid = false
+          }
         }
         continue
       }
@@ -646,8 +650,18 @@ class Island(
       }
     }
 
-    // check that every hexagon is connected
+    // Check rules which apply to each visible hexagon
+    for (hexagon in visibleHexagons) {
+      val data = this.getData(hexagon)
+      if (data.piece is TreePiece && data.piece::class != this.treeType(hexagon)) {
+        publishError(
+          "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${this.treeType(hexagon).simpleName}"
+        )
+        valid = false
+      }
+    }
 
+    // check that every hexagon is connected
     val visibleNeighbors = HashSet<Hexagon<HexagonData>>(visibleHexagons.size)
     val toCheck = Queue<Hexagon<HexagonData>>(visibleHexagons.size * 2)
     val firstVisible = visibleHexagons.firstOrNull()
