@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Attackable hexagons outline color is now based on the strength difference between the held piece and the hexagon to attack
 * [visual] Add background to the android icon
 * [visual] Show how many previews to load when in the splash screen
+* [visual] Show island id and ARtB in debug hud
 * [technical] Add `--save-island-on-loading-it` program argument flag
 
 ### Changed

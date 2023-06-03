@@ -48,7 +48,7 @@ class IslandPreviewCollection : Disposable {
   private fun renderNextPreview() {
     synchronized(internalPreviewRendererQueue) {
       if (internalPreviewRendererQueue.isEmpty) {
-        if(!Hex.args.mapEditor) {
+        if (!Hex.args.mapEditor) {
           islandPreviews.sort()
         }
         return

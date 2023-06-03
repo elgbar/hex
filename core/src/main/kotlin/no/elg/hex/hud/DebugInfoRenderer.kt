@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Disposable
 import ktx.assets.disposeSafely
-import ktx.collections.component1
-import ktx.collections.component2
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
@@ -16,6 +14,13 @@ import no.elg.hex.hud.ScreenRenderer.draw
 import no.elg.hex.hud.ScreenRenderer.drawAll
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
+import kotlin.collections.MutableList
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.count
+import kotlin.collections.mapTo
+import kotlin.collections.mutableListOf
+import kotlin.collections.sort
 
 /** @author Elg */
 class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
@@ -27,7 +32,6 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
   private val teamHexagons: MutableList<String> = mutableListOf()
 
   init {
-
     fpsText = variableText(
       "FPS: ",
       Gdx.graphics::getFramesPerSecond,
@@ -43,9 +47,13 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
 
       debugLines = arrayOf(
         prefixText(
-          "Island is ",
-          callable = { islandScreen.island.grid.gridData },
-          format = { gridData -> "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()}" }
+          "Island ",
+          callable = { islandScreen.island },
+          format = { island ->
+            val gridData = island.grid.gridData
+            "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()} " +
+              "ARtB ${island.authorRoundsToBeat} Id ${(Hex.screen as? PreviewIslandScreen)?.id ?: -1} "
+          }
         ),
         prefixText(
           "Current team is ",
