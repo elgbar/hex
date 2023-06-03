@@ -7,7 +7,7 @@ import no.elg.hex.island.Island
 data class IslandMetadata(val id: Int, val island: Island, val preview: Texture) : Disposable, Comparable<IslandMetadata> {
 
   override fun compareTo(other: IslandMetadata): Int {
-    return if (island.authorRoundsToBeat < 0) {
+    return if (island.authorRoundsToBeat <= Island.UNKNOWN_ROUNDS_TO_BEAT) {
       id.compareTo(other.id)
     } else {
       island.authorRoundsToBeat.compareTo(other.island.authorRoundsToBeat)

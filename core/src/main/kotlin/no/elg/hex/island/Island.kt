@@ -700,7 +700,7 @@ class Island(
     const val MAX_START_CAPITAL = 25
 
     const val NO_ENEMY_HEXAGONS = -1
-    const val UNKNOWN_ROUNDS_TO_BEAT = -1
+    const val UNKNOWN_ROUNDS_TO_BEAT = 0
 
     fun Hand.createDtoPieceCopy(): Piece {
       return this.piece.let { it.copyTo(if (restore) it.data.copy() else EDGE_DATA) }
