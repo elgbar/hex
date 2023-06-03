@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Adjust team color to make them easier to distinguish
 * [visual] Reduce maximum zoom from `2.5` to `2`
 * [visual] Move the non-islands buttons in the level select screen closer to the center of the screen
+* [visual] Draw box around island without a Author Rounds to Beat
 * [technical] Rendering now happens non-continuously, that is, only when needed
   * This drastically reduces the amount of power the game uses
 * [technical] Minimum android SDK version have been reduced to 26

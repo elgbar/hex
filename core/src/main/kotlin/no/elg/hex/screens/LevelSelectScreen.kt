@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import no.elg.hex.Hex
 import no.elg.hex.input.LevelSelectInputProcessor
+import no.elg.hex.island.Island
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -51,7 +52,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
       }
 
       batch.draw(metadata.preview, x, y, width, height)
-      if (Hex.debugStage) {
+      if (Hex.debugStage || metadata.island.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) {
         drawBox(x, y, width, height)
       }
     }
