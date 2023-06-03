@@ -37,6 +37,7 @@ class AndroidLauncher : AndroidApplication() {
     val glVersion = configurationInfo?.glEsVersion?.toFloatOrNull() ?: 2f
 
     if (glVersion >= 3) {
+      @Suppress("DEPRECATION")
       config.useGL30 = true
     }
     config.useImmersiveMode = false

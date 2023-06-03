@@ -22,9 +22,7 @@ fun main(args: Array<String>) {
   Hex.audioDisabled = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
 
   config.setWindowedMode(defaultDisplayMode.width / 2, defaultDisplayMode.height / 2)
-//  config.initialBackgroundColor = Hex.backgroundColor
 
-//  config.backgroundFPS = 10
   config.foregroundFPS = 0
   config.isVSync = Hex.launchPreference.getBoolean(Settings.VSYNC_PATH, true)
   config.setWindowIcon(Internal, "icons/icon32.png", "icons/icon128.png")

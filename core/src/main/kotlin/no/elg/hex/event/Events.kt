@@ -32,8 +32,8 @@ object Events {
   inline fun <reified T : Event> fireEvent(event: T) {
     val listeners: Array<(T) -> Unit> = getEventList(T::class)
 
-    Gdx.app.trace("Event") { "Firing event $event" }
     if (listeners.isEmpty) return
+    Gdx.app.trace("Event") { "Firing event $event" }
 
     runBlocking {
       onRenderingThread {
