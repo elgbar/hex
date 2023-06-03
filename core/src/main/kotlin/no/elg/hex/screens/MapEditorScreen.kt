@@ -193,9 +193,11 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             |Island Validation rules:
             |
             |* All visible hexagons must be reachable from all other visible hexagons 
-            |  (ie there can only be one island)
+            |  (i.e., there can only be one island)
             |* No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
             |* There must be exactly one capital per territory
+            |* Pine tree can not have an invisible hexagons next to them
+            |* Palms trees can not only be surrendered by visible hexagons
           """.trimMargin()
         ) {
           it.expand().fill()
