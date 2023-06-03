@@ -52,7 +52,7 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
             island.also {
               it.regenerateCapitals()
               it.currentTeam = Settings.startTeam
-              if (it.authorRoundsToBeat < Island.UNKNOWN_ROUNDS_TO_BEAT){
+              if (it.authorRoundsToBeat < Island.UNKNOWN_ROUNDS_TO_BEAT) {
                 it.authorRoundsToBeat = Island.UNKNOWN_ROUNDS_TO_BEAT
               }
             }.createDto().serialize(),

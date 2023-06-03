@@ -48,6 +48,7 @@ class IslandPreviewCollection : Disposable {
   private fun renderNextPreview() {
     synchronized(internalPreviewRendererQueue) {
       if (internalPreviewRendererQueue.isEmpty) {
+        islandPreviews.sort()
         return
       }
       lastPostedFrameId = Gdx.graphics.frameId
@@ -205,7 +206,6 @@ class IslandPreviewCollection : Disposable {
         }
         addPreviewRender(runnable)
         renderNextPreview()
-        islandPreviews.sort()
       }
     }
   }
@@ -256,7 +256,6 @@ class IslandPreviewCollection : Disposable {
           islandPreviews.get(existingIndex).disposeSafely()
           islandPreviews.set(existingIndex, islandMetadata)
         }
-        islandPreviews.sort()
       }
     }
   }
