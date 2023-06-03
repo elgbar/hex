@@ -49,7 +49,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   private fun getHoveringIslandId(): Int {
-    for (i in 0..PREVIEWS_PER_ROW) {
+    for (i in 0 until PREVIEWS_PER_ROW) {
       val (x, y, width, height) = slotRect(i)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return i - PREVIEWS_PER_ROW
