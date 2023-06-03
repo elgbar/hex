@@ -81,7 +81,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
     private set
 
   var editor: Editor = OpaquenessEditor.ToggleOpaqueness
-  private val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, 0, Int.MAX_VALUE)
+  val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, 0, Int.MAX_VALUE)
 
   init {
     quicksave()

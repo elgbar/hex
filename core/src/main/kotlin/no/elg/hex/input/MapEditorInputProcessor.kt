@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Buttons
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.input.editor.EditMetadata
 import no.elg.hex.input.editor.Editor
+import no.elg.hex.island.Island
 import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.util.calculateHexagonsWithinRadius
 import no.elg.hex.util.getData
@@ -39,6 +40,7 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : AbstractInp
       editor.edit(hex, data, metadata)
     }
     editor.postEdit(metadata)
+    screen.artbSpinner.setValue(Island.UNKNOWN_ROUNDS_TO_BEAT, true)
   }
 
   private fun setEditorMetadata(cursorHex: Hexagon<HexagonData>): EditMetadata {
