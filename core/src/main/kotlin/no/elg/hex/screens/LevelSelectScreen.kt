@@ -38,7 +38,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
       }
     }
 
-    for ((i, metadata) in Hex.assets.islandPreviews.islandPreviews.withIndex()) {
+    for ((i, metadata) in Hex.assets.islandPreviews.islandWithIndex()) {
       val (x, y, width, height) = input.slotRect(i + PREVIEWS_PER_ROW)
 
       if (y + height < camera.position.y - camera.viewportHeight / 2f) {

@@ -11,7 +11,6 @@ import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.R
-import no.elg.hex.Settings
 
 
 class AndroidLauncher : AndroidApplication() {

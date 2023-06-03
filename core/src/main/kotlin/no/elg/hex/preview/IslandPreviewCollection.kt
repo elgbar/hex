@@ -14,6 +14,7 @@ import ktx.assets.disposeSafely
 import ktx.assets.load
 import ktx.async.KtxAsync
 import ktx.collections.GdxArray
+import ktx.collections.sortBy
 import ktx.graphics.center
 import ktx.graphics.use
 import no.elg.hex.Hex
@@ -39,18 +40,34 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class IslandPreviewCollection : Disposable {
 
-  internal val islandPreviews = GdxArray<IslandMetadata>()
-
+  private val islandPreviews = GdxArray<IslandMetadata>()
   private val internalPreviewRendererQueue = GdxArray<Runnable>()
   private var lastPostedFrameId = 0L
   private val screen get() = Hex.screen
 
+  fun islandWithIndex(): Iterable<IndexedValue<IslandMetadata>> {
+    synchronized(internalPreviewRendererQueue) {
+      return islandPreviews.toList().withIndex()
+    }
+  }
+
+  fun sort() {
+    Gdx.app.postRunnable {
+      synchronized(internalPreviewRendererQueue) {
+        if (!Hex.args.mapEditor) {
+          islandPreviews.sortBy {
+            val authorRoundsToBeat = it.island.authorRoundsToBeat
+            if (authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) Int.MAX_VALUE else authorRoundsToBeat
+          }
+          Gdx.app.log("LOCAL", "order (artb -> id) ${islandPreviews.map { "${it.island.authorRoundsToBeat} -> ${it.id}" }}")
+        }
+      }
+    }
+  }
+
   private fun renderNextPreview() {
     synchronized(internalPreviewRendererQueue) {
       if (internalPreviewRendererQueue.isEmpty) {
-        if (!Hex.args.mapEditor) {
-          islandPreviews.sort()
-        }
         return
       }
       lastPostedFrameId = Gdx.graphics.frameId
@@ -187,18 +204,14 @@ class IslandPreviewCollection : Disposable {
           val previewProgress = getProgress(id, true)
           val island = loadIslandSync(id)
           try {
-            when {
-              previewProgress != null -> {
-                islandPreviews.add(IslandMetadata(id, island, decodeStringToTexture(previewProgress)))
-              }
-
-              islandPreviewFile.exists() -> {
-                islandPreviews.add(IslandMetadata(id, island, Texture(islandPreviewFile)))
-              }
-
-              else -> {
-                MessagesRenderer.publishWarning("Failed to load preview of island $id")
-                updateSelectPreview(id)
+            synchronized(internalPreviewRendererQueue) {
+              when {
+                previewProgress != null -> islandPreviews.add(IslandMetadata(id, island, decodeStringToTexture(previewProgress)))
+                islandPreviewFile.exists() -> islandPreviews.add(IslandMetadata(id, island, Texture(islandPreviewFile)))
+                else -> {
+                  MessagesRenderer.publishWarning("Failed to load preview of island $id")
+                  updateSelectPreview(id)
+                }
               }
             }
           } catch (e: Exception) {
@@ -218,7 +231,9 @@ class IslandPreviewCollection : Disposable {
     maybeIsland: Island? = null
   ) {
     KtxAsync.launch(Hex.asyncThread) {
-      val metadata = islandPreviews.firstOrNull { it.id == id }
+      val metadata = synchronized(internalPreviewRendererQueue) {
+        islandPreviews.firstOrNull { it.id == id }
+      }
       if (metadata == null) {
         MessagesRenderer.publishWarning("Unknown island with id $id")
         return@launch
@@ -251,22 +266,26 @@ class IslandPreviewCollection : Disposable {
         }
         islandPreferences.flush()
         val islandMetadata = IslandMetadata(id, island, preview.colorBufferTexture)
-        val existingIndex = islandPreviews.indexOfFirst { it.id == id }
-        if (existingIndex == -1) {
-          islandPreviews.add(islandMetadata)
-        } else {
-          islandPreviews.get(existingIndex).disposeSafely()
-          islandPreviews.set(existingIndex, islandMetadata)
+        synchronized(internalPreviewRendererQueue) {
+          val existingIndex = islandPreviews.indexOfFirst { it.id == id }
+          if (existingIndex == -1) {
+            islandPreviews.add(islandMetadata)
+          } else {
+            islandPreviews.get(existingIndex).disposeSafely()
+            islandPreviews.set(existingIndex, islandMetadata)
+          }
         }
       }
     }
   }
 
   private fun disposePreviews() {
-    for (metadata in islandPreviews) {
-      metadata.dispose()
+    synchronized(internalPreviewRendererQueue) {
+      for (metadata in islandPreviews) {
+        metadata.dispose()
+      }
+      islandPreviews.clear()
     }
-    islandPreviews.clear()
   }
 
   override fun dispose() {

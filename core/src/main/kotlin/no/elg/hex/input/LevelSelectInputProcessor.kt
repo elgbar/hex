@@ -56,7 +56,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       }
     }
 
-    for ((index, metadata) in Hex.assets.islandPreviews.islandPreviews.withIndex()) {
+    for ((index, metadata) in Hex.assets.islandPreviews.islandWithIndex()) {
       val (x, y, width, height) = slotRect(index + PREVIEWS_PER_ROW)
       if (mouseX in x..x + width && mouseY in y..y + height) {
         return metadata.id
