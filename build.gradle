@@ -137,6 +137,10 @@ project(":desktop") {
     useJUnitPlatform()
   }
 
+  jar {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+  }
+
   classes {
     doFirst {
       // Automatically create a soft link to the island folder to allow map-editor to work
