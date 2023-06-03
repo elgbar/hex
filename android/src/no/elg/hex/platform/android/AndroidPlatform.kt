@@ -23,7 +23,7 @@ class AndroidPlatform(private val activity: Activity) : Platform {
   override val canControlAudio: Boolean = false
 
   override fun platformInit() {
-    if (VERSION.SDK_INT >= VERSION_CODES.P) {
+    if (VERSION.SDK_INT >= VERSION_CODES.R) {
       activity.window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
     }
   }
