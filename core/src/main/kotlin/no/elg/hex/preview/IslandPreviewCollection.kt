@@ -41,21 +41,19 @@ class IslandPreviewCollection : Disposable {
   private var lastPostedFrameId = 0L
   private val screen get() = Hex.screen
 
-  private fun renderNextPreview(ignoreCheck: Boolean) {
+  private fun renderNextPreview() {
     synchronized(internalPreviewRendererQueue) {
-      if (ignoreCheck || Gdx.graphics.frameId > lastPostedFrameId) {
-        if (internalPreviewRendererQueue.isEmpty) {
-          return
-        }
-        lastPostedFrameId = Gdx.graphics.frameId
-        val runnable = internalPreviewRendererQueue.pop()
-        Gdx.app.postRunnable {
-          try {
-            runnable.run()
-          } finally {
-            renderingCount.decrementAndGet()
-            renderNextPreview(true)
-          }
+      if (internalPreviewRendererQueue.isEmpty) {
+        return
+      }
+      lastPostedFrameId = Gdx.graphics.frameId
+      val runnable = internalPreviewRendererQueue.pop()
+      Gdx.app.postRunnable {
+        try {
+          runnable.run()
+        } finally {
+          renderingCount.decrementAndGet()
+          renderNextPreview()
         }
       }
     }
@@ -68,12 +66,16 @@ class IslandPreviewCollection : Disposable {
     modifier: PreviewModifier = PreviewModifier.NOTHING,
     onComplete: (preview: FrameBuffer) -> Unit
   ) {
-    renderingCount.incrementAndGet()
     val runnable = doRenderPreview(island, previewWidth, previewHeight, modifier, onComplete)
+    addPreviewRender(runnable)
+    renderNextPreview()
+  }
+
+  private fun addPreviewRender(runnable: Runnable) {
     synchronized(internalPreviewRendererQueue) {
+      renderingCount.incrementAndGet()
       internalPreviewRendererQueue.add(runnable)
     }
-    renderNextPreview(false)
   }
 
   private fun doRenderPreview(
@@ -152,7 +154,7 @@ class IslandPreviewCollection : Disposable {
   }
 
   fun renderPreviews() {
-    reportTiming("render all island previews") {
+    reportTiming("loading all island previews") {
       if (Hex.assets.islandFiles.islandIds.size == 0) {
         if (!Hex.args.`disable-island-loading`) {
           MessagesRenderer.publishError("Failed to find any islands to load")
@@ -171,29 +173,32 @@ class IslandPreviewCollection : Disposable {
           updateSelectPreview(id)
           continue
         }
+        val runnable = {
+          val islandPreviewFile = getIslandFile(id, true)
+          val previewProgress = PreviewIslandScreen.getProgress(id, true)
+          val island = loadIslandSync(id)
+          try {
+            when {
+              previewProgress != null -> {
+                islandPreviews.add(IslandMetadata(id, island, decodeStringToTexture(previewProgress)))
+              }
 
-        val islandPreviewFile = getIslandFile(id, true)
-        val previewProgress = PreviewIslandScreen.getProgress(id, true)
-        val island = loadIslandSync(id)
-        try {
-          when {
-            previewProgress != null -> {
-              islandPreviews.add(IslandMetadata(id, island, decodeStringToTexture(previewProgress)))
-            }
+              islandPreviewFile.exists() -> {
+                islandPreviews.add(IslandMetadata(id, island, Texture(islandPreviewFile)))
+              }
 
-            islandPreviewFile.exists() -> {
-              islandPreviews.add(IslandMetadata(id, island, Texture(islandPreviewFile)))
+              else -> {
+                MessagesRenderer.publishWarning("Failed to load preview of island $id")
+                updateSelectPreview(id)
+              }
             }
-
-            else -> {
-              MessagesRenderer.publishWarning("Failed to load preview of island $id")
-              updateSelectPreview(id)
-            }
+          } catch (e: Exception) {
+            MessagesRenderer.publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
+            updateSelectPreview(id)
           }
-        } catch (e: Exception) {
-          MessagesRenderer.publishWarning("Failed to read progress preview of island ${islandPreviewFile.name()}")
-          updateSelectPreview(id)
         }
+        addPreviewRender(runnable)
+        renderNextPreview()
       }
     }
   }

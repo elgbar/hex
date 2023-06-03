@@ -53,6 +53,7 @@ import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.fetch
 import no.elg.hex.util.isLoaded
+import no.elg.hex.util.reportTiming
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -223,112 +224,117 @@ class Assets : AssetManager() {
   }
 
   init {
-    Gdx.app.debug("ASSET", "Using ${scale}x scale")
+    reportTiming("Init assets") {
+      Gdx.app.debug("ASSET", "Using ${scale}x scale")
 
-    if (Hex.debug) {
-      super.getLogger().level = DEBUG
-    }
-
-    KtxAsync.launch(Hex.asyncThread) {
-      val warmUpStart = TimeUtils.millis()
-      for (i in 1..100) {
-        val deserStart = TimeUtils.millis()
-        Island.deserialize(MIN_ISLAND)
-        Gdx.app.trace("WARMUP") { "Warmup pass $i took ${TimeUtils.timeSinceMillis(deserStart)} ms" }
+      if (Hex.debug) {
+        super.getLogger().level = DEBUG
       }
-      Gdx.app.debug("WARMUP") { "Island deserialization warmup complete in ${TimeUtils.timeSinceMillis(warmUpStart)} ms" }
+
+      KtxAsync.launch(Hex.asyncThread) {
+        val warmUpStart = TimeUtils.millis()
+        for (i in 1..100) {
+          val deserStart = TimeUtils.millis()
+          Island.deserialize(MIN_ISLAND)
+          Gdx.app.trace("WARMUP") { "Warmup pass $i took ${TimeUtils.timeSinceMillis(deserStart)} ms" }
+        }
+        Gdx.app.debug("WARMUP") { "Island deserialization warmup complete in ${TimeUtils.timeSinceMillis(warmUpStart)} ms" }
+      }
+
+      super.setErrorListener { asset, throwable ->
+        MessagesRenderer.publishError("Failed to load ${asset.type.simpleName} asset ${asset.fileName}")
+        throwable.printStackTrace()
+      }
+      resolver = InternalFileHandleResolver()
+
+      setLoader(FreeTypeFontGeneratorLoader(resolver), null)
+      setLoader(FreetypeFontLoader(resolver), ".ttf")
+
+      loadFont(bold = false, italic = false)
+
+      // essential assets for the loading splash screen
+
+      // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
+      finishLoading()
+      Gdx.app.debug("Assets", "Initial assets loaded")
     }
-
-    super.setErrorListener { asset, throwable ->
-      MessagesRenderer.publishError("Failed to load ${asset.type.simpleName} asset ${asset.fileName}")
-      throwable.printStackTrace()
-    }
-    resolver = InternalFileHandleResolver()
-
-    setLoader(FreeTypeFontGeneratorLoader(resolver), null)
-    setLoader(FreetypeFontLoader(resolver), ".ttf")
-
-    loadFont(bold = false, italic = false)
-
-    // essential assets for the loading splash screen
-
-    // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
-    finishLoading()
-    Gdx.app.debug("Assets", "Initial assets loaded")
   }
 
   fun loadAssets() {
-    setLoader(IslandAsynchronousAssetLoader(resolver), ".$ISLAND_FILE_ENDING")
-    setLoader(IslandAsynchronousAssetLoader(resolver))
+    reportTiming("Load assets") {
+      updateTitle()
+      setLoader(IslandAsynchronousAssetLoader(resolver), ".$ISLAND_FILE_ENDING")
+      setLoader(IslandAsynchronousAssetLoader(resolver))
 
-    loadingInfo = "fonts"
-    // rest of the fonts
-    loadFont(bold = false, italic = true)
-    loadFont(bold = true, italic = false)
-    loadFont(bold = true, italic = true)
-    loadFont(bold = false, italic = false, flip = false)
-    loadFont(bold = false, italic = true, flip = false)
-    loadFont(bold = true, italic = false, flip = false)
-    loadFont(bold = true, italic = true, flip = false)
+      loadingInfo = "fonts"
+      // rest of the fonts
+      loadFont(bold = false, italic = true)
+      loadFont(bold = true, italic = false)
+      loadFont(bold = true, italic = true)
+      loadFont(bold = false, italic = false, flip = false)
+      loadFont(bold = false, italic = true, flip = false)
+      loadFont(bold = true, italic = false, flip = false)
+      loadFont(bold = true, italic = true, flip = false)
 
-    loadingInfo = "VisUI"
+      loadingInfo = "VisUI"
 
-    if (!VisUI.isLoaded()) {
-      if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
-    }
-    with(VisUI.getSkin() as Skin) {
-      val notFlippedFont = getFont(bold = false, italic = false, flip = false)
-      val boldNotFlippedFont = getFont(bold = false, italic = false, flip = false)
-
-      this["default-font"] = notFlippedFont
-
-      label(extend = "default") { font = notFlippedFont }
-      label(extend = "link-label") { font = notFlippedFont }
-      label(extend = "small") { font = notFlippedFont }
-      label(extend = "menuitem-shortcut") { font = notFlippedFont }
-
-      visTextField(extend = "default") { font = notFlippedFont }
-      textField(extend = "default") { font = notFlippedFont }
-
-      visTextButton(extend = "default") { font = notFlippedFont }
-      visTextButton(extend = "menu-bar") { font = notFlippedFont }
-      visTextButton(extend = "toggle") { font = notFlippedFont }
-      visTextButton(extend = "blue") { font = notFlippedFont }
-
-      visCheckBox(extend = "default") { font = notFlippedFont }
-
-      textButton(extend = "default") { font = notFlippedFont }
-
-      val newOpenButtonStyle = visImageTextButton(extend = "default") { font = notFlippedFont }
-      visImageTextButton(extend = "menu-bar") { font = notFlippedFont }
-      imageTextButton(extend = "default") { font = notFlippedFont }
-
-      window(extend = "default") { titleFont = boldNotFlippedFont }
-      window(extend = "resizable") { titleFont = boldNotFlippedFont }
-      window(extend = "noborder") { titleFont = boldNotFlippedFont }
-      window(extend = "dialog") { titleFont = boldNotFlippedFont }
-
-      menuItem(extend = "default") { font = notFlippedFont }
-      menu { openButtonStyle = newOpenButtonStyle }
-
-      sizes {
-        this.spinnerFieldSize = 100f
-        this.spinnerButtonHeight = 10f
+      if (!VisUI.isLoaded()) {
+        if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
       }
+      with(VisUI.getSkin() as Skin) {
+        val notFlippedFont = getFont(bold = false, italic = false, flip = false)
+        val boldNotFlippedFont = getFont(bold = false, italic = false, flip = false)
+
+        this["default-font"] = notFlippedFont
+
+        label(extend = "default") { font = notFlippedFont }
+        label(extend = "link-label") { font = notFlippedFont }
+        label(extend = "small") { font = notFlippedFont }
+        label(extend = "menuitem-shortcut") { font = notFlippedFont }
+
+        visTextField(extend = "default") { font = notFlippedFont }
+        textField(extend = "default") { font = notFlippedFont }
+
+        visTextButton(extend = "default") { font = notFlippedFont }
+        visTextButton(extend = "menu-bar") { font = notFlippedFont }
+        visTextButton(extend = "toggle") { font = notFlippedFont }
+        visTextButton(extend = "blue") { font = notFlippedFont }
+
+        visCheckBox(extend = "default") { font = notFlippedFont }
+
+        textButton(extend = "default") { font = notFlippedFont }
+
+        val newOpenButtonStyle = visImageTextButton(extend = "default") { font = notFlippedFont }
+        visImageTextButton(extend = "menu-bar") { font = notFlippedFont }
+        imageTextButton(extend = "default") { font = notFlippedFont }
+
+        window(extend = "default") { titleFont = boldNotFlippedFont }
+        window(extend = "resizable") { titleFont = boldNotFlippedFont }
+        window(extend = "noborder") { titleFont = boldNotFlippedFont }
+        window(extend = "dialog") { titleFont = boldNotFlippedFont }
+
+        menuItem(extend = "default") { font = notFlippedFont }
+        menu { openButtonStyle = newOpenButtonStyle }
+
+        sizes {
+          this.spinnerFieldSize = 100f
+          this.spinnerButtonHeight = 10f
+        }
+      }
+      Scene2DSkin.defaultSkin = VisUI.getSkin()
+
+      loadingInfo = "sprites"
+
+      load<TextureAtlas>(SPRITE_ATLAS)
+      load<TextureAtlas>(TUTORIAL_ATLAS)
+
+      audioLoaded(true)
+
+      loadingInfo = "islands"
+
+      islandFiles.fullFilesSearch() // find all island files
+      islandPreviews.renderPreviews()
     }
-    Scene2DSkin.defaultSkin = VisUI.getSkin()
-
-    loadingInfo = "sprites"
-
-    load<TextureAtlas>(SPRITE_ATLAS)
-    load<TextureAtlas>(TUTORIAL_ATLAS)
-
-    audioLoaded(true)
-
-    loadingInfo = "islands"
-
-    islandFiles.fullFilesSearch() // find all island files
-    islandPreviews.renderPreviews()
   }
 
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
@@ -396,5 +402,21 @@ class Assets : AssetManager() {
   @Deprecated("Does not care about type", replaceWith = ReplaceWith("fetch(fileName)"), level = DeprecationLevel.ERROR)
   override fun <T : Any?> get(fileName: String?): T {
     return super.get(fileName)
+  }
+
+  private fun updateTitle() {
+    var title = "Hex"
+    if (Hex.assets.version != null) {
+      title += " v${Hex.assets.version}"
+    }
+    if (Hex.args.mapEditor) {
+      title += " - Map Editor"
+    }
+    if (Hex.args.trace) {
+      title += " (trace)"
+    } else if (Hex.args.debug) {
+      title += " (debug)"
+    }
+    Gdx.graphics.setTitle(title)
   }
 }

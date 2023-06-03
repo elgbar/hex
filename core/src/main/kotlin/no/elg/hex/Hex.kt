@@ -113,54 +113,55 @@ object Hex : ApplicationAdapter() {
     }
 
   override fun create() {
-    Gdx.graphics.isContinuousRendering = false
-    paused = false
+    Gdx.app.logLevel =
+      when {
+        args.silent -> LOG_NONE
+        args.trace -> LOG_TRACE
+        args.debug -> LOG_DEBUG
+        else -> LOG_INFO
+      }
+    reportTiming("create") {
+      Gdx.graphics.isContinuousRendering = false
+      paused = false
 
-    try {
-      require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
+      try {
+        require(this::args.isInitialized) { "An instance of ApplicationParser must be set before calling create()" }
 
-      Gdx.app.logLevel =
-        when {
-          args.silent -> LOG_NONE
-          args.trace -> LOG_TRACE
-          args.debug -> LOG_DEBUG
-          else -> LOG_INFO
+        KtxAsync.initiate()
+        Gdx.app.info("SYS") { "Version: ${platform.version}" }
+        Gdx.app.info("SYS") { "App log level: ${logLevelToName(Gdx.app.logLevel)}" }
+        Gdx.app.debug("SYS") { "App backend: ${Gdx.app.type}" }
+        Gdx.app.debug("SYS") { "App version: ${Gdx.app.version}" }
+        Gdx.app.debug("SYS") { "Max pointers: ${Gdx.input.maxPointers}" }
+        Gdx.app.debug("SYS") { "GraphicsType: ${Gdx.graphics.type}" }
+        Gdx.app.debug("SYS") { "GL version: ${Gdx.graphics.glVersion.debugVersionString}" }
+        Gdx.app.debug("SYS") { "MSAA: ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
+        Gdx.app.debug("SYS") {
+          "VSYNC: ${
+            Gdx.app.graphics.let {
+              if (it is LwjglGraphics) {
+                "${
+                  it::class.java.getDeclaredField("vsync").also { field -> field.isAccessible = true }.get(it)
+                } (by field)"
+              } else {
+                "${launchPreference.getBoolean(Settings.VSYNC_PATH)} (by settings)"
+              }
+            }
+          }"
         }
 
-      KtxAsync.initiate()
-      Gdx.app.info("SYS") { "Version: ${platform.version}" }
-      Gdx.app.info("SYS") { "App log level: ${logLevelToName(Gdx.app.logLevel)}" }
-      Gdx.app.debug("SYS") { "App backend: ${Gdx.app.type}" }
-      Gdx.app.debug("SYS") { "App version: ${Gdx.app.version}" }
-      Gdx.app.debug("SYS") { "Max pointers: ${Gdx.input.maxPointers}" }
-      Gdx.app.debug("SYS") { "GraphicsType: ${Gdx.graphics.type}" }
-      Gdx.app.debug("SYS") { "GL version: ${Gdx.graphics.glVersion.debugVersionString}" }
-      Gdx.app.debug("SYS") { "MSAA: ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
-      Gdx.app.debug("SYS") {
-        "VSYNC: ${
-          Gdx.app.graphics.let {
-            if (it is LwjglGraphics) {
-              "${
-                it::class.java.getDeclaredField("vsync").also { field -> field.isAccessible = true }.get(it)
-              } (by field)"
-            } else {
-              "${launchPreference.getBoolean(Settings.VSYNC_PATH)} (by settings)"
-            }
-          }
-        }"
+        Gdx.input.inputProcessor = inputMultiplexer
+        Gdx.input.setCatchKey(Keys.BACK, true)
+
+        if (args.profile) {
+          GLProfilerRenderer.enable()
+        }
+
+        resume()
+      } catch (e: Throwable) {
+        e.printStackTrace()
+        MessagesRenderer.publishError("Threw when loaded: $e", 600f)
       }
-
-      Gdx.input.inputProcessor = inputMultiplexer
-      Gdx.input.setCatchKey(Keys.BACK, true)
-
-      if (args.profile) {
-        GLProfilerRenderer.enable()
-      }
-
-      resume()
-    } catch (e: Throwable) {
-      e.printStackTrace()
-      MessagesRenderer.publishError("Threw when loaded: $e", 600f)
     }
   }
 
@@ -192,12 +193,12 @@ object Hex : ApplicationAdapter() {
     asyncThread = newSingleThreadAsyncContext()
 
     assets = Assets()
-    updateTitle()
+    Gdx.app.postRunnable {
+      assets.loadAssets()
 
-    assets.loadAssets()
-
-    // must be last
-    assets.finishMain()
+      // must be last
+      assets.finishMain()
+    }
   }
 
   override fun pause() {
@@ -236,21 +237,5 @@ object Hex : ApplicationAdapter() {
 
   fun setClearColorAlpha(alpha: Float) {
     Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, alpha)
-  }
-
-  private fun updateTitle() {
-    var title = "Hex"
-    if (assets.version != null) {
-      title += " v${assets.version}"
-    }
-    if (args.mapEditor) {
-      title += " - Map Editor"
-    }
-    if (args.trace) {
-      title += " (trace)"
-    } else if (args.debug) {
-      title += " (debug)"
-    }
-    Gdx.graphics.setTitle(title)
   }
 }
