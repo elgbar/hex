@@ -37,7 +37,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
       }
     }
 
-    for ((i, preview) in Hex.assets.islandPreviews.islandPreviews.withIndex()) {
+    for ((i, metadata) in Hex.assets.islandPreviews.islandPreviews.withIndex()) {
       val (x, y, width, height) = input.slotRect(i + PREVIEWS_PER_ROW)
 
       if (y + height < camera.position.y - camera.viewportHeight / 2f) {
@@ -50,7 +50,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
         break
       }
 
-      batch.draw(preview.preview, x, y, width, height)
+      batch.draw(metadata.preview, x, y, width, height)
       if (Hex.debugStage) {
         drawBox(x, y, width, height)
       }
@@ -68,8 +68,8 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     lineRenderer.rect(x, y, width, height)
   }
 
-  private fun drawSlotBox(slot: Int) {
-    val (inputX, inputY, inputWidth, inputHeight) = input.slotRect(slot, 1f)
+  private fun drawSlotBox(index: Int) {
+    val (inputX, inputY, inputWidth, inputHeight) = input.slotRect(index, 1f)
     drawBox(inputX, inputY, inputWidth, inputHeight, Color.GRAY)
   }
 

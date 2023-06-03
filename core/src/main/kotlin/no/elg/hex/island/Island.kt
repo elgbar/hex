@@ -41,6 +41,7 @@ import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
+import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
@@ -393,7 +394,7 @@ class Island(
     history.clear()
     Hex.screen.also {
       if (it is PreviewIslandScreen) {
-        it.clearProgress()
+        clearIslandProgress(it.id)
       }
     }
     Hex.screen = LevelSelectScreen()

@@ -48,7 +48,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     )
   }
 
-  private fun getHoveringIslandIndex(): Int {
+  private fun getHoveringIslandId(): Int {
     for (i in 0..PREVIEWS_PER_ROW) {
       val (x, y, width, height) = slotRect(i)
       if (mouseX in x..x + width && mouseY in y..y + height) {
@@ -56,21 +56,21 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       }
     }
 
-    for ((index, i) in Hex.assets.islandFiles.islandIds.withIndex()) {
+    for ((index, metadata) in Hex.assets.islandPreviews.islandPreviews.withIndex()) {
       val (x, y, width, height) = slotRect(index + PREVIEWS_PER_ROW)
       if (mouseX in x..x + width && mouseY in y..y + height) {
-        return i
+        return metadata.id
       }
     }
     return INVALID_ISLAND_INDEX
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    val index = getHoveringIslandIndex()
-    Gdx.app.debug("SELECT", "Clicked on index $index")
+    val id = getHoveringIslandId()
+    Gdx.app.debug("SELECT", "Clicked on id $id")
     when {
-      index == -PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
-      index == -PREVIEWS_PER_ROW + 1 -> {
+      id == -PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
+      id == -PREVIEWS_PER_ROW + 1 -> {
         if (Hex.args.mapEditor) {
           Hex.screen = LevelCreationScreen()
         } else {
@@ -78,9 +78,9 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
         }
       }
 
-      index == -1 -> Hex.screen = TutorialScreen()
-      index in -PREVIEWS_PER_ROW..-1 -> return false
-      index != INVALID_ISLAND_INDEX -> play(index)
+      id == -1 -> Hex.screen = TutorialScreen()
+      id in -PREVIEWS_PER_ROW..-1 -> return false
+      id != INVALID_ISLAND_INDEX -> play(id)
       else -> return false
     }
     Hex.assets.clickSound?.play(Settings.volume)
@@ -88,7 +88,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   private fun scroll(delta: Float) {
-    val (_, y, _, height) = slotRect(Hex.assets.islandFiles.islandIds.size + PREVIEWS_PER_ROW * 2)
+    val (_, y, _, height) = slotRect(Hex.assets.islandFiles.size + PREVIEWS_PER_ROW * 2)
     val screenHeight = Gdx.graphics.height.toFloat()
     val minimum = screenHeight / 2f
     val maximum = max(minimum, y + height - screenHeight / 2f + paddingX)
@@ -113,14 +113,14 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     when (keycode) {
       Keys.FORWARD_DEL, Keys.DEL -> {
         if (Hex.args.mapEditor) {
-          val index = getHoveringIslandIndex()
-          if (index == INVALID_ISLAND_INDEX) return false
-          Gdx.app.debug("SELECT", "Deleting island $index")
-          val file = getIslandFile(index, preview = false, allowInternal = false)
-          val filePreview = getIslandFile(index, preview = true, allowInternal = false)
+          val id = getHoveringIslandId()
+          if (id == INVALID_ISLAND_INDEX) return false
+          Gdx.app.debug("SELECT", "Deleting island $id")
+          val file = getIslandFile(id, preview = false, allowInternal = false)
+          val filePreview = getIslandFile(id, preview = true, allowInternal = false)
 
           if (!file.delete()) {
-            publishWarning("Failed to delete island $index")
+            publishWarning("Failed to delete island $id")
           } else {
             val previewDel = filePreview.delete()
             // wait for file to synced with disk to make sure it appears as deleted when running file search
@@ -133,10 +133,10 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
                 Thread.yield()
               }
             }
-            Hex.assets.unload(getIslandFileName(index))
+            Hex.assets.unload(getIslandFileName(id))
             Hex.assets.islandFiles.fullFilesSearch()
             screen.dispose()
-            publishMessage("Deleted island $index", color = Color.GREEN)
+            publishMessage("Deleted island $id", color = Color.GREEN)
           }
           Hex.screen = screen
         }

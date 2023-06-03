@@ -14,17 +14,16 @@ import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.Island
 import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.LevelSelectScreen
-import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SplashIslandScreen
 
-fun getIslandFileName(slot: Int, preview: Boolean = false): String {
-  return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$slot.${if (preview) "png" else ISLAND_FILE_ENDING}"
+fun getIslandFileName(id: Int, preview: Boolean = false): String {
+  return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$id.${if (preview) "png" else ISLAND_FILE_ENDING}"
 }
 
 fun getIslandLevelFileName(id: Int): String = "$ISLAND_SAVES_DIR.json"
 
-fun getIslandFile(slot: Int, preview: Boolean = false, allowInternal: Boolean = true): FileHandle {
-  val path = getIslandFileName(slot, preview)
+fun getIslandFile(id: Int, preview: Boolean = false, allowInternal: Boolean = true): FileHandle {
+  val path = getIslandFileName(id, preview)
   val local = Gdx.files.local(path)
   return if (local.exists()) local else if (allowInternal) Gdx.files.internal(path) else local
 }
@@ -68,7 +67,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
 
 fun loadIslandSync(id: Int): Island {
   try {
-    val progress = PreviewIslandScreen.getProgress(id)
+    val progress = getProgress(id)
     Gdx.app.trace("IS SPLASH") { "progress: $progress" }
     return if (!Hex.args.mapEditor && !progress.isNullOrBlank()) {
       Gdx.app.debug("IS SPLASH", "Found progress for island $id")
@@ -90,8 +89,8 @@ fun loadIslandSync(id: Int): Island {
 }
 
 fun resetAllIslandProgress() {
-  PreviewIslandScreen.islandPreferences.clear()
-  PreviewIslandScreen.islandPreferences.flush()
+  islandPreferences.clear()
+  islandPreferences.flush()
   Hex.assets.islandPreviews.renderPreviews()
 }
 

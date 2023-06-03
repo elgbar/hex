@@ -41,7 +41,7 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
     } else {
       batch.use {
         val txt = if (assetsDone) {
-          val totalIslands = Hex.assets.islandFiles.islandIds.size
+          val totalIslands = Hex.assets.islandFiles.size
           """
           |Rendering island previews
           |

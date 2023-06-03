@@ -17,12 +17,14 @@ class IslandFiles {
    */
   val islandIds = ArrayList<Int>()
 
+  val size: Int get() = islandIds.size
+
   val nextIslandId: Int
     get() {
       if (islandIds.isEmpty()) return 0
       val firstExisting =
-        islandIds.filterIndexed { index, i -> index + 1 != islandIds.size && islandIds[index + 1] != i + 1 }
-          .firstOrNull() ?: (islandIds.size - 1)
+        islandIds.filterIndexed { index, i -> index + 1 != size && islandIds[index + 1] != i + 1 }
+          .firstOrNull() ?: (size - 1)
       return firstExisting + 1
     }
 
@@ -32,28 +34,28 @@ class IslandFiles {
       islandIds.clear()
 
       var nonExistentFilesInRow = 0
-      for (slot in 0..Int.MAX_VALUE) {
-        val file = getIslandFile(slot, allowInternal = !Hex.args.mapEditor)
+      for (id in 0..Int.MAX_VALUE) {
+        val file = getIslandFile(id, allowInternal = !Hex.args.mapEditor)
         if (file.exists()) {
           if (file.isDirectory) continue
           if (nonExistentFilesInRow > 0) {
             Gdx.app.debug(TAG) {
-              "Missing the islands ${(slot - nonExistentFilesInRow until slot).map { getIslandFileName(it) }}"
+              "Missing the islands ${(id - nonExistentFilesInRow until id).map { getIslandFileName(it) }}"
             }
           }
-          val fileName = getIslandFileName(slot)
+          val fileName = getIslandFileName(id)
           Gdx.app.trace(TAG) { "Found island $fileName" }
           nonExistentFilesInRow = 0
 
           if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded<Island>(fileName)) {
             Hex.assets.load<Island>(fileName)
           }
-          islandIds += slot
+          islandIds += id
         } else {
           nonExistentFilesInRow++
           if (nonExistentFilesInRow >= FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH) {
             Gdx.app.trace(TAG) {
-              "Did not find any existing files for $FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH files after island ${slot - FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH}"
+              "Did not find any existing files for $FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH files after island ${id - FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH}"
             }
             break
           }

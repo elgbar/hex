@@ -3,8 +3,10 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.utils.Align
+import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import ktx.actors.isShown
 import ktx.actors.minusAssign
+import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
@@ -13,6 +15,7 @@ import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
 import ktx.scene2d.vis.menuItem
+import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visImageTextButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
@@ -34,6 +37,7 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.input.editor.editorsList
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
+import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.fixWrongTreeTypes
@@ -77,6 +81,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
     private set
 
   var editor: Editor = OpaquenessEditor.ToggleOpaqueness
+  private val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, 0, Int.MAX_VALUE)
 
   init {
     quicksave()
@@ -94,6 +99,29 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
           }
         }
       )
+
+      visWindow("Enter Author Round to Beat") {
+        visLabel("Lowest number of rounds\nto beat this level")
+        row()
+        spinner("", artbSpinner) {
+          textField.addValidator { input ->
+            val intInput = input?.toIntOrNull() ?: -1
+            intInput >= UNKNOWN_ROUNDS_TO_BEAT
+          }
+
+          onChange {
+            if (textField.isInputValid) {
+              island.authorRoundsToBeat = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
+            }
+          }
+        }
+        pack()
+      }.also {
+        editorsWindows[it] = {
+          centerWindow()
+          setPosition(0f, y * 3f / 2f)
+        }
+      }
 
       fun exit() {
         confirmExit.centerWindow()
@@ -265,6 +293,10 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             menuItem("Toggle Editor Types") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F1) {
                 editorsWindows.forEach { it.key.toggleShown(this@MapEditorScreen.stageScreen.stage) }
+              }
+            }
+            menuItem("Set Author Round to Beat (ARtB)") {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F2) {
               }
             }
           }

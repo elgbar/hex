@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import kotlinx.coroutines.launch
+import ktx.assets.disposeSafely
 import ktx.assets.load
 import ktx.async.KtxAsync
 import ktx.collections.GdxArray
@@ -25,7 +26,10 @@ import no.elg.hex.util.decodeStringToTexture
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.getPrefName
+import no.elg.hex.util.getProgress
 import no.elg.hex.util.isLoaded
+import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.loadIslandSync
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.saveScreenshotAsString
@@ -113,34 +117,36 @@ class IslandPreviewCollection : Disposable {
         )
       }
 
+      fun printText(text: String) {
+        val font = Hex.assets.regularFont
+
+        screen.camera.setToOrtho(screen.yDown, widthOffset, heightOffset)
+        screen.camera.center(widthOffset, heightOffset)
+
+        screen.batch.projectionMatrix = screen.camera.combined
+
+        font.color = Color.WHITE
+        font.draw(
+          screen.batch,
+          text,
+          0f,
+          (screen.camera.viewportHeight - font.data.capHeight) / 2f,
+          screen.camera.viewportWidth,
+          Align.center,
+          false
+        )
+      }
+
       when (modifier) {
         PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
         PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
         PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
-
-        PreviewModifier.WON -> {
-          val text = "${island.round}"
-
-          val font = Hex.assets.regularFont
-
-          screen.camera.setToOrtho(screen.yDown, widthOffset, heightOffset)
-          screen.camera.center(widthOffset, heightOffset)
-
-          screen.batch.projectionMatrix = screen.camera.combined
-
-          font.color = Color.WHITE
-          font.draw(
-            screen.batch,
-            text,
-            0f,
-            (screen.camera.viewportHeight - font.data.capHeight) / 2f,
-            screen.camera.viewportWidth,
-            Align.center,
-            false
-          )
-        }
-
+        PreviewModifier.WON -> printText("${island.round}")
         PreviewModifier.NOTHING -> Unit
+      }
+
+      if (Hex.trace && !Hex.args.mapEditor) {
+        printText("ARtB: ${island.authorRoundsToBeat}")
       }
     }
     screen.camera.setToOrtho(screen.yDown)
@@ -155,7 +161,7 @@ class IslandPreviewCollection : Disposable {
 
   fun renderPreviews() {
     reportTiming("loading all island previews") {
-      if (Hex.assets.islandFiles.islandIds.size == 0) {
+      if (Hex.assets.islandFiles.size == 0) {
         if (!Hex.args.`disable-island-loading`) {
           MessagesRenderer.publishError("Failed to find any islands to load")
           if (Hex.args.mapEditor) {
@@ -175,7 +181,7 @@ class IslandPreviewCollection : Disposable {
         }
         val runnable = {
           val islandPreviewFile = getIslandFile(id, true)
-          val previewProgress = PreviewIslandScreen.getProgress(id, true)
+          val previewProgress = getProgress(id, true)
           val island = loadIslandSync(id)
           try {
             when {
@@ -199,6 +205,7 @@ class IslandPreviewCollection : Disposable {
         }
         addPreviewRender(runnable)
         renderNextPreview()
+        islandPreviews.sort()
       }
     }
   }
@@ -209,9 +216,9 @@ class IslandPreviewCollection : Disposable {
     maybeIsland: Island? = null
   ) {
     KtxAsync.launch(Hex.asyncThread) {
-      val index = Hex.assets.islandFiles.islandIds.indexOf(id)
-      if (index == -1) {
-        MessagesRenderer.publishWarning("Failed to find file index of island with a slot at $id")
+      val metadata = islandPreviews.firstOrNull { it.id == id }
+      if (metadata == null) {
+        MessagesRenderer.publishWarning("Unknown island with id $id")
         return@launch
       }
 
@@ -231,17 +238,25 @@ class IslandPreviewCollection : Disposable {
 
       val rendereredPreviewSize = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
       renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, modifier) { preview ->
-        val previewName = PreviewIslandScreen.getPrefName(id, true)
+        val previewName = getPrefName(id, true)
         if (Hex.args.mapEditor) {
-          PreviewIslandScreen.islandPreferences.remove(previewName)
+          islandPreferences.remove(previewName)
           val islandPreviewFile = getIslandFile(id, preview = true, allowInternal = false)
           preview.takeScreenshot(islandPreviewFile)
         } else {
           Gdx.app.debug("IS PREVIEW", "Saving preview of island $id")
-          PreviewIslandScreen.islandPreferences.putString(previewName, preview.saveScreenshotAsString())
+          islandPreferences.putString(previewName, preview.saveScreenshotAsString())
         }
-        PreviewIslandScreen.islandPreferences.flush()
-        islandPreviews.add(IslandMetadata(id, island, preview.colorBufferTexture))
+        islandPreferences.flush()
+        val islandMetadata = IslandMetadata(id, island, preview.colorBufferTexture)
+        val existingIndex = islandPreviews.indexOfFirst { it.id == id }
+        if (existingIndex == -1) {
+          islandPreviews.add(islandMetadata)
+        } else {
+          islandPreviews.get(existingIndex).disposeSafely()
+          islandPreviews.set(existingIndex, islandMetadata)
+        }
+        islandPreviews.sort()
       }
     }
   }

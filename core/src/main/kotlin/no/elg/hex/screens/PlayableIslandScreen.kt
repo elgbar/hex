@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
-import ktx.actors.onClick
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -53,6 +52,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.saveProgress
 import no.elg.hex.util.show
 
 /** @author Elg */
@@ -76,7 +76,8 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   private val disableChecker: MutableMap<Disableable, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
-  private var modifier = NOTHING
+  var modifier = NOTHING
+    private set
 
   val stage: Stage get() = stageScreen.stage
 
@@ -439,11 +440,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     frameUpdatable.dispose()
     stageScreen.dispose()
     island.cancelCurrentAI()
-    if (modifier == NOTHING) {
-      saveProgress()
-    }
-
-    Hex.assets.islandPreviews.updateSelectPreview(id, modifier, island)
+    saveProgress()
     modifier = NOTHING
 
     DebugGraphRenderer.dispose()
