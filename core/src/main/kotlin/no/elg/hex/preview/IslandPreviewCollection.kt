@@ -48,7 +48,9 @@ class IslandPreviewCollection : Disposable {
   private fun renderNextPreview() {
     synchronized(internalPreviewRendererQueue) {
       if (internalPreviewRendererQueue.isEmpty) {
-        islandPreviews.sort()
+        if(!Hex.args.mapEditor) {
+          islandPreviews.sort()
+        }
         return
       }
       lastPostedFrameId = Gdx.graphics.frameId
