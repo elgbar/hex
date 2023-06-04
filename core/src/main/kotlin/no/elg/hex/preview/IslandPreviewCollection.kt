@@ -59,7 +59,6 @@ class IslandPreviewCollection : Disposable {
             val authorRoundsToBeat = it.island.authorRoundsToBeat
             if (authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) Int.MAX_VALUE else authorRoundsToBeat
           }
-          Gdx.app.log("LOCAL", "order (artb -> id) ${islandPreviews.map { "${it.island.authorRoundsToBeat} -> ${it.id}" }}")
         }
       }
     }
