@@ -5,7 +5,6 @@ import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import no.elg.hex.Hex
 import kotlin.reflect.jvm.jvmName
 
 /** @author Elg */
@@ -32,27 +31,6 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
   override fun resize(width: Int, height: Int) {
     camera.setToOrtho(yDown, width.toFloat(), height.toFloat())
     updateCamera()
-  }
-
-  fun renderBackground() {
-    batch.disableBlending()
-    batch.begin()
-
-    val bgWidth = Hex.assets.background.packedWidth.toFloat()
-    val bgHeight = Hex.assets.background.packedHeight.toFloat()
-
-    var offsetY = 0
-    do {
-      var offsetX = 0
-      do {
-        batch.draw(Hex.assets.background, offsetX * bgWidth, offsetY * bgHeight)
-        offsetX++
-      } while (offsetX < Gdx.graphics.width.toFloat() * camera.zoom)
-      offsetY++
-    } while (offsetY < Gdx.graphics.height.toFloat() * camera.zoom)
-
-    batch.end()
-    batch.enableBlending()
   }
 
   override fun hide() {
