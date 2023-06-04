@@ -87,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] Fix exceptions being thrown if an island had no hexagons loaded
 * [technical] Fix wrong AI team being announced as the winner when you loose
 * [technical] Fix wrong tree type in island 24
+* [technical] Fix crash on chrome os desktop
 
 ### Removed
 

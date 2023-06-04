@@ -203,9 +203,11 @@ object Hex : ApplicationAdapter() {
 
   override fun pause() {
     paused = true
-    screen = SplashScreen(screen)
     inputMultiplexer.clear()
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+    Gdx.app.postRunnable {
+      screen = SplashScreen(screen)
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+    }
     assets.dispose()
     asyncThread.dispose()
     ScreenRenderer.dispose()
