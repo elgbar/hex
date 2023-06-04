@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Show how many previews to load when in the splash screen
 * [visual] Show island id and ARtB in debug hud
 * [technical] Add `--save-island-on-loading-it` program argument flag
+* [technical] On android, allow users to set the orientation
 
 ### Changed
 
