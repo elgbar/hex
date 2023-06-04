@@ -60,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] Only call `ensureCapitalStartFunds` when saving, this speeds up loading drastically
 * [technical] On desktop, only move/ the camera when pressing the right mouse button
 * [technical] Reset ARtB when doing an edit to a map
+* [technical] Reset ARtB when doing an edit to a map
 
 ### Fixed
 

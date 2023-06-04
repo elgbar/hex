@@ -49,7 +49,7 @@ object Settings {
   var enableStrengthHint by PreferenceDelegate(true, priority = 100)
   var enableStrengthBar by PreferenceDelegate(true, priority = 100)
 
-  var showFps by PreferenceDelegate(false, priority = 109)
+  var showFps by PreferenceDelegate(false, priority = 109, shouldHide = { !Hex.debug })
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
   var MSAA by PreferenceDelegate(4, Hex.launchPreference, true, shouldHide = { !Hex.platform.canSetMSAA }) { it !in 0..16 }
