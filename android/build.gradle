@@ -51,8 +51,8 @@ android {
     debug {
       minifyEnabled false
 
-      resValue("string", "args", "--debug")
       resValue("string", "version", hexVersion)
+      resValue("string", "args", "")
     }
   }
   buildFeatures {
