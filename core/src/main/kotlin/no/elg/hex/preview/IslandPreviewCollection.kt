@@ -32,7 +32,6 @@ import no.elg.hex.util.getProgress
 import no.elg.hex.util.isLoaded
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.loadIslandSync
-import no.elg.hex.util.reportTiming
 import no.elg.hex.util.saveScreenshotAsString
 import no.elg.hex.util.takeScreenshot
 import no.elg.hex.util.trace
@@ -56,7 +55,7 @@ class IslandPreviewCollection : Disposable {
       synchronized(internalPreviewRendererQueue) {
         if (!Hex.args.mapEditor) {
           islandPreviews.sortBy {
-            val authorRoundsToBeat = it.island.authorRoundsToBeat
+            val authorRoundsToBeat = it.island?.authorRoundsToBeat
             if (authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) Int.MAX_VALUE else authorRoundsToBeat
           }
         }
@@ -179,38 +178,43 @@ class IslandPreviewCollection : Disposable {
   }
 
   fun renderPreviews() {
-    reportTiming("loading all island previews") {
-      if (Hex.assets.islandFiles.size == 0) {
-        if (!Hex.args.`disable-island-loading`) {
-          MessagesRenderer.publishError("Failed to find any islands to load")
-          if (Hex.args.mapEditor) {
-            MessagesRenderer.publishWarning("Do you have the correct island symbolic link in the project?")
-            MessagesRenderer.publishWarning("There should be a error printed in the gradle logs")
-            MessagesRenderer.publishWarning("To fix on windows you can enable Developer Mode")
-          }
+    if (Hex.assets.islandFiles.size == 0) {
+      if (!Hex.args.`disable-island-loading`) {
+        MessagesRenderer.publishError("Failed to find any islands to load")
+        if (Hex.args.mapEditor) {
+          MessagesRenderer.publishWarning("Do you have the correct island symbolic link in the project?")
+          MessagesRenderer.publishWarning("There should be a error printed in the gradle logs")
+          MessagesRenderer.publishWarning("To fix on windows you can enable Developer Mode")
         }
-        return
       }
-      disposePreviews()
+      return
+    }
+    disposePreviews()
 
-      for (id in Hex.assets.islandFiles.islandIds) {
-        if (Hex.args.`update-previews`) {
-          updateSelectPreview(id)
-          continue
-        }
+    for (id in Hex.assets.islandFiles.islandIds) {
+      if (Hex.args.`update-previews`) {
+        updateSelectPreview(id)
+        continue
+      }
+      KtxAsync.launch(Hex.asyncThread) {
+        val islandPreviewFile = getIslandFile(id, true)
+        val previewProgress = getProgress(id, true)
+        val island = loadIslandSync(id)
+
         val runnable = {
-          val islandPreviewFile = getIslandFile(id, true)
-          val previewProgress = getProgress(id, true)
-          val island = loadIslandSync(id)
           try {
-            synchronized(internalPreviewRendererQueue) {
-              when {
-                previewProgress != null -> islandPreviews.add(IslandMetadata(id, island, decodeStringToTexture(previewProgress)))
-                islandPreviewFile.exists() -> islandPreviews.add(IslandMetadata(id, island, Texture(islandPreviewFile)))
-                else -> {
-                  MessagesRenderer.publishWarning("Failed to load preview of island $id")
-                  updateSelectPreview(id)
-                }
+            val texture: Texture? = when {
+              previewProgress != null -> decodeStringToTexture(previewProgress)
+              islandPreviewFile.exists() -> Texture(islandPreviewFile)
+              else -> {
+                MessagesRenderer.publishWarning("Failed to load preview of island $id")
+                updateSelectPreview(id)
+                null
+              }
+            }
+            if (texture is Texture) {
+              synchronized(internalPreviewRendererQueue) {
+                islandPreviews.add(IslandMetadata(id, island, texture))
               }
             }
           } catch (e: Exception) {
