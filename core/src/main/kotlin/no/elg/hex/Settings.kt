@@ -53,7 +53,7 @@ object Settings {
   var showFps by PreferenceDelegate(false, priority = 109, shouldHide = { !Hex.debug })
 
   const val MSAA_SAMPLES_PATH = "MSAA" // Settings::MSAA.name
-  var MSAA by PreferenceDelegate(4, Hex.launchPreference, true, shouldHide = { !Hex.platform.canSetMSAA }) { it !in 0..16 }
+  var MSAA by PreferenceDelegate(Hex.platform.defaultMSAA, Hex.launchPreference, true, shouldHide = { !Hex.platform.canSetMSAA }) { it !in 0..16 }
 
   var zoomSpeed by PreferenceDelegate(
     0.2f,

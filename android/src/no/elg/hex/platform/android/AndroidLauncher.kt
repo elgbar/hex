@@ -27,7 +27,7 @@ class AndroidLauncher : AndroidApplication() {
 
     Hex.launchPreference = AndroidPreferences(getSharedPreferences(Hex.LAUNCH_PREF, MODE_PRIVATE))
     Hex.platform = AndroidPlatform(this)
-    config.numSamples = 2 //default value
+    config.numSamples = Hex.platform.defaultMSAA
 
     config.depth = 0
 

@@ -16,10 +16,11 @@ class AndroidPlatform(private val activity: Activity) : Platform {
 
   override val version: String by lazy { activity.resources.getString(R.string.version) }
 
-  override val canLimitFps: Boolean = false
+  override val canLimitFps: Boolean = false 
   override val canToggleVsync: Boolean = false
 
   override val canSetMSAA: Boolean = false
+  override val defaultMSAA: Int = 4
   override val canControlAudio: Boolean = false
 
   override fun platformInit() {

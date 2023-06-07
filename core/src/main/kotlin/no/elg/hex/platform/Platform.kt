@@ -18,6 +18,7 @@ interface Platform {
   val canToggleVsync: Boolean
 
   val canSetMSAA: Boolean
+  val defaultMSAA: Int
 
   val canControlAudio: Boolean
 

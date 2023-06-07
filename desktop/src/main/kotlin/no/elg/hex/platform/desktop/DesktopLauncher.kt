@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
   val samples = if (Hex.launchPreference.contains(MSAA_SAMPLES_PATH)) {
     Hex.launchPreference.getInteger(MSAA_SAMPLES_PATH)
   } else {
-    16 // default value
+    Hex.platform.defaultMSAA
   }
   val c = Hex.backgroundColor
   config.setBackBufferConfig((c.r * 255).toInt(), (c.g * 255).toInt(), (c.b * 255).toInt(), 1, config.depth, config.stencil, samples)

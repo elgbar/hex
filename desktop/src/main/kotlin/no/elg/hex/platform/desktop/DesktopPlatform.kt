@@ -14,6 +14,7 @@ class DesktopPlatform : Platform {
   override val canToggleVsync: Boolean = true
 
   override val canSetMSAA: Boolean = true
+  override val defaultMSAA: Int = 16
 
   override val canControlAudio: Boolean = true
 
