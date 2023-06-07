@@ -23,16 +23,24 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
-import no.elg.hex.platform.PlatformType
+import no.elg.hex.platform.PlatformType.DESKTOP
+import no.elg.hex.platform.PlatformType.MOBILE
 
-private const val MOBILE_BUTTON_PADDING = 45f
-private const val DESKTOP_BUTTON_PADDING = 10f
-
-private const val MOBILE_SPACING = 20f
-private const val DESKTOP_SPACING = 5f
-
-val buttonPadding: Float get() = if (Hex.platform.type == PlatformType.MOBILE) MOBILE_BUTTON_PADDING else DESKTOP_BUTTON_PADDING
-val platformSpacing: Float get() = if (Hex.platform.type == PlatformType.MOBILE) MOBILE_SPACING else DESKTOP_SPACING
+val buttonPadding: Float
+  get() = when (Hex.platform.type) {
+    MOBILE -> 45f
+    DESKTOP -> 10f
+  }
+val platformSpacing: Float
+  get() = when (Hex.platform.type) {
+    MOBILE -> 20f
+    DESKTOP -> 5f
+  }
+val platformCheckBoxSize: Float
+  get() = when (Hex.platform.type) {
+    MOBILE -> 50f
+    DESKTOP -> 20f
+  }
 
 /**
  * Alias for [PopupMenu.addSeparator] to make it blend better in with the scene 2d DSL, but without

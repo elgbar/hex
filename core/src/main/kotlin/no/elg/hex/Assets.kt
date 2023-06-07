@@ -33,6 +33,7 @@ import ktx.style.imageTextButton
 import ktx.style.label
 import ktx.style.menu
 import ktx.style.menuItem
+import ktx.style.separator
 import ktx.style.set
 import ktx.style.sizes
 import ktx.style.textButton
@@ -300,7 +301,11 @@ class Assets : AssetManager() {
         visTextButton(extend = "menu-bar") { font = notFlippedFont }
         visTextButton(extend = "toggle") { font = notFlippedFont }
         visTextButton(extend = "blue") { font = notFlippedFont }
-        visTextButton(name = "mapeditor-checked-aware", extend = "default") {
+        visTextButton(name = "dangerous", extend = "default") {
+          font = notFlippedFont
+          fontColor = Color.valueOf("#5e2000")
+        }
+
         visTextButton(name = "mapeditor-editor-item", extend = "default") {
           font = notFlippedFont
           disabledFontColor = Color.valueOf("#31E776")
@@ -325,6 +330,9 @@ class Assets : AssetManager() {
         sizes {
           this.spinnerFieldSize = 100f
           this.spinnerButtonHeight = 10f
+        }
+        separator(extend = "default") {
+          this.thickness = 1
         }
       }
       Scene2DSkin.defaultSkin = VisUI.getSkin()

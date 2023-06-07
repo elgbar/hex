@@ -16,6 +16,7 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.KVisTable
+import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visLabel
@@ -27,10 +28,13 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.util.buttonPadding
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.findEnumValues
+import no.elg.hex.util.platformCheckBoxSize
+import no.elg.hex.util.platformSpacing
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
 import kotlin.math.max
@@ -64,7 +68,7 @@ class SettingsScreen : OverlayScreen() {
           pad(10f)
 
           // allow scroll past back button
-          padBottom(this.prefHeight / 2f)
+          padBottom(this.prefHeight)
 
           val minWidth = 0.4f
 
@@ -103,13 +107,23 @@ class SettingsScreen : OverlayScreen() {
             addSetting(property as KMutableProperty1<Settings, Any>, delegate as PreferenceDelegate<*>)
           }
 
+          separator {
+            it.expand()
+            it.fillX()
+            it.colspan(2)
+          }
+
           for (property in otherProperties) {
             val name = property.name.toTitleCase()
             if (property.returnType.jvmErasure.isSubclassOf(ResetSetting::class)) {
               val delegate = property.get(Settings) as ResetSetting
               val confirmResetWindow = this@actors.confirmWindow(name, delegate.confirmText) { delegate.onResetConfirmed() }
-              visTextButton(name) {
-                this.color = Color.RED
+              row()
+              visTextButton(name, "dangerous") {
+                settingsStyle(it)
+                it.colspan(2)
+                it.pad(buttonPadding)
+                it.space(platformSpacing)
                 onClick {
                   confirmResetWindow.show(stage)
                 }
@@ -117,14 +131,15 @@ class SettingsScreen : OverlayScreen() {
             }
           }
 
-          row()
           Hex.assets.version?.also { version ->
+            row()
             visLabel("Version: $version") {
               it.colspan(2)
               it.center()
               color = Color.LIGHT_GRAY
             }
           }
+
           row()
           addBackButton {
             it.colspan(2)
@@ -158,6 +173,7 @@ class SettingsScreen : OverlayScreen() {
     }
 
     val clazz = delegate.initialValue::class
+    val onChange: () -> Unit
     if (clazz.java.isEnum) {
       val enumValues = findEnumValues(clazz as KClass<out Enum<*>>).sortedBy { it.ordinal }.toGdxArray()
       visSelectBox<Enum<*>> {
@@ -168,16 +184,24 @@ class SettingsScreen : OverlayScreen() {
         }
         onHideListeners += { delegate.hide(property) }
 
-        onChange {
+        property.set(Settings, this.selected)
+        this.selected = property.get(Settings) as Enum<*>
+        onChange = {
           property.set(Settings, this.selected)
           this.selected = property.get(Settings) as Enum<*>
           restartLabel.fire(ChangeEvent())
+        }
+        onChange {
+          onChange()
         }
       }
     } else {
       when (clazz) {
         Boolean::class -> visCheckBox("") {
           commonStyle(it, false)
+          cells.get(0)?.also { cell ->
+            cell.size(platformCheckBoxSize)
+          }
 
           val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
           onShowListeners += readSetting
@@ -186,11 +210,18 @@ class SettingsScreen : OverlayScreen() {
           onHideListeners += { delegate.hide(property) }
 
           setProgrammaticChangeEvents(false)
-          onChange {
-            property.set(Settings, isChecked)
+          onChange = {
+            val wasChecked = property.get(Settings) as Boolean
+            if (isChecked != wasChecked) {
+              property.set(Settings, isChecked)
+            } else {
+              property.set(Settings, !wasChecked)
+            }
             isChecked = property.get(Settings) as Boolean
             restartLabel.fire(ChangeEvent())
           }
+
+          onChange { onChange() }
         }
 
         String::class ->
@@ -212,11 +243,13 @@ class SettingsScreen : OverlayScreen() {
             onHideListeners += { delegate.hide(property) }
 
             programmaticChangeEvents = false
-            onChange {
+            onChange = {
               property.set(Settings, text)
               text = property.get(Settings).toString()
               restartLabel.fire(ChangeEvent())
             }
+
+            onChange { onChange() }
           }
 
         Int::class ->
@@ -230,12 +263,14 @@ class SettingsScreen : OverlayScreen() {
             onHideListeners += { delegate.hide(property) }
 
             isProgrammaticChangeEvents = false
-            onChange {
+            onChange = {
               val intModel = model as IntSpinnerModel
               property.set(Settings, intModel.value)
               intModel.value = property.get(Settings) as Int
               restartLabel.fire(ChangeEvent())
             }
+
+            onChange { onChange() }
           }
 
         Float::class, Double::class ->
@@ -258,12 +293,14 @@ class SettingsScreen : OverlayScreen() {
             onHideListeners += { delegate.hide(property) }
 
             isProgrammaticChangeEvents = false
-            onChange {
+            onChange = {
               val floatModel = model as FloatSpinnerModel
               property.set(Settings, floatModel.value.toFloat())
               floatModel.value = (property.get(Settings) as Float).toBigDecimal()
               restartLabel.fire(ChangeEvent())
             }
+
+            onChange { onChange() }
           }
 
         else -> error("The class $clazz is not yet supported as a settings")
@@ -271,19 +308,26 @@ class SettingsScreen : OverlayScreen() {
     }
 
     horizontalGroup {
-      it.left()
-      it.pad(0f)
-      it.space(20f)
-      it.expandX()
+      onClick {
+        onChange()
+      }
+      settingsStyle(it)
       it.minWidth(Value.percentWidth(minWidth, this@addSetting))
 
       // Show settings name after setting editor
       visLabel(name) {
         style.fontColor = Color.WHITE
       }
+
       addActor(restartLabel)
     }
     row()
+  }
+
+  private fun settingsStyle(cell: Cell<*>) {
+    cell.pad(0f)
+    cell.space(platformSpacing)
+    cell.expandX()
   }
 
   override fun show() {

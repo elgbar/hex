@@ -61,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] On desktop, only move/ the camera when pressing the right mouse button
 * [technical] Reset ARtB when doing an edit to a map
 * [technical] Don't allow fps to be shown when playing normally
+* [technical] Clicking the text will toggle boolean settings
 
 ### Fixed
 
