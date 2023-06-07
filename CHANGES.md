@@ -96,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] Fix wrong tree type in island 24
 * [technical] Fix crash on chrome os desktop
 * [technical] Fix click sound on android
+* [technical] Fix missing clicking sound on interaction
 
 ### Removed
 

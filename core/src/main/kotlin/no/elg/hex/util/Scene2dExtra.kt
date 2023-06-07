@@ -82,7 +82,11 @@ fun Button.onInteract(
   catchEvent: Boolean = false,
   interaction: Button.() -> Unit
 ) {
-  onChange(interaction)
+  val interactionWithSound: Button.() -> Unit = {
+    playClick()
+    interaction()
+  }
+  onChange(interactionWithSound)
 
   if (keyShortcuts.isNotEmpty()) {
     if (this is MenuItem) {
@@ -96,7 +100,7 @@ fun Button.onInteract(
         catchEvent = catchEvent,
         listener = {
           if (!isDisabled) {
-            interaction()
+            interactionWithSound()
           }
         }
       )
