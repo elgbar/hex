@@ -24,11 +24,11 @@ fun FrameBuffer.takeScreenshot(fileHandle: FileHandle) {
   this.use {
     val bufferWidth = this.width
     val bufferHeight = this.height
-    val pixels = ScreenUtils.getFrameBufferPixels(0, 0, bufferWidth, bufferHeight, true)
+    val pixels = ScreenUtils.getFrameBufferPixels(0, 0, bufferWidth, bufferHeight, false)
 
     val screenshotImage = Pixmap(bufferWidth, bufferHeight, Pixmap.Format.RGBA8888)
     BufferUtils.copy(pixels, 0, screenshotImage.pixels, pixels.size)
-    PixmapIO.writePNG(fileHandle, screenshotImage, Deflater.BEST_COMPRESSION, true)
+    PixmapIO.writePNG(fileHandle, screenshotImage, Deflater.BEST_COMPRESSION, false)
     screenshotImage.dispose()
   }
 }
