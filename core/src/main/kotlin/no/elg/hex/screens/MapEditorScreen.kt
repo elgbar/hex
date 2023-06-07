@@ -2,7 +2,9 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.utils.Align
+import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import ktx.actors.isShown
 import ktx.actors.minusAssign
@@ -16,9 +18,9 @@ import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
 import ktx.scene2d.vis.menuItem
 import ktx.scene2d.vis.spinner
-import ktx.scene2d.vis.visImageTextButton
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
+import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
@@ -140,16 +142,28 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
           isResizable = false
           titleLabel.setAlignment(Align.center)
           defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+          var lastChecked: VisTextButton? = null
           for (itemRow in items) {
             for (item in itemRow) {
-              visImageTextButton(stringifyItem(item).toTitleCase()) {
+              visTextButton(stringifyItem(item).toTitleCase(), style = "mapeditor-editor-item") {
                 pad(5f)
-                onClick { onButtonClick(item) }
+                onClick {
+                  lastChecked?.isDisabled = false
+                  this.isDisabled = true
+                  lastChecked = this
+
+                  onButtonClick(item)
+                }.also { clickListener ->
+                  if (lastChecked == null) {
+                    clickListener.clicked(InputEvent(), 0f, 0f)
+                  }
+                }
                 it.fillX()
               }
             }
             row()
           }
+
           pack()
         }.also {
           editorsWindows[it] = {

@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP_PINGPONG
@@ -299,6 +300,11 @@ class Assets : AssetManager() {
         visTextButton(extend = "menu-bar") { font = notFlippedFont }
         visTextButton(extend = "toggle") { font = notFlippedFont }
         visTextButton(extend = "blue") { font = notFlippedFont }
+        visTextButton(name = "mapeditor-checked-aware", extend = "default") {
+        visTextButton(name = "mapeditor-editor-item", extend = "default") {
+          font = notFlippedFont
+          disabledFontColor = Color.valueOf("#31E776")
+        }
 
         visCheckBox(extend = "default") { font = notFlippedFont }
 
