@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.kotcrab.vis.ui.widget.MenuItem
 import com.kotcrab.vis.ui.widget.PopupMenu
 import com.kotcrab.vis.ui.widget.Separator
@@ -41,6 +42,12 @@ val platformCheckBoxSize: Float
     MOBILE -> 50f
     DESKTOP -> 20f
   }
+
+@Scene2dDsl
+fun Button.padAndSpace(cell: Cell<*>) {
+  cell.pad(buttonPadding)
+  cell.space(platformSpacing)
+}
 
 /**
  * Alias for [PopupMenu.addSeparator] to make it blend better in with the scene 2d DSL, but without
@@ -207,6 +214,7 @@ fun StageWidget.confirmWindow(
         it.expandX()
         it.center()
         onClick {
+          playClick()
           this@visWindow.whenConfirmed()
           this@visWindow.fadeOut()
         }
@@ -221,6 +229,7 @@ fun StageWidget.confirmWindow(
         it.expandX()
         it.center()
         onClick {
+          playClick()
           this@visWindow.whenDenied()
           this@visWindow.fadeOut()
         }
@@ -267,6 +276,7 @@ fun StageWidget.okWindow(
       it.space(10f)
       it.pad(platformSpacing)
       onClick {
+        playClick()
         this@visWindow.whenConfirmed()
         this@visWindow.fadeOut()
       }

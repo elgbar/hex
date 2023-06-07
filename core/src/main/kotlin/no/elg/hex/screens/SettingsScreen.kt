@@ -28,13 +28,14 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.util.buttonPadding
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.findEnumValues
+import no.elg.hex.util.padAndSpace
 import no.elg.hex.util.platformCheckBoxSize
 import no.elg.hex.util.platformSpacing
+import no.elg.hex.util.playClick
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
 import kotlin.math.max
@@ -83,6 +84,7 @@ class SettingsScreen : OverlayScreen() {
           visLabel("Description", init = init)
 
           row()
+          sep()
 
           val (settingsProperties, otherProperties) = Settings::class.declaredMemberProperties.partition {
             it.also { it.isAccessible = true }.getDelegate(Settings) is PreferenceDelegate<*>
@@ -107,11 +109,7 @@ class SettingsScreen : OverlayScreen() {
             addSetting(property as KMutableProperty1<Settings, Any>, delegate as PreferenceDelegate<*>)
           }
 
-          separator {
-            it.expand()
-            it.fillX()
-            it.colspan(2)
-          }
+          sep()
 
           for (property in otherProperties) {
             val name = property.name.toTitleCase()
@@ -121,9 +119,10 @@ class SettingsScreen : OverlayScreen() {
               row()
               visTextButton(name, "dangerous") {
                 settingsStyle(it)
+                padAndSpace(it)
                 it.colspan(2)
-                it.pad(buttonPadding)
-                it.space(platformSpacing)
+                it.prefWidth(Value.percentHeight(0.25f, this@visTable))
+                it.prefHeight(Value.percentHeight(0.03f, this@visTable))
                 onClick {
                   confirmResetWindow.show(stage)
                 }
@@ -142,8 +141,10 @@ class SettingsScreen : OverlayScreen() {
 
           row()
           addBackButton {
+            padAndSpace(it)
             it.colspan(2)
-            it.prefWidth(Value.percentHeight(0.25f, this@visTable))
+            it.prefWidth(Value.percentHeight(0.2f, this@visTable))
+            it.prefHeight(Value.percentHeight(0.05f, this@visTable))
             it.space(0f)
           }
         }
@@ -158,6 +159,15 @@ class SettingsScreen : OverlayScreen() {
     if (includeWidth) {
       it.minWidth(Hex.assets.fontSize * MIN_FIELD_WIDTH)
     }
+  }
+
+  private fun KVisTable.sep() {
+    separator {
+      it.expand()
+      it.fillX()
+      it.colspan(2)
+    }
+    row()
   }
 
   @Scene2dDsl
@@ -178,19 +188,27 @@ class SettingsScreen : OverlayScreen() {
       val enumValues = findEnumValues(clazz as KClass<out Enum<*>>).sortedBy { it.ordinal }.toGdxArray()
       visSelectBox<Enum<*>> {
         this.items = enumValues
-        commonStyle(this@addSetting.getCell(this))
+        val cell = this@addSetting.getCell(this)
+        cell.prefWidth(Value.percentHeight(0.15f, this@addSetting))
+        cell.prefHeight(Value.percentHeight(0.03f, this@addSetting))
+        commonStyle(cell)
         onShowListeners += {
           this.selected = property.get(Settings) as Enum<*>
         }
         onHideListeners += { delegate.hide(property) }
+//        for (child in this.scrollPane.children) {
+//          val childCell = this@addSetting.getCell(child)
+//          childCell.prefWidth(Value.percentHeight(0.15f, this@addSetting))
+//          childCell.prefHeight(Value.percentHeight(0.05f, this@addSetting))
+//        }
 
-        property.set(Settings, this.selected)
-        this.selected = property.get(Settings) as Enum<*>
         onChange = {
           property.set(Settings, this.selected)
-          this.selected = property.get(Settings) as Enum<*>
           restartLabel.fire(ChangeEvent())
         }
+
+        onClick { playClick() }
+
         onChange {
           onChange()
         }
@@ -249,7 +267,10 @@ class SettingsScreen : OverlayScreen() {
               restartLabel.fire(ChangeEvent())
             }
 
-            onChange { onChange() }
+            onChange {
+              playClick()
+              onChange()
+            }
           }
 
         Int::class ->
@@ -270,7 +291,10 @@ class SettingsScreen : OverlayScreen() {
               restartLabel.fire(ChangeEvent())
             }
 
-            onChange { onChange() }
+            onChange {
+              playClick()
+              onChange()
+            }
           }
 
         Float::class, Double::class ->
@@ -300,7 +324,10 @@ class SettingsScreen : OverlayScreen() {
               restartLabel.fire(ChangeEvent())
             }
 
-            onChange { onChange() }
+            onChange {
+              playClick()
+              onChange()
+            }
           }
 
         else -> error("The class $clazz is not yet supported as a settings")
@@ -309,6 +336,7 @@ class SettingsScreen : OverlayScreen() {
 
     horizontalGroup {
       onClick {
+        playClick()
         onChange()
       }
       settingsStyle(it)

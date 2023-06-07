@@ -147,14 +147,14 @@ object Settings {
   var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.args.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { !Hex.debug })
 
-  val deleteAllProcess = ResetSetting("Are you use you want to delete all your progress?") {
+  val deleteAllProgress = ResetSetting("Are you sure you want to delete all your progress?") {
     resetAllIslandProgress()
     MessagesRenderer.publishWarning("All progress have been deleted")
     Hex.screen = LevelSelectScreen()
   }
 
   @Suppress("UNCHECKED_CAST")
-  val resetSettings = ResetSetting("Are you use you want to reset settings?") {
+  val resetSettings = ResetSetting("Are you sure you want reset all settings?") {
     Gdx.app.postRunnable {
       for (
       (property, loopDelegate) in Settings::class.declaredMemberProperties //

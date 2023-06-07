@@ -7,9 +7,9 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
-import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.playClick
 
 abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRootTable) {
 
@@ -25,10 +25,10 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
   }
 
   @Scene2dDsl
-  protected fun <S> KWidget<S>.addBackButton(init: KVisTextButton.(S) -> Unit = {}) {
+  fun <S> KWidget<S>.addBackButton(init: KVisTextButton.(S) -> Unit = {}) {
     visTextButton("Back") {
       onInteract(stage, intArrayOf(Keys.ESCAPE), intArrayOf(Keys.BACK)) {
-        Hex.assets.clickSound?.play(Settings.volume)
+        playClick()
         backToPreviousScreen()
       }
       init(it)

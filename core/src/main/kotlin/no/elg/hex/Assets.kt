@@ -31,8 +31,10 @@ import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 import ktx.style.imageTextButton
 import ktx.style.label
+import ktx.style.list
 import ktx.style.menu
 import ktx.style.menuItem
+import ktx.style.selectBox
 import ktx.style.separator
 import ktx.style.set
 import ktx.style.sizes
@@ -303,7 +305,10 @@ class Assets : AssetManager() {
         visTextButton(extend = "blue") { font = notFlippedFont }
         visTextButton(name = "dangerous", extend = "default") {
           font = notFlippedFont
-          fontColor = Color.valueOf("#5e2000")
+          fontColor = Color.WHITE
+          up = newDrawable("white", Color.valueOf("#FF4136"))
+          down = newDrawable("white", Color.FIREBRICK)
+          over = newDrawable("white", Color.FIREBRICK)
         }
 
         visTextButton(name = "mapeditor-editor-item", extend = "default") {
@@ -333,6 +338,14 @@ class Assets : AssetManager() {
         }
         separator(extend = "default") {
           this.thickness = 1
+          this.background = newDrawable("white", Color.LIGHT_GRAY)
+        }
+        selectBox(extend = "default") {
+          font = notFlippedFont
+          listStyle = list(extend = "default") {
+            font = notFlippedFont
+            background = getDrawable("window")
+          }
         }
       }
       Scene2DSkin.defaultSkin = VisUI.getSkin()
