@@ -7,6 +7,7 @@ import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.delegate.PreferenceDelegate
+import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.resetAllIslandProgress
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -146,49 +147,28 @@ object Settings {
   var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.args.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { !Hex.debug })
 
-  private const val DELETE_ALL_PROGRESS_STRING = "delete all"
-  var deleteAllProgress by PreferenceDelegate(
-    "Type '$DELETE_ALL_PROGRESS_STRING' to confirm",
-    runOnChangeOnInit = false,
-    priority = 10_000,
-    onChange = { delegate, _, new ->
-      if (new.equals(DELETE_ALL_PROGRESS_STRING, true)) {
-        resetAllIslandProgress()
-        MessagesRenderer.publishWarning("All progress have been deleted")
-        Hex.screen = LevelSelectScreen()
-        return@PreferenceDelegate delegate.initialValue
+  val deleteAllProcess = ResetSetting("Are you use you want to delete all your progress?") {
+    resetAllIslandProgress()
+    MessagesRenderer.publishWarning("All progress have been deleted")
+    Hex.screen = LevelSelectScreen()
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  val resetSettings = ResetSetting("Are you use you want to reset settings?") {
+    Gdx.app.postRunnable {
+      for (
+      (property, loopDelegate) in Settings::class.declaredMemberProperties //
+        .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
+        .filterValues { it is PreferenceDelegate<*> && it !is ResetSetting } //
+      ) {
+        // Nullable types are not allowed, this is ok cast
+        (loopDelegate as PreferenceDelegate<Any>).setValue(Settings, property, loopDelegate.initialValue)
       }
-      return@PreferenceDelegate new
     }
-  )
 
-  private const val RESET_SETTINGS_STRING = "reset settings"
-  var resetSettings by PreferenceDelegate(
-    "Type '$RESET_SETTINGS_STRING' to confirm",
-    runOnChangeOnInit = false,
-    priority = 10_000,
-    onChange = { delegate, _, new ->
-      if (new.equals(RESET_SETTINGS_STRING, true)) {
-
-        Gdx.app.postRunnable {
-          for (
-          (property, loopDelegate) in Settings::class.declaredMemberProperties //
-            .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
-            .filterValues { it is PreferenceDelegate<*> } //
-          ) {
-
-            // Nullable types are not allowed, this is ok cast
-            (loopDelegate as PreferenceDelegate<Any>).setValue(Settings, property, loopDelegate.initialValue)
-          }
-        }
-
-        MessagesRenderer.publishWarning("All settings have been reset")
-        Hex.screen = LevelSelectScreen()
-        return@PreferenceDelegate delegate.initialValue
-      }
-      return@PreferenceDelegate new
-    }
-  )
+    MessagesRenderer.publishWarning("All settings have been reset")
+    Hex.screen = LevelSelectScreen()
+  }
 
   private var lastGotoCalled = 0L
   private fun gotoLevelSelect() {

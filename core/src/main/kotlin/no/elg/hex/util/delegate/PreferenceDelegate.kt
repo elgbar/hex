@@ -8,7 +8,7 @@ import no.elg.hex.util.trace
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
-class PreferenceDelegate<T : Any>(
+open class PreferenceDelegate<T : Any>(
   /**
    * Initial value this setting should have
    */
@@ -54,6 +54,7 @@ class PreferenceDelegate<T : Any>(
   fun displayRestartWarning() = requireRestart && changed
 
   init {
+    @Suppress("LeakingThis")
     require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char || initialValue is Enum<*>) {
       "Type must either be Enum, Number, String, Char, or Boolean. The given type us ${initialValue::class.simpleName}"
     }
@@ -66,7 +67,6 @@ class PreferenceDelegate<T : Any>(
     }
   }
 
-  @Suppress("UNCHECKED_CAST")
   operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
     currentValue?.also { return it }
 
@@ -99,6 +99,7 @@ class PreferenceDelegate<T : Any>(
       return null
     }
 
+    @Suppress("UNCHECKED_CAST")
     return when (initialValue) {
       is Boolean -> preferences.getBoolean(propertyName, initialValue as Boolean)
       is Int -> preferences.getInteger(propertyName, initialValue as Int)
