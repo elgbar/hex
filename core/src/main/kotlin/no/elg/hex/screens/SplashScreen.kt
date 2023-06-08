@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Align
 import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
-import no.elg.hex.preview.IslandPreviewCollection
 import no.elg.hex.util.play
 
 /** @author Elg */
@@ -29,8 +28,8 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
 
   override fun render(delta: Float) {
     val assetsDone = Hex.assets.update() // Don't set a time here, we WANT one task per frame
-    val renderingLeft = IslandPreviewCollection.renderingCount.get()
-    if (!Hex.paused && Hex.assets.mainFinishedLoading && renderingLeft == 0 && assetsDone) {
+    val previewRenderingDone = Hex.assets.islandPreviews.size
+    if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.islandFiles.size == previewRenderingDone && assetsDone) {
       Hex.assets.islandPreviews.sort()
       val realNextScreen = nextScreen
       if (realNextScreen != null && realNextScreen !== this) {
@@ -46,7 +45,7 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
           """
           |Rendering island previews
           |
-          |${totalIslands - renderingLeft} / $totalIslands
+          |$previewRenderingDone / $totalIslands
           |
           |${System.currentTimeMillis() - startTime} ms
           """.trimMargin()

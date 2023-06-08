@@ -50,12 +50,14 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
+  val size get() = islandPreviews.size
+
   fun sort() {
     Gdx.app.postRunnable {
       synchronized(internalPreviewRendererQueue) {
         if (!Hex.args.mapEditor) {
           islandPreviews.sortBy {
-            val authorRoundsToBeat = it.island?.authorRoundsToBeat
+            val authorRoundsToBeat = it.island.authorRoundsToBeat
             if (authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) Int.MAX_VALUE else authorRoundsToBeat
           }
         }

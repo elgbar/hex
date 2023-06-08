@@ -6,6 +6,7 @@ import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.screens.LevelSelectScreen
+import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.resetAllIslandProgress
@@ -150,7 +151,7 @@ object Settings {
   val deleteAllProgress = ResetSetting("Are you sure you want to delete all your progress?") {
     resetAllIslandProgress()
     MessagesRenderer.publishWarning("All progress have been deleted")
-    Hex.screen = LevelSelectScreen()
+    Hex.screen = SplashScreen(LevelSelectScreen())
   }
 
   @Suppress("UNCHECKED_CAST")
