@@ -80,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [visual] Fix capitals rendering "buy" flag when it is an AIs turn
 * [visual] Fix pieces being animated when in map editor mode
 * [visual] Black bars on android
+* [visual] Fix island preview might be clipped if the island is very large
 * [technical] Fix map editor not finding the island folder on a fresh clone
 * [technical] Fix saving while holding piece threw a serialization exception
 * [technical] Fix double recording of selecting territory event

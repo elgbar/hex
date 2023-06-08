@@ -84,10 +84,20 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
 
     camera.position.x = islandCenterX.toFloat()
     camera.position.y = islandCenterY.toFloat()
-    camera.zoom = max(widthZoom, heightZoom).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
+    camera.zoom = max(widthZoom, heightZoom).toFloat()
     updateCamera()
   }
 
+  fun enforceCameraBounds(updateCamera: Boolean = true) {
+    val (maxX, minX, maxY, minY) = visibleGridSize
+    camera.position.x = camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+    camera.position.y = camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+    camera.zoom = camera.zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
+    if (updateCamera) {
+      camera.update()
+      Gdx.graphics.requestRendering()
+    }
+  }
   override fun show() {
     basicIslandInputProcessor.show()
 
