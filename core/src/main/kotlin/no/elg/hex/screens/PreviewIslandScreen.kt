@@ -13,7 +13,8 @@ import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.renderer.VerticesRenderer
-import no.elg.hex.util.component6
+import no.elg.hex.screens.SplashIslandScreen.Companion.createIslandScreen
+import no.elg.hex.util.VisibleGrid.Companion.calculateVisibleGrid
 import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
@@ -22,29 +23,10 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
 
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
-  fun enforceCameraBounds() {
-    val (maxX, minX, maxY, minY) = visibleGridSize
-    camera.position.x = camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
-    camera.position.y = camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
-  }
+  var smoothTransition: SmoothTransition? = null
 
-  private fun calcVisibleGridSize(): DoubleArray {
-    val visible = island.visibleHexagons
-    if (visible.isEmpty()) return doubleArrayOf(.0, .0, .0, .0, .0, .0)
-
-    val minX = visible.minOf { it.externalBoundingBox.x }
-    val maxX = visible.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
-
-    val minY = visible.minOf { it.externalBoundingBox.y + it.externalBoundingBox.height }
-    val maxY = visible.maxOf { it.externalBoundingBox.y }
-
-    val maxInvX = island.allHexagons.maxOf { it.externalBoundingBox.x + it.externalBoundingBox.width }
-    val maxInvY = island.allHexagons.maxOf { it.externalBoundingBox.y }
-
-    return doubleArrayOf(maxX, minX, maxY, minY, maxInvX, maxInvY)
-  }
-
-  private val visibleGridSize by lazy { calcVisibleGridSize() }
+  private val visibleGridSize get() = if (Hex.args.mapEditor) { island.calculateVisibleGrid() } else { lazyVisibleGridSize }
+  private val lazyVisibleGridSize by lazy { island.calculateVisibleGrid() }
   private val verticesRenderer by lazy { VerticesRenderer(this) }
   private val outlineRenderer by lazy { OutlineRenderer(this) }
   private val spriteRenderer by lazy { SpriteRenderer(this) }
