@@ -27,7 +27,9 @@ fun PreviewIslandScreen.saveProgress() {
   } else {
     PreviewModifier.NOTHING
   }
-  Hex.assets.islandPreviews.updateSelectPreview(id, modifier, island)
+  if (!Hex.paused) {
+    Hex.assets.islandPreviews.updateSelectPreview(id, modifier, island)
+  }
 }
 
 fun clearIslandProgress(id: Int) {
