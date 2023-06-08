@@ -354,12 +354,12 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
 
-    val editorsWindow1 = editorsWindows.filter {
+    val filteredEditorsWindows = editorsWindows.filter {
       val window = it.key
       window.isShown().also { b -> if (b) stageScreen.stage -= window }
     }
     stageScreen.resize(width, height)
-    editorsWindow1.forEach {
+    filteredEditorsWindows.forEach {
       it.key.show(stageScreen.stage, false, 0f)
       it.value(it.key)
     }

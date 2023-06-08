@@ -15,7 +15,7 @@ import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.SplashIslandScreen.Companion.createIslandScreen
-import no.elg.hex.util.VisibleGrid.Companion.calculateVisibleGrid
+import no.elg.hex.util.GridSize.Companion.calculateGridSize
 import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
@@ -28,11 +28,11 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
 
   private val visibleGridSize
     get() = if (Hex.args.mapEditor) {
-      island.calculateVisibleGrid()
+      island.calculateGridSize()
     } else {
       lazyVisibleGridSize
     }
-  private val lazyVisibleGridSize by lazy { island.calculateVisibleGrid() }
+  private val lazyVisibleGridSize by lazy { island.calculateGridSize() }
   private val verticesRenderer by lazy { VerticesRenderer(this) }
   private val outlineRenderer by lazy { OutlineRenderer(this) }
   private val spriteRenderer by lazy { SpriteRenderer(this) }
@@ -40,8 +40,6 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
 
   private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private lateinit var visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>
-
-  private var first: Boolean = true
 
   override fun render(delta: Float) {
     verticesRenderer.frameUpdate()
@@ -101,24 +99,16 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
   }
 
   override fun resize(width: Int, height: Int) {
-
     super.resize(width, height)
     if (StrengthBarRenderer.isEnabled) {
-      strengthBarRenderer.resize(Gdx.graphics.width, Gdx.graphics.height)
+      strengthBarRenderer.resize(width, height)
     }
-
-    if (first) {
-      centerCamera()
-      first = false
-    } else {
-      enforceCameraBounds()
-    }
+    centerCamera()
   }
 
   override fun recreate(): AbstractScreen =
     createIslandScreen(id, island, false).also {
       Gdx.app.postRunnable {
-        it.first = false
         it.resize(Gdx.graphics.width, Gdx.graphics.height)
         it.camera.combined.set(camera.combined)
         it.camera.position.set(camera.position)
