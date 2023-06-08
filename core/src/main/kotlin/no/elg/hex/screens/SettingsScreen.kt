@@ -71,10 +71,8 @@ class SettingsScreen : OverlayScreen() {
           // allow scroll past back button
           padBottom(this.prefHeight)
 
-          val minWidth = 0.4f
-
           val init: (@Scene2dDsl VisLabel).(Cell<*>) -> Unit = {
-            it.minWidth(Value.percentWidth(minWidth, this@visTable))
+            it.minWidth(Value.percentWidth( 0.4f, this@visTable))
             it.expandX()
             it.center()
             this.setAlignment(Align.center)
@@ -196,11 +194,6 @@ class SettingsScreen : OverlayScreen() {
           this.selected = property.get(Settings) as Enum<*>
         }
         onHideListeners += { delegate.hide(property) }
-//        for (child in this.scrollPane.children) {
-//          val childCell = this@addSetting.getCell(child)
-//          childCell.prefWidth(Value.percentHeight(0.15f, this@addSetting))
-//          childCell.prefHeight(Value.percentHeight(0.05f, this@addSetting))
-//        }
 
         onChange = {
           property.set(Settings, this.selected)
