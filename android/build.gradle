@@ -29,6 +29,7 @@ android {
       jniLibs.srcDirs = ['libs']
     }
   }
+  var fullVersion = "$hexVersion-avc$androidVersionCode"
   packagingOptions {
     resources {
       excludes += ['META-INF/robovm/ios/robovm.xml']
@@ -39,7 +40,7 @@ android {
     minSdkVersion 26
     targetSdkVersion androidSdkVersion
     versionCode androidVersionCode
-    versionName hexVersion
+    versionName fullVersion
   }
   buildTypes {
     release {
