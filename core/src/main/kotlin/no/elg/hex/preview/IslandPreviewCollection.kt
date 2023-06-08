@@ -109,6 +109,7 @@ class IslandPreviewCollection : Disposable {
   ) = Runnable {
     val islandScreen = PreviewIslandScreen(-1, island, true)
     islandScreen.resize(previewWidth, previewHeight)
+    islandScreen.centerCamera()
     val buffer = FrameBuffer(
       Pixmap.Format.RGBA8888,
       previewWidth.coerceAtLeast(1),
@@ -234,12 +235,8 @@ class IslandPreviewCollection : Disposable {
     maybeIsland: Island? = null
   ) {
     KtxAsync.launch(Hex.asyncThread) {
-      val metadata = synchronized(internalPreviewRendererQueue) {
-        islandPreviews.firstOrNull { it.id == id }
-      }
-      if (metadata == null) {
-        MessagesRenderer.publishWarning("Unknown island with id $id")
-        return@launch
+      synchronized(internalPreviewRendererQueue) {
+        islandPreviews.firstOrNull { it.id == id } ?: return@launch
       }
 
       val island = if (maybeIsland == null) {

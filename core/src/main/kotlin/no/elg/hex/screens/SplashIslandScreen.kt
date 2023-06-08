@@ -16,7 +16,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.loadIslandSync
 
-class SplashIslandScreen(val id: Int, private var island: Island? = null) : AbstractScreen() {
+class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScreen() {
 
   var loadable: Boolean = true
     private set
@@ -37,7 +37,7 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
     } else {
       Hex.screen = if (initIsland != null) {
         dispose()
-        createIslandScreen(initIsland)
+        createIslandScreen(id, initIsland)
       } else {
         KtxAsync.launch(Hex.asyncThread) {
           island = loadIslandSync(id)
@@ -48,14 +48,11 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
     }
   }
 
-  private fun createIslandScreen(island: Island) =
-    if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)
-
   override fun render(delta: Float) {
     val currIsland = island
     if (currIsland != null) {
       loading = false
-      Hex.screen = createIslandScreen(currIsland)
+      Hex.screen = createIslandScreen(id, currIsland)
       Gdx.app.log("IS SPLASH", "Loaded island $id in ${System.currentTimeMillis() - startTime} ms")
     } else {
       batch.use {
@@ -104,5 +101,13 @@ class SplashIslandScreen(val id: Int, private var island: Island? = null) : Abst
         return true
       }
     }
+
+    fun createIslandScreen(id: Int, island: Island, center: Boolean = true) =
+      (if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)).also {
+//        if (center) {
+//          it.resize(Gdx.graphics.width, Gdx.graphics.height)
+//          it.centerCamera()
+//        }
+      }
   }
 }

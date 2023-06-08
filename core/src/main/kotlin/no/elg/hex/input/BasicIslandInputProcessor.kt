@@ -47,7 +47,6 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
       screen.camera.translate(dx, dy)
       screen.enforceCameraBounds()
-      screen.camera.update()
       return false
     }
     return false

@@ -34,8 +34,6 @@ data class SmoothTransition(
         camera.position.y = Interpolation.smooth.apply(yPositionOrigin, yTarget, progress)
       }
       screen.enforceCameraBounds()
-      camera.update()
-
       Gdx.graphics.requestRendering()
       return false
     }

@@ -81,10 +81,8 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
       } else if (!screen.isDisposed) {
         Hex.screen = screen
         return
-      } else if (screen is PreviewIslandScreen) {
-        play(screen.id, screen.island)
       } else if (screen is SplashIslandScreen) {
-        play(screen.id)
+        play(screen.id, screen.island)
       } else if (screen is ReloadableScreen) {
         Hex.screen = screen.recreate()
       } else {

@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
 import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.event.HexagonVisibilityChanged
@@ -19,22 +20,28 @@ import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
 /** @author Elg */
-open class PreviewIslandScreen(val id: Int, val island: Island, private val isPreviewRenderer: Boolean) : AbstractScreen() {
+open class PreviewIslandScreen(val id: Int, val island: Island, private val isPreviewRenderer: Boolean) : AbstractScreen(), ReloadableScreen {
 
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
   var smoothTransition: SmoothTransition? = null
 
-  private val visibleGridSize get() = if (Hex.args.mapEditor) { island.calculateVisibleGrid() } else { lazyVisibleGridSize }
+  private val visibleGridSize
+    get() = if (Hex.args.mapEditor) {
+      island.calculateVisibleGrid()
+    } else {
+      lazyVisibleGridSize
+    }
   private val lazyVisibleGridSize by lazy { island.calculateVisibleGrid() }
   private val verticesRenderer by lazy { VerticesRenderer(this) }
   private val outlineRenderer by lazy { OutlineRenderer(this) }
   private val spriteRenderer by lazy { SpriteRenderer(this) }
   private val strengthBarRenderer by lazy { StrengthBarRenderer(this.island) }
+
   private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private lateinit var visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>
 
-  var smoothTransition: SmoothTransition? = null
+  private var first: Boolean = true
 
   override fun render(delta: Float) {
     verticesRenderer.frameUpdate()
@@ -53,51 +60,72 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
     }
   }
 
-  override fun resize(width: Int, height: Int) {
-    super.resize(width, height)
+  fun centerCamera() {
     val data = island.grid.gridData
     if (island.allHexagons.isEmpty()) return
 
-    val (maxX, minX, maxY, minY, maxInvX, maxInvY) = if (Hex.args.mapEditor) {
-      calcVisibleGridSize()
-    } else {
-      visibleGridSize
+    with(visibleGridSize) {
+      // Sum the distance from the edge of the grid to the first visible hexagon
+      // |.###..| (`.` are invisible, `#` are visible hexagons)
+      // The offset would then be 3
+      val gridWidthOffset = maxInvX - minX - maxX
+      val gridHeightOffset = maxInvY - minY - maxY
+
+      val islandCenterX = (maxInvX - gridWidthOffset) / 2
+      val islandCenterY = (maxInvY - gridHeightOffset) / 2
+
+      // Add some padding as the min/max x/y are calculated from the center of the hexagons
+      val widthZoom = (maxX - minX + ZOOM_PADDING_HEXAGONS * data.hexagonWidth) / camera.viewportWidth
+      val heightZoom = (maxY - minY + ZOOM_PADDING_HEXAGONS * data.hexagonHeight) / camera.viewportHeight
+
+      camera.position.x = islandCenterX.toFloat()
+      camera.position.y = islandCenterY.toFloat()
+      camera.zoom = max(widthZoom, heightZoom).toFloat()
     }
-
-    if (StrengthBarRenderer.isEnabled) {
-      strengthBarRenderer.resize(width, height)
+    if (!isPreviewRenderer) {
+      enforceCameraBounds(false)
     }
-
-    // Sum the distance from the edge of the grid to the first visible hexagon
-    // |.###..| (`.` are invisible, `#` are visible hexagons)
-    // The offset would then be 3
-    val gridWidthOffset = maxInvX - minX - maxX
-    val gridHeightOffset = maxInvY - minY - maxY
-
-    val islandCenterX = (maxInvX - gridWidthOffset) / 2
-    val islandCenterY = (maxInvY - gridHeightOffset) / 2
-
-    // Add some padding as the min/max x/y are calculated from the center of the hexagons
-    val padding = 2
-    val widthZoom = (maxX - minX + padding * data.hexagonWidth) / camera.viewportWidth
-    val heightZoom = (maxY - minY + padding * data.hexagonHeight) / camera.viewportHeight
-
-    camera.position.x = islandCenterX.toFloat()
-    camera.position.y = islandCenterY.toFloat()
-    camera.zoom = max(widthZoom, heightZoom).toFloat()
     updateCamera()
   }
 
   fun enforceCameraBounds(updateCamera: Boolean = true) {
-    val (maxX, minX, maxY, minY) = visibleGridSize
-    camera.position.x = camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
-    camera.position.y = camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+    with(visibleGridSize) {
+      camera.position.x = camera.position.x.coerceIn(minX.toFloat(), maxX.toFloat())
+      camera.position.y = camera.position.y.coerceIn(minY.toFloat(), maxY.toFloat())
+    }
     camera.zoom = camera.zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
     if (updateCamera) {
-      camera.update()
+      updateCamera()
       Gdx.graphics.requestRendering()
     }
   }
+
+  override fun resize(width: Int, height: Int) {
+
+    super.resize(width, height)
+    if (StrengthBarRenderer.isEnabled) {
+      strengthBarRenderer.resize(Gdx.graphics.width, Gdx.graphics.height)
+    }
+
+    if (first) {
+      centerCamera()
+      first = false
+    } else {
+      enforceCameraBounds()
+    }
+  }
+
+  override fun recreate(): AbstractScreen =
+    createIslandScreen(id, island, false).also {
+      Gdx.app.postRunnable {
+        it.first = false
+        it.resize(Gdx.graphics.width, Gdx.graphics.height)
+        it.camera.combined.set(camera.combined)
+        it.camera.position.set(camera.position)
+        it.camera.zoom = camera.zoom
+      }
+    }
+
   override fun show() {
     basicIslandInputProcessor.show()
 
@@ -134,5 +162,9 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
     if (::visibilityChangedListener.isInitialized) {
       visibilityChangedListener.dispose()
     }
+  }
+
+  companion object {
+    const val ZOOM_PADDING_HEXAGONS = 2
   }
 }
