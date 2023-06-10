@@ -11,8 +11,6 @@ interface AI {
 
   /**
    * Do the AI's turn
-   *
-   * @return If the AI is still alive, i.e., `false` if the AI is dead
    */
-  suspend fun action(island: Island, gameIntegration: GameInteraction): Boolean
+  suspend fun action(island: Island, gameInteraction: GameInteraction)
 }

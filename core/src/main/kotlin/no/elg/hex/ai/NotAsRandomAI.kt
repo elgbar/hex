@@ -98,7 +98,7 @@ class NotAsRandomAI(
 //      Baron::class,
     )
 
-  override suspend fun action(island: Island, gameInteraction: GameInteraction): Boolean {
+  override suspend fun action(island: Island, gameInteraction: GameInteraction) {
     island.select(island.visibleHexagons.first())
     val territories = island.getTerritories(team)
     for (territory in territories) {
@@ -116,7 +116,6 @@ class NotAsRandomAI(
     }
     island.select(null)
     resetBlacklists()
-    return territories.isNotEmpty()
   }
 
   private fun pickUp(territory: Territory, gameInteraction: GameInteraction): Boolean {
