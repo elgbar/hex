@@ -28,6 +28,7 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.util.buttonPadding
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
@@ -346,7 +347,7 @@ class SettingsScreen : OverlayScreen() {
   }
 
   private fun settingsStyle(cell: Cell<*>) {
-    cell.pad(0f)
+    cell.pad(buttonPadding)
     cell.space(platformSpacing)
     cell.expandX()
   }
