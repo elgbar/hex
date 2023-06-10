@@ -27,7 +27,7 @@ import no.elg.hex.Hex
 import no.elg.hex.platform.PlatformType.DESKTOP
 import no.elg.hex.platform.PlatformType.MOBILE
 
-val buttonPadding: Float
+val platformButtonPadding: Float
   get() = when (Hex.platform.type) {
     MOBILE -> 45f
     DESKTOP -> 10f
@@ -44,8 +44,8 @@ val platformCheckBoxSize: Float
   }
 
 @Scene2dDsl
-fun Button.padAndSpace(cell: Cell<*>) {
-  cell.pad(buttonPadding)
+fun padAndSpace(cell: Cell<*>) {
+  cell.pad(platformButtonPadding)
   cell.space(platformSpacing)
 }
 
@@ -214,7 +214,7 @@ fun StageWidget.confirmWindow(
       }
 
       visTextButton("Yes") {
-        pad(buttonPadding)
+        pad(platformButtonPadding)
         it.expandX()
         it.center()
         onClick {
@@ -229,7 +229,7 @@ fun StageWidget.confirmWindow(
       }
 
       visTextButton("No") {
-        pad(buttonPadding)
+        pad(platformButtonPadding)
         it.expandX()
         it.center()
         onClick {
@@ -274,7 +274,7 @@ fun StageWidget.okWindow(
     row()
 
     visTextButton("OK") {
-      this.pad(buttonPadding)
+      this.pad(platformButtonPadding)
       it.expandX()
       it.center()
       it.space(10f)

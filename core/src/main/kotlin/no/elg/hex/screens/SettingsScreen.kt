@@ -28,7 +28,7 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.util.buttonPadding
+import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
@@ -190,7 +190,8 @@ class SettingsScreen : OverlayScreen() {
         val cell = this@addSetting.getCell(this)
         cell.prefWidth(Value.percentHeight(0.15f, this@addSetting))
         cell.prefHeight(Value.percentHeight(0.03f, this@addSetting))
-        commonStyle(cell)
+        commonStyle(cell, false)
+
         onShowListeners += {
           this.selected = property.get(Settings) as Enum<*>
         }
@@ -347,7 +348,7 @@ class SettingsScreen : OverlayScreen() {
   }
 
   private fun settingsStyle(cell: Cell<*>) {
-    cell.pad(buttonPadding)
+    cell.pad(platformButtonPadding)
     cell.space(platformSpacing)
     cell.expandX()
   }
