@@ -28,6 +28,7 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
@@ -114,7 +115,11 @@ class SettingsScreen : OverlayScreen() {
             val name = property.name.toTitleCase()
             if (property.returnType.jvmErasure.isSubclassOf(ResetSetting::class)) {
               val delegate = property.get(Settings) as ResetSetting
-              val confirmResetWindow = this@actors.confirmWindow(name, delegate.confirmText) { delegate.onResetConfirmed() }
+              val confirmResetWindow = this@actors.confirmWindow(name, delegate.confirmText) {
+                delegate.onResetConfirmed()
+                MessagesRenderer.publishWarning("Resetting $name")
+                Hex.screen = SplashScreen(LevelSelectScreen())
+              }
               row()
               visTextButton(name, "dangerous") {
                 settingsStyle(it)

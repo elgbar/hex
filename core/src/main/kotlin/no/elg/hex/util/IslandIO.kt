@@ -24,6 +24,10 @@ fun getIslandLevelFileName(id: Int): String = "$ISLAND_SAVES_DIR.json"
 
 fun getIslandFile(id: Int, preview: Boolean = false, allowInternal: Boolean = true): FileHandle {
   val path = getIslandFileName(id, preview)
+  return getIslandFile(path, allowInternal)
+}
+
+fun getIslandFile(path: String, allowInternal: Boolean): FileHandle{
   val local = Gdx.files.local(path)
   return if (local.exists()) local else if (allowInternal) Gdx.files.internal(path) else local
 }

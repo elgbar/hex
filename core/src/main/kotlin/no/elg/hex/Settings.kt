@@ -150,8 +150,6 @@ object Settings {
 
   val deleteAllProgress = ResetSetting("Are you sure you want to delete all your progress?") {
     resetAllIslandProgress()
-    MessagesRenderer.publishWarning("All progress have been deleted")
-    Hex.screen = SplashScreen(LevelSelectScreen())
   }
 
   @Suppress("UNCHECKED_CAST")
@@ -166,9 +164,6 @@ object Settings {
         (loopDelegate as PreferenceDelegate<Any>).setValue(Settings, property, loopDelegate.initialValue)
       }
     }
-
-    MessagesRenderer.publishWarning("All settings have been reset")
-    Hex.screen = LevelSelectScreen()
   }
 
   private var lastGotoCalled = 0L

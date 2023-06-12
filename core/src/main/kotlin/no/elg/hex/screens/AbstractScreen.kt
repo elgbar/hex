@@ -16,9 +16,7 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
   var isDisposed = false
     private set
 
-  val camera: OrthographicCamera by lazy {
-    OrthographicCamera().apply { setToOrtho(yDown) }
-  }
+  val camera: OrthographicCamera by lazy { OrthographicCamera().apply { setToOrtho(yDown) } }
 
   abstract override fun render(delta: Float)
 

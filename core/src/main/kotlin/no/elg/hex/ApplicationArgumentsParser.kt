@@ -26,6 +26,7 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val `update-previews` by parser.flagging("Update pre-rendered previews of islands")
   val `update-saved-islands` by parser.flagging("Update the saved islands by saving them again after loading them. Only really useful when changing the save format")
   val `load-all-islands` by parser.flagging("Load all islands at startup instead of when first played")
+  val `reset-all` by parser.flagging("Resetting settings and progress")
 
   val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toInt() }.default { 0 }
   val profile by parser.flagging("Enable GL profiling")

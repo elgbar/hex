@@ -19,6 +19,7 @@ data class IslandDto(
   val hexagonData: SortedMap<CubeCoordinate, HexagonData>,
   val round: Int,
   val team: Team = Team.LEAF,
+  @Deprecated("Use [IslandMetadataDto#authorRoundsToBeat]")
   val authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT
 ) {
   init {

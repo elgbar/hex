@@ -1,6 +1,5 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Scaling.fit
@@ -18,7 +17,7 @@ import kotlin.contracts.contract
 /** @author Elg */
 open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false) {
 
-  val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
+  val stage by lazy { Stage(ScalingViewport(fit, 1f, 1f, camera)) }
 
   val rootTable: KVisTable get() = internalRootTable
   private lateinit var internalRootTable: KVisTable
