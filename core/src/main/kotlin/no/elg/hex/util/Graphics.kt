@@ -9,8 +9,6 @@ import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
-import com.badlogic.gdx.utils.Base64Coder
-import com.badlogic.gdx.utils.Base64Coder.urlsafeMap
 import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
@@ -33,17 +31,16 @@ fun FrameBuffer.takeScreenshot(fileHandle: FileHandle) {
   }
 }
 
-fun FrameBuffer.saveScreenshotAsString(): String {
+fun FrameBuffer.toBytes(): ByteArray {
   val tmpFile = Gdx.files.local("tmp/${TimeUtils.nanoTime()}")
   takeScreenshot(tmpFile)
-  return String(Base64Coder.encode(tmpFile.readBytes(), urlsafeMap)).also {
+  return tmpFile.file().readBytes().also {
     tmpFile.delete()
   }
 }
 
-fun decodeStringToTexture(encoded: String): Texture {
-  val decoded = Base64Coder.decode(encoded, urlsafeMap)
-  return Texture(Pixmap(decoded, 0, decoded.size))
+fun textureFromBytes(encoded: ByteArray): Texture {
+  return Texture(Pixmap(encoded, 0, encoded.size))
 }
 
 fun Camera.resetHdpi() = HdpiUtils.glViewport(0, 0, viewportWidth.toInt(), viewportHeight.toInt())

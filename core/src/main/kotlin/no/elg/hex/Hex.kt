@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.dataformat.smile.databind.SmileMapper
 import com.fasterxml.jackson.module.kotlin.jsonMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.kotcrab.vis.ui.VisUI
@@ -49,6 +50,11 @@ import kotlin.system.exitProcess
 object Hex : ApplicationAdapter() {
 
   const val LAUNCH_PREF = "launchPref"
+
+
+  @JvmStatic
+  val smileMapper: SmileMapper = SmileMapper.builder().addModule(kotlinModule())
+    .build()
 
   @JvmStatic
   val mapper = jsonMapper {
@@ -115,7 +121,7 @@ object Hex : ApplicationAdapter() {
 
   override fun create() {
 
-    if(args.`reset-all`){
+    if (args.`reset-all`) {
       islandPreferences.clear()
       Settings.resetSettings.onResetConfirmed()
     }

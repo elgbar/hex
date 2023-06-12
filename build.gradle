@@ -196,6 +196,7 @@ project(":core") {
     api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
     api "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.15.2"
 
     testApi "org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion"
     testApi("org.junit.jupiter:junit-jupiter-api:$junitVersion")

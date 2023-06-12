@@ -23,7 +23,7 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.isLoaded
-import no.elg.hex.util.saveScreenshotAsString
+import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -36,8 +36,7 @@ class IslandPreviewCollection : Disposable {
 
   fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> {
     synchronized(internalPreviewRendererQueue) {
-//      sort()
-      return fastIslandPreviews.toList().withIndex()
+      return fastIslandPreviews.withIndex()
     }
   }
 
@@ -219,7 +218,7 @@ class IslandPreviewCollection : Disposable {
       val rendereredPreviewSize = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
       renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, modifier) { preview ->
 
-        val islandMetadata = FastIslandMetadata(id, island.authorRoundsToBeat, preview.saveScreenshotAsString())
+        val islandMetadata = FastIslandMetadata(id, island.authorRoundsToBeat, preview.toBytes())
         islandMetadata.save()
         synchronized(internalPreviewRendererQueue) {
           val existingIndex = fastIslandPreviews.indexOfFirst { it.id == id }
