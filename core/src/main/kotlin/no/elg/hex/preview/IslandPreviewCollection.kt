@@ -30,24 +30,27 @@ import java.util.concurrent.atomic.AtomicInteger
 class IslandPreviewCollection : Disposable {
 
   private val fastIslandPreviews = GdxArray<FastIslandMetadata>()
+  private var dirty = true
   private val internalPreviewRendererQueue = GdxArray<Runnable>()
   private var lastPostedFrameId = 0L
   private val screen get() = Hex.screen
 
   fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> {
     synchronized(internalPreviewRendererQueue) {
-      return fastIslandPreviews.withIndex()
+      if (dirty) {
+        sort()
+      }
+      return fastIslandPreviews.toList().withIndex()
     }
   }
 
   val size get() = fastIslandPreviews.size
 
-  fun sort() {
-    Gdx.app.postRunnable {
+  private fun sort() {
+    dirty = false
+    if (!Hex.args.mapEditor) {
       synchronized(internalPreviewRendererQueue) {
-        if (!Hex.args.mapEditor) {
-          fastIslandPreviews.sort()
-        }
+        fastIslandPreviews.sort()
       }
     }
   }
@@ -189,6 +192,7 @@ class IslandPreviewCollection : Disposable {
       }
       synchronized(internalPreviewRendererQueue) {
         fastIslandPreviews.add(FastIslandMetadata.load(id))
+        dirty = true
       }
     }
   }
@@ -225,6 +229,7 @@ class IslandPreviewCollection : Disposable {
           } else {
             fastIslandPreviews.set(existingIndex, islandMetadata)
           }
+          dirty = true
         }
       }
     }

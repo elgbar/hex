@@ -30,7 +30,6 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
     val assetsDone = Hex.assets.update() // Don't set a time here, we WANT one task per frame
     val previewRenderingDone = Hex.assets.islandPreviews.size
     if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.islandFiles.size == previewRenderingDone && assetsDone) {
-      Hex.assets.islandPreviews.sort()
       val realNextScreen = nextScreen
       if (realNextScreen != null && realNextScreen !== this) {
         refreshAndSetScreen(realNextScreen)
