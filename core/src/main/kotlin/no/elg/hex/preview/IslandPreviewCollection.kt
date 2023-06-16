@@ -40,7 +40,7 @@ class IslandPreviewCollection : Disposable {
       if (dirty) {
         sort()
       }
-      return fastIslandPreviews.toList().withIndex()
+      return fastIslandPreviews.withIndex()
     }
   }
 
