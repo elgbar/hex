@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
 import no.elg.hex.Hex
-import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.screens.LevelCreationScreen
@@ -24,6 +23,7 @@ import no.elg.hex.util.component4
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
+import no.elg.hex.util.playClick
 import java.lang.Float.max
 
 /** @author Elg */
@@ -83,7 +83,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       id != INVALID_ISLAND_INDEX -> play(id)
       else -> return false
     }
-    Hex.assets.clickSound?.play(Settings.volume)
+    playClick()
     return true
   }
 

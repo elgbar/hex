@@ -51,7 +51,6 @@ object Hex : ApplicationAdapter() {
 
   const val LAUNCH_PREF = "launchPref"
 
-
   @JvmStatic
   val smileMapper: SmileMapper = SmileMapper.builder().addModule(kotlinModule())
     .build()
@@ -120,7 +119,6 @@ object Hex : ApplicationAdapter() {
     }
 
   override fun create() {
-
     if (args.`reset-all`) {
       islandPreferences.clear()
       Settings.resetSettings.onResetConfirmed()

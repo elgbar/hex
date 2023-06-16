@@ -29,12 +29,12 @@ import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
-import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.findEnumValues
 import no.elg.hex.util.padAndSpace
+import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.platformCheckBoxSize
 import no.elg.hex.util.platformSpacing
 import no.elg.hex.util.playClick
@@ -52,6 +52,7 @@ class SettingsScreen : OverlayScreen() {
 
   private val onShowListeners = mutableListOf<() -> Unit>()
   private val onHideListeners = mutableListOf<() -> Unit>()
+  private var isShown = false
 
   init {
     stage.actors {
@@ -74,7 +75,7 @@ class SettingsScreen : OverlayScreen() {
           padBottom(this.prefHeight)
 
           val init: (@Scene2dDsl VisLabel).(Cell<*>) -> Unit = {
-            it.minWidth(Value.percentWidth( 0.4f, this@visTable))
+            it.minWidth(Value.percentWidth(0.4f, this@visTable))
             it.expandX()
             it.center()
             this.setAlignment(Align.center)
@@ -239,7 +240,10 @@ class SettingsScreen : OverlayScreen() {
             restartLabel.fire(ChangeEvent())
           }
 
-          onChange { onChange() }
+          onChange {
+            playClick()
+            onChange()
+          }
         }
 
         String::class ->
@@ -363,9 +367,11 @@ class SettingsScreen : OverlayScreen() {
     for (function in onShowListeners) {
       function()
     }
+    isShown = true
   }
 
   override fun hide() {
+    isShown = false
     super.hide()
     for (function in onHideListeners) {
       function()

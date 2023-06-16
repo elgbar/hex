@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
-import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.screens.LevelSelectScreen
-import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.resetAllIslandProgress

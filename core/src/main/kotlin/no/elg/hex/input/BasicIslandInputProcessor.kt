@@ -12,6 +12,7 @@ import no.elg.hex.platform.PlatformType
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getHexagon
+import no.elg.hex.util.playClick
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.abs
@@ -56,7 +57,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     when (keycode) {
       ESCAPE, BACK -> {
         Hex.screen = LevelSelectScreen()
-        Hex.assets.clickSound?.play(Settings.volume)
+        playClick()
       }
 
       else -> return false

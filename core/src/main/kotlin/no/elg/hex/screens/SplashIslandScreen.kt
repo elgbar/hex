@@ -9,12 +9,12 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.graphics.use
 import no.elg.hex.Hex
-import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.AbstractInput
 import no.elg.hex.island.Island
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.loadIslandSync
+import no.elg.hex.util.playClick
 
 class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScreen() {
 
@@ -93,7 +93,7 @@ class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScre
         when (keycode) {
           Input.Keys.ESCAPE, Input.Keys.BACK -> {
             Hex.screen = LevelSelectScreen()
-            Hex.assets.clickSound?.play(Settings.volume)
+            playClick()
           }
 
           else -> return false
