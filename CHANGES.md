@@ -67,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Improved reset buttons instead of having to type in a string
   * Use drop down menu for enum selection
   * Increase size elements so its easier to click them on mobile
+* [technical] Save metadata on disk as smile instead of json
 
 ### Fixed
 
@@ -99,6 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [technical] Fix crash on chrome os desktop
 * [technical] Fix click sound on android
 * [technical] Fix missing clicking sound on interaction
+* [technical] Fix regression with long loading times
 
 ### Removed
 
