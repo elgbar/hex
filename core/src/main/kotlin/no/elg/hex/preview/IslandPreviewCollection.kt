@@ -181,16 +181,14 @@ class IslandPreviewCollection : Disposable {
     }
 
     disposePreviews()
-    KtxAsync.launch(Hex.asyncThread) {
 
-      for (id in Hex.assets.islandFiles.islandIds) {
-        if (Hex.args.`update-previews`) {
-          updateSelectPreview(id)
-          continue
-        }
-        synchronized(internalPreviewRendererQueue) {
-          fastIslandPreviews.add(FastIslandMetadata.load(id))
-        }
+    for (id in Hex.assets.islandFiles.islandIds) {
+      if (Hex.args.`update-previews`) {
+        updateSelectPreview(id)
+        continue
+      }
+      synchronized(internalPreviewRendererQueue) {
+        fastIslandPreviews.add(FastIslandMetadata.load(id))
       }
     }
   }

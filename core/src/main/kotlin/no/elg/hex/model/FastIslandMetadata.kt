@@ -39,7 +39,7 @@ data class FastIslandMetadata(
       val file = fileHandle.file()
       Hex.smileMapper.writeValue(file, this)
     } else {
-      islandPreferences.putString(getMetadataFileName(id), Hex.smileMapper.writeValueAsString(this))
+      islandPreferences.putString(getMetadataName(id), Hex.smileMapper.writeValueAsString(this))
       islandPreferences.flush()
     }
   }
@@ -52,22 +52,22 @@ data class FastIslandMetadata(
 
   companion object {
 
-    private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
+    private fun getMetadataName(id: Int) = "island-metadata-$id.smile"
 
     private fun getFileHandle(id: Int, isForWriting: Boolean) =
-      getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
+      getIslandFile("$ISLAND_METADATA_DIR/${getMetadataName(id)}", !isForWriting)
 
     private val charset = Charsets.UTF_8.toString()
 
     fun load(id: Int): FastIslandMetadata? {
-      val prefJson = islandPreferences.getString(getMetadataFileName(id), null)
       return try {
+        val prefJson = islandPreferences.getString(getMetadataName(id), null)
         val json = if (Hex.args.mapEditor || prefJson.isNullOrBlank()) {
           getFileHandle(id, false).readString(charset)
         } else {
           prefJson
         }
-        Hex.smileMapper.readValue(json)
+        Hex.smileMapper.readValue(json, FastIslandMetadata::class.java)
       } catch (e: Exception) {
         Gdx.app.error("IslandMetadataDto", "Failed to find a metadata dto with id $id", e)
         null
