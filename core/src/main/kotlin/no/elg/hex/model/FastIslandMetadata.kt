@@ -8,11 +8,13 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.util.textureFromBytes
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.loadIslandSync
+import no.elg.hex.util.textureFromBytes
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 data class FastIslandMetadata(
   val id: Int,
@@ -32,6 +34,7 @@ data class FastIslandMetadata(
       .compare(this, other)
   }
 
+  @OptIn(ExperimentalEncodingApi::class)
   fun save() {
     if (Hex.args.mapEditor) {
       val fileHandle = getFileHandle(id, true)
@@ -39,7 +42,7 @@ data class FastIslandMetadata(
       val file = fileHandle.file()
       Hex.smileMapper.writeValue(file, this)
     } else {
-      islandPreferences.putString(getMetadataName(id), Hex.smileMapper.writeValueAsString(this))
+      islandPreferences.putString(getMetadataFileName(id), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
       islandPreferences.flush()
     }
   }
@@ -52,22 +55,23 @@ data class FastIslandMetadata(
 
   companion object {
 
-    private fun getMetadataName(id: Int) = "island-metadata-$id.smile"
+    private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
 
     private fun getFileHandle(id: Int, isForWriting: Boolean) =
-      getIslandFile("$ISLAND_METADATA_DIR/${getMetadataName(id)}", !isForWriting)
+      getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
 
     private val charset = Charsets.UTF_8.toString()
 
+    @OptIn(ExperimentalEncodingApi::class)
     fun load(id: Int): FastIslandMetadata? {
+      val pref: String? = islandPreferences.getString(getMetadataFileName(id), null)
       return try {
-        val prefJson = islandPreferences.getString(getMetadataName(id), null)
-        val json = if (Hex.args.mapEditor || prefJson.isNullOrBlank()) {
-          getFileHandle(id, false).readString(charset)
+        val bytes = if (Hex.args.mapEditor || pref.isNullOrEmpty()) {
+          getFileHandle(id, false).readBytes()
         } else {
-          prefJson
+          Base64.decode(pref)
         }
-        Hex.smileMapper.readValue(json, FastIslandMetadata::class.java)
+        Hex.smileMapper.readValue(bytes)
       } catch (e: Exception) {
         Gdx.app.error("IslandMetadataDto", "Failed to find a metadata dto with id $id", e)
         null
