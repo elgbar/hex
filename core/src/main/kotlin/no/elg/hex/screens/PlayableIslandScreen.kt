@@ -52,6 +52,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.playClick
 import no.elg.hex.util.saveProgress
 import no.elg.hex.util.show
 
@@ -163,6 +164,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             up: TextureRegion,
             down: TextureRegion? = null,
             disabled: TextureRegion? = null,
+            playClick: Boolean = false,
             disableCheck: ((Territory?) -> Boolean) = { interactDisabled() },
             vararg keyShortcut: Int,
             onClick: Button.() -> Unit
@@ -185,7 +187,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
               if (disabled != null) {
                 style.disabled = drawableToTextureRegion(disabled)
               }
-              onInteract(stage, *keyShortcut, interaction = onClick)
+              onInteract(stage, *keyShortcut, playClick = playClick, interaction = onClick)
               disableChecker[this] = disableCheck
 
               background = null
@@ -256,8 +258,10 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             interactButton(
               tooltip = "Surrender",
               up = Hex.assets.surrender,
+              playClick = true,
               keyShortcut = intArrayOf(Keys.NUM_6)
             ) {
+
               if (Settings.confirmSurrender) {
                 confirmSurrender.show(stage)
               } else {

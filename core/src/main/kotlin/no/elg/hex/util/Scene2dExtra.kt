@@ -61,12 +61,14 @@ fun PopupMenu.separator() {
 fun Button.onInteract(
   stage: Stage,
   vararg keyShortcut: Int,
+  playClick: Boolean = true,
   catchEvent: Boolean = false,
   interaction: Button.() -> Unit
 ) {
   this.onInteract(
     stage = stage,
     keyShortcuts = arrayOf(keyShortcut),
+    playClick = playClick,
     catchEvent = catchEvent,
     interaction = interaction
   )
@@ -80,10 +82,13 @@ fun Button.onInteract(
   stage: Stage,
   vararg keyShortcuts: IntArray,
   catchEvent: Boolean = false,
+  playClick: Boolean = true,
   interaction: Button.() -> Unit
 ) {
   val interactionWithSound: Button.() -> Unit = {
-    playClick()
+    if(playClick) {
+      playClick()
+    }
     interaction()
   }
   onChange(interactionWithSound)
