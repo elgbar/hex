@@ -52,7 +52,6 @@ class SettingsScreen : OverlayScreen() {
 
   private val onShowListeners = mutableListOf<() -> Unit>()
   private val onHideListeners = mutableListOf<() -> Unit>()
-  private var isShown = false
 
   init {
     stage.actors {
@@ -367,11 +366,9 @@ class SettingsScreen : OverlayScreen() {
     for (function in onShowListeners) {
       function()
     }
-    isShown = true
   }
 
   override fun hide() {
-    isShown = false
     super.hide()
     for (function in onHideListeners) {
       function()
