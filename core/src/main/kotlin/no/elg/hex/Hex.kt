@@ -226,10 +226,11 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun resize(width: Int, height: Int) {
-    if (width > 0 && height > 0) {
-      ScreenRenderer.resize(width, height)
-      screen.resize(width, height)
+    if (paused || width <= 0 || height <= 0) {
+      return
     }
+    ScreenRenderer.resize(width, height)
+    screen.resize(width, height)
   }
 
   override fun dispose() {
