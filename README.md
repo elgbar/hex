@@ -98,19 +98,14 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 ### TODO
 
 * Add minimap
-* Generate trees when generating random island
-* Rework the settings screen
-* Rank how difficult islands are to beat
 * Add a proper tutorial, nobody likes to read
-* Color-grade the border of attackable hexagons according to how beneficial it is to attack it
 * Reimplement `DefaultHexagonDataStorage` to use `IntMap` and where the key is a compacted key
 * Add fling support in the level select screen
-* Add a visible number to the island
 * When clicking an island to play it, zoom into the sprite while loading the island
 
 #### Known bugs
 
-* Lag when un/redoing after a long game
+* Lag when un/redoing after a long game (not verified it still happens after 2.0.0)
   * Hard to do since it's loading the previous version of the map. Have to look into why it takes longer late-game
   * The reason for the lag is when there are a large amount of actions done there are lots of data
   * Ideas to mitigate this issue
