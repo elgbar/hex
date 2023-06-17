@@ -1,10 +1,16 @@
 # Hex
 
+[Download the app on Google Play Store](https://play.google.com/store/apps/details?id=no.elg.hex)
+
 A simple turn based strategy game aiming to clone the gameplay of Slay.
 
-![Level select screen](./images/levelselect.png)
+![Level select screen](./images/level-select.png)
 
 ![Playing the game](./images/placing-unit.png)
+
+![Creating a new level in map editor](./images/level-creation.png)
+
+![Editing a map in map editor](./images/map-editor.png)
 
 ## Glossaries
 
@@ -25,12 +31,13 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 
 ## Help page
 
-*Accurate as of version 1.3.0-SNAPSHOT*
+*Accurate as of version 2.0.0*
 
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
        [--draw-edges] [--stage-debug] [--update-previews]
-       [--update-saved-islands] [--load-all-islands] [--scale SCALE] [--profile]
+       [--update-saved-islands] [--load-all-islands] [--reset-all]
+       [--scale SCALE] [--profile]
 
 optional arguments:
   -h, --help                 show this help message and exit
@@ -49,7 +56,7 @@ optional arguments:
 
   --draw-edges               Draw the edge hexagons to assists with debugging
 
-  --stage-debug              Enable debug overlay for UI using scene2d
+  --stage-debug              Enable debug overlay for UI
 
   --update-previews          Update pre-rendered previews of islands
 
@@ -59,6 +66,8 @@ optional arguments:
 
   --load-all-islands         Load all islands at startup instead of when first
                              played
+
+  --reset-all                Resetting settings and progress
 
   --scale SCALE              Scale of UI, if <= 0 default scale apply
 
