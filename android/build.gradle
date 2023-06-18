@@ -33,6 +33,12 @@ android {
   packagingOptions {
     resources {
       excludes += ['META-INF/robovm/ios/robovm.xml']
+      excludes += ['islands/**']
+      excludes += ['sprites/**']
+      excludes += ['fonts/**']
+      excludes += ['sounds/**']
+      excludes += ['icons/**']
+      excludes += ['shaders/**']
     }
   }
   defaultConfig {
