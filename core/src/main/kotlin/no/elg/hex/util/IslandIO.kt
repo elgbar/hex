@@ -51,7 +51,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
 
   val existed = file.exists()
   if (file.isDirectory) {
-    publishError("Failed to save island the name '${file.name()}' as the resulting file will be a directory.")
+    publishError("Failed to save island the name '${file.name()}' as there exists a directory with that name")
     return false
   }
   return try {

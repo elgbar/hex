@@ -44,6 +44,7 @@ import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.fixWrongTreeTypes
+import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.hide
 import no.elg.hex.util.next
 import no.elg.hex.util.onInteract
