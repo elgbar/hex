@@ -314,6 +314,7 @@ class Assets : AssetManager() {
 
         visTextButton(name = "mapeditor-editor-item", extend = "default") {
           font = notFlippedFont
+          focusBorder = null
           disabledFontColor = Color.valueOf("#31E776")
         }
 
