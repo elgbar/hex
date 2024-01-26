@@ -160,9 +160,18 @@ class HexagonData(
 
     if (edge != other.edge) return false
     if (team != other.team) return false
-    if (piece != other.piece) return false
+    return piece == other.piece
+  }
 
-    return true
+  fun equalsWithoutData(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as HexagonData
+
+    if (edge != other.edge) return false
+    if (team != other.team) return false
+    return piece.equalsWithoutData(other.piece)
   }
 
   override fun hashCode(): Int {

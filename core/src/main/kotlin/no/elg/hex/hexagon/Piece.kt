@@ -15,6 +15,8 @@ import no.elg.hex.util.isNotPartOfATerritory
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 const val NO_STRENGTH = 0
@@ -119,6 +121,26 @@ sealed class Piece {
   open val serializationData: Any? = null
 
   open fun handleDeserializationData(serializationData: Any?) = Unit
+  override fun equals(other: Any?): Boolean {
+    return equalsWithoutData(other) && data == other.data
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  fun equalsWithoutData(other: Any?): Boolean {
+    contract { returns(true) implies (other is Piece) }
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Piece
+
+    return serializationData == other.serializationData
+  }
+
+  override fun hashCode(): Int {
+    var result = 1
+    result = 31 * result + (serializationData?.hashCode() ?: 0)
+    return result
+  }
 }
 
 val PIECES: List<KClass<out Piece>> by lazy {
@@ -165,6 +187,11 @@ object Empty : Piece() {
   override val capitalReplacementResistance = -1
   override fun place(onto: HexagonData): Boolean = true
   override fun copyTo(newData: HexagonData) = this
+  override fun equals(other: Any?): Boolean {
+    return other === this
+  }
+
+  override fun hashCode(): Int = 0
 }
 
 // //////////////

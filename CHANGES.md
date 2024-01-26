@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Do not show save confirmation when exiting map editor without doing any changes
+
 ### Removed
 
 ---

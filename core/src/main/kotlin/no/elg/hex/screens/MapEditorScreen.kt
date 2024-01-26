@@ -129,9 +129,11 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       }
 
       fun exit() {
-        if(initialIsland != island.createDto()) {
+        if (!getIslandFile(id).exists() || initialIsland != island.createDto()) {
           confirmExit.centerWindow()
           confirmExit.toggleShown(stage)
+        } else {
+          Hex.screen = LevelSelectScreen()
         }
       }
 
