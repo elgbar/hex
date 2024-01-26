@@ -16,6 +16,7 @@ import ktx.actors.onClick
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
 import ktx.scene2d.actors
+import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
@@ -50,10 +51,8 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.hide
-import no.elg.hex.util.next
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
-import no.elg.hex.util.previous
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.removeSmallerIslands
 import no.elg.hex.util.saveInitialIsland
@@ -73,6 +72,8 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   private val debugInfoRenderer = DebugInfoRenderer(this)
 
   private val editorsWindows: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
+  private val editorsButtons: MutableList<(Any) -> Unit> = mutableListOf()
+
 
   private val confirmExit: KVisWindow
 
@@ -142,12 +143,13 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       }
 
       @Scene2dDsl
-      fun <T> StageWidget.itemsWindow(
+      fun <T : Any> StageWidget.itemsWindow(
         title: String,
         items: Iterable<Iterable<T>>,
         stringifyItem: (T) -> String,
         onResize: KVisWindow.() -> Unit,
         onButtonClick: (T) -> Unit,
+        onOtherClicked: (item: T, thisButton: KVisTextButton) -> Unit = {_,_->},
         icon: (T) -> Pair<TextureRegion, Color?>? = { null }
       ): KVisWindow =
         visWindow(title) {
@@ -165,21 +167,23 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
                   maybeColor?.also { newColor ->
                     this.color = newColor
                   }
-                  it.minWidth(size)
-                  it.minHeight(size)
-                  it.maxWidth(size)
-                  it.maxHeight(size)
+                  it.minSize(size)
+                  it.maxSize(size)
                   it.fillX()
                 }
               }
               visTextButton(stringifyItem(item).toTitleCase(), style = "mapeditor-editor-item") {
                 pad(5f)
+                editorsButtons += { onOtherClicked(item, this)  }
                 onClick {
                   lastChecked?.isDisabled = false
                   this.isDisabled = true
                   lastChecked = this
 
                   onButtonClick(item)
+                  for (function in editorsButtons) {
+                    function(item)
+                  }
                 }.also { clickListener ->
                   if (lastChecked == null) {
                     clickListener.clicked(InputEvent(), 0f, 0f)
@@ -203,7 +207,10 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         items = listOf(Team.entries),
         stringifyItem = { it.name.lowercase() },
         onResize = { setPosition(0f, y) },
-        onButtonClick = { this@MapEditorScreen.selectedTeam = it },
+        onButtonClick = {
+          this@MapEditorScreen.selectedTeam = it
+          this@MapEditorScreen.editor = TeamEditor.SetTeam
+        },
         icon = { Hex.assets.surrender to it.color }
       )
 
@@ -212,7 +219,10 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         items = PIECES_ORGANIZED,
         stringifyItem = { it.simpleName ?: it.jvmName },
         onResize = { setPosition(0f, y / 2) },
-        onButtonClick = { this@MapEditorScreen.selectedPiece = it },
+        onButtonClick = {
+          this@MapEditorScreen.selectedPiece = it
+          this@MapEditorScreen.editor = PieceEditor.SetPiece
+        },
         icon = { (Hex.assets.getTexture(it.createHandInstance(), false) ?: Hex.assets.background) to null }
       )
 
@@ -221,7 +231,10 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         items = editorsList,
         stringifyItem = { it::class.simpleName ?: it::class.jvmName },
         onResize = { setPosition(parent.width, 0f) },
-        onButtonClick = { this@MapEditorScreen.editor = it }
+        onButtonClick = { this@MapEditorScreen.editor = it },
+        onOtherClicked = { item, button ->
+          button.isDisabled = item == this@MapEditorScreen.editor
+        }
       )
 
       val infoWindow = visWindow("Island editor information") {

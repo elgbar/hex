@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Automatically change the editor type to 'set team/piece' when changing the team/piece in the map editor
+
 ### Fixed
 
 * Do not show save confirmation when exiting map editor without doing any changes
