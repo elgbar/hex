@@ -10,7 +10,8 @@ import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
-import no.elg.hex.util.defaultDisplayMode
+import no.elg.hex.util.defaultDisplayHeight
+import no.elg.hex.util.defaultDisplayWidth
 
 fun main(args: Array<String>) {
   val config = ReadableLwjgl3ApplicationConfiguration()
@@ -21,7 +22,7 @@ fun main(args: Array<String>) {
   Hex.platform = DesktopPlatform()
   Hex.audioDisabled = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
 
-  config.setWindowedMode(defaultDisplayMode.width / 2, defaultDisplayMode.height / 2)
+  config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
 
   config.foregroundFPS = 0
   config.isVSync = Hex.launchPreference.getBoolean(Settings.VSYNC_PATH, true)

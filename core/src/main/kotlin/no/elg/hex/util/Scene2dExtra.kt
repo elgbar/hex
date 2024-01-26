@@ -86,7 +86,7 @@ fun Button.onInteract(
   interaction: Button.() -> Unit
 ) {
   val interactionWithSound: Button.() -> Unit = {
-    if(playClick) {
+    if (playClick) {
       playClick()
     }
     interaction()
