@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import ktx.actors.alpha
 import ktx.actors.isShown
 import ktx.actors.minusAssign
 import ktx.actors.onChange
@@ -71,6 +72,8 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
 
   private val confirmExit: KVisWindow
 
+  private val initialIsland = island.createDto()
+
   var brushRadius: Int = 1
     private set(value) {
       field = value.coerceIn(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
@@ -126,8 +129,10 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       }
 
       fun exit() {
-        confirmExit.centerWindow()
-        confirmExit.toggleShown(stage)
+        if(initialIsland != island.createDto()) {
+          confirmExit.centerWindow()
+          confirmExit.toggleShown(stage)
+        }
       }
 
       @Scene2dDsl
@@ -140,6 +145,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       ): KVisWindow =
         visWindow(title) {
           isResizable = false
+          style.stageBackground = null
           titleLabel.setAlignment(Align.center)
           defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
           var lastChecked: VisTextButton? = null
