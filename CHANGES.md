@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* Remove `Editor Type Specific` button as it is redundant and does not update the UI properly
+
 ---
 # v2.0.0 - 2023-06-17
 

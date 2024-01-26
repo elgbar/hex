@@ -317,22 +317,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
                 brushRadius--
               }
             }
-
-            separator()
-
-            menuItem("Editor Type Specific") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.Q) {
-                if (editor is TeamEditor) {
-                  selectedTeam = Team.entries.toTypedArray().let {
-                    if (shiftPressed) it.previous(selectedTeam) else it.next(selectedTeam)
-                  }
-                } else if (editor is PieceEditor) {
-                  selectedPiece = PIECES.let {
-                    if (shiftPressed) it.previous(selectedPiece) else it.next(selectedPiece)
-                  }
-                }
-              }
-            }
           }
           menu("Tools") {
             menuItem("Toggle Editor Types") {
