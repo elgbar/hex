@@ -2,11 +2,13 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
-import ktx.actors.alpha
 import ktx.actors.isShown
 import ktx.actors.minusAssign
 import ktx.actors.onChange
@@ -19,6 +21,7 @@ import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
 import ktx.scene2d.vis.menuItem
 import ktx.scene2d.vis.spinner
+import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
@@ -43,6 +46,7 @@ import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.confirmWindow
+import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.hide
@@ -143,7 +147,8 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         items: Iterable<Iterable<T>>,
         stringifyItem: (T) -> String,
         onResize: KVisWindow.() -> Unit,
-        onButtonClick: (T) -> Unit
+        onButtonClick: (T) -> Unit,
+        icon: (T) -> Pair<TextureRegion, Color?>? = { null }
       ): KVisWindow =
         visWindow(title) {
           isResizable = false
@@ -153,6 +158,20 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
           var lastChecked: VisTextButton? = null
           for (itemRow in items) {
             for (item in itemRow) {
+              icon(item)?.also { (icon, maybeColor) ->
+                val size = 15f
+                val flippedIcon = AtlasRegion(icon).also { it.flip(false, true) }
+                visImage(flippedIcon) {
+                  maybeColor?.also { newColor ->
+                    this.color = newColor
+                  }
+                  it.minWidth(size)
+                  it.minHeight(size)
+                  it.maxWidth(size)
+                  it.maxHeight(size)
+                  it.fillX()
+                }
+              }
               visTextButton(stringifyItem(item).toTitleCase(), style = "mapeditor-editor-item") {
                 pad(5f)
                 onClick {
@@ -184,7 +203,8 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         items = listOf(Team.entries),
         stringifyItem = { it.name.lowercase() },
         onResize = { setPosition(0f, y) },
-        onButtonClick = { this@MapEditorScreen.selectedTeam = it }
+        onButtonClick = { this@MapEditorScreen.selectedTeam = it },
+        icon = { Hex.assets.surrender to it.color }
       )
 
       itemsWindow(
@@ -192,7 +212,8 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         items = PIECES_ORGANIZED,
         stringifyItem = { it.simpleName ?: it.jvmName },
         onResize = { setPosition(0f, y / 2) },
-        onButtonClick = { this@MapEditorScreen.selectedPiece = it }
+        onButtonClick = { this@MapEditorScreen.selectedPiece = it },
+        icon = { (Hex.assets.getTexture(it.createHandInstance(), false) ?: Hex.assets.background) to null }
       )
 
       itemsWindow(
