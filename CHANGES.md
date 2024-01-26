@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+# v2.0.1 - 2024-01-26
+
+### Added
+
 * Add icons to the map editor screens selector
 * Add three more islands
 
