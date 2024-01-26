@@ -67,13 +67,13 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   private val mapInputProcessor = MapEditorInputProcessor(this)
   private val frameUpdatable = MapEditorRenderer(this)
   private val debugInfoRenderer = DebugInfoRenderer(this)
-  private lateinit var quickSavedIsland: IslandDto
 
   private val editorsWindows: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
   private val confirmExit: KVisWindow
 
   private val initialIsland = island.createDto()
+  private var quickSavedIsland: IslandDto = initialIsland
 
   var brushRadius: Int = 1
     private set(value) {
@@ -90,7 +90,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, 0, Int.MAX_VALUE)
 
   init {
-    quicksave()
     stageScreen.stage.actors {
 
       confirmExit = confirmWindow(
@@ -340,10 +339,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   }
 
   private fun quickload() {
-    if (!::quickSavedIsland.isInitialized) {
-      publishError("No quick save found")
-      return
-    }
     island.restoreState(quickSavedIsland)
   }
 
