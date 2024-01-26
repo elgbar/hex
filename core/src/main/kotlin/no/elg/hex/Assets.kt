@@ -47,6 +47,19 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
+import no.elg.hex.hexagon.Baron
+import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Castle
+import no.elg.hex.hexagon.Empty
+import no.elg.hex.hexagon.Grave
+import no.elg.hex.hexagon.Knight
+import no.elg.hex.hexagon.LivingPiece
+import no.elg.hex.hexagon.PEASANT_PRICE
+import no.elg.hex.hexagon.PalmTree
+import no.elg.hex.hexagon.Peasant
+import no.elg.hex.hexagon.Piece
+import no.elg.hex.hexagon.PineTree
+import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandFiles
@@ -58,6 +71,7 @@ import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.fetch
 import no.elg.hex.util.isLoaded
 import no.elg.hex.util.reportTiming
+import no.elg.hex.util.requestRenderingIn
 import no.elg.hex.util.trace
 import com.badlogic.gdx.utils.Array as GdxArray
 
@@ -150,11 +164,11 @@ class Assets : AssetManager() {
 
   private fun findSprite(regionName: String): AtlasRegion {
     val region: AtlasRegion = try {
-      Hex.assets.sprites.findRegion(regionName)
+      sprites.findRegion(regionName)
     } catch (e: GdxRuntimeException) {
       throw IllegalArgumentException("Failed to find loaded sprite $regionName")
     }
-      ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${Hex.assets.sprites.regions.map { it.name }}")
+      ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded are ${sprites.regions.map { it.name }}")
 
     require(region.originalHeight == region.originalWidth) {
       "Different originalWidth and originalHeight for region $region, width: ${region.originalWidth}, height ${region.originalHeight}"
@@ -366,6 +380,48 @@ class Assets : AssetManager() {
     }
   }
 
+  fun getTexture(piece: Piece, animate: Boolean): AtlasRegion? {
+    var minTimeToRender = Float.MAX_VALUE
+    return when (piece) {
+      is Capital -> {
+        if (piece.balance >= PEASANT_PRICE && animate) {
+          piece.elapsedAnimationTime += Gdx.graphics.deltaTime
+          val capitalFlag = capitalFlag
+          minTimeToRender = minTimeToRender.coerceAtMost(capitalFlag.frameDuration)
+          capitalFlag.getKeyFrame(piece.elapsedAnimationTime)
+        } else {
+          capital
+        }
+      }
+
+      is PalmTree -> palm
+      is PineTree -> pine
+      is Castle -> castle
+      is Grave -> grave
+      is LivingPiece -> {
+        val pieceAnimation = when (piece) {
+          is Peasant -> peasant
+          is Spearman -> spearman
+          is Knight -> knight
+          is Baron -> baron
+        }
+        if (!piece.moved && animate) {
+          minTimeToRender = minTimeToRender.coerceAtMost(pieceAnimation.frameDuration)
+          pieceAnimation.getKeyFrame(piece.updateAnimationTime())
+        } else {
+          pieceAnimation.getKeyFrame(0f)
+        }
+      }
+
+      is Empty -> null
+    }.also {
+      if (minTimeToRender != Float.MAX_VALUE) {
+//        Gdx.app.trace("Sprite Rendering") { "[frame id ${Gdx.graphics.frameId}] Requesting frame in $minTimeToRender seconds" }
+        Gdx.graphics.requestRenderingIn(minTimeToRender)
+      }
+    }
+  }
+
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
     return finishLoadingAsset(fontName(bold, italic, flip, fontSize))
   }
@@ -435,8 +491,8 @@ class Assets : AssetManager() {
 
   private fun updateTitle() {
     var title = "Hex"
-    if (Hex.assets.version != null) {
-      title += " v${Hex.assets.version}"
+    if (version != null) {
+      title += " v$version"
     }
     if (Hex.args.mapEditor) {
       title += " - Map Editor"
