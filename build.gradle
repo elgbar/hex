@@ -6,13 +6,13 @@ import java.nio.file.Paths
 buildscript {
   ext {
     appName = "Hex"
-    kotlinVersion = "1.8.22"
+    kotlinVersion = "1.9.22"
     gdxVersion = '1.11.0'
     ktxVersion = "1.11.0-rc6"
     visVersion = '1.5.1'
     jacksonVersion = "2.15.2"
     junitVersion = "5.9.3"
-    kotlinCoroutineVersion = "1.7.1"
+    kotlinCoroutineVersion = "1.8.0-RC2"
     argparserVersion = "2.0.7"
     spotlessVersion = "6.19.0"
     androidGradleToolsVersion = '8.0.2'

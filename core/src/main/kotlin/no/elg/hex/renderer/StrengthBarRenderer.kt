@@ -65,7 +65,7 @@ class StrengthBarRenderer(val island: Island) : FrameUpdatable, Disposable, Resi
     val percentagesHexagons = island.calculatePercentagesHexagons()
     // inverse height
     var offsetX = 0
-    for (team in Team.values()) {
+    for (team in Team.entries) {
       val percent = percentagesHexagons[team] ?: error("No percentage for team $team")
       offsetX += drawRect(offsetX, percent, team, island.currentTeam == team)
     }

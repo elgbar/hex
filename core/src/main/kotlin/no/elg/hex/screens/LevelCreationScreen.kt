@@ -61,7 +61,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   private val disableables = mutableListOf<Disableable>()
   private val previewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
 
-  private val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.values()))
+  private val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.entries.toTypedArray()))
   private val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
   private val heightSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
   private val seedField = VisTextField(Random.nextLong().toString())
@@ -147,7 +147,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
         spinner = spinner("Layout", layoutSpinner) {
           val minWidth =
             Hex.assets.fontSize *
-              HexagonalGridLayout.values().maxOf { layout -> layout.name.length / 2f + 1 }
+              HexagonalGridLayout.entries.toTypedArray().maxOf { layout -> layout.name.length / 2f + 1 }
           cells.get(1)?.minWidth(minWidth)
           textField.addValidator(validator)
           onChange { renderPreview() }

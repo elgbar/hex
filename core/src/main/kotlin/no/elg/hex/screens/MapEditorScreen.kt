@@ -76,7 +76,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       field = value.coerceIn(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
     }
 
-  var selectedTeam: Team = Team.values().first()
+  var selectedTeam: Team = Team.entries.first()
     private set
 
   var selectedPiece: KClass<out Piece> = PIECES.first()
@@ -173,7 +173,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         }
       itemsWindow(
         title = "Team",
-        items = listOf(Team.values().toList()),
+        items = listOf(Team.entries),
         stringifyItem = { it.name.lowercase() },
         onResize = { setPosition(0f, y) },
         onButtonClick = { this@MapEditorScreen.selectedTeam = it }
@@ -294,7 +294,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             menuItem("Editor Type Specific") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.Q) {
                 if (editor is TeamEditor) {
-                  selectedTeam = Team.values().let {
+                  selectedTeam = Team.entries.toTypedArray().let {
                     if (shiftPressed) it.previous(selectedTeam) else it.next(selectedTeam)
                   }
                 } else if (editor is PieceEditor) {

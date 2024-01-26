@@ -66,7 +66,7 @@ object IslandGeneration {
       noise.setSeed(seed)
       island = Island(width, height, layout)
       val random = Random(seed)
-      val teams = Team.values()
+      val teams = Team.entries.toTypedArray()
 
       for (hexagon in island.allHexagons) {
         val data = island.getData(hexagon)

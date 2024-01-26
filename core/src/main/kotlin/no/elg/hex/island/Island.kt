@@ -89,7 +89,7 @@ class Island(
   var round = round
     private set
 
-  val turn get() = (round - 1) * Team.values().size + (currentTeam.ordinal - startTeam.ordinal)
+  val turn get() = (round - 1) * Team.entries.size + (currentTeam.ordinal - startTeam.ordinal)
 
   lateinit var grid: HexagonalGrid<HexagonData>
     private set
@@ -232,7 +232,7 @@ class Island(
   /**
    * How many of the current players are not real (i.e. an AI)
    */
-  val aiPlayers: Int get() = Team.values().size - realPlayers
+  val aiPlayers: Int get() = Team.entries.size - realPlayers
 
   val currentAI: AI? get() = teamToPlayer[currentTeam]
 
@@ -242,7 +242,7 @@ class Island(
   private val teamToPlayer =
     EnumMap<Team, AI?>(Team::class.java).apply {
       // if we create more teams this makes sure they are playing along
-      this.putAll(Team.values().map { it to Difficulty.HARD.aiConstructor(it) })
+      this.putAll(Team.entries.map { it to Difficulty.HARD.aiConstructor(it) })
 
       put(SUN, Settings.teamSunAI.aiConstructor(SUN))
       put(LEAF, Settings.teamLeafAI.aiConstructor(LEAF))
@@ -287,7 +287,7 @@ class Island(
 
   fun calculatePercentagesHexagons(): EnumMap<Team, Float> {
     val totalHexagons = visibleHexagons.count().toFloat().coerceAtLeast(1f)
-    return Team.values().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {
+    return Team.entries.toTypedArray().associateWithTo(EnumMap<Team, Float>(Team::class.java)) {
       val current = hexagonsPerTeam.getOrDefault(it, 0)
       current / totalHexagons
     }
@@ -298,7 +298,7 @@ class Island(
       select(null)
 
       val oldTeam = currentTeam
-      val newTeam = Team.values().next(oldTeam)
+      val newTeam = Team.entries.toTypedArray().next(oldTeam)
       currentTeam = newTeam
       Gdx.app.debug("TURN") { "Starting turn of $newTeam" }
       Gdx.app.postRunnable { Events.fireEvent(TeamEndTurnEvent(oldTeam, newTeam)) }

@@ -17,7 +17,7 @@ sealed interface TeamEditor : Editor {
     override val order: Int = 0
 
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-      data.team = Team.values().random()
+      data.team = Team.entries.toTypedArray().random()
     }
   }
 }
