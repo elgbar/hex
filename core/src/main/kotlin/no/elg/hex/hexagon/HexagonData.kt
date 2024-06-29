@@ -160,7 +160,7 @@ class HexagonData(
 
     if (edge != other.edge) return false
     if (team != other.team) return false
-    return piece == other.piece
+    return piece.equalsWithoutData(other.piece)
   }
 
   fun equalsWithoutData(other: Any?): Boolean {

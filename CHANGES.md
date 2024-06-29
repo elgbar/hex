@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix critical crash when selecting territory after placing a piece
+
 ### Removed
 
 ---
@@ -37,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Remove `Editor Type Specific` button as it is redundant and does not update the UI properly
 
 ---
+
 # v2.0.0 - 2023-06-17
 
 Major revision as there are some game play and technical breaking changes in this release.
