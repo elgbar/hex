@@ -108,64 +108,65 @@ class IslandPreviewCollection : Disposable {
       previewHeight.coerceAtLeast(1),
       false
     )
-    buffer.begin()
-    Hex.setClearColorAlpha(0f)
-    Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-    screen.updateCamera()
-    islandScreen.render(0f)
-    screen.camera.setToOrtho(screen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
-    val widthOffset = screen.camera.viewportWidth / 5
-    val heightOffset = screen.camera.viewportHeight / 5
-    screen.batch.use(screen.camera) {
+    buffer.use {
+      Hex.setClearColorAlpha(0f)
+      Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
+      islandScreen.updateCamera()
+      islandScreen.render(0f)
+      val camera = islandScreen.camera
+
+      val widthOffset = camera.viewportWidth / 5
+      val heightOffset = camera.viewportHeight / 5
+
       fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
-        screen.batch.draw(
+        islandScreen.batch.draw(
           textureRegion,
           widthOffset,
           heightOffset,
-          screen.camera.viewportWidth - widthOffset * 2,
-          screen.camera.viewportHeight - heightOffset * 2
+          camera.viewportWidth - widthOffset * 2,
+          camera.viewportHeight - heightOffset * 2
         )
       }
 
       fun printText(text: String) {
         val font = Hex.assets.regularFont
 
-        screen.camera.setToOrtho(screen.yDown, widthOffset, heightOffset)
-        screen.camera.center(widthOffset, heightOffset)
+        camera.setToOrtho(islandScreen.yDown, widthOffset, heightOffset)
+        camera.center(widthOffset, heightOffset)
 
-        screen.batch.projectionMatrix = screen.camera.combined
+        islandScreen.batch.projectionMatrix = camera.combined
 
         font.color = Color.WHITE
         font.draw(
-          screen.batch,
+          islandScreen.batch,
           text,
           0f,
-          (screen.camera.viewportHeight - font.data.capHeight) / 2f,
-          screen.camera.viewportWidth,
+          (camera.viewportHeight - font.data.capHeight) / 2f,
+          camera.viewportWidth,
           Align.center,
           false
         )
       }
 
-      when (modifier) {
-        PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
-        PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
-        PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
-        PreviewModifier.WON -> printText("${island.round}")
-        PreviewModifier.NOTHING -> Unit
-      }
+      camera.setToOrtho(islandScreen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
+      islandScreen.batch.use(camera) {
 
-      if (Hex.trace && !Hex.args.mapEditor) {
-        printText("ARtB: ${island.authorRoundsToBeat}")
+        when (modifier) {
+          PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
+          PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
+          PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
+          PreviewModifier.WON -> printText("${island.round}")
+          PreviewModifier.NOTHING -> Unit
+        }
+
+        if (Hex.trace && !Hex.args.mapEditor) {
+          printText("ARtB: ${island.authorRoundsToBeat}")
+        }
       }
+      camera.setToOrtho(islandScreen.yDown)
+      Hex.setClearColorAlpha(1f)
     }
-    screen.camera.setToOrtho(screen.yDown)
-    screen.updateCamera()
-
-    Hex.setClearColorAlpha(1f)
-
-    buffer.end()
     islandScreen.dispose()
     onComplete(buffer)
   }
