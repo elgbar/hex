@@ -52,7 +52,6 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
-import no.elg.hex.util.playClick
 import no.elg.hex.util.saveProgress
 import no.elg.hex.util.show
 
@@ -444,8 +443,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     frameUpdatable.dispose()
     stageScreen.dispose()
     island.cancelCurrentAI()
-    saveProgress()
-    modifier = NOTHING
+    if (modifier == NOTHING) {
+      saveProgress()
+    }
 
     DebugGraphRenderer.dispose()
     debugRenderer.dispose()

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fix critical crash when selecting territory after placing a piece
+* Fix surrendering not working correctly
 
 ### Removed
 
