@@ -74,7 +74,6 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
   private val editorsWindows: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
   private val editorsButtons: MutableList<(Any) -> Unit> = mutableListOf()
 
-
   private val confirmExit: KVisWindow
 
   private val initialIsland = island.createDto()
@@ -149,7 +148,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         stringifyItem: (T) -> String,
         onResize: KVisWindow.() -> Unit,
         onButtonClick: (T) -> Unit,
-        onOtherClicked: (item: T, thisButton: KVisTextButton) -> Unit = {_,_->},
+        onOtherClicked: (item: T, thisButton: KVisTextButton) -> Unit = { _, _ -> },
         icon: (T) -> Pair<TextureRegion, Color?>? = { null }
       ): KVisWindow =
         visWindow(title) {
@@ -174,7 +173,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
               }
               visTextButton(stringifyItem(item).toTitleCase(), style = "mapeditor-editor-item") {
                 pad(5f)
-                editorsButtons += { onOtherClicked(item, this)  }
+                editorsButtons += { onOtherClicked(item, this) }
                 onClick {
                   lastChecked?.isDisabled = false
                   this.isDisabled = true
