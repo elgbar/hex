@@ -1,11 +1,10 @@
 project.ext.mainClassName = "no.elg.hex.desktop.AndroidLauncher"
 project.ext.assetsDir = new File("../core/src/main/resources")
 
-int androidSdkVersion = 33
+int androidSdkVersion = 35
 int androidVersionCode = Integer.parseInt(androidVersionCode)
 
 android {
-  buildToolsVersion = "33.0.2"
   compileSdk androidSdkVersion
 
   compileOptions {
