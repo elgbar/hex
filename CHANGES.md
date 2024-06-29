@@ -13,11 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Removed
+
+---
+
+# v2.0.2 - 2024-06-29
+
+### Fixed
+
 * Fix critical crash when selecting territory after placing a piece
 * Fix surrendering not working correctly
 * Fix camera jumping when saving
-
-### Removed
 
 ---
 
