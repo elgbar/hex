@@ -21,7 +21,6 @@ import no.elg.hex.hexagon.Spearman
 import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.getData
 import no.elg.hex.util.isKeyPressed
-import no.elg.hex.util.saveProgress
 import no.elg.hex.util.toggleShown
 
 /** @author Elg */
@@ -34,11 +33,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       return false
     }
     val cursorHex = screen.basicIslandInputProcessor.cursorHex ?: return false
-    return gameInteraction.click(cursorHex, longPress).also { result ->
-      if (result) {
-        screen.saveProgress()
-      }
-    }
+    return gameInteraction.click(cursorHex, longPress)
   }
 
   override fun keyDown(keycode: Int): Boolean {

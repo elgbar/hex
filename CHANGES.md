@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Save whenever the player is placing or picking up pieces
-
 ### Fixed
 
 * Fix critical crash when selecting territory after placing a piece
