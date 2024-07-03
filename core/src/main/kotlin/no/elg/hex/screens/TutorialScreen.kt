@@ -10,12 +10,13 @@ import ktx.actors.setScrollFocus
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
-import ktx.scene2d.container
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visScrollPane
 import ktx.scene2d.vis.visTable
 import no.elg.hex.Hex
+import no.elg.hex.util.platformButtonPadding
+import no.elg.hex.util.separator
 
 class TutorialScreen : OverlayScreen(false) {
 
@@ -36,6 +37,7 @@ class TutorialScreen : OverlayScreen(false) {
         top()
         left()
         pad(Value.percentWidth(0.01f, this@visTable))
+        padLeft(Value.percentWidth(0.02f, this@visTable))
 
         @Scene2dDsl
         fun KWidget<Cell<*>>.lab(
@@ -47,7 +49,7 @@ class TutorialScreen : OverlayScreen(false) {
           this.visLabel(text) {
             setAlignment(textAlign)
             wrap = true
-            it.width(Value.percentWidth(0.97f, this@visTable))
+            it.width(Value.percentWidth(0.96f, this@visTable))
             pack()
           }
           this@visTable.row()
@@ -65,7 +67,15 @@ class TutorialScreen : OverlayScreen(false) {
           }
         }
 
-        lab("Cost overview", "costs", false, Align.center)
+        visLabel("Tutorial", style = "h1") {
+          setAlignment(Align.center)
+          it.padTop(Value.percentWidth(0.01f, this@visTable))
+        }
+
+        this@visTable.row()
+        lab("Upkeep per turn for each type", "costs", false)
+
+        separator()
 
         lab(
           "When starting a new game, the island is divided between six players. " +
@@ -120,10 +130,11 @@ class TutorialScreen : OverlayScreen(false) {
             "other pine trees."
         )
 
-        container {
-          addBackButton()
-          center()
-          it.minWidth(Value.percentWidth(0.97f, this@visTable))
+        addBackButton {
+          pad(platformButtonPadding)
+          val horzPadding = Value.percentWidth(0.33f, this@visTable)
+          padLeft(horzPadding)
+          padRight(horzPadding)
         }
       }
 

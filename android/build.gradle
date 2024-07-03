@@ -59,6 +59,7 @@ android {
 
       resValue("string", "version", hexVersion)
       resValue("string", "args", "")
+//      resValue("string", "args", "--trace")
     }
   }
   buildFeatures {
