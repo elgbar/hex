@@ -3,6 +3,7 @@ package no.elg.hex
 import com.badlogic.gdx.Application.ApplicationType.Android
 import com.badlogic.gdx.Application.ApplicationType.Desktop
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
@@ -25,6 +26,8 @@ import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.VisUI.SkinScale.X1
 import com.kotcrab.vis.ui.VisUI.SkinScale.X2
 import kotlinx.coroutines.launch
+import ktx.assets.Asset
+import ktx.assets.ManagedAsset
 import ktx.assets.load
 import ktx.assets.setLoader
 import ktx.async.KtxAsync
@@ -69,7 +72,7 @@ import no.elg.hex.util.defaultDisplayWidth
 import no.elg.hex.util.delegate.SoundAlternativeDelegate
 import no.elg.hex.util.delegate.SoundDelegate
 import no.elg.hex.util.fetch
-import no.elg.hex.util.isLoaded
+import no.elg.hex.util.fetchOrNull
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.requestRenderingIn
 import no.elg.hex.util.trace
@@ -110,11 +113,6 @@ class Assets : AssetManager() {
     const val SPRITE_ATLAS = "sprites/sprites.atlas"
     const val TUTORIAL_ATLAS = "sprites/tutorial.atlas"
 
-    const val BOLD_FONT = "fonts/UbuntuMono-B.ttf"
-    const val BOLD_ITALIC_FONT = "fonts/UbuntuMono-BI.ttf"
-    const val REGULAR_FONT = "fonts/UbuntuMono-R.ttf"
-    const val REGULAR_ITALIC_FONT = "fonts/UbuntuMono-RI.ttf"
-
     const val UNDO_ALL_SOUND = "sounds/undo_all.mp3"
     const val CLICK_SOUND = "sounds/click.mp3"
 
@@ -147,10 +145,10 @@ class Assets : AssetManager() {
     }
   }
 
-  val regularFont: BitmapFont by lazy { if (isLoaded<BitmapFont>(REGULAR_FONT)) fetch(REGULAR_FONT) else FALLBACK_FONT }
-  val regularItalicFont: BitmapFont by lazy { fetch(REGULAR_ITALIC_FONT) }
-  val boldFont: BitmapFont by lazy { fetch(BOLD_FONT) }
-  val boldItalicFont: BitmapFont by lazy { fetch(BOLD_ITALIC_FONT) }
+  val regularFont: BitmapFont by lazy { getFont(bold = false, italic = false) }
+  val regularItalicFont: BitmapFont by lazy { getFont(bold = false, italic = true) }
+  val boldFont: BitmapFont by lazy { getFont(bold = true, italic = false) }
+  val boldItalicFont: BitmapFont by lazy { getFont(bold = true, italic = true) }
 
   private val sprites: TextureAtlas by lazy { fetch(SPRITE_ATLAS) }
   val tutorialScreenShots: TextureAtlas by lazy { fetch(TUTORIAL_ATLAS) }
@@ -223,22 +221,27 @@ class Assets : AssetManager() {
   val coinsSound by SoundAlternativeDelegate(COINS_SOUND, COINS_SOUND_RANGE)
   val emptyCoffersSound by SoundAlternativeDelegate(EMPTY_COFFERS_SOUND, EMPTY_COFFERS_SOUND_RANGE)
 
-  private fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize) {
+  private fun loadFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): Asset<BitmapFont> {
     val boldness = if (bold) "B" else "R"
     val italicness = if (italic) "I" else ""
+    val name = fontAssetName(bold, italic, flip, fontSize)
+
+    val existing = fetchOrNull<BitmapFont>(name)
+    if (existing != null) {
+      return ManagedAsset<BitmapFont>(this, AssetDescriptor(name, BitmapFont::class.java, null))
+    }
 
     val parameter = FreeTypeFontLoaderParameter()
     parameter.fontParameters.size = fontSize
     parameter.fontParameters.minFilter = Linear
     parameter.fontParameters.flip = flip
     parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
-    val name = fontName(bold, italic, flip, fontSize)
 
     Gdx.app.debug("ASSET", "loading font '$name'")
     if (fileHandleResolver.resolve(parameter.fontFileName).exists()) {
-      load<BitmapFont>(name, parameter)
+      return load<BitmapFont>(name, parameter)
     } else {
-      Gdx.app.log("ASSET", "Failed to find font file for '$name'")
+      throw IllegalArgumentException("Font file '${parameter.fontFileName}' does not exist")
     }
   }
 
@@ -252,7 +255,7 @@ class Assets : AssetManager() {
 
       KtxAsync.launch(Hex.asyncThread) {
         val warmUpStart = TimeUtils.millis()
-        for (i in 1..100) {
+        for (i in 1..25) {
           val deserStart = TimeUtils.millis()
           Island.deserialize(MIN_ISLAND)
           Gdx.app.trace("WARMUP") { "Warmup pass $i took ${TimeUtils.timeSinceMillis(deserStart)} ms" }
@@ -290,10 +293,12 @@ class Assets : AssetManager() {
       loadFont(bold = false, italic = true)
       loadFont(bold = true, italic = false)
       loadFont(bold = true, italic = true)
-      loadFont(bold = false, italic = false, flip = false)
       loadFont(bold = false, italic = true, flip = false)
-      loadFont(bold = true, italic = false, flip = false)
       loadFont(bold = true, italic = true, flip = false)
+
+      val notFlippedFontAsset = loadFont(bold = false, italic = false, flip = false)
+      val boldNotFlippedFontAsset = loadFont(bold = true, italic = false, flip = false)
+      val largeRegularFontAsset = loadFont(bold = false, italic = false, flip = false, fontSize = fontSize * 2)
 
       loadingInfo = "VisUI"
 
@@ -301,25 +306,27 @@ class Assets : AssetManager() {
         if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
       }
       with(VisUI.getSkin() as Skin) {
-        val notFlippedFont = getFont(bold = false, italic = false, flip = false)
-        val boldNotFlippedFont = getFont(bold = false, italic = false, flip = false)
+        val regularFont = notFlippedFontAsset.also { finishLoading() }.asset
+        val largeRegularFont = largeRegularFontAsset.also { finishLoading() }.asset
+        val boldFont = boldNotFlippedFontAsset.also { finishLoading() }.asset
 
-        this["default-font"] = notFlippedFont
+        this["default-font"] = regularFont
 
-        label(extend = "default") { font = notFlippedFont }
-        label(extend = "link-label") { font = notFlippedFont }
-        label(extend = "small") { font = notFlippedFont }
-        label(extend = "menuitem-shortcut") { font = notFlippedFont }
+        label(extend = "default") { font = regularFont }
+        label(extend = "link-label") { font = regularFont }
+        label(extend = "small") { font = regularFont }
+        label(extend = "menuitem-shortcut") { font = regularFont }
+        label(name = "h1", extend = "small") { font = largeRegularFont }
 
-        visTextField(extend = "default") { font = notFlippedFont }
-        textField(extend = "default") { font = notFlippedFont }
+        visTextField(extend = "default") { font = regularFont }
+        textField(extend = "default") { font = regularFont }
 
-        visTextButton(extend = "default") { font = notFlippedFont }
-        visTextButton(extend = "menu-bar") { font = notFlippedFont }
-        visTextButton(extend = "toggle") { font = notFlippedFont }
-        visTextButton(extend = "blue") { font = notFlippedFont }
+        visTextButton(extend = "default") { font = regularFont }
+        visTextButton(extend = "menu-bar") { font = regularFont }
+        visTextButton(extend = "toggle") { font = regularFont }
+        visTextButton(extend = "blue") { font = regularFont }
         visTextButton(name = "dangerous", extend = "default") {
-          font = notFlippedFont
+          font = regularFont
           fontColor = Color.WHITE
           up = newDrawable("white", Color.valueOf("#FF4136"))
           down = newDrawable("white", Color.FIREBRICK)
@@ -327,25 +334,25 @@ class Assets : AssetManager() {
         }
 
         visTextButton(name = "mapeditor-editor-item", extend = "default") {
-          font = notFlippedFont
+          font = regularFont
           focusBorder = null
           disabledFontColor = Color.valueOf("#31E776")
         }
 
-        visCheckBox(extend = "default") { font = notFlippedFont }
+        visCheckBox(extend = "default") { font = regularFont }
 
-        textButton(extend = "default") { font = notFlippedFont }
+        textButton(extend = "default") { font = regularFont }
 
-        val newOpenButtonStyle = visImageTextButton(extend = "default") { font = notFlippedFont }
-        visImageTextButton(extend = "menu-bar") { font = notFlippedFont }
-        imageTextButton(extend = "default") { font = notFlippedFont }
+        val newOpenButtonStyle = visImageTextButton(extend = "default") { font = regularFont }
+        visImageTextButton(extend = "menu-bar") { font = regularFont }
+        imageTextButton(extend = "default") { font = regularFont }
 
-        window(extend = "default") { titleFont = boldNotFlippedFont }
-        window(extend = "resizable") { titleFont = boldNotFlippedFont }
-        window(extend = "noborder") { titleFont = boldNotFlippedFont }
-        window(extend = "dialog") { titleFont = boldNotFlippedFont }
+        window(extend = "default") { titleFont = boldFont }
+        window(extend = "resizable") { titleFont = boldFont }
+        window(extend = "noborder") { titleFont = boldFont }
+        window(extend = "dialog") { titleFont = boldFont }
 
-        menuItem(extend = "default") { font = notFlippedFont }
+        menuItem(extend = "default") { font = regularFont }
         menu { openButtonStyle = newOpenButtonStyle }
 
         sizes {
@@ -357,9 +364,9 @@ class Assets : AssetManager() {
           this.background = newDrawable("white", Color.LIGHT_GRAY)
         }
         selectBox(extend = "default") {
-          font = notFlippedFont
+          font = regularFont
           listStyle = list(extend = "default") {
-            font = notFlippedFont
+            font = regularFont
             background = getDrawable("window")
           }
         }
@@ -423,14 +430,14 @@ class Assets : AssetManager() {
   }
 
   private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
-    return finishLoadingAsset(fontName(bold, italic, flip, fontSize))
+    return fetch(fontAssetName(bold, italic, flip, fontSize))
   }
 
-  private fun fontName(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): String {
-    val boldness = if (bold) "B" else "R"
-    val italicness = if (italic) "I" else ""
-    val flippiness = if (flip) "" else "-NF"
-    val sizeiness = if (fontSize != this.fontSize) "-s$fontSize" else ""
+  private fun fontAssetName(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): String {
+    val boldness = if (bold) "bold" else "regular"
+    val italicness = if (italic) "italic" else ""
+    val flippiness = if (flip) "-flipped" else "-notflipped"
+    val sizeiness = "-s$fontSize"
     return "fonts/UbuntuMono-$boldness$italicness$flippiness$sizeiness.ttf"
   }
 
