@@ -16,7 +16,6 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.KVisTable
-import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visLabel
@@ -38,6 +37,7 @@ import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.platformCheckBoxSize
 import no.elg.hex.util.platformSpacing
 import no.elg.hex.util.playClick
+import no.elg.hex.util.separator
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
 import kotlin.math.max
@@ -84,7 +84,7 @@ class SettingsScreen : OverlayScreen() {
           visLabel("Description", init = init)
 
           row()
-          sep()
+          separator()
 
           val (settingsProperties, otherProperties) = Settings::class.declaredMemberProperties.partition {
             it.also { it.isAccessible = true }.getDelegate(Settings) is PreferenceDelegate<*>
@@ -109,7 +109,7 @@ class SettingsScreen : OverlayScreen() {
             addSetting(property as KMutableProperty1<Settings, Any>, delegate as PreferenceDelegate<*>)
           }
 
-          sep()
+          separator()
 
           for (property in otherProperties) {
             val name = property.name.toTitleCase()
@@ -145,7 +145,6 @@ class SettingsScreen : OverlayScreen() {
 
           row()
           addBackButton {
-            padAndSpace(it)
             it.colspan(2)
             it.prefWidth(Value.percentHeight(0.2f, this@visTable))
             it.prefHeight(Value.percentHeight(0.05f, this@visTable))
@@ -163,15 +162,6 @@ class SettingsScreen : OverlayScreen() {
     if (includeWidth) {
       it.minWidth(Hex.assets.fontSize * MIN_FIELD_WIDTH)
     }
-  }
-
-  private fun KVisTable.sep() {
-    separator {
-      it.expand()
-      it.fillX()
-      it.colspan(2)
-    }
-    row()
   }
 
   @Scene2dDsl

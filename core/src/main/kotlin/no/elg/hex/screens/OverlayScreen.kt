@@ -2,6 +2,7 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.vis.KVisTextButton
@@ -9,6 +10,7 @@ import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.padAndSpace
 
 abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRootTable) {
 
@@ -24,11 +26,12 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
   }
 
   @Scene2dDsl
-  fun <S> KWidget<S>.addBackButton(init: KVisTextButton.(S) -> Unit = {}) {
+  fun <S : Cell<*>> KWidget<S>.addBackButton(init: KVisTextButton.(S) -> Unit = {}) {
     visTextButton("Back") {
       onInteract(stage, intArrayOf(Keys.ESCAPE), intArrayOf(Keys.BACK)) {
         backToPreviousScreen()
       }
+      padAndSpace(it)
       init(it)
     }
   }

@@ -19,7 +19,9 @@ import ktx.actors.onKeyDown
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
 import ktx.scene2d.table
+import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.KVisWindow
+import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visWindow
@@ -42,6 +44,16 @@ val platformCheckBoxSize: Float
     MOBILE -> 50f
     DESKTOP -> 20f
   }
+
+@Scene2dDsl
+fun KVisTable.separator() {
+  this@separator.separator("menu") {
+    it.expand()
+    it.fillX()
+    it.colspan(2)
+  }
+  row()
+}
 
 @Scene2dDsl
 fun padAndSpace(cell: Cell<*>) {
