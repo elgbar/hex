@@ -2,10 +2,12 @@ package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
+import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Piece
+import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.trace
 
 /** @author Elg */
@@ -16,7 +18,7 @@ data class Hand(
    * If the held piece should be refunded/returned when disposing.
    * This is useful when modifying the held piece without duplicating money/pieces
    */
-  var restore: Boolean = true
+  var restore: RestoreAction = DefaultRestoreAction
 ) : Disposable {
 
   init {
@@ -35,24 +37,67 @@ data class Hand(
   override fun dispose() {
     require(currentHand) { "Hand already disposed " }
     currentHand = false
-    Gdx.app.trace("HAND") { "Disposing hand $this, refund? $restore" }
-    if (restore) {
-      if (piece.data === HexagonData.EDGE_DATA) {
-        // refund when placing it back
-        territory.capital.balance += piece.price
-      } else {
-        val placed = piece.data.setPiece(piece::class)
-        require(placed) { "Failed to place old hand piece back to where it was" }
-        // restore the piece to its last placed location
-        val newPiece = piece.data.piece
-        if (newPiece is LivingPiece) {
-          newPiece.moved = false
-        }
-      }
-    }
+    Gdx.app.trace("HAND") { "Disposing hand $this, refund? ${restore::class.simpleName}" }
+    restore.restore(this)
   }
 
-  override fun toString(): String {
-    return "piece: ${piece::class.simpleName}, territory: $territory"
+  override fun toString(): String =
+    "piece: ${piece::class.simpleName}, territory: $territory, restore: $restore"
+
+  companion object {
+    sealed interface RestoreAction {
+      fun restore(hand: Hand)
+      val serializedName: String?
+
+      companion object {
+        val allInstances: List<RestoreAction> = RestoreAction::class.sealedSubclasses
+          .map {
+            it.objectInstance ?: error("All instances of RestoreAction must be an object, $it is not an object")
+          }
+
+        fun fromString(actionName: String?): RestoreAction =
+          allInstances.find { it.serializedName == actionName } ?: DefaultRestoreAction
+
+        fun toString(action: RestoreAction?): String? = action?.serializedName
+      }
+    }
+
+    data object NoRestore : RestoreAction {
+      override fun restore(hand: Hand) = Unit
+      override fun toString(): String = "No restore"
+      override val serializedName: String? = "no"
+    }
+
+    data object RefundCastleSwapAction : RestoreAction {
+      override fun restore(hand: Hand) {
+        hand.territory.capital.balance += Castle::class.createHandInstance().price
+        DefaultRestoreAction.restore(hand)
+      }
+
+      override fun toString(): String = "Castle Swap Restore"
+
+      override val serializedName: String? = "castle swap"
+    }
+
+    data object DefaultRestoreAction : RestoreAction {
+      override fun restore(hand: Hand) {
+        with(hand) {
+          if (piece.data === HexagonData.EDGE_DATA) {
+            hand.territory.capital.balance += hand.piece.price
+          } else {
+            val placed = piece.data.setPiece(piece::class)
+            require(placed) { "Failed to place old hand piece back to where it was" }
+            // restore the piece to its last placed location
+            val newPiece = piece.data.piece
+            if (newPiece is LivingPiece) {
+              newPiece.moved = false
+            }
+          }
+        }
+      }
+
+      override fun toString(): String = "Restore"
+      override val serializedName: String? = null
+    }
   }
 }

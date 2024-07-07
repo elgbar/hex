@@ -104,7 +104,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
 
           val data = hand.piece.data
 
-          hand.restore = false
+          hand.restore = Hand.Companion.NoRestore
           island.hand = null
 
           val newPiece = newType.createInstance(data)
@@ -157,9 +157,12 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
 
     val oldPiece = hexData.piece
     if (oldPiece is LivingPiece && newPiece is Castle && hexData.team == territory.team) {
-      if (!oldPiece.moved && hexData.setPiece(Castle::class)) {
+      if (!oldPiece.moved) {
         island.history.remember("Swapping castle for living piece") {
-          island.hand = Hand(territory, oldPiece, restore = false)
+          hexData.setPiece(Castle::class) {
+            island.hand?.restore = Hand.Companion.NoRestore
+            island.hand = Hand(territory, oldPiece, restore = Hand.Companion.RefundCastleSwapAction)
+          }
         }
         return true
       }
@@ -199,7 +202,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
       island.history.remember("Placing piece") {
         hexData.team = territory.team
         // Never refund as we are placing the unit down right now
-        island.hand?.restore = false
+        island.hand?.restore = Hand.Companion.NoRestore
         island.hand = null
 
         val updatedPiece = hexData.piece

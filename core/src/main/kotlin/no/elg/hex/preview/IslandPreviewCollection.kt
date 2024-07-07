@@ -151,7 +151,6 @@ class IslandPreviewCollection : Disposable {
 
       camera.setToOrtho(islandScreen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
       islandScreen.batch.use(camera) {
-
         when (modifier) {
           PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
           PreviewModifier.LOST -> drawAsset(Hex.assets.grave)

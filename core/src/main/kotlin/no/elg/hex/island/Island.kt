@@ -37,6 +37,7 @@ import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInteraction
+import no.elg.hex.island.Hand.Companion.NoRestore
 import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
@@ -68,7 +69,7 @@ import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 /** @author Elg */
-@JsonIgnoreProperties("initialLoad")
+@JsonIgnoreProperties("initialLoad", "handRestore")
 class Island(
   width: Int,
   height: Int,
@@ -78,7 +79,7 @@ class Island(
   handCoordinate: CubeCoordinate? = null,
   @JsonAlias("piece")
   handPiece: Piece? = null,
-  handRestore: Boolean? = null,
+  handRestoreAction: String? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   @JsonAlias("turn")
   round: Int = 1,
@@ -139,7 +140,7 @@ class Island(
       territoryCoordinate = dto.territoryCoordinate,
       handCoordinate = dto.handCoordinate,
       handPiece = dto.handPiece,
-      handRestore = dto.handRestore,
+      handRestoreAction = dto.handRestoreAction,
       hexagonData = dto.hexagonData,
       team = dto.team
     )
@@ -172,7 +173,7 @@ class Island(
     territoryCoordinate: CubeCoordinate? = null,
     handCoordinate: CubeCoordinate? = null,
     handPiece: Piece? = null,
-    handRestore: Boolean? = null,
+    handRestoreAction: String? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     team: Team
   ) {
@@ -201,17 +202,14 @@ class Island(
     val territory = selected
     if (successfulSelect && handPiece != null && territory != null) {
       val handHex = territory.hexagons.find { it.cubeCoordinate == handCoordinate }
-      val handData = if (handHex == null) {
-        EDGE_DATA
-      } else {
-        getData(handHex)
-      }
+      val handData = handHex?.let(::getData) ?: EDGE_DATA
+      val handRestoreAction = Hand.Companion.RestoreAction.fromString(handRestoreAction)
       hand = Hand(
         territory,
         handPiece::class.createInstance(handData).also {
           if (it is LivingPiece) it.moved = false
         },
-        handRestore ?: true
+        handRestoreAction
       )
     }
   }
@@ -254,7 +252,7 @@ class Island(
   private var aiJob: Job? = null
 
   init {
-    restoreState(width, height, layout, territoryCoordinate, handCoordinate, handPiece, handRestore, hexagonData, startTeam)
+    restoreState(width, height, layout, territoryCoordinate, handCoordinate, handPiece, handRestoreAction, hexagonData, startTeam)
     history.clear()
     initialState = createDto().copy()
   }
@@ -704,7 +702,7 @@ class Island(
     const val UNKNOWN_ROUNDS_TO_BEAT = 0
 
     fun Hand.createDtoPieceCopy(): Piece {
-      return this.piece.let { it.copyTo(if (restore) it.data.copy() else EDGE_DATA) }
+      return this.piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
     }
 
     fun deserialize(json: String): Island = Hex.mapper.readValue(json)
@@ -719,8 +717,8 @@ class Island(
   fun createDto(): IslandDto {
     val hand = hand
     val handPiece = hand?.createDtoPieceCopy()
+    val handRestoreAction = Hand.Companion.RestoreAction.toString(hand?.restore)
     val handCoordinate = hand?.territory?.hexagons?.find { getData(it) === hand.piece.data }?.cubeCoordinate
-    val handRestore = hand?.restore
     val territoryCoord = selected?.hexagons?.first()?.cubeCoordinate
 
     return IslandDto(
@@ -730,7 +728,7 @@ class Island(
       territoryCoordinate = territoryCoord,
       handCoordinate = handCoordinate,
       handPiece = handPiece,
-      handRestore = handRestore,
+      handRestoreAction = handRestoreAction,
       hexagonData = visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
       round = round,
       team = currentTeam,

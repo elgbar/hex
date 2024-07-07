@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Using regular font instead of bold font
+* Fix infinite tower glitch
+  * A player could swap a living piece and a just-bought castle to get the castle for free
+  * Thanks Willy!
 
 ### Removed
 
