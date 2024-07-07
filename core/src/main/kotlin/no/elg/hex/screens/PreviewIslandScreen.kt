@@ -107,7 +107,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
   }
 
   override fun recreate(): AbstractScreen =
-    createIslandScreen(id, island, false).also {
+    createIslandScreen(id, island).also {
       Gdx.app.postRunnable {
         it.resize(Gdx.graphics.width, Gdx.graphics.height)
         it.camera.combined.set(camera.combined)

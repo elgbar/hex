@@ -102,12 +102,11 @@ class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScre
       }
     }
 
-    fun createIslandScreen(id: Int, island: Island, center: Boolean = true) =
-      (if (Hex.args.mapEditor) MapEditorScreen(id, island) else PlayableIslandScreen(id, island)).also {
-//        if (center) {
-//          it.resize(Gdx.graphics.width, Gdx.graphics.height)
-//          it.centerCamera()
-//        }
+    fun createIslandScreen(id: Int, island: Island) =
+      if (Hex.args.mapEditor) {
+        MapEditorScreen(id, island)
+      } else {
+        PlayableIslandScreen(id, island)
       }
   }
 }
