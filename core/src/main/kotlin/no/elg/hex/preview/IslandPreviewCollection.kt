@@ -38,7 +38,7 @@ class IslandPreviewCollection : Disposable {
   fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> {
     synchronized(internalPreviewRendererQueue) {
       if (dirty) {
-        sort()
+        sortIslands()
       }
       return fastIslandPreviews.withIndex()
     }
@@ -46,7 +46,7 @@ class IslandPreviewCollection : Disposable {
 
   val size get() = fastIslandPreviews.size
 
-  private fun sort() {
+  fun sortIslands() {
     dirty = false
     if (!Hex.args.mapEditor) {
       synchronized(internalPreviewRendererQueue) {

@@ -13,9 +13,12 @@ import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.loadIslandSync
 import no.elg.hex.util.textureFromBytes
+import java.util.Comparator.comparingInt
+import java.util.function.ToIntFunction
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+// TODO add if the island is completed/surrendered to make it possible to warn before restarting the island
 data class FastIslandMetadata(
   val id: Int,
   val authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT,
@@ -28,11 +31,17 @@ data class FastIslandMetadata(
   @get:JsonIgnore
   val island: Island by lazy { loadIslandSync(id) }
 
-  override fun compareTo(other: FastIslandMetadata): Int {
-    return Comparator.comparingInt(FastIslandMetadata::authorRoundsToBeat)
-      .thenComparingInt(FastIslandMetadata::id)
+  override fun compareTo(other: FastIslandMetadata): Int =
+    comparingInt(object : ToIntFunction<FastIslandMetadata> {
+      override fun applyAsInt(p0: FastIslandMetadata): Int =
+        if (Island.UNKNOWN_ROUNDS_TO_BEAT == p0.authorRoundsToBeat) {
+          Int.MAX_VALUE / 2
+        } else {
+          p0.authorRoundsToBeat
+        }
+    })
+      .thenComparing(comparingInt(FastIslandMetadata::id).reversed())
       .compare(this, other)
-  }
 
   @OptIn(ExperimentalEncodingApi::class)
   fun save() {
@@ -59,8 +68,6 @@ data class FastIslandMetadata(
 
     private fun getFileHandle(id: Int, isForWriting: Boolean) =
       getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
-
-    private val charset = Charsets.UTF_8.toString()
 
     @OptIn(ExperimentalEncodingApi::class)
     fun load(id: Int): FastIslandMetadata? {

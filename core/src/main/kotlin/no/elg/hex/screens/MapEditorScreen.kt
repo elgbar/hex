@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
@@ -91,7 +92,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
     private set
 
   var editor: Editor = OpaquenessEditor.ToggleOpaqueness
-  val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, 0, Int.MAX_VALUE)
+  val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, Int.MIN_VALUE, Int.MAX_VALUE)
 
   init {
     stageScreen.stage.actors {
@@ -110,19 +111,14 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       )
 
       visWindow("Enter Author Round to Beat") {
-        visLabel("Lowest number of rounds\nto beat this level")
+        visLabel("Lowest number of rounds\nto beat this level\n$UNKNOWN_ROUNDS_TO_BEAT = not played, ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last")
         row()
         spinner("", artbSpinner) {
-          textField.addValidator { input ->
-            val intInput = input?.toIntOrNull() ?: -1
-            intInput >= UNKNOWN_ROUNDS_TO_BEAT
-          }
-
           onChange {
-            if (textField.isInputValid) {
-              island.authorRoundsToBeat = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
-            }
+            val parsedInt = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
+            island.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
           }
+          it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
         }
         pack()
       }.also {

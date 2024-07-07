@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Make it easier to read the upkeep cost in the tutorial screen by adding a white border to the numbers
 * Tweak tutorial screen
 * Pressing escape on desktop will take you back to the level select screen
+* Allow islands to be manually placed last
 
 ### Fixed
 
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix infinite tower glitch
   * A player could swap a living piece and a just-bought castle to get the castle for free
   * Thanks Willy!
+* Fix sorting islands without a rating before islands with ratings
 
 ### Removed
 

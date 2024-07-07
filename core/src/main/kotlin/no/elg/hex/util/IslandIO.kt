@@ -61,6 +61,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
       Hex.assets.islandFiles.fullFilesSearch()
     }
     Hex.assets.islandPreviews.updateSelectPreview(id)
+    Hex.assets.islandPreviews.sortIslands()
     true
   } catch (e: Throwable) {
     publishError("Failed to saved island '${file.name()}'")
