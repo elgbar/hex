@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Make it easier to read the upkeep cost in the tutorial screen by adding a white border to the numbers
 * Tweak tutorial screen
+* Pressing escape on desktop will take you back to the level select screen
 
 ### Fixed
 

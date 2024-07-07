@@ -1,6 +1,7 @@
 package no.elg.hex.input
 
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.Input.Keys.BACK
 import com.badlogic.gdx.Input.Keys.BACKSPACE
 import com.badlogic.gdx.Input.Keys.ESCAPE
 import com.badlogic.gdx.Input.Keys.F10
@@ -40,10 +41,11 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
     if (screen.island.isCurrentTeamAI()) return false
 
     when (keycode) {
-      BACKSPACE, SPACE, ESCAPE -> {
+      ESCAPE, BACK -> return false
+      BACKSPACE, SPACE -> {
         when {
           screen.island.hand != null -> screen.island.hand = null
-          keycode != ESCAPE && screen.island.selected != null -> screen.island.select(null)
+          screen.island.selected != null -> screen.island.select(null)
           else -> return false
         }
       }
