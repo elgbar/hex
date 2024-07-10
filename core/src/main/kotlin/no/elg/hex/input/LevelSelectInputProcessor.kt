@@ -4,9 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
+import ktx.actors.isShown
+import ktx.scene2d.actors
+import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
+import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.screens.LevelCreationScreen
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.LevelSelectScreen.Companion.NON_ISLAND_SCALE
@@ -20,14 +25,18 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
 import no.elg.hex.util.playClick
+import no.elg.hex.util.show
 import java.lang.Float.max
 
 /** @author Elg */
 class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : AbstractInput(true) {
+
+  val ignoreInput: Boolean get() = screen.confirmWindow.isShown()
 
   /**
    * @param scale in range 0..1
@@ -66,6 +75,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
+    if(ignoreInput) return false
     val id = getHoveringIslandId()
     Gdx.app.debug("SELECT", "Clicked on id $id")
     when {
@@ -80,7 +90,16 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
 
       id == -1 -> Hex.screen = TutorialScreen()
       id in -PREVIEWS_PER_ROW..-1 -> return false
-      id != INVALID_ISLAND_INDEX -> play(id)
+      id != INVALID_ISLAND_INDEX -> {
+        val metadata = FastIslandMetadata.load(id)
+        if (metadata.modifier == PreviewModifier.NOTHING) {
+          play(metadata)
+        } else {
+          screen.toPlay = metadata
+          screen.confirmWindow.show(screen.stage)
+        }
+      }
+
       else -> return false
     }
     playClick()
@@ -100,16 +119,19 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+    if(ignoreInput) return false
     scroll(-Gdx.input.getDeltaY(0).toFloat())
     return true
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
+    if(ignoreInput) return false
     scroll(amountY * SCROLL_SPEED)
     return true
   }
 
   override fun keyDown(keycode: Int): Boolean {
+    if(ignoreInput) return false
     when (keycode) {
       Keys.FORWARD_DEL, Keys.DEL -> {
         if (Hex.args.mapEditor) {

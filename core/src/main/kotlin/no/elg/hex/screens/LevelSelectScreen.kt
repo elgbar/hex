@@ -4,20 +4,46 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
+import com.badlogic.gdx.scenes.scene2d.Stage
+import ktx.scene2d.actors
+import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
+import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.confirmWindow
+import no.elg.hex.util.play
+import no.elg.hex.util.show
 
 /** @author Elg */
 class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
+  private val stageScreen by lazy { StageScreen() }
+  val stage: Stage get() = stageScreen.stage
+
   internal val input by lazy { LevelSelectInputProcessor(this) }
   private val mouseX get() = input.mouseX
   private val mouseY get() = input.mouseY
+
+  lateinit var confirmWindow: KVisWindow
+  lateinit var toPlay : FastIslandMetadata
+  fun initStage() {
+    stage.actors {
+      confirmWindow = confirmWindow(
+        "Restart Island?",
+        "Do you want to restart island? This will reset all progress on the island.",
+        whenConfirmed = {
+          toPlay.modifier = PreviewModifier.NOTHING
+          play(toPlay)
+        }
+      )
+    }
+  }
 
   override fun render(delta: Float) {
     if (LevelSelectInputProcessor.lastY != camera.position.y) {
@@ -58,6 +84,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     }
     batch.end()
     lineRenderer.end()
+    stageScreen.render(delta)
   }
 
   fun color(x: Float, y: Float, width: Float, height: Float, notSelectedColor: Color = NOT_SELECTED_COLOR): Color {
@@ -76,7 +103,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
   private fun drawScreenSprite(selected: TextureRegion, notSelected: TextureRegion, index: Int) {
     val (x, y, width, height) = input.slotRect(index, NON_ISLAND_SCALE)
-    val sprite = if (mouseX in x..x + width && mouseY in y..y + height) selected else notSelected
+    val sprite = if (!input.ignoreInput && mouseX in x..x + width && mouseY in y..y + height) selected else notSelected
     batch.draw(sprite, x, y, width, height)
     if (Hex.debugStage) {
       // Show the interaction area of these buttons
@@ -119,11 +146,18 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
   override fun show() {
     input.show()
+    initStage()
+    stageScreen.show()
+  }
+
+  override fun hide() {
+    stageScreen.hide()
   }
 
   override fun resize(width: Int, height: Int) {
     super.resize(width, height)
     input.restoreScrollPosition()
+    stageScreen.resize(width, height)
   }
 
   companion object {

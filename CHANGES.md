@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * New islands validation rule: No pieces on invisible hexagons
+* Add confirmation dialog when restarting a completed island
 
 ### Changed
 
@@ -20,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Make ARtB editing more user friendly
   * Add a warning when resetting ARtB of an island
   * Display the previous ARtB when editing an island
+* Always render the previews as 1024x1024
+* Update ARtB of island 11 to be 11
 
 ### Fixed
 
