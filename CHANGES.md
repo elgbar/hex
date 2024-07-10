@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Display the previous ARtB when editing an island
 * Always render the previews as 1024x1024
 * Update ARtB of island 11 to be 11
+* Draw a capital on the preview when the island has been conquered
 
 ### Fixed
 
