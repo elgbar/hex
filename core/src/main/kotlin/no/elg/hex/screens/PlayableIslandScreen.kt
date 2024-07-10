@@ -39,6 +39,7 @@ import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.preview.PreviewModifier.AI_DONE
 import no.elg.hex.preview.PreviewModifier.LOST
@@ -56,7 +57,7 @@ import no.elg.hex.util.saveProgress
 import no.elg.hex.util.show
 
 /** @author Elg */
-class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
+class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : PreviewIslandScreen(metadata, island, isPreviewRenderer = false) {
 
   private val stageScreen = StageScreen()
   private val inputProcessor by lazy { GameInputProcessor(this) }
@@ -80,7 +81,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
   init {
     island.gameInteraction = GameInteraction(island, endGame = ::endGame)
-    stageScreen.stage.actors {
+    stage.actors {
 
       fun endGame(modifier: PreviewModifier): KVisWindow.() -> Unit = {
         island.history.disable()

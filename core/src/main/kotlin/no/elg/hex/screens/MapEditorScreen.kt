@@ -47,6 +47,7 @@ import no.elg.hex.input.editor.editorsList
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
 import no.elg.hex.util.confirmWindow
@@ -67,7 +68,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
 /** @author Elg */
-class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island, isPreviewRenderer = false) {
+class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIslandScreen(metadata, island, isPreviewRenderer = false) {
 
   private val stageScreen = StageScreen()
   private val mapInputProcessor = MapEditorInputProcessor(this)
@@ -104,7 +105,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         "Do you want to save before exiting?",
         whenDenied = { Hex.screen = LevelSelectScreen() },
         whenConfirmed = {
-          if (saveInitialIsland(id, island)) {
+          if (saveInitialIsland(metadata, island)) {
             Hex.screen = LevelSelectScreen()
           } else {
             this@confirmWindow.fadeOut()
@@ -144,7 +145,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
       }
 
       fun exit() {
-        if (!getIslandFile(id).exists() || initialIsland != island.createDto()) {
+        if (!getIslandFile(metadata.id).exists() || initialIsland != island.createDto()) {
           confirmExit.centerWindow()
           confirmExit.toggleShown(stage)
         } else {
@@ -278,16 +279,16 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
           menu("Island") {
             menuItem("Save") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.S) {
-                saveInitialIsland(id, island)
+                saveInitialIsland(metadata, island)
               }
             }
             menuItem("Reload") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.R) {
 
-                if (play(id)) {
-                  publishMessage("Successfully reloaded island $id")
+                if (play(metadata)) {
+                  publishMessage("Successfully reloaded island ${metadata.id}")
                 } else {
-                  publishError("Failed to reload island $id")
+                  publishError("Failed to reload island ${metadata.id}")
                 }
               }
             }

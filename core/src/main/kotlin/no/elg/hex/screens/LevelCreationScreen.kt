@@ -269,7 +269,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
               "CREATOR",
               "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value}"
             )
-            play(nextId, createIsland())
+            play(FastIslandMetadata(nextId), createIsland())
           }
         }
 

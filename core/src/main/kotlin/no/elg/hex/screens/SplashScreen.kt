@@ -10,7 +10,7 @@ import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.util.play
 
 /** @author Elg */
-class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), ReloadableScreen {
+class SplashScreen(private var nextScreen: AbstractScreen?) : AbstractScreen(), ReloadableScreen {
 
   private var startTime: Long = System.currentTimeMillis()
 
@@ -80,7 +80,7 @@ class SplashScreen(var nextScreen: AbstractScreen?) : AbstractScreen(), Reloadab
         Hex.screen = screen
         return
       } else if (screen is SplashIslandScreen) {
-        play(screen.id, screen.island)
+        play(screen.metadata, screen.island)
       } else if (screen is ReloadableScreen) {
         Hex.screen = screen.recreate()
       } else {

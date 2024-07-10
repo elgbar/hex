@@ -39,11 +39,12 @@ class FastIslandMetadata(
   private var internalPreview: Texture? = null
 
   @get:JsonIgnore
-  val preview: Texture? get() {
-    if (internalPreview != null) return internalPreview
-    internalPreview = textureFromBytes(previewPixmap ?: return null)
-    return internalPreview
-  }
+  val preview: Texture?
+    get() {
+      if (internalPreview != null) return internalPreview
+      internalPreview = textureFromBytes(previewPixmap ?: return null)
+      return internalPreview
+    }
 
   override fun compareTo(other: FastIslandMetadata): Int =
     comparingInt(
@@ -61,6 +62,11 @@ class FastIslandMetadata(
   @OptIn(ExperimentalEncodingApi::class)
   fun save() {
     if (Hex.args.mapEditor) {
+      require(id >= 0) { "Island id must be positive, is $id" }
+      require(!Hex.args.mapEditor || modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
+      requireNotNull(previewPixmap) { "A preview have not been generated" }
+      requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
+
       val fileHandle = getFileHandle(id, true)
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()
@@ -101,7 +107,7 @@ class FastIslandMetadata(
       getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
 
     @OptIn(ExperimentalEncodingApi::class)
-    fun load(id: Int): FastIslandMetadata? {
+    fun load(id: Int): FastIslandMetadata {
       val pref: String? = islandPreferences.getString(getMetadataFileName(id), null)
       return try {
         val bytes = if (Hex.args.mapEditor || pref.isNullOrEmpty()) {
@@ -112,7 +118,7 @@ class FastIslandMetadata(
         Hex.smileMapper.readValue(bytes)
       } catch (e: Exception) {
         Gdx.app.error("IslandMetadataDto", "Failed to find a metadata dto with id $id", e)
-        null
+        FastIslandMetadata(id)
       }
     }
   }

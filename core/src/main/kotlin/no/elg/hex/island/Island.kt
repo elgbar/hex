@@ -393,6 +393,7 @@ class Island(
     Hex.screen.also {
       if (it is PreviewIslandScreen) {
         clearIslandProgress(it.id)
+        clearIslandProgress(it.metadata.id)
       }
     }
     Hex.screen = LevelSelectScreen()

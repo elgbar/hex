@@ -16,12 +16,12 @@ fun getProgress(id: Int, preview: Boolean = false): String? {
 }
 
 fun PreviewIslandScreen.saveProgress() {
-  Gdx.app.debug("IS PROGRESS", "Saving progress of island $id")
+  Gdx.app.debug("IS PROGRESS", "Saving progress of island ${metadata.id}")
   island.select(null)
-  islandPreferences.putString(getPrefName(id, false), island.createDto().serialize())
+  islandPreferences.putString(getPrefName(metadata.id, false), island.createDto().serialize())
   islandPreferences.flush()
   if (!Hex.paused) {
-    Hex.assets.islandPreviews.updateSelectPreview(id, island, metadata)
+    Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
   }
 }
 

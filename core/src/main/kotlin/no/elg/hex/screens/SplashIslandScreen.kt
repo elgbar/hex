@@ -12,11 +12,12 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.AbstractInput
 import no.elg.hex.island.Island
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.loadIslandSync
 import no.elg.hex.util.playClick
 
-class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScreen() {
+class SplashIslandScreen(val metadata: FastIslandMetadata, var island: Island? = null) : AbstractScreen() {
 
   var loadable: Boolean = true
     private set
@@ -28,19 +29,19 @@ class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScre
   init {
     require(!loading) { "Two island splash screens should not be active at the same time!" }
     loading = true
-    val islandFile = getIslandFile(id)
+    val islandFile = getIslandFile(metadata.id)
     val initIsland = island
     if (initIsland == null && !islandFile.exists()) {
-      MessagesRenderer.publishWarning("Tried to play island $id, but island does not exist")
+      MessagesRenderer.publishWarning("Tried to play island ${metadata.id}, but island does not exist")
       loading = false
       loadable = false
     } else {
       Hex.screen = if (initIsland != null) {
         dispose()
-        createIslandScreen(id, initIsland)
+        createIslandScreen(metadata, initIsland)
       } else {
         KtxAsync.launch(Hex.asyncThread) {
-          island = loadIslandSync(id)
+          island = loadIslandSync(metadata.id)
         }
         this
       }
@@ -52,13 +53,13 @@ class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScre
     val currIsland = island
     if (currIsland != null) {
       loading = false
-      Hex.screen = createIslandScreen(id, currIsland)
-      Gdx.app.log("IS SPLASH", "Loaded island $id in ${System.currentTimeMillis() - startTime} ms")
+      Hex.screen = createIslandScreen(metadata, currIsland)
+      Gdx.app.log("IS SPLASH", "Loaded island ${metadata.id} in ${System.currentTimeMillis() - startTime} ms")
     } else {
       batch.use {
         val txt =
           """
-          |Loading Island $id
+          |Loading Island ${metadata.id}
           |
           |0%
           |
@@ -102,11 +103,11 @@ class SplashIslandScreen(val id: Int, var island: Island? = null) : AbstractScre
       }
     }
 
-    fun createIslandScreen(id: Int, island: Island) =
+    fun createIslandScreen(metadata: FastIslandMetadata, island: Island) =
       if (Hex.args.mapEditor) {
-        MapEditorScreen(id, island)
+        MapEditorScreen(metadata, island)
       } else {
-        PlayableIslandScreen(id, island)
+        PlayableIslandScreen(metadata, island)
       }
   }
 }

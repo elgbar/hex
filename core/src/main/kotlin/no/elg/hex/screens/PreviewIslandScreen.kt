@@ -21,13 +21,11 @@ import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
 /** @author Elg */
-open class PreviewIslandScreen(val id: Int, val island: Island, private val isPreviewRenderer: Boolean) : AbstractScreen(), ReloadableScreen {
+open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Island, private val isPreviewRenderer: Boolean) : AbstractScreen(), ReloadableScreen {
 
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
   var smoothTransition: SmoothTransition? = null
-
-  val metadata = FastIslandMetadata.load(id) ?: FastIslandMetadata(id)
 
   private val visibleGridSize
     get() = if (Hex.args.mapEditor) {
@@ -110,7 +108,7 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
   }
 
   override fun recreate(): AbstractScreen =
-    createIslandScreen(id, island).also {
+    createIslandScreen(metadata, island).also {
       Gdx.app.postRunnable {
         it.resize(Gdx.graphics.width, Gdx.graphics.height)
         it.camera.combined.set(camera.combined)

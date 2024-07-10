@@ -7,11 +7,11 @@ import no.elg.hex.Assets.Companion.ISLAND_FILE_ENDING
 import no.elg.hex.Assets.Companion.ISLAND_PREVIEWS_DIR
 import no.elg.hex.Assets.Companion.ISLAND_SAVES_DIR
 import no.elg.hex.Hex
-import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.island.Island
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.SplashIslandScreen
@@ -30,22 +30,23 @@ fun getIslandFile(path: String, allowInternal: Boolean): FileHandle {
   return if (local.exists()) local else if (allowInternal) Gdx.files.internal(path) else local
 }
 
-fun play(id: Int, island: Island? = null): Boolean {
+fun play(id: UInt, island: Island? = null): Boolean = play(FastIslandMetadata(id.toInt()), island)
+fun play(metadata: FastIslandMetadata, island: Island? = null): Boolean {
   if (SplashIslandScreen.loading) {
     publishWarning("Already loading an island!")
     return false
   }
-  return SplashIslandScreen(id, island).loadable
+  return SplashIslandScreen(metadata, island).loadable
 }
 
-fun saveInitialIsland(id: Int, island: Island): Boolean {
+fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
   if (!island.validate()) {
     publishError("Island failed validation")
     return false
   }
   island.ensureCapitalStartFunds()
 
-  val file = getIslandFile(id, allowInternal = false)
+  val file = getIslandFile(metadata.id, allowInternal = false)
 
   val existed = file.exists()
   if (file.isDirectory) {
@@ -58,7 +59,7 @@ fun saveInitialIsland(id: Int, island: Island): Boolean {
     if (!existed) {
       Hex.assets.islandFiles.fullFilesSearch()
     }
-    Hex.assets.islandPreviews.updateSelectPreview(id)
+    Hex.assets.islandPreviews.updateSelectPreview(metadata)
     Hex.assets.islandPreviews.sortIslands()
     true
   } catch (e: Throwable) {
@@ -81,7 +82,7 @@ fun loadIslandSync(id: Int): Island {
     }
   } catch (e: Exception) {
     Gdx.app.postRunnable {
-      MessagesRenderer.publishError(
+      publishError(
         "Failed to load island $id due to a ${e::class.simpleName}: ${e.message}",
         exception = e
       )
