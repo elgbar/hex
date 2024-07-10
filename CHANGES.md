@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * A player could swap a living piece and a just-bought castle to get the castle for free
   * Thanks Willy!
 * Fix sorting islands without a rating before islands with ratings
+* Fix screen messages not fading out smoothly/at all
 
 ### Removed
 

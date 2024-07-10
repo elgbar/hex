@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.Color.YELLOW
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hud.ScreenRenderer.draw
+import no.elg.hex.util.requestRenderingIn
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** @author Elg */
@@ -59,18 +60,18 @@ object MessagesRenderer : FrameUpdatable {
 
     ScreenRenderer.use {
       for ((index, pair) in messages.withIndex()) {
-        val (message, timeLeft) = pair
+        val (message, lastTimeLeft) = pair
 
-        if (timeLeft < FADE_START) {
-          val alpha = timeLeft / FADE_START
-          message.setAlpha(alpha)
-        } else {
-          message
-        }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
-
-        val newTime = timeLeft - Gdx.graphics.deltaTime
-        if (newTime > 0f) {
-          newMessages.add(message to newTime)
+        val updatedTime = lastTimeLeft - Gdx.graphics.deltaTime
+        if (updatedTime > 0f) {
+          if (updatedTime < FADE_START) {
+            Gdx.graphics.requestRendering()
+            val alpha = updatedTime / FADE_START
+            message.setAlpha(alpha)
+          } else {
+            message
+          }.draw(index + 1, ScreenDrawPosition.BOTTOM_RIGHT)
+          newMessages.add(message to updatedTime)
         } else if (message is StaticScreenText) {
           staticTextPool.free(message)
         }
@@ -78,6 +79,10 @@ object MessagesRenderer : FrameUpdatable {
     }
     messages.clear()
     messages.addAll(newMessages)
+
+    newMessages.map { it.second - FADE_START }.filter { it > 0 }.minOrNull()?.also {
+      Gdx.graphics.requestRenderingIn(it)
+    }
   }
 
   private fun ScreenText.setAlpha(alpha: Float): ScreenText {

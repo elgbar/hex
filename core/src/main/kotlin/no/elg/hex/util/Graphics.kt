@@ -50,6 +50,7 @@ private var wantedRenderTime = Long.MAX_VALUE
 private var currentTask: TimerTask? = null
 
 fun Graphics.requestRenderingIn(seconds: Float) {
+  require(seconds >= 0) { "Seconds must be positive" }
   synchronized(futureRequestRenderTimer) {
     val delayMs = (seconds * 1000.0).toLong()
     val nextRenderTime = System.currentTimeMillis() + delayMs
@@ -58,7 +59,6 @@ fun Graphics.requestRenderingIn(seconds: Float) {
       currentTask?.cancel()
       currentTask = futureRequestRenderTimer.schedule(delayMs) {
         synchronized(futureRequestRenderTimer) {
-//          Gdx.app.trace("requestRenderingIn") { "Requesting rendering, (accuracy is ${System.currentTimeMillis() - nextRenderTime} ms)" }
           if (wantedRenderTime == nextRenderTime) {
             wantedRenderTime = Long.MAX_VALUE
           }
