@@ -5,8 +5,6 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
 import ktx.actors.isShown
-import ktx.scene2d.actors
-import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
@@ -75,7 +73,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    if(ignoreInput) return false
+    if (ignoreInput) return false
     val id = getHoveringIslandId()
     Gdx.app.debug("SELECT", "Clicked on id $id")
     when {
@@ -119,19 +117,19 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-    if(ignoreInput) return false
+    if (ignoreInput) return false
     scroll(-Gdx.input.getDeltaY(0).toFloat())
     return true
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
-    if(ignoreInput) return false
+    if (ignoreInput) return false
     scroll(amountY * SCROLL_SPEED)
     return true
   }
 
   override fun keyDown(keycode: Int): Boolean {
-    if(ignoreInput) return false
+    if (ignoreInput) return false
     when (keycode) {
       Keys.FORWARD_DEL, Keys.DEL -> {
         if (Hex.args.mapEditor) {

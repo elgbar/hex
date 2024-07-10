@@ -322,7 +322,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       if (teamPercentages >= PERCENT_HEXES_OWNED_TO_WIN ||
         percentagesHexagons.all { (team, percent) -> team === currentTeam || percent < MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER }
       ) {
-        acceptAISurrender.show(stageScreen.stage)
+        acceptAISurrender.show(stage)
         return
       }
     }
@@ -390,7 +390,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
         }
 
         // We can do an action! Let's warn users of ending their turn
-        confirmEndTurn.show(stageScreen.stage)
+        confirmEndTurn.show(stage)
         return
       }
     }

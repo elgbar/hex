@@ -31,8 +31,8 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   private val mouseY get() = input.mouseY
 
   lateinit var confirmWindow: KVisWindow
-  lateinit var toPlay : FastIslandMetadata
-  fun initStage() {
+  lateinit var toPlay: FastIslandMetadata
+  private fun initStage() {
     stage.actors {
       confirmWindow = confirmWindow(
         "Restart Island?",
