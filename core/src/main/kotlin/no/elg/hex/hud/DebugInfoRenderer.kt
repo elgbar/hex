@@ -52,7 +52,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
           format = { island ->
             val gridData = island.grid.gridData
             "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()} " +
-              "ARtB ${island.authorRoundsToBeat} Id ${(Hex.screen as? PreviewIslandScreen)?.id ?: -1} "
+              (Hex.screen as? PreviewIslandScreen)?.metadata?.let { metadata -> "ARtB ${metadata.authorRoundsToBeat} Id ${metadata.id} " }
           }
         ),
         prefixText(

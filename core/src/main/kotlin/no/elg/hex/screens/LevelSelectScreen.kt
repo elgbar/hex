@@ -52,7 +52,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
       }
 
       batch.draw(metadata.preview, x, y, width, height)
-      if (Hex.debugStage || (Hex.args.mapEditor && metadata.island.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT)) {
+      if (Hex.debugStage || (Hex.args.mapEditor && metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT)) {
         drawBox(x, y, width, height)
       }
     }

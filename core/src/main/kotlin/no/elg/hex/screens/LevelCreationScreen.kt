@@ -44,6 +44,7 @@ import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_OCTAVES
 import no.elg.hex.island.IslandGeneration.INITIAL_FREQUENCY
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
 import no.elg.hex.util.value
@@ -332,7 +333,8 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       Hex.assets.islandPreviews.renderPreview(
         createIsland(),
         previewSize,
-        previewSize
+        previewSize,
+        FastIslandMetadata(-1)
       ) {
         previewBuffer?.dispose()
         previewBuffer = it

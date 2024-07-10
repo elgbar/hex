@@ -5,41 +5,56 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.module.kotlin.readValue
+import ktx.assets.disposeSafely
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
+import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.islandPreferences
-import no.elg.hex.util.loadIslandSync
 import no.elg.hex.util.textureFromBytes
 import java.util.Comparator.comparingInt
 import java.util.function.ToIntFunction
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-// TODO add if the island is completed/surrendered to make it possible to warn before restarting the island
-data class FastIslandMetadata(
+class FastIslandMetadata(
   val id: Int,
-  val authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT,
-  val previewPixmap: ByteArray
+  previewPixmap: ByteArray? = null,
+  /**
+   * The number of rounds the author has beaten the island in
+   */
+  var authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT,
+
+  var modifier: PreviewModifier = PreviewModifier.NOTHING
 ) : Comparable<FastIslandMetadata>, Disposable {
 
-  @get:JsonIgnore
-  val preview: Texture by lazy { textureFromBytes(previewPixmap) }
+  var previewPixmap: ByteArray? = previewPixmap
+    set(value) {
+      internalPreview.disposeSafely()
+      internalPreview = null
+      field = value
+    }
+
+  private var internalPreview: Texture? = null
 
   @get:JsonIgnore
-  val island: Island by lazy { loadIslandSync(id) }
+  val preview: Texture? get() {
+    if (internalPreview != null) return internalPreview
+    internalPreview = textureFromBytes(previewPixmap ?: return null)
+    return internalPreview
+  }
 
   override fun compareTo(other: FastIslandMetadata): Int =
-    comparingInt(object : ToIntFunction<FastIslandMetadata> {
-      override fun applyAsInt(p0: FastIslandMetadata): Int =
-        if (Island.UNKNOWN_ROUNDS_TO_BEAT == p0.authorRoundsToBeat) {
+    comparingInt(
+      ToIntFunction<FastIslandMetadata> { metadata ->
+        if (Island.UNKNOWN_ROUNDS_TO_BEAT == metadata.authorRoundsToBeat) {
           Int.MAX_VALUE / 2
         } else {
-          p0.authorRoundsToBeat
+          metadata.authorRoundsToBeat
         }
-    })
+      }
+    )
       .thenComparing(comparingInt(FastIslandMetadata::id).reversed())
       .compare(this, other)
 
@@ -57,9 +72,25 @@ data class FastIslandMetadata(
   }
 
   override fun dispose() {
-    if (::preview.isLazyInitialized) {
-      preview.dispose()
-    }
+    internalPreview.disposeSafely()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as FastIslandMetadata
+
+    if (id != other.id) return false
+    if (authorRoundsToBeat != other.authorRoundsToBeat) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = id
+    result = 31 * result + authorRoundsToBeat
+    return result
   }
 
   companion object {

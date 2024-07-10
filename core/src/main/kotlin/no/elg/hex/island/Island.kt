@@ -69,7 +69,7 @@ import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 /** @author Elg */
-@JsonIgnoreProperties("initialLoad", "handRestore")
+@JsonIgnoreProperties("initialLoad", "handRestore", "authorRoundsToBeat")
 class Island(
   width: Int,
   height: Int,
@@ -84,8 +84,7 @@ class Island(
   @JsonAlias("turn")
   round: Int = 1,
   @JsonAlias("team")
-  private val startTeam: Team = Settings.startTeam,
-  var authorRoundsToBeat: Int = UNKNOWN_ROUNDS_TO_BEAT
+  private val startTeam: Team = Settings.startTeam
 ) {
   var round = round
     private set
@@ -141,7 +140,7 @@ class Island(
       territoryCoordinate = dto.territoryCoordinate,
       handCoordinate = dto.handCoordinate,
       handPiece = dto.handPiece,
-      handRestoreAction = dto.handRestoreAction,
+      handRestoreActionName = dto.handRestoreAction,
       hexagonData = dto.hexagonData,
       team = dto.team
     )
@@ -174,7 +173,7 @@ class Island(
     territoryCoordinate: CubeCoordinate? = null,
     handCoordinate: CubeCoordinate? = null,
     handPiece: Piece? = null,
-    handRestoreAction: String? = null,
+    handRestoreActionName: String? = null,
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     team: Team
   ) {
@@ -204,7 +203,7 @@ class Island(
     if (successfulSelect && handPiece != null && territory != null) {
       val handHex = territory.hexagons.find { it.cubeCoordinate == handCoordinate }
       val handData = handHex?.let(::getData) ?: EDGE_DATA
-      val handRestoreAction = Hand.Companion.RestoreAction.fromString(handRestoreAction)
+      val handRestoreAction = Hand.Companion.RestoreAction.fromString(handRestoreActionName)
       hand = Hand(
         territory,
         handPiece::class.createInstance(handData).also {
@@ -742,8 +741,7 @@ class Island(
       handRestoreAction = handRestoreAction,
       hexagonData = visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
       round = round,
-      team = currentTeam,
-      authorRoundsToBeat = authorRoundsToBeat
+      team = currentTeam
     )
   }
 }

@@ -3,8 +3,6 @@ package no.elg.hex.util
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import no.elg.hex.Hex
-import no.elg.hex.preview.PreviewModifier
-import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.screens.PreviewIslandScreen
 
 val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
@@ -22,13 +20,8 @@ fun PreviewIslandScreen.saveProgress() {
   island.select(null)
   islandPreferences.putString(getPrefName(id, false), island.createDto().serialize())
   islandPreferences.flush()
-  val modifier = if (this is PlayableIslandScreen) {
-    modifier
-  } else {
-    PreviewModifier.NOTHING
-  }
   if (!Hex.paused) {
-    Hex.assets.islandPreviews.updateSelectPreview(id, modifier, island)
+    Hex.assets.islandPreviews.updateSelectPreview(id, island, metadata)
   }
 }
 

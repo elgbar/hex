@@ -10,6 +10,7 @@ import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.input.SmoothTransition
 import no.elg.hex.island.Island
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
@@ -25,6 +26,8 @@ open class PreviewIslandScreen(val id: Int, val island: Island, private val isPr
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
   var smoothTransition: SmoothTransition? = null
+
+  val metadata = FastIslandMetadata.load(id) ?: FastIslandMetadata(id)
 
   private val visibleGridSize
     get() = if (Hex.args.mapEditor) {

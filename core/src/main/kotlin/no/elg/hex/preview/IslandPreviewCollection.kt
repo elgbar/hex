@@ -77,11 +77,10 @@ class IslandPreviewCollection : Disposable {
     island: Island,
     previewWidth: Int,
     previewHeight: Int,
-    modifier: PreviewModifier = PreviewModifier.NOTHING,
+    metadata: FastIslandMetadata,
     onComplete: (preview: FrameBuffer) -> Unit
   ) {
-    val runnable = doRenderPreview(island, previewWidth, previewHeight, modifier, onComplete)
-    addPreviewRender(runnable)
+    addPreviewRender(doRenderPreview(island, previewWidth, previewHeight, metadata, onComplete))
     renderNextPreview()
   }
 
@@ -96,7 +95,7 @@ class IslandPreviewCollection : Disposable {
     island: Island,
     previewWidth: Int,
     previewHeight: Int,
-    modifier: PreviewModifier = PreviewModifier.NOTHING,
+    metadata: FastIslandMetadata,
     onComplete: (preview: FrameBuffer) -> Unit
   ) = Runnable {
     val islandScreen = PreviewIslandScreen(-1, island, true)
@@ -151,16 +150,19 @@ class IslandPreviewCollection : Disposable {
 
       camera.setToOrtho(islandScreen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
       islandScreen.batch.use(camera) {
-        when (modifier) {
+        when (metadata.modifier) {
           PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
           PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
           PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
-          PreviewModifier.WON -> printText("${island.round}")
+          PreviewModifier.WON -> {
+            drawAsset(Hex.assets.capital)
+            printText(island.round.toString())
+          }
           PreviewModifier.NOTHING -> Unit
         }
 
         if (Hex.trace && !Hex.args.mapEditor) {
-          printText("ARtB: ${island.authorRoundsToBeat}")
+          printText("ARtB: ${metadata.authorRoundsToBeat}")
         }
       }
       camera.setToOrtho(islandScreen.yDown)
@@ -199,8 +201,8 @@ class IslandPreviewCollection : Disposable {
 
   fun updateSelectPreview(
     id: Int,
-    modifier: PreviewModifier = PreviewModifier.NOTHING,
-    maybeIsland: Island? = null
+    maybeIsland: Island? = null,
+    maybeFastIslandMetadata: FastIslandMetadata? = null
   ) {
     KtxAsync.launch(Hex.asyncThread) {
       val island = if (maybeIsland == null) {
@@ -218,9 +220,9 @@ class IslandPreviewCollection : Disposable {
       }
 
       val rendereredPreviewSize = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
-      renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, modifier) { preview ->
-
-        val islandMetadata = FastIslandMetadata(id, island.authorRoundsToBeat, preview.toBytes())
+      val islandMetadata = maybeFastIslandMetadata ?: FastIslandMetadata(id)
+      renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, islandMetadata) { preview ->
+        islandMetadata.previewPixmap = preview.toBytes()
         islandMetadata.save()
         synchronized(internalPreviewRendererQueue) {
           val existingIndex = fastIslandPreviews.indexOfFirst { it.id == id }

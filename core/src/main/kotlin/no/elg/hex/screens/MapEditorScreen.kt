@@ -93,7 +93,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
     private set
 
   var editor: Editor = OpaquenessEditor.ToggleOpaqueness
-  val artbSpinner = IntSpinnerModel(island.authorRoundsToBeat, Int.MIN_VALUE, Int.MAX_VALUE)
+  val artbSpinner = IntSpinnerModel(metadata.authorRoundsToBeat, Int.MIN_VALUE, Int.MAX_VALUE)
 
   init {
     stageScreen.stage.actors {
@@ -117,7 +117,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         spinner("", artbSpinner) {
           onChange {
             val parsedInt = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
-            island.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
+            metadata.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
           }
           it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
         }

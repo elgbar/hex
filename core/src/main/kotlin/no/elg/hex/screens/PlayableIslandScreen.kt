@@ -76,9 +76,6 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   private val disableChecker: MutableMap<Disableable, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
-  var modifier = NOTHING
-    private set
-
   val stage: Stage get() = stageScreen.stage
 
   init {
@@ -87,7 +84,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
 
       fun endGame(modifier: PreviewModifier): KVisWindow.() -> Unit = {
         island.history.disable()
-        this@PlayableIslandScreen.modifier = modifier
+        metadata.modifier = modifier
         island.restoreInitialState()
       }
 
@@ -443,7 +440,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
     frameUpdatable.dispose()
     stageScreen.dispose()
     island.cancelCurrentAI()
-    if (modifier == NOTHING) {
+    if (metadata.modifier == NOTHING) {
       saveProgress()
     }
 
