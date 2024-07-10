@@ -146,6 +146,12 @@ fun Island.fixWrongTreeTypes() {
   forEachPieceType<TreePiece> { hex, _, _ -> replaceWithTree(this, hex) }
 }
 
+fun Island.cleanPiecesOnInvisibleHexagons() {
+  invisibleHexagons.withData(this, false) { _, data ->
+    data.setPiece<Empty>()
+  }
+}
+
 fun Island.removeSmallerIslands() {
   val islands = findIslands()
   val maxIsland = islands.maxByOrNull { it.size } ?: return

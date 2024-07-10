@@ -47,6 +47,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
 import no.elg.hex.model.IslandDto
+import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fixWrongTreeTypes
@@ -232,16 +233,13 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         }
       )
 
-      val infoWindow = visWindow("Island editor information") {
+      val infoWindow = visWindow("Island validation information") {
         closeOnEscape()
         addCloseButton()
         isModal = true
         visLabel(
           """
-            |Tips and Tricks:
-            |* Holding SHIFT will reverse iteration order, unless otherwise stated
-            |
-            |Island Validation rules:
+            |Island Validation Rules:
             |
             |* All visible hexagons must be reachable from all other visible hexagons 
             |  (i.e., there can only be one island)
@@ -249,6 +247,7 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             |* There must be exactly one capital per territory
             |* Pine tree can not have an invisible hexagons next to them
             |* Palms trees can not only be surrendered by visible hexagons
+            |* No pieces on invisible hexagons
           """.trimMargin()
         ) {
           it.expand().fill()
@@ -310,6 +309,11 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
             menuItem("Fix wrong tree types") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.T) {
                 island.fixWrongTreeTypes()
+              }
+            }
+            menuItem("Remove pieces on invisible hexagons") {
+              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.I) {
+                island.cleanPiecesOnInvisibleHexagons()
               }
             }
 

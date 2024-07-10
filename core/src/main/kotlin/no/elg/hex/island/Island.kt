@@ -108,6 +108,7 @@ class Island(
 
   val allHexagons: Set<Hexagon<HexagonData>> get() = internalAllHexagons
   val visibleHexagons: Set<Hexagon<HexagonData>> get() = internalVisibleHexagons
+  val invisibleHexagons: Set<Hexagon<HexagonData>> get() = allHexagons - visibleHexagons
 
   var hand: Hand? = null
     set(value) {
@@ -687,6 +688,16 @@ class Island(
       publishError("The visible hexagon grid is not connected.")
       valid = false
     }
+
+    // Check rules which apply to each invisible hexagon
+    for (hexagon in invisibleHexagons) {
+      val data = this.getData(hexagon)
+      if (data.piece !is Empty) {
+        publishError("Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is invisible but has a piece on it! ${data.piece}")
+        valid = false
+      }
+    }
+
     return valid
   }
 
