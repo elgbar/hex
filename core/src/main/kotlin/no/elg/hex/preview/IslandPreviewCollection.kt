@@ -13,13 +13,11 @@ import kotlinx.coroutines.launch
 import ktx.assets.load
 import ktx.async.KtxAsync
 import ktx.collections.GdxArray
-import ktx.graphics.center
 import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
-import no.elg.hex.screens.LevelSelectScreen.Companion.shownPreviewSize
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFileName
@@ -100,7 +98,7 @@ class IslandPreviewCollection : Disposable {
   ) = Runnable {
     val islandScreen = PreviewIslandScreen(FastIslandMetadata(-1), island, true)
     islandScreen.resize(previewWidth, previewHeight)
-    islandScreen.centerCamera()
+
     val buffer = FrameBuffer(
       Pixmap.Format.RGBA8888,
       previewWidth.coerceAtLeast(1),
@@ -111,44 +109,37 @@ class IslandPreviewCollection : Disposable {
       Hex.setClearColorAlpha(0f)
       Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
-      islandScreen.updateCamera()
       islandScreen.render(0f)
       val camera = islandScreen.camera
+      camera.zoom = .25f
+      islandScreen.updateCamera()
 
-      val widthOffset = camera.viewportWidth / 5
-      val heightOffset = camera.viewportHeight / 5
-
+      val width = camera.zoom * previewWidth / 2f
+      val height = camera.zoom * previewHeight / 2f
       fun drawAsset(textureRegion: TextureAtlas.AtlasRegion) {
         islandScreen.batch.draw(
           textureRegion,
-          widthOffset,
-          heightOffset,
-          camera.viewportWidth - widthOffset * 2,
-          camera.viewportHeight - heightOffset * 2
+          camera.position.x - width / 2f,
+          camera.position.y - height / 2f,
+          width,
+          height
         )
       }
 
-      fun printText(text: String) {
+      fun printText(text: String, heightMod: Float) {
         val font = Hex.assets.regularFont
-
-        camera.setToOrtho(islandScreen.yDown, widthOffset, heightOffset)
-        camera.center(widthOffset, heightOffset)
-
-        islandScreen.batch.projectionMatrix = camera.combined
-
         font.color = Color.WHITE
         font.draw(
           islandScreen.batch,
           text,
+          camera.position.x,
+          camera.position.y + heightMod,
           0f,
-          (camera.viewportHeight - font.data.capHeight) / 2f,
-          camera.viewportWidth,
           Align.center,
           false
         )
       }
 
-      camera.setToOrtho(islandScreen.yDown, previewWidth.toFloat(), previewHeight.toFloat())
       islandScreen.batch.use(camera) {
         when (metadata.modifier) {
           PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
@@ -156,17 +147,16 @@ class IslandPreviewCollection : Disposable {
           PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
           PreviewModifier.WON -> {
             drawAsset(Hex.assets.capital)
-            printText(island.round.toString())
+            printText("Won in ${island.round} rounds", height / 2f)
           }
 
           PreviewModifier.NOTHING -> Unit
         }
 
-        if (Hex.trace && !Hex.args.mapEditor) {
-          printText("ARtB: ${metadata.authorRoundsToBeat}")
+        if (Hex.debug && !Hex.args.mapEditor) {
+          printText("id ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", -height / 1.5f)
         }
       }
-      camera.setToOrtho(islandScreen.yDown)
       Hex.setClearColorAlpha(1f)
     }
     islandScreen.dispose()

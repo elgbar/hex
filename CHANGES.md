@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Thanks Willy!
 * Fix sorting islands without a rating before islands with ratings
 * Fix screen messages not fading out smoothly/at all
+* Fix previews being inconsistently rendered
 
 ### Removed
 
