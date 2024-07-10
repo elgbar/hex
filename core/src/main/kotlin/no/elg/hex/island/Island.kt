@@ -392,7 +392,7 @@ class Island(
     history.clear()
     Hex.screen.also {
       if (it is PreviewIslandScreen) {
-        clearIslandProgress(it.id)
+        Hex.assets.islandPreviews.updateSelectPreview(it.metadata, it.island)
         clearIslandProgress(it.metadata.id)
       }
     }
