@@ -2,34 +2,39 @@
 
 package no.elg.hex.input.editor
 
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hud.MessagesRenderer.publishWarning
 import org.hexworks.mixite.core.api.Hexagon
 
 sealed interface OpaquenessEditor : Editor {
 
-  override fun postEdit(metadata: EditMetadata) {
-//    metadata.island.recalculateVisibleIslands()
-  }
-
-  object SetOpaque : OpaquenessEditor {
+  data object SetOpaque : OpaquenessEditor {
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
       data.isDisabled = false
     }
   }
 
-  object SetTransparent : OpaquenessEditor {
+  data object SetTransparent : OpaquenessEditor {
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
       data.isDisabled = true
+      if (data.piece !is Empty) {
+        publishWarning("Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is had ${data.piece} on it. It has been removed.", 1f)
+        data.setPiece<Empty>()
+      }
     }
   }
 
-  object ToggleOpaqueness : OpaquenessEditor {
+  data object ToggleOpaqueness : OpaquenessEditor {
 
     override val order: Int = 0
 
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-      val shouldDisable = metadata.clickedHexagonData.invisible
-      data.isDisabled = !shouldDisable
+      if (metadata.clickedHexagonData.invisible) {
+        SetOpaque.edit(hexagon, data, metadata)
+      } else {
+        SetTransparent.edit(hexagon, data, metadata)
+      }
     }
   }
 }

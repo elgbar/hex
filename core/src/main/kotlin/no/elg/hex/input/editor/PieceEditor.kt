@@ -1,20 +1,31 @@
 package no.elg.hex.input.editor
 
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.PIECES
+import no.elg.hex.hexagon.Piece
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.reflect.KClass
 
 sealed interface PieceEditor : Editor {
 
-  object SetPiece : PieceEditor {
-    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-      data.setPiece(metadata.selectedPiece)
+  companion object {
+    fun HexagonData.trySetPiece(pieceClass: KClass<out Piece>) {
+      if (visible || pieceClass == Empty::class) {
+        setPiece(pieceClass)
+      }
     }
   }
 
-  object RandomizePiece : PieceEditor {
+  data object SetPiece : PieceEditor {
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-      data.setPiece(PIECES.random())
+      data.trySetPiece(metadata.selectedPiece)
+    }
+  }
+
+  data object RandomizePiece : PieceEditor {
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
+      data.trySetPiece(PIECES.random())
     }
   }
 }
