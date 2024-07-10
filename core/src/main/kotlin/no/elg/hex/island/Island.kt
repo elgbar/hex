@@ -461,7 +461,7 @@ class Island(
     if (capitals.isEmpty()) {
       // No capital found, generate a new capital
       val capHexData = this.getData(calculateBestCapitalPlacement(territoryHexes))
-      return if (capHexData.setPiece(Capital::class)) capHexData.piece as Capital else null
+      return if (capHexData.setPiece<Capital>()) capHexData.piece as Capital else null
     } else if (capitals.size == 1) {
       return this.getData(capitals.first()).piece as Capital
     }
@@ -484,7 +484,7 @@ class Island(
         continue
       }
       otherCapital.transfer(bestData)
-      data.setPiece(Empty::class)
+      data.setPiece<Empty>()
     }
     return bestData
   }

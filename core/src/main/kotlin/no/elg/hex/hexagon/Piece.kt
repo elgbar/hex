@@ -436,7 +436,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
 
   fun kill(island: Island, hex: Hexagon<HexagonData>) {
     Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.gridX},${hex.gridZ}) with a grave" }
-    island.getData(hex).setPiece(Grave::class)
+    island.getData(hex).setPiece<Grave>()
   }
 
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {

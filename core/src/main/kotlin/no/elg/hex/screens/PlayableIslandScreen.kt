@@ -122,7 +122,7 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
             continue
           }
           data.team = island.currentTeam
-          data.setPiece(Empty::class)
+          data.setPiece<Empty>()
         }
 
         island.select(null)

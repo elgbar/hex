@@ -137,7 +137,7 @@ fun Island.calculateStrength(hexagon: Hexagon<HexagonData>, pretendedTeam: Team?
 }
 
 fun Island.regenerateCapitals() {
-  forEachPieceType<Capital> { _, data, _ -> data.setPiece(Empty::class) }
+  forEachPieceType<Capital> { _, data, _ -> data.setPiece<Empty>() }
   ensureCapitalStartFunds()
   select(null)
 }

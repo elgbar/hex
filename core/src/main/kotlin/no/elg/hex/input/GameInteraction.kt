@@ -134,7 +134,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
       // We currently don't hold anything in our hand, so pick it up!
       island.history.remember("Pickup piece") {
         island.hand = Hand(territory, cursorPiece)
-        pieceChanged = hexData.setPiece(Empty::class)
+        pieceChanged = hexData.setPiece<Empty>()
       }
       Gdx.app.trace("PLACE") { "Hand was null, now it is ${island.hand}" }
       return pieceChanged
@@ -159,7 +159,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     if (oldPiece is LivingPiece && newPiece is Castle && hexData.team == territory.team) {
       if (!oldPiece.moved) {
         island.history.remember("Swapping castle for living piece") {
-          hexData.setPiece(Castle::class) {
+          hexData.setPiece<Castle>() {
             island.hand?.restore = Hand.Companion.NoRestore
             island.hand = Hand(territory, oldPiece, restore = Hand.Companion.RefundCastleSwapAction)
           }
@@ -235,7 +235,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
         piece is LivingPiece && !piece.moved
       }.forEach {
         pieces += it.piece as LivingPiece
-        it.setPiece(Empty::class)
+        it.setPiece<Empty>()
       }
       Gdx.app.trace("MARCH") { "Marching ${pieces.size} pieces" }
       if (pieces.isEmpty()) return false
