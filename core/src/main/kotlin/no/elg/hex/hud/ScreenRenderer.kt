@@ -293,7 +293,7 @@ object ScreenRenderer : Disposable, Resizable {
     private set
 
   /**
-   * Must call [begin] before using this function, call [end] when done drawing
+   * Must call [#begin] before using this function, call [#end] when done drawing
    */
   fun ScreenText.draw(
     line: Int,

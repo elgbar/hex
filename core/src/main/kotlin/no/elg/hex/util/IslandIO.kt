@@ -20,8 +20,6 @@ fun getIslandFileName(id: Int, preview: Boolean = false): String {
   return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$id.${if (preview) "png" else ISLAND_FILE_ENDING}"
 }
 
-fun getIslandLevelFileName(id: Int): String = "$ISLAND_SAVES_DIR.json"
-
 fun getIslandFile(id: Int, preview: Boolean = false, allowInternal: Boolean = true): FileHandle {
   val path = getIslandFileName(id, preview)
   return getIslandFile(path, allowInternal)

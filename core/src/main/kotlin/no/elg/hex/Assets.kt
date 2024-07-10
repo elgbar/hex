@@ -130,10 +130,6 @@ class Assets : AssetManager() {
 
     private const val FONT_SIZE = 20
 
-    private val FALLBACK_FONT by lazy {
-      BitmapFont(false)
-    }
-
     val nativeScale: Int by lazy {
       val size = when (Gdx.app.type) {
         Desktop -> defaultDisplayWidth
@@ -286,7 +282,6 @@ class Assets : AssetManager() {
     reportTiming("Load assets") {
       updateTitle()
       setLoader(IslandAsynchronousAssetLoader(resolver), ".$ISLAND_FILE_ENDING")
-      setLoader(IslandAsynchronousAssetLoader(resolver))
 
       loadingInfo = "fonts"
       // rest of the fonts

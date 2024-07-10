@@ -12,7 +12,6 @@ import kotlin.reflect.KClass
  */
 class SimpleEventListener<T : Event>(clazz: KClass<T>, private val run: (T) -> Unit) : Disposable {
 
-  @Suppress("UNCHECKED_CAST")
   private val eventList = Events.getEventList(clazz)
 
   init {

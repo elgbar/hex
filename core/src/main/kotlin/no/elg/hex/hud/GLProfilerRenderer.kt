@@ -53,6 +53,7 @@ object GLProfilerRenderer : FrameUpdatable, Disposable {
     }
   }
 
+  @Suppress("GDXKotlinProfilingCode")
   fun enable() {
     profiler.enable()
   }

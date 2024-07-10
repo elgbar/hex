@@ -159,7 +159,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     if (oldPiece is LivingPiece && newPiece is Castle && hexData.team == territory.team) {
       if (!oldPiece.moved) {
         island.history.remember("Swapping castle for living piece") {
-          hexData.setPiece<Castle>() {
+          hexData.setPiece<Castle> {
             island.hand?.restore = Hand.Companion.NoRestore
             island.hand = Hand(territory, oldPiece, restore = Hand.Companion.RefundCastleSwapAction)
           }

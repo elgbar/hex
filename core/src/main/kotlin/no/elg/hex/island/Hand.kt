@@ -2,12 +2,11 @@ package no.elg.hex.island
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
-import no.elg.hex.hexagon.Castle
+import no.elg.hex.hexagon.CASTLE_PRICE
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Piece
-import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.trace
 
 /** @author Elg */
@@ -50,7 +49,7 @@ data class Hand(
       val serializedName: String?
 
       companion object {
-        val allInstances: List<RestoreAction> = RestoreAction::class.sealedSubclasses
+        private val allInstances: List<RestoreAction> = RestoreAction::class.sealedSubclasses
           .map {
             it.objectInstance ?: error("All instances of RestoreAction must be an object, $it is not an object")
           }
@@ -65,18 +64,18 @@ data class Hand(
     data object NoRestore : RestoreAction {
       override fun restore(hand: Hand) = Unit
       override fun toString(): String = "No restore"
-      override val serializedName: String? = "no"
+      override val serializedName: String = "no"
     }
 
     data object RefundCastleSwapAction : RestoreAction {
       override fun restore(hand: Hand) {
-        hand.territory.capital.balance += Castle::class.createHandInstance().price
+        hand.territory.capital.balance += CASTLE_PRICE
         DefaultRestoreAction.restore(hand)
       }
 
       override fun toString(): String = "Castle Swap Restore"
 
-      override val serializedName: String? = "castle swap"
+      override val serializedName: String = "castle swap"
     }
 
     data object DefaultRestoreAction : RestoreAction {

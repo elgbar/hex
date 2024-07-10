@@ -22,6 +22,7 @@ internal class PreferenceDelegateTest {
     Gdx.app.exit()
   }
 
+  @Suppress("RemoveExplicitTypeArguments")
   private object TestSettings {
 
     var boolPref by PreferenceDelegate<Boolean>(true)

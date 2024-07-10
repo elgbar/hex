@@ -288,8 +288,9 @@ class PlayableIslandScreen(id: Int, island: Island) : PreviewIslandScreen(id, is
   }
 
   private fun surrender() {
-    modifier = SURRENDER
-    island.surrender()
+    metadata.modifier = SURRENDER
+    island.restoreInitialState()
+    Gdx.app.log("ISLAND", "Player surrendered on round ${island.round}")
   }
 
   private fun endGame(win: Boolean) {

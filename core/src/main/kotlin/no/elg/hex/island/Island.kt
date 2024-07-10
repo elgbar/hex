@@ -98,9 +98,9 @@ class Island(
   lateinit var gameInteraction: GameInteraction
 
   /**
-   * Prefer this over calling [grid.hexagons] as this has better performance.
+   * Prefer this over calling [HexagonalGrid.hexagons] as this has better performance.
    *
-   * During normal play it will only contain the visible hexagons but when [ApplicationArgumentsParser.mapEditor] is true this will contain all hexagons
+   * During normal play it will only contain the visible hexagons but when [no.elg.hex.ApplicationArgumentsParser.mapEditor] is `true` this will contain all hexagons
    */
   private val internalAllHexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
   private val internalVisibleHexagons: MutableSet<Hexagon<HexagonData>> = HashSet()
@@ -396,11 +396,6 @@ class Island(
       }
     }
     Hex.screen = LevelSelectScreen()
-  }
-
-  fun surrender() {
-    restoreInitialState()
-    Gdx.app.log("ISLAND", "Player surrendered on round $round")
   }
 
   /** Select the hex under the cursor */

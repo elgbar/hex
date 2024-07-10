@@ -17,8 +17,6 @@ fun schedule(delaySeconds: Float, task: () -> Unit) {
 
 /**
  * Executes the given [block] and returns elapsed time in milliseconds.
- *
- * @sample samples.system.Timing.measureBlockTimeMillis
  */
 @OptIn(ExperimentalContracts::class)
 inline fun <T> returningMeasureTimeMillis(block: () -> T): Pair<T, Long> {
