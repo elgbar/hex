@@ -27,6 +27,7 @@ import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
+import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.hexagon.PIECES
@@ -111,8 +112,21 @@ class MapEditorScreen(id: Int, island: Island) : PreviewIslandScreen(id, island,
         }
       )
 
-      visWindow("Enter Author Round to Beat") {
-        visLabel("Lowest number of rounds\nto beat this level\n$UNKNOWN_ROUNDS_TO_BEAT = not played, ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last")
+      visWindow("Enter ARtB") {
+        visTextTooltip(
+          """
+           Author Round to Beat (ARtB) is the 
+           lowest number of rounds to beat
+           this level and used to calculate 
+           the difficulty  of the level.
+          """.trimIndent()
+        )
+        visLabel(
+          """
+           Previous ARtB: ${metadata.authorRoundsToBeat}
+           $UNKNOWN_ROUNDS_TO_BEAT = not played, ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
+          """.trimIndent()
+        )
         row()
         spinner("", artbSpinner) {
           onChange {

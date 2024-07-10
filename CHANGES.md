@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Tweak tutorial screen
 * Pressing escape on desktop will take you back to the level select screen
 * Allow islands to be manually placed last
+* Make ARtB editing more user friendly
+  * Add a warning when resetting ARtB of an island
+  * Display the previous ARtB when editing an island
 
 ### Fixed
 

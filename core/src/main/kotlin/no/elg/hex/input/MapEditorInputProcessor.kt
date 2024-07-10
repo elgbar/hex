@@ -3,6 +3,7 @@ package no.elg.hex.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import no.elg.hex.hexagon.HexagonData
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.editor.EditMetadata
 import no.elg.hex.input.editor.Editor
 import no.elg.hex.island.Island
@@ -40,7 +41,10 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : AbstractInp
       editor.edit(hex, data, metadata)
     }
     editor.postEdit(metadata)
-    screen.artbSpinner.setValue(Island.UNKNOWN_ROUNDS_TO_BEAT, true)
+    if (screen.artbSpinner.value != Island.UNKNOWN_ROUNDS_TO_BEAT) {
+      MessagesRenderer.publishWarning("Resetting rounds to beat to unknown as the map has been edited")
+      screen.artbSpinner.setValue(Island.UNKNOWN_ROUNDS_TO_BEAT, true)
+    }
   }
 
   private fun setEditorMetadata(cursorHex: Hexagon<HexagonData>): EditMetadata {
