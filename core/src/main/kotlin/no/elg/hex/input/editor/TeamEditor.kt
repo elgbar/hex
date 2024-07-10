@@ -6,13 +6,13 @@ import org.hexworks.mixite.core.api.Hexagon
 
 sealed interface TeamEditor : Editor {
 
-  object SetTeam : TeamEditor {
+  data object SetTeam : TeamEditor {
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
       data.team = metadata.selectedTeam
     }
   }
 
-  object RandomizeTeam : TeamEditor {
+  data object RandomizeTeam : TeamEditor {
 
     override val order: Int = 0
 

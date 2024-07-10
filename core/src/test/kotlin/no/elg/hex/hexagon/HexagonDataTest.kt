@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 internal class HexagonDataTest {
   @Test
   internal fun `Can serialize hexagon data with capital piece`() {
-    val hex = HexagonData(false).also { it.setPiece(Capital::class) }
+    val hex = HexagonData(false).also { it.setPiece<Capital>() }
     val json = Hex.mapper.writeValueAsString(hex)
     assertEquals(hex, Hex.mapper.readValue<HexagonData>(json))
   }

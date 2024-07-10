@@ -92,13 +92,12 @@ class VariableScreenText<T : Any>(
   val format: (ScreenText.(T) -> String)? = null
 ) : ScreenText(color, bold, italic, next) {
 
-  @Suppress("IMPLICIT_CAST_TO_ANY")
   override val text: String
     get() = format(format, callable)
 }
 
 class NullableVariableScreenText<T : Any>(
-  val callable: () -> T?,
+  private val callable: () -> T?,
   color: Color = WHITE,
   bold: Boolean = false,
   italic: Boolean = false,
@@ -106,27 +105,26 @@ class NullableVariableScreenText<T : Any>(
   val format: (ScreenText.(T?) -> String)? = null
 ) : ScreenText(color, bold, italic, next) {
 
-  @Suppress("IMPLICIT_CAST_TO_ANY")
   override val text: String
     get() = formatNullable(format, callable)
 }
 
 @Suppress("SuspiciousVarProperty")
-class IfScreenText(val ifupon: () -> ScreenText) : ScreenText() {
+class IfScreenText(val ifUpon: () -> ScreenText) : ScreenText() {
 
-  override val text: String get() = ifupon().text
+  override val text: String get() = ifUpon().text
 
   override var color: Color = WHITE
-    get() = ifupon().color
+    get() = ifUpon().color
 
   override var bold: Boolean = false
-    get() = ifupon().bold
+    get() = ifUpon().bold
 
   override var italic: Boolean = false
-    get() = ifupon().italic
+    get() = ifUpon().italic
 
   override var next: ScreenText? = null
-    get() = ifupon().next
+    get() = ifUpon().next
 }
 
 val staticTextPool = pool { StaticScreenText("") }
