@@ -220,8 +220,7 @@ class IslandPreviewCollection : Disposable {
         maybeIsland
       }
 
-      val rendereredPreviewSize = (2 * shownPreviewSize.toInt()).coerceAtLeast(MIN_PREVIEW_SIZE)
-      renderPreview(island, rendereredPreviewSize, rendereredPreviewSize, metadata) { preview ->
+      renderPreview(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata) { preview ->
         metadata.previewPixmap = preview.toBytes()
         metadata.save()
         synchronized(internalPreviewRendererQueue) {
@@ -249,7 +248,7 @@ class IslandPreviewCollection : Disposable {
   }
 
   companion object {
-    private const val MIN_PREVIEW_SIZE = 512
+    private const val PREVIEW_SIZE = 1024
 
     val renderingCount = AtomicInteger(0)
     val renderingPreviews: Boolean get() = renderingCount.get() > 0
