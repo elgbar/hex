@@ -141,6 +141,7 @@ class Assets : AssetManager() {
     }
   }
 
+  val regularFontNotScaled: BitmapFont by lazy { getFont(bold = false, italic = false, fontSize = FONT_SIZE) }
   val regularFont: BitmapFont by lazy { getFont(bold = false, italic = false) }
   val regularItalicFont: BitmapFont by lazy { getFont(bold = false, italic = true) }
   val boldFont: BitmapFont by lazy { getFont(bold = true, italic = false) }
@@ -290,6 +291,7 @@ class Assets : AssetManager() {
       loadFont(bold = true, italic = true)
       loadFont(bold = false, italic = true, flip = false)
       loadFont(bold = true, italic = true, flip = false)
+      loadFont(bold = false, italic = false, flip = false, fontSize = FONT_SIZE)
 
       val notFlippedFontAsset = loadFont(bold = false, italic = false, flip = false)
       val boldNotFlippedFontAsset = loadFont(bold = true, italic = false, flip = false)
@@ -424,9 +426,8 @@ class Assets : AssetManager() {
     }
   }
 
-  private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont {
-    return fetch(fontAssetName(bold, italic, flip, fontSize))
-  }
+  private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont =
+    fetch(fontAssetName(bold, italic, flip, fontSize))
 
   private fun fontAssetName(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): String {
     val boldness = if (bold) "bold" else "regular"

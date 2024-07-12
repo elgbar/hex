@@ -45,7 +45,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     stage.actors {
       confirmWindow = confirmWindow(
         "Restart Island?",
-        "Do you want to restart island? This will reset all progress on the island.",
+        "This will reset all progress on the island.",
         whenConfirmed = {
           toPlay?.let {
             toPlay = null

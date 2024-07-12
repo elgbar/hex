@@ -127,7 +127,7 @@ class IslandPreviewCollection : Disposable {
       }
 
       fun printText(text: String, heightMod: Float) {
-        val font = Hex.assets.regularFont
+        val font = Hex.assets.regularFontNotScaled
         font.color = Color.WHITE
         font.draw(
           islandScreen.batch,
@@ -158,7 +158,7 @@ class IslandPreviewCollection : Disposable {
           }
           PreviewModifier.NOTHING ->
             if (!Hex.args.mapEditor) {
-              printText("Currently round ${island.round}", belowAsset)
+              printText("Round ${island.round}", belowAsset)
             }
         }
 
