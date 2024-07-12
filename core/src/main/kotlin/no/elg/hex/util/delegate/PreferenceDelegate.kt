@@ -54,7 +54,6 @@ open class PreferenceDelegate<T : Any>(
   fun displayRestartWarning() = requireRestart && changed
 
   init {
-    @Suppress("LeakingThis")
     require(initialValue is Number || initialValue is String || initialValue is Boolean || initialValue is Char || initialValue is Enum<*>) {
       "Type must either be Enum, Number, String, Char, or Boolean. The given type us ${initialValue::class.simpleName}"
     }
