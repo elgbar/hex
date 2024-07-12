@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Always render the previews as 1024x1024
 * Update ARtB of island 11 to be 11 rounds
 * Draw a capital on the preview when the island has been conquered
+* Suggest that there are actions to do when a piece can chop down a tree
 
 ### Fixed
 

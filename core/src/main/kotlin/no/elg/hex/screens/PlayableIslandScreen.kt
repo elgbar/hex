@@ -387,15 +387,15 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
             continue
           }
           val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) }
-          val canNotMergeWithOtherPiece = territory.hexagons.none {
+          val canNotMergeWithOtherPieceOrChopTree = territory.hexagons.none {
             val terrPiece = island.getData(it).piece
             return@none if (terrPiece === piece) {
               false // can never merge with self
             } else {
-              terrPiece is LivingPiece && piece.canMerge(terrPiece)
+              (terrPiece is LivingPiece && piece.canMerge(terrPiece)) || terrPiece is TreePiece
             }
           }
-          if (canNotAttackAnything && canNotMergeWithOtherPiece) {
+          if (canNotAttackAnything && canNotMergeWithOtherPieceOrChopTree) {
             // The current piece is able to move, but not attack any territory, nor buy any new pieces to merge with
             continue
           }
