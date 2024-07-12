@@ -1,6 +1,8 @@
 sprites.png
 size:4096,4096
 repeat:none
+background
+bounds:16,2708,1218,1218
 castle
 bounds:1104,150,512,512
 grave
@@ -8,9 +10,9 @@ bounds:3442,3414,512,512
 hand
 bounds:16,1648,1028,1028
 help
-bounds:2192,694,512,512
+bounds:2192,1238,512,512
 help_selected
-bounds:1810,2870,512,512
+bounds:16,560,512,512
 man00
 bounds:2354,2870,512,512
 man01
@@ -30,7 +32,7 @@ bounds:1620,1782,512,512
 man13
 bounds:2898,3414,512,512
 man14
-bounds:2192,1238,512,512
+bounds:1648,150,512,512
 man20
 bounds:3252,2326,512,512
 man21
@@ -52,7 +54,7 @@ bounds:16,16,512,512
 man30
 bounds:16,16,512,512
 palm
-bounds:16,560,512,512
+bounds:1810,3414,512,512
 pine
 bounds:2736,1238,512,512
 redo
@@ -61,10 +63,8 @@ settings
 bounds:1648,1238,512,512
 settings_selected
 bounds:3280,1238,512,512
-slay_game_background
-bounds:16,2708,1218,1218
 surrender
-bounds:2192,150,512,512
+bounds:2192,694,512,512
 undo
 bounds:1076,2164,512,512
 undo_all
@@ -76,11 +76,11 @@ bounds:2164,1782,512,512
 village1
 bounds:2898,2870,512,512
 village2
-bounds:1648,150,512,512
+bounds:2192,150,512,512
 village3
 bounds:2708,2326,512,512
 village4
-bounds:1810,3414,512,512
+bounds:1810,2870,512,512
 village5
 bounds:1104,1238,512,512
 village6
