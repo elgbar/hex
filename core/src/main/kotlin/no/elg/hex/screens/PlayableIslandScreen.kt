@@ -33,6 +33,7 @@ import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.PEASANT_STRENGTH
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.SPEARMAN_STRENGTH
+import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
