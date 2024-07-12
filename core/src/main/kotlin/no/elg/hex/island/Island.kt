@@ -48,7 +48,6 @@ import no.elg.hex.util.forEachPieceType
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
-import no.elg.hex.util.getTerritories
 import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.next
@@ -62,7 +61,7 @@ import org.hexworks.mixite.core.api.HexagonOrientation.FLAT_TOP
 import org.hexworks.mixite.core.api.HexagonalGrid
 import org.hexworks.mixite.core.api.HexagonalGridBuilder
 import org.hexworks.mixite.core.api.HexagonalGridLayout
-import java.util.*
+import java.util.EnumMap
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
@@ -255,6 +254,8 @@ class Island(
     initialState = createDto().copy()
   }
 
+  fun isTeamAI(team: Team) = teamToPlayer[team] != null
+  fun isTeamHuman(team: Team) = teamToPlayer[team] == null
   fun isCurrentTeamAI() = currentAI != null
   fun isCurrentTeamHuman() = currentAI == null
 
@@ -335,11 +336,15 @@ class Island(
         return@launch
       }
 
-      if (getTerritories(newTeam).isNotEmpty()) {
+      if (capitals.isNotEmpty()) {
         beginTurn()
       } else {
-        Gdx.app.debug("TURN", "Team $newTeam have no territories, skipping their turn")
-        endTurn()
+        if (isTeamHuman(newTeam) && realPlayers == 1) {
+          gameInteraction.endGame(false)
+        } else {
+          Gdx.app.debug("TURN", "Team $newTeam have no territories, skipping their turn")
+          endTurn()
+        }
       }
     }
   }
@@ -576,10 +581,14 @@ class Island(
     return currBest ?: error("No best!?")
   }
 
+  /**
+   * The game has ended when there is only one team left with a capital left
+   */
   fun checkGameEnded(): Boolean {
     val currentTeam = currentTeam
     forEachPieceType<Capital> { _, data, _ ->
       if (data.team != currentTeam) {
+        // Someone else has a capital, the game has not ended yet!
         return false
       }
     }
