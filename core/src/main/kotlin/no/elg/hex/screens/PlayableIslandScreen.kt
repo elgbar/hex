@@ -68,9 +68,9 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private val confirmEndTurn: VisWindow
   private val confirmSurrender: VisWindow
   internal val acceptAISurrender: VisWindow
-  private val youWon: VisWindow
-  private val youLost: VisWindow
-  private val aiDone: VisWindow
+  private val youWon: KVisWindow
+  private val youLost: KVisWindow
+  private val aiDone: KVisWindow
 
   private val buttonGroup: VisTable
 
@@ -309,14 +309,15 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   }
 
   private fun endGame(win: Boolean) {
-    for ((window, action) in labelUpdater) {
-      window.action()
+    val window = when {
+      island.realPlayers == 0 -> aiDone
+      win -> youWon
+      else -> youLost
     }
-    when {
-      island.realPlayers == 0 -> aiDone.show(stage)
-      win -> youWon.show(stage)
-      else -> youLost.show(stage)
+    labelUpdater[window]?.also { action ->
+      action.invoke(window)
     }
+    window.show(stage)
   }
 
   private fun endTurn(allowAISurrender: Boolean = true) {

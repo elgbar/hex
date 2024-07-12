@@ -275,11 +275,10 @@ fun StageWidget.okWindow(
   labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit>,
   whenConfirmed: KVisWindow.() -> Unit,
   text: () -> String
-): VisWindow {
+): KVisWindow {
   return visWindow(title) {
     isMovable = false
     isModal = true
-    this.hide()
     val label = visLabel("")
 
     labelUpdater[this] = {
@@ -305,6 +304,6 @@ fun StageWidget.okWindow(
 
     pack()
     centerWindow()
-    fadeOut(0f)
+    hide()
   }
 }
