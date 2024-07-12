@@ -43,6 +43,7 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
+  var confirmRestartIsland by PreferenceDelegate(true, priority = 100, shouldHide = { Hex.args.mapEditor }) // does nothing when in map editor
   var allowAIToSurrender by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug })
 
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)

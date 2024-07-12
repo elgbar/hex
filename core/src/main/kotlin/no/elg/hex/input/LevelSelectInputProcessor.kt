@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
-import ktx.actors.isShown
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.model.FastIslandMetadata
@@ -23,18 +23,16 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
-import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
 import no.elg.hex.util.playClick
-import no.elg.hex.util.show
 import java.lang.Float.max
 
 /** @author Elg */
 class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : AbstractInput(true) {
 
-  val ignoreInput: Boolean get() = screen.confirmWindow.isShown()
+  val ignoreInput: Boolean get() = screen.confirmingRestartIsland
 
   /**
    * @param scale in range 0..1
@@ -90,11 +88,11 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       id in -PREVIEWS_PER_ROW..-1 -> return false
       id != INVALID_ISLAND_INDEX -> {
         val metadata = FastIslandMetadata.load(id)
-        if (metadata.modifier == PreviewModifier.NOTHING) {
+        if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.args.mapEditor) {
+          metadata.modifier = PreviewModifier.NOTHING
           play(metadata)
         } else {
-          screen.toPlay = metadata
-          screen.confirmWindow.show(screen.stage)
+          screen.confirmRestartIsland(metadata)
         }
       }
 

@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.scenes.scene2d.Stage
+import ktx.actors.isShown
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
@@ -30,16 +32,26 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   private val mouseX get() = input.mouseX
   private val mouseY get() = input.mouseY
 
-  lateinit var confirmWindow: KVisWindow
-  lateinit var toPlay: FastIslandMetadata
+  private lateinit var confirmWindow: KVisWindow
+  private var toPlay: FastIslandMetadata? = null
+
+  val confirmingRestartIsland get() = confirmWindow.isShown()
+  fun confirmRestartIsland(island: FastIslandMetadata) {
+    toPlay = island
+    confirmWindow.show(stage)
+  }
+
   private fun initStage() {
     stage.actors {
       confirmWindow = confirmWindow(
         "Restart Island?",
         "Do you want to restart island? This will reset all progress on the island.",
         whenConfirmed = {
-          toPlay.modifier = PreviewModifier.NOTHING
-          play(toPlay)
+          toPlay?.let {
+            toPlay = null
+            it.modifier = PreviewModifier.NOTHING
+            play(it)
+          } ?: MessagesRenderer.publishError("Failed to restart island, try disabling the 'Confirm Restart Island' setting")
         }
       )
     }
