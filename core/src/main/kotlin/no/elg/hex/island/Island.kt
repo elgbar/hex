@@ -39,10 +39,8 @@ import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Hand.Companion.NoRestore
 import no.elg.hex.model.IslandDto
-import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
-import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
@@ -386,17 +384,6 @@ class Island(
     } finally {
       aiJob = null
     }
-  }
-
-  fun restoreInitialState() {
-    history.clear()
-    Hex.screen.also {
-      if (it is PreviewIslandScreen) {
-        Hex.assets.islandPreviews.updateSelectPreview(it.metadata, it.island)
-        clearIslandProgress(it.metadata.id)
-      }
-    }
-    Hex.screen = LevelSelectScreen()
   }
 
   /** Select the hex under the cursor */

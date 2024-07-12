@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix screen messages not fading out smoothly/at all
 * Fix previews being inconsistently rendered
 * Remove the raw tutorial images from the app/jar
+* Fix switching app after winning/loosing but before pressing OK would cause the island to be loaded in a non-playable state
 
 ### Removed
 

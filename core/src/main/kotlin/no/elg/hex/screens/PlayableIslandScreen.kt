@@ -83,15 +83,28 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     island.gameInteraction = GameInteraction(island, endGame = ::endGame)
     stage.actors {
 
-      fun endGame(modifier: PreviewModifier): KVisWindow.() -> Unit = {
+      fun onGameEnded(modifier: PreviewModifier) {
         island.history.disable()
         metadata.modifier = modifier
-        island.restoreInitialState()
+        restoreInitialState()
       }
 
-      youWon = okWindow("You Won!", labelUpdater, endGame(WON)) { "Congratulations! You won in ${island.round} rounds" }
-      youLost = okWindow("You Lost", labelUpdater, endGame(LOST)) { "Too bad! You lost in ${island.round} rounds to ${island.winningTeam.name}" }
-      aiDone = okWindow("Game Over", labelUpdater, endGame(AI_DONE)) { "The AI ${island.winningTeam.name} won in ${island.round} rounds" }
+      val toLevelSelectScreen: KVisWindow.() -> Unit = {
+        Hex.screen = LevelSelectScreen()
+      }
+
+      youWon = okWindow("You Won!", labelUpdater, toLevelSelectScreen) {
+        onGameEnded(WON)
+        "Congratulations! You won in ${island.round} rounds"
+      }
+      youLost = okWindow("You Lost", labelUpdater, toLevelSelectScreen) {
+        onGameEnded(LOST)
+        "Too bad! You lost in ${island.round} rounds to ${island.winningTeam.name}"
+      }
+      aiDone = okWindow("Game Over", labelUpdater, toLevelSelectScreen) {
+        onGameEnded(AI_DONE)
+        "The AI ${island.winningTeam.name} won in ${island.round} rounds"
+      }
 
       confirmEndTurn = confirmWindow(
         "Confirm End Turn",
@@ -290,7 +303,8 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
   private fun surrender() {
     metadata.modifier = SURRENDER
-    island.restoreInitialState()
+    restoreInitialState()
+    Hex.screen = LevelSelectScreen()
     Gdx.app.log("ISLAND", "Player surrendered on round ${island.round}")
   }
 

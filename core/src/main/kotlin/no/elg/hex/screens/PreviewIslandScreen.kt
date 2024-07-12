@@ -11,12 +11,14 @@ import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM
 import no.elg.hex.input.SmoothTransition
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.renderer.OutlineRenderer
 import no.elg.hex.renderer.SpriteRenderer
 import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.SplashIslandScreen.Companion.createIslandScreen
 import no.elg.hex.util.GridSize.Companion.calculateGridSize
+import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
@@ -41,6 +43,12 @@ open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Isl
 
   private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private lateinit var visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>
+
+  protected fun restoreInitialState() {
+    island.history.clear()
+    Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
+    clearIslandProgress(metadata.id)
+  }
 
   override fun render(delta: Float) {
     verticesRenderer.frameUpdate()
@@ -108,12 +116,16 @@ open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Isl
   }
 
   override fun recreate(): AbstractScreen =
-    createIslandScreen(metadata, island).also {
-      Gdx.app.postRunnable {
-        it.resize(Gdx.graphics.width, Gdx.graphics.height)
-        it.camera.combined.set(camera.combined)
-        it.camera.position.set(camera.position)
-        it.camera.zoom = camera.zoom
+    if (metadata.modifier != PreviewModifier.NOTHING) {
+      LevelSelectScreen()
+    } else {
+      createIslandScreen(metadata, island).also {
+        Gdx.app.postRunnable {
+          it.resize(Gdx.graphics.width, Gdx.graphics.height)
+          it.camera.combined.set(camera.combined)
+          it.camera.position.set(camera.position)
+          it.camera.zoom = camera.zoom
+        }
       }
     }
 
