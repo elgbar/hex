@@ -151,6 +151,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
   }
 
   override fun hide() {
+    super.hide()
     stageScreen.hide()
   }
 
