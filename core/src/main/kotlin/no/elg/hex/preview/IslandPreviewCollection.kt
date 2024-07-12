@@ -140,21 +140,31 @@ class IslandPreviewCollection : Disposable {
         )
       }
 
+      val belowAsset = height / 2f
       islandScreen.batch.use(camera) {
         when (metadata.modifier) {
-          PreviewModifier.SURRENDER -> drawAsset(Hex.assets.surrender)
-          PreviewModifier.LOST -> drawAsset(Hex.assets.grave)
+          PreviewModifier.SURRENDER -> {
+            drawAsset(Hex.assets.surrender)
+            printText("Surrendered on round ${island.round}", belowAsset)
+          }
+          PreviewModifier.LOST -> {
+            drawAsset(Hex.assets.capital)
+            printText("Lost on round ${island.round}", belowAsset)
+          }
           PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
           PreviewModifier.WON -> {
             drawAsset(Hex.assets.capital)
-            printText("Won in ${island.round} rounds", height / 2f)
+            printText("Won in ${island.round} rounds", belowAsset)
           }
-
-          PreviewModifier.NOTHING -> Unit
+          PreviewModifier.NOTHING ->
+            if (!Hex.args.mapEditor) {
+              printText("Currently round ${island.round}", belowAsset)
+            }
         }
 
         if (Hex.debug && !Hex.args.mapEditor) {
-          printText("id ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", -height / 1.5f)
+          val aboveAsset = -height / 1.5f
+          printText("id ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", aboveAsset)
         }
       }
       Hex.setClearColorAlpha(1f)
