@@ -1,6 +1,6 @@
 name=sprites
 filename=
-output=.
+output=../core/src/main/resources/sprites
 
 alias=true
 alphaThreshold=0
@@ -30,9 +30,11 @@ square=false
 bleed=true
 limitMemory=false
 useIndexes=true
+prettyPrint=false
+legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:nearest}]
-inputFiles=[{path:recreation,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:recreation/flag.png,type:Ignore}]
+inputFiles=[{path:recreation/flag.png,type:Ignore},{path:.,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 keepInputFileExtensions=false
 
 
@@ -40,7 +42,7 @@ keepInputFileExtensions=false
 
 name=tutorial
 filename=
-output=.
+output=../core/src/main/resources/sprites
 
 alias=true
 alphaThreshold=0
@@ -70,6 +72,8 @@ square=false
 bleed=true
 limitMemory=false
 useIndexes=true
+prettyPrint=false
+legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
 inputFiles=[{path:tutorial,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
@@ -78,7 +82,7 @@ keepInputFileExtensions=false
 
 -PROJ-
 
-version=4.10.2
+version=4.13.0
 fileTypeType=png
 fileTypeData={encoding:RGBA8888,compType:PNGTASTIC,compData:"{level:9,removeGamma:false}"}
 previewBackgroundColor=ffffffff
