@@ -170,7 +170,7 @@ project(":core") {
 
   classes {
     doFirst {
-      new File("$buildDir/resources/main/version.properties").withWriter { writer ->
+      layout.buildDirectory.file("resources/main/version.properties").get().asFile.withWriter { writer ->
         Properties properties = new Properties()
         properties['version'] = hexVersion
         properties.store writer, null
