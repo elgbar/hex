@@ -291,7 +291,7 @@ class Assets : AssetManager() {
       loadFont(bold = true, italic = true)
       loadFont(bold = false, italic = true, flip = false)
       loadFont(bold = true, italic = true, flip = false)
-      loadFont(bold = false, italic = false, flip = false, fontSize = FONT_SIZE)
+      loadFont(bold = false, italic = false, fontSize = FONT_SIZE)
 
       val notFlippedFontAsset = loadFont(bold = false, italic = false, flip = false)
       val boldNotFlippedFontAsset = loadFont(bold = true, italic = false, flip = false)
