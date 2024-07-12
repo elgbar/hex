@@ -148,7 +148,7 @@ class IslandPreviewCollection : Disposable {
             printText("Surrendered on round ${island.round}", belowAsset)
           }
           PreviewModifier.LOST -> {
-            drawAsset(Hex.assets.capital)
+            drawAsset(Hex.assets.grave)
             printText("Lost on round ${island.round}", belowAsset)
           }
           PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
