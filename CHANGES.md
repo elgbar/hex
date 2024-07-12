@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Add a warning when resetting ARtB of an island
   * Display the previous ARtB when editing an island
 * Always render the previews as 1024x1024
-* Update ARtB of island 11 to be 11
+* Update ARtB of island 11 to be 11 rounds
 * Draw a capital on the preview when the island has been conquered
 
 ### Fixed
