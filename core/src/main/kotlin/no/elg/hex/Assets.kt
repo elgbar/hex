@@ -90,11 +90,6 @@ class Assets : AssetManager() {
       field = value
     }
 
-  /**
-   * Current Hex version in `major.minor.patch` format
-   */
-  var version: String? = null
-
   companion object {
 
     private val MIN_ISLAND =
@@ -494,8 +489,8 @@ class Assets : AssetManager() {
 
   private fun updateTitle() {
     var title = "Hex"
-    if (version != null) {
-      title += " v$version"
+    Hex.platform.version?.also { v ->
+      title += " v$v"
     }
     if (Hex.args.mapEditor) {
       title += " - Map Editor"

@@ -7,7 +7,7 @@ import no.elg.hex.util.loadProperties
 
 class DesktopPlatform : Platform {
 
-  override val version: String by lazy { loadProperties("version.properties").getProperty("version") }
+  override val version: String? by lazy { loadProperties("version.properties").getProperty("version", null) }
 
   override val canLimitFps: Boolean = true
 

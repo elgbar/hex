@@ -5,7 +5,7 @@ interface Platform {
   /**
    * Current version of Hex
    */
-  val version: String
+  val version: String?
 
   /**
    * Whether the current platform is able to limit FPS

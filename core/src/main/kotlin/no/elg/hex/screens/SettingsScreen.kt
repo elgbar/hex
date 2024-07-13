@@ -134,7 +134,7 @@ class SettingsScreen : OverlayScreen() {
             }
           }
 
-          Hex.assets.version?.also { version ->
+          Hex.platform.version?.also { version ->
             row()
             visLabel("Version: $version") {
               it.colspan(2)
