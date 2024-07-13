@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add export and import of islands
+  * Currently only to the clipboard
+
 ### Changed
 
 * Only clear island progress when restarting island

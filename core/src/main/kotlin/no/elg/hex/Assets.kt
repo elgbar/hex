@@ -325,6 +325,15 @@ class Assets : AssetManager() {
           over = newDrawable("white", Color.FIREBRICK)
         }
 
+        visTextButton(name = "export", extend = "default") {
+          font = regularFont
+          fontColor = Color.WHITE
+          up = newDrawable("white", Color.valueOf("#008040"))
+          val highlighted = Color.valueOf("#008000")
+          down = newDrawable("white", highlighted)
+          over = newDrawable("white", highlighted)
+        }
+
         visTextButton(name = "mapeditor-editor-item", extend = "default") {
           font = regularFont
           focusBorder = null

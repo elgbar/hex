@@ -6,3 +6,7 @@ import no.elg.hex.Settings
 fun playClick() {
   Hex.assets.clickSound?.play(Settings.volume)
 }
+
+fun playMoney() {
+  Hex.assets.coinsSound?.play(Settings.volume)
+}

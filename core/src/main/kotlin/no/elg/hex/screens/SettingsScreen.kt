@@ -5,12 +5,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.utils.Align
+import com.fasterxml.jackson.core.type.TypeReference
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import kotlinx.coroutines.launch
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.actors.setScrollFocus
+import ktx.async.KtxAsync
 import ktx.collections.toGdxArray
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -28,10 +31,14 @@ import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.util.ExportedIslandData
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
+import no.elg.hex.util.exportIsland
 import no.elg.hex.util.findEnumValues
+import no.elg.hex.util.importIslands
 import no.elg.hex.util.padAndSpace
 import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.platformCheckBoxSize
@@ -111,6 +118,62 @@ class SettingsScreen : OverlayScreen() {
 
           separator()
 
+          @Scene2dDsl
+          fun otherSettingsStyle(cell: Cell<*>) {
+            settingsStyle(cell)
+            padAndSpace(cell)
+            cell.colspan(2)
+            cell.prefWidth(Value.percentHeight(0.25f, this@visTable))
+            cell.prefHeight(Value.percentHeight(0.03f, this@visTable))
+          }
+
+          row()
+          visTextButton("Export islands", "export") {
+            otherSettingsStyle(it)
+            onClick {
+              playClick()
+              val progress = Hex.assets.islandFiles.islandIds
+                .mapNotNull(FastIslandMetadata::loadProgress)
+                .map(::exportIsland)
+              if (progress.isEmpty()) {
+                MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
+                return@onClick
+              }
+              if (Hex.platform.writeToClipboard("Hex island export", progress)) {
+                MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
+              }
+            }
+          }
+
+          row()
+          visTextButton("Import islands", "export") {
+            otherSettingsStyle(it)
+            onClick {
+              playClick()
+              val clipboardText = Hex.platform.readFromClipboard()
+              if (clipboardText == null) {
+                MessagesRenderer.publishWarning("No valid text found in clipboard")
+                return@onClick
+              }
+
+              val progress = try {
+                Hex.mapper.readValue(clipboardText, islandsExportType)
+              } catch (e: Exception) {
+                MessagesRenderer.publishError("Invalid island data found in clipboard")
+                return@onClick
+              }
+              if (progress.isEmpty()) {
+                MessagesRenderer.publishWarning("No islands found in clipboard")
+                return@onClick
+              }
+
+              KtxAsync.launch(Hex.asyncThread) { importIslands(progress) }
+            }
+          }
+          row()
+
+          separator()
+
           for (property in otherProperties) {
             val name = property.name.toTitleCase()
             if (property.returnType.jvmErasure.isSubclassOf(ResetSetting::class)) {
@@ -122,11 +185,7 @@ class SettingsScreen : OverlayScreen() {
               }
               row()
               visTextButton(name, "dangerous") {
-                settingsStyle(it)
-                padAndSpace(it)
-                it.colspan(2)
-                it.prefWidth(Value.percentHeight(0.25f, this@visTable))
-                it.prefHeight(Value.percentHeight(0.03f, this@visTable))
+                otherSettingsStyle(it)
                 onClick {
                   confirmResetWindow.show(stage)
                 }
@@ -345,6 +404,7 @@ class SettingsScreen : OverlayScreen() {
     row()
   }
 
+  @Scene2dDsl
   private fun settingsStyle(cell: Cell<*>) {
     cell.pad(platformButtonPadding)
     cell.space(platformSpacing)
@@ -367,5 +427,7 @@ class SettingsScreen : OverlayScreen() {
 
   companion object {
     const val MIN_FIELD_WIDTH = 5f
+
+    val islandsExportType: TypeReference<List<ExportedIslandData>> = object : TypeReference<List<ExportedIslandData>>() {}
   }
 }
