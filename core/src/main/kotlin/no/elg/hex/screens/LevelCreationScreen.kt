@@ -72,6 +72,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
   private var previewBuffer: FrameBuffer? = null
   private val previewBufferNoise: FrameBuffer? = null
   private var pixmap: Pixmap? = null
+  private val dummyMetadata = FastIslandMetadata(-1)
 
   private val validator = object : FormInputValidator("Invalid width/height for given layout") {
     override fun validate(input: String?): Boolean {
@@ -334,7 +335,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
         createIsland(),
         previewSize,
         previewSize,
-        FastIslandMetadata(-1)
+        dummyMetadata
       ) {
         previewBuffer?.dispose()
         previewBuffer = it
@@ -388,6 +389,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
     pixmap.disposeSafely()
     previewBufferNoise.disposeSafely()
     previewBuffer.disposeSafely()
+    dummyMetadata.dispose()
   }
 
   override fun resize(width: Int, height: Int) {

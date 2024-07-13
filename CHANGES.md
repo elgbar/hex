@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fix not displaying version in the settings screen and title on desktop
+* Fix potential memory leak when updating previews 
 
 ### Removed
 
