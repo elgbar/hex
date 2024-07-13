@@ -71,7 +71,7 @@ fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
 
 fun loadIslandSync(id: Int): Island {
   try {
-    val progress = getProgress(id)
+    val progress = getIslandProgress(id)
     Gdx.app.trace("IS SPLASH") { "progress: $progress" }
     return if (!Hex.args.mapEditor && !progress.isNullOrBlank()) {
       Gdx.app.debug("IS SPLASH", "Found progress for island $id")

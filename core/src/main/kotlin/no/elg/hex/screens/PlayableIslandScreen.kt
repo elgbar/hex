@@ -54,7 +54,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
-import no.elg.hex.util.saveProgress
+import no.elg.hex.util.saveIslandProgress
 import no.elg.hex.util.show
 
 /** @author Elg */
@@ -87,7 +87,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       fun onGameEnded(modifier: PreviewModifier) {
         island.history.disable()
         metadata.modifier = modifier
-        restoreInitialState()
+        Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
       }
 
       val toLevelSelectScreen: KVisWindow.() -> Unit = {
@@ -304,7 +304,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
   private fun surrender() {
     metadata.modifier = SURRENDER
-    restoreInitialState()
+    Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
     Hex.screen = LevelSelectScreen()
     Gdx.app.log("ISLAND", "Player surrendered on round ${island.round}")
   }
@@ -415,7 +415,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       island.gameInteraction.endGame()
       return
     }
-    saveProgress()
+    saveIslandProgress()
 
     island.endTurn()
   }
@@ -459,7 +459,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     stageScreen.dispose()
     island.cancelCurrentAI()
     if (metadata.modifier == NOTHING) {
-      saveProgress()
+      saveIslandProgress()
     }
 
     DebugGraphRenderer.dispose()

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Only clear island progress when restarting island
+
 ### Fixed
 
 * Fix not displaying version in the settings screen and title on desktop

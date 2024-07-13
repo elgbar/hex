@@ -18,7 +18,6 @@ import no.elg.hex.renderer.StrengthBarRenderer
 import no.elg.hex.renderer.VerticesRenderer
 import no.elg.hex.screens.SplashIslandScreen.Companion.createIslandScreen
 import no.elg.hex.util.GridSize.Companion.calculateGridSize
-import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
@@ -43,12 +42,6 @@ open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Isl
 
   private lateinit var teamChangedListener: SimpleEventListener<HexagonChangedTeamEvent>
   private lateinit var visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>
-
-  protected fun restoreInitialState() {
-    island.history.clear()
-    Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
-    clearIslandProgress(metadata.id)
-  }
 
   override fun render(delta: Float) {
     verticesRenderer.frameUpdate()

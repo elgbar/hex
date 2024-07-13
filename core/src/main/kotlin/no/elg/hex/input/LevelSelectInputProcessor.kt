@@ -19,6 +19,7 @@ import no.elg.hex.screens.LevelSelectScreen.Companion.paddingY
 import no.elg.hex.screens.LevelSelectScreen.Companion.shownPreviewSize
 import no.elg.hex.screens.SettingsScreen
 import no.elg.hex.screens.TutorialScreen
+import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -89,7 +90,9 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       id != INVALID_ISLAND_INDEX -> {
         val metadata = FastIslandMetadata.load(id)
         if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.args.mapEditor) {
-          metadata.modifier = PreviewModifier.NOTHING
+          if (metadata.modifier != PreviewModifier.NOTHING) {
+            clearIslandProgress(metadata)
+          }
           play(metadata)
         } else {
           screen.confirmRestartIsland(metadata)

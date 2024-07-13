@@ -13,7 +13,7 @@ import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
-import no.elg.hex.preview.PreviewModifier
+import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
@@ -49,7 +49,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
         whenConfirmed = {
           toPlay?.let {
             toPlay = null
-            it.modifier = PreviewModifier.NOTHING
+            clearIslandProgress(it)
             play(it)
           } ?: MessagesRenderer.publishError("Failed to restart island, try disabling the 'Confirm Restart Island' setting")
         }
