@@ -203,6 +203,8 @@ project(":core") {
     api "com.fasterxml.jackson.module:jackson-module-kotlin"
     api "com.fasterxml.jackson.dataformat:jackson-dataformat-smile"
 
+    implementation 'org.tukaani:xz:1.9'
+
     testApi "org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion"
     testApi("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testApi "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
