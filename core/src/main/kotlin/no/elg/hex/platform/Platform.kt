@@ -37,4 +37,19 @@ interface Platform {
   fun trace(tag: String, exception: Throwable?, message: String)
 
   val type: PlatformType
+
+  /**
+   * Set the text to the clipboard
+   *
+   * @param label User-visible label for the clip data, might be ignored by some platforms
+   * @param text The actual text to be copied to the clipboard
+   * @return `true` if a notification should be shown that the text was copied to the clipboard
+   */
+  fun writeToClipboard(label: String, data: Any): Boolean
+
+  /**
+   * Read the text from the clipboard
+   * @return The text from the clipboard or `null` if there is no text in the clipboard
+   */
+  fun readFromClipboard(): String?
 }
