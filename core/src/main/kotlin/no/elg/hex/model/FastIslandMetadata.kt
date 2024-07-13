@@ -59,13 +59,16 @@ class FastIslandMetadata(
       .thenComparing(comparingInt(FastIslandMetadata::id).reversed())
       .compare(this, other)
 
+  /**
+   * Must be called on main thread
+   */
   @OptIn(ExperimentalEncodingApi::class)
   fun save() {
+    require(id >= 0) { "Island id must be positive, is $id" }
+    requireNotNull(previewPixmap) { "A preview have not been generated" }
+    requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
     if (Hex.args.mapEditor) {
-      require(id >= 0) { "Island id must be positive, is $id" }
-      require(!Hex.args.mapEditor || modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
-      requireNotNull(previewPixmap) { "A preview have not been generated" }
-      requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
+      require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
 
       val fileHandle = getFileHandle(id, true)
       fileHandle.parent().mkdirs()
@@ -103,23 +106,38 @@ class FastIslandMetadata(
 
     private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
 
-    private fun getFileHandle(id: Int, isForWriting: Boolean) =
+    fun getFileHandle(id: Int, isForWriting: Boolean) =
       getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
 
-    @OptIn(ExperimentalEncodingApi::class)
-    fun load(id: Int): FastIslandMetadata {
-      val pref: String? = islandPreferences.getString(getMetadataFileName(id), null)
+    fun loadInitial(id: Int): FastIslandMetadata? {
       return try {
-        val bytes = if (Hex.args.mapEditor || pref.isNullOrEmpty()) {
-          getFileHandle(id, false).readBytes()
-        } else {
-          Base64.decode(pref)
-        }
-        Hex.smileMapper.readValue(bytes)
+        val serialized = getFileHandle(id, false).readBytes() ?: return null
+        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
       } catch (e: Exception) {
-        Gdx.app.error("IslandMetadataDto", "Failed to find a metadata dto with id $id", e)
-        FastIslandMetadata(id)
+        Gdx.app.error("IslandMetadataDto", "Failed to load initial island metadata for island $id", e)
+        null
       }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    fun loadProgress(id: Int): FastIslandMetadata? {
+      val raw = islandPreferences.getString(getMetadataFileName(id), null) ?: return null
+      return try {
+        val serialized = Base64.decode(raw)
+        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+      } catch (e: Exception) {
+        Gdx.app.error("IslandMetadataDto", "Failed to load island metadata progress for island $id", e)
+        null
+      }
+    }
+
+    fun load(id: Int): FastIslandMetadata {
+      val savedMetadata = if (Hex.args.mapEditor || !islandPreferences.contains(getMetadataFileName(id))) {
+        loadInitial(id)
+      } else {
+        loadProgress(id)
+      }
+      return savedMetadata ?: FastIslandMetadata(id)
     }
   }
 }
