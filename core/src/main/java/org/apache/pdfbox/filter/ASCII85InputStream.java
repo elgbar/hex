@@ -26,7 +26,7 @@ import java.io.InputStream;
  * @author Ben Litchfield
  *
  */
-final class ASCII85InputStream extends FilterInputStream
+public final class ASCII85InputStream extends FilterInputStream
 {
   private int index;
   private int n;
@@ -48,7 +48,7 @@ final class ASCII85InputStream extends FilterInputStream
    *
    * @param is The input stream to actually read from.
    */
-  ASCII85InputStream(InputStream is)
+  public ASCII85InputStream(InputStream is)
   {
     super(is);
     index = 0;

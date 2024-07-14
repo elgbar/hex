@@ -26,7 +26,7 @@ import java.io.OutputStream;
  * @author Ben Litchfield
  *
  */
-final class ASCII85OutputStream extends FilterOutputStream
+public final class ASCII85OutputStream extends FilterOutputStream
 {
 
   private int lineBreak;
@@ -51,7 +51,7 @@ final class ASCII85OutputStream extends FilterOutputStream
    *
    * @param out The output stream to write to.
    */
-  ASCII85OutputStream(OutputStream out)
+  public ASCII85OutputStream(OutputStream out)
   {
     super(out);
     lineBreak = 36 * 2;
