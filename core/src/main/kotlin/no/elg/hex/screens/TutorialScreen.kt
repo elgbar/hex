@@ -3,9 +3,9 @@ package no.elg.hex.screens
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Value
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.badlogic.gdx.utils.Scaling
 import ktx.actors.setScrollFocus
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
@@ -15,7 +15,7 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visScrollPane
 import ktx.scene2d.vis.visTable
 import no.elg.hex.Hex
-import no.elg.hex.util.platformButtonPadding
+import no.elg.hex.util.platformSpacing
 import no.elg.hex.util.separator
 
 class TutorialScreen : OverlayScreen(false) {
@@ -30,13 +30,10 @@ class TutorialScreen : OverlayScreen(false) {
       }
     }
 
-    val border = TextureRegionDrawable(findTutorialRegion("border"))
-
     stage.actors {
       val table = this@actors.visTable(defaultSpacing = true) {
         val superTable = this@visTable
-        top()
-        left()
+        center()
         val padding = 0.01f
         val width = 0.95f
         pad(Value.percentWidth(padding, superTable))
@@ -44,40 +41,34 @@ class TutorialScreen : OverlayScreen(false) {
         @Scene2dDsl
         fun KWidget<Cell<*>>.lab(
           text: String,
-          regionName: String? = null,
-          addBackground: Boolean = true,
-          textAlign: Int = Align.left
+          regionName: String? = null
         ) {
           this.visLabel(text) {
-            setAlignment(textAlign)
+            setAlignment(Align.left)
             wrap = true
             it.width(Value.percentWidth(width, superTable))
+            it.pad(2f)
             pack()
           }
           superTable.row()
           if (regionName != null) {
             visTable {
-              if (addBackground) {
-                background = border
-              }
               this.visImage(findTutorialRegion(regionName)) {
-                it.maxWidth(Value.percentWidth(width, superTable))
-                it.pad(2f)
+                setScaling(Scaling.contain)
               }
             }
-
             superTable.row()
           }
         }
 
         visLabel("Tutorial", style = "h1") {
           setAlignment(Align.center)
-          it.padTop(Value.percentWidth(padding, superTable))
+          it.padTop(Value.Fixed(platformSpacing))
           it.width(Value.percentWidth(width, superTable))
         }
 
         superTable.row()
-        lab("Upkeep per turn for each type", "costs", false)
+        lab("Upkeep per turn for each type", "costs")
 
         separator()
 
@@ -89,9 +80,9 @@ class TutorialScreen : OverlayScreen(false) {
           "tutorial-1"
         )
         lab(
-          "Once you select a territory, you can view its economic situation in the Info window at the top right of the screen. " +
+          "Once you select a territory, you can view its economic situation in the Info Window at the top right of the screen. " +
             "This shows the territory's profit (or loss) and how much money the territory currently has. " +
-            "You can buy peasants, costing 10m or castles, costing 15, if you have enough money. " +
+            "You can buy peasants, costing 10 or castles, costing 15, if you have enough money. " +
             "Just tap on the icon in the lower left corner of the screen of the piece you want to buy.",
           "tutorial-2"
         )
@@ -135,17 +126,14 @@ class TutorialScreen : OverlayScreen(false) {
         )
 
         addBackButton {
-          pad(platformButtonPadding)
-          val horzPadding = Value.percentWidth(0.33f, superTable)
-          padLeft(horzPadding)
-          padRight(horzPadding)
+          it.fill(0.66f, it.fillY)
         }
       }
 
       visScrollPane {
         // remove the weird edge color
         this.style.background = null
-
+        setScrollingDisabled(true, false)
         setFillParent(true)
         setFlickScroll(true)
         fadeScrollBars = false

@@ -46,13 +46,14 @@ val platformCheckBoxSize: Float
   }
 
 @Scene2dDsl
-fun KVisTable.separator() {
-  this@separator.separator("menu") {
-    it.expand()
+fun KVisTable.separator(init: (@Scene2dDsl Separator).(Cell<*>) -> Unit = {}): Separator {
+  val table = this@separator
+  return table.separator("menu") {
+    it.expandX()
     it.fillX()
-    it.colspan(2)
-  }
-  row()
+    it.colspan(table.columns)
+    this.init(it)
+  }.also { row() }
 }
 
 @Scene2dDsl
