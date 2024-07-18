@@ -21,7 +21,7 @@ import no.elg.hex.util.separator
 class TutorialScreen : OverlayScreen(false) {
 
   init {
-    fun tutorialImage(regionName: String): AtlasRegion {
+    fun findTutorialRegion(regionName: String): AtlasRegion {
       try {
         return Hex.assets.tutorialScreenShots.findRegion(regionName)
           ?: throw IllegalArgumentException("No sprite with the name $regionName is loaded. Loaded tutorial are ${Hex.assets.tutorialScreenShots.regions.map { it.name }}")
@@ -30,14 +30,16 @@ class TutorialScreen : OverlayScreen(false) {
       }
     }
 
-    val border = TextureRegionDrawable(tutorialImage("border"))
+    val border = TextureRegionDrawable(findTutorialRegion("border"))
 
     stage.actors {
       val table = this@actors.visTable(defaultSpacing = true) {
+        val superTable = this@visTable
         top()
         left()
-        pad(Value.percentWidth(0.01f, this@visTable))
-        padLeft(Value.percentWidth(0.02f, this@visTable))
+        val padding = 0.01f
+        val width = 0.95f
+        pad(Value.percentWidth(padding, superTable))
 
         @Scene2dDsl
         fun KWidget<Cell<*>>.lab(
@@ -49,30 +51,32 @@ class TutorialScreen : OverlayScreen(false) {
           this.visLabel(text) {
             setAlignment(textAlign)
             wrap = true
-            it.width(Value.percentWidth(0.96f, this@visTable))
+            it.width(Value.percentWidth(width, superTable))
             pack()
           }
-          this@visTable.row()
+          superTable.row()
           if (regionName != null) {
             visTable {
               if (addBackground) {
                 background = border
               }
-              this.visImage(tutorialImage(regionName)) {
+              this.visImage(findTutorialRegion(regionName)) {
+                it.maxWidth(Value.percentWidth(width, superTable))
                 it.pad(2f)
               }
             }
 
-            this@visTable.row()
+            superTable.row()
           }
         }
 
         visLabel("Tutorial", style = "h1") {
           setAlignment(Align.center)
-          it.padTop(Value.percentWidth(0.01f, this@visTable))
+          it.padTop(Value.percentWidth(padding, superTable))
+          it.width(Value.percentWidth(width, superTable))
         }
 
-        this@visTable.row()
+        superTable.row()
         lab("Upkeep per turn for each type", "costs", false)
 
         separator()
@@ -132,7 +136,7 @@ class TutorialScreen : OverlayScreen(false) {
 
         addBackButton {
           pad(platformButtonPadding)
-          val horzPadding = Value.percentWidth(0.33f, this@visTable)
+          val horzPadding = Value.percentWidth(0.33f, superTable)
           padLeft(horzPadding)
           padRight(horzPadding)
         }
