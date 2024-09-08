@@ -72,8 +72,13 @@ object Hex : ApplicationAdapter() {
   lateinit var assets: Assets
     private set
 
-  lateinit var asyncThread: AsyncExecutorDispatcher
-    private set
+  val asyncThread: AsyncExecutorDispatcher get() = internalAsyncThread ?: error("Async thread not initialized")
+
+  private var internalAsyncThread: AsyncExecutorDispatcher? = null
+    set(value) {
+      field?.dispose()
+      field = value
+    }
 
   var paused = false
     private set
@@ -201,7 +206,7 @@ object Hex : ApplicationAdapter() {
     resetClearColor()
     ScreenRenderer.resume()
 
-    asyncThread = newSingleThreadAsyncContext()
+    internalAsyncThread = newSingleThreadAsyncContext()
 
     assets = Assets()
     Gdx.app.postRunnable {
@@ -220,7 +225,7 @@ object Hex : ApplicationAdapter() {
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     }
     assets.dispose()
-    asyncThread.dispose()
+    internalAsyncThread = null
     ScreenRenderer.dispose()
     VisUI.dispose(false)
   }
