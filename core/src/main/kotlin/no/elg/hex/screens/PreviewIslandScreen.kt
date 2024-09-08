@@ -22,7 +22,7 @@ import no.elg.hex.util.isLazyInitialized
 import kotlin.math.max
 
 /** @author Elg */
-open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Island, private val isPreviewRenderer: Boolean) : AbstractScreen(), ReloadableScreen {
+open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Island, val isPreviewRenderer: Boolean) : AbstractScreen(), ReloadableScreen {
 
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 

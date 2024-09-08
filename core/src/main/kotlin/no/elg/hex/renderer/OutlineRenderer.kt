@@ -12,7 +12,6 @@ import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
-import no.elg.hex.preview.IslandPreviewCollection
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
@@ -31,9 +30,10 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       it.playMode = Animation.PlayMode.LOOP
     }
 
-  private val allowedToDrawInvisible get() = !IslandPreviewCollection.renderingPreviews
+  private val allowedToDrawInvisible get() = !islandScreen.isPreviewRenderer
   private val shouldDrawEdges get() = Hex.args.`draw-edges` && allowedToDrawInvisible
   private val shouldDrawInvisible get() = Hex.args.mapEditor && allowedToDrawInvisible
+  private val shouldDrawCurrentTeamHexagons get() = !Hex.args.mapEditor && allowedToDrawInvisible
 
   override fun frameUpdate() {
     lineRenderer.use(Filled, islandScreen.camera) {
@@ -53,7 +53,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
         }
       }
 
-      if (islandScreen.island.isCurrentTeamHuman()) {
+      if (islandScreen.island.isCurrentTeamHuman() && shouldDrawCurrentTeamHexagons) {
         islandScreen.island.selected?.also {
           drawOutLines(it.hexagons) { _, target -> target.set(selectedColor) }
 

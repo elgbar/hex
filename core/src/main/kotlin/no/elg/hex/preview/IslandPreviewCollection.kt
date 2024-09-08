@@ -26,7 +26,6 @@ import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.isLoaded
 import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
-import java.util.concurrent.atomic.AtomicInteger
 
 class IslandPreviewCollection : Disposable {
 
@@ -211,8 +210,5 @@ class IslandPreviewCollection : Disposable {
 
   companion object {
     const val PREVIEW_SIZE = 1024
-
-    val renderingCount = AtomicInteger(0)
-    val renderingPreviews: Boolean get() = renderingCount.get() > 0
   }
 }
