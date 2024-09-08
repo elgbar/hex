@@ -142,12 +142,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     return false
   }
 
-  private fun placeDown(
-    island: Island,
-    territory: Territory,
-    placeOn: Hexagon<HexagonData>,
-    newPiece: Piece
-  ): Boolean {
+  private fun placeDown(island: Island, territory: Territory, placeOn: Hexagon<HexagonData>, newPiece: Piece): Boolean {
     val hexData = island.getData(placeOn)
     val isBorderHexagon = territory.enemyBorderHexes.contains(placeOn)
     if (hexData.team != island.currentTeam && !isBorderHexagon) {

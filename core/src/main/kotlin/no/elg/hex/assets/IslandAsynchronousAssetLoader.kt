@@ -18,27 +18,13 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
 
   private var island: Island? = null
 
-  override fun loadSync(
-    manager: AssetManager,
-    fileName: String,
-    file: FileHandle,
-    parameter: IslandAssetLoaderParameters?
-  ): Island? {
+  override fun loadSync(manager: AssetManager, fileName: String, file: FileHandle, parameter: IslandAssetLoaderParameters?): Island? {
     return island?.also { island = null }
   }
 
-  override fun getDependencies(
-    fileName: String,
-    file: FileHandle,
-    parameter: IslandAssetLoaderParameters?
-  ) = null
+  override fun getDependencies(fileName: String, file: FileHandle, parameter: IslandAssetLoaderParameters?) = null
 
-  override fun loadAsync(
-    manager: AssetManager,
-    fileName: String,
-    file: FileHandle,
-    parameter: IslandAssetLoaderParameters?
-  ) {
+  override fun loadAsync(manager: AssetManager, fileName: String, file: FileHandle, parameter: IslandAssetLoaderParameters?) {
     island = null
     val json: String = reportTiming("read island file as string") {
       file.readString()

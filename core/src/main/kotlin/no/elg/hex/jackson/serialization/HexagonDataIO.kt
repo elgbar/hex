@@ -41,11 +41,7 @@ class HexagonDataDeserializer(defaultSerializer: BeanDeserializer) :
 
 class HexagonDataDeserializerModifier : BeanDeserializerModifier() {
 
-  override fun modifyDeserializer(
-    config: DeserializationConfig?,
-    beanDesc: BeanDescription,
-    deserializer: JsonDeserializer<*>
-  ): JsonDeserializer<*> {
+  override fun modifyDeserializer(config: DeserializationConfig?, beanDesc: BeanDescription, deserializer: JsonDeserializer<*>): JsonDeserializer<*> {
     if (beanDesc.beanClass == HexagonData::class.java) {
       require(deserializer is BeanDeserializer) { "Default deserializer must be a BeanDeserializer" }
       return HexagonDataDeserializer(deserializer)

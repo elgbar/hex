@@ -98,12 +98,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
     destination.set(src.x / Gdx.graphics.ppcX, src.y / Gdx.graphics.ppcY)
   }
 
-  override fun pinch(
-    initialPointer1: Vector2,
-    initialPointer2: Vector2,
-    pointer1: Vector2,
-    pointer2: Vector2
-  ): Boolean {
+  override fun pinch(initialPointer1: Vector2, initialPointer2: Vector2, pointer1: Vector2, pointer2: Vector2): Boolean {
     if (!pinching) {
       Gdx.app.debug("pinch zoom", "Pinch start")
       unprojectVector(initialPointer1, lastPointer1)

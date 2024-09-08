@@ -39,10 +39,7 @@ class TutorialScreen : OverlayScreen(false) {
         pad(Value.percentWidth(padding, superTable))
 
         @Scene2dDsl
-        fun KWidget<Cell<*>>.lab(
-          text: String,
-          regionName: String? = null
-        ) {
+        fun KWidget<Cell<*>>.lab(text: String, regionName: String? = null) {
           this.visLabel(text) {
             setAlignment(Align.left)
             wrap = true

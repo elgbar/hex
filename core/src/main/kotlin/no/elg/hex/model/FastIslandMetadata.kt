@@ -106,8 +106,7 @@ class FastIslandMetadata(
 
     private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
 
-    fun getFileHandle(id: Int, isForWriting: Boolean) =
-      getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
+    fun getFileHandle(id: Int, isForWriting: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
 
     fun loadInitial(id: Int): FastIslandMetadata? {
       return try {

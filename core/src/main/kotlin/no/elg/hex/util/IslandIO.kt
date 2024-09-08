@@ -27,7 +27,13 @@ fun getIslandFile(id: Int, preview: Boolean = false, allowInternal: Boolean = tr
 
 fun getIslandFile(path: String, allowInternal: Boolean): FileHandle {
   val local = Gdx.files.local(path)
-  return if (local.exists()) local else if (allowInternal) Gdx.files.internal(path) else local
+  return if (local.exists()) {
+    local
+  } else if (allowInternal) {
+    Gdx.files.internal(path)
+  } else {
+    local
+  }
 }
 
 fun play(id: UInt, island: Island? = null): Boolean = play(FastIslandMetadata(id.toInt()), island)

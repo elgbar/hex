@@ -41,11 +41,7 @@ object MessagesRenderer : FrameUpdatable {
     messages.add(0, sst to durationSeconds)
   }
 
-  fun publishMessage(
-    message: ScreenText,
-    durationSeconds: Float = DEFAULT_DURATION_SECONDS,
-    exception: Exception? = null
-  ) {
+  fun publishMessage(message: ScreenText, durationSeconds: Float = DEFAULT_DURATION_SECONDS, exception: Exception? = null) {
     if (exception == null) {
       Gdx.app.log("MESSAGE", message.wholeText)
     } else {

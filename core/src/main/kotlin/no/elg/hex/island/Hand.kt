@@ -40,8 +40,7 @@ data class Hand(
     restore.restore(this)
   }
 
-  override fun toString(): String =
-    "piece: ${piece::class.simpleName}, territory: $territory, restore: $restore"
+  override fun toString(): String = "piece: ${piece::class.simpleName}, territory: $territory, restore: $restore"
 
   companion object {
     sealed interface RestoreAction {
@@ -54,8 +53,7 @@ data class Hand(
             it.objectInstance ?: error("All instances of RestoreAction must be an object, $it is not an object")
           }
 
-        fun fromString(actionName: String?): RestoreAction =
-          allInstances.find { it.serializedName == actionName } ?: DefaultRestoreAction
+        fun fromString(actionName: String?): RestoreAction = allInstances.find { it.serializedName == actionName } ?: DefaultRestoreAction
 
         fun toString(action: RestoreAction?): String? = action?.serializedName
       }

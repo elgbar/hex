@@ -72,15 +72,10 @@ sealed class ScreenText(
         else -> Hex.assets.boldItalicFont
       }
 
-  fun <T : Any> format(
-    givenFormat: (ScreenText.(T) -> String)?,
-    givenCallable: () -> T
-  ): String = givenFormat?.invoke(this, givenCallable()) ?: givenCallable().toString()
+  fun <T : Any> format(givenFormat: (ScreenText.(T) -> String)?, givenCallable: () -> T): String = givenFormat?.invoke(this, givenCallable()) ?: givenCallable().toString()
 
-  fun <T : Any> formatNullable(
-    givenFormat: (ScreenText.(T?) -> String)?,
-    givenCallable: () -> T?
-  ): String = givenFormat?.invoke(this, givenCallable()) ?: givenCallable().toString()
+  fun <T : Any> formatNullable(givenFormat: (ScreenText.(T?) -> String)?, givenCallable: () -> T?): String =
+    givenFormat?.invoke(this, givenCallable()) ?: givenCallable().toString()
 }
 
 class VariableScreenText<T : Any>(
@@ -266,12 +261,7 @@ fun nullText(next: ScreenText) = StaticScreenText("null", color = RED, next = ne
 private val emptyText = StaticScreenText("")
 fun emptyText(): ScreenText = staticTextPool.obtain()
 
-fun booleanText(
-  callable: () -> Boolean,
-  bold: Boolean = false,
-  italic: Boolean = false,
-  next: ScreenText? = null
-) =
+fun booleanText(callable: () -> Boolean, bold: Boolean = false, italic: Boolean = false, next: ScreenText? = null) =
   VariableScreenText(
     callable,
     bold = bold,
@@ -295,12 +285,7 @@ object ScreenRenderer : Disposable, Resizable {
   /**
    * Must call [#begin] before using this function, call [#end] when done drawing
    */
-  fun ScreenText.draw(
-    line: Int,
-    position: ScreenDrawPosition = TOP_LEFT,
-    offsetX: Float = spacing,
-    lines: Int = 1
-  ) {
+  fun ScreenText.draw(line: Int, position: ScreenDrawPosition = TOP_LEFT, offsetX: Float = spacing, lines: Int = 1) {
     val text = text
     if (text.isNotEmpty()) {
       val y =

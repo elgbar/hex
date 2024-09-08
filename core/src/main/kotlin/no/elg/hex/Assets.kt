@@ -170,11 +170,7 @@ class Assets : AssetManager() {
     return region
   }
 
-  private fun findAnimation(
-    regionPrefix: String,
-    totalFrames: Int,
-    frameDuration: Float
-  ): Animation<AtlasRegion> {
+  private fun findAnimation(regionPrefix: String, totalFrames: Int, frameDuration: Float): Animation<AtlasRegion> {
     val array = GdxArray<AtlasRegion>()
     for (frame in 0 until totalFrames) {
       array.add(findSprite(regionPrefix + frame))
@@ -430,8 +426,7 @@ class Assets : AssetManager() {
     }
   }
 
-  private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont =
-    fetch(fontAssetName(bold, italic, flip, fontSize))
+  private fun getFont(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): BitmapFont = fetch(fontAssetName(bold, italic, flip, fontSize))
 
   private fun fontAssetName(bold: Boolean, italic: Boolean, flip: Boolean = true, fontSize: Int = this.fontSize): String {
     val boldness = if (bold) "bold" else "regular"

@@ -155,12 +155,7 @@ operator fun Stage.plusAssign(eventListener: EventListener) {
 }
 
 /** Call listener if a key down event where the keycode is the given key is fired */
-inline fun <T : Actor> T.onKeyDown(
-  keycode: Int,
-  catchEvent: Boolean = false,
-  onlyWhenShown: Boolean = false,
-  crossinline listener: T.() -> Unit
-) =
+inline fun <T : Actor> T.onKeyDown(keycode: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit) =
   onKeyDown(catchEvent) { eventKey ->
     if (eventKey == keycode && (!onlyWhenShown || isShown())) {
       listener()
@@ -168,12 +163,7 @@ inline fun <T : Actor> T.onKeyDown(
   }
 
 /** Call listener when all of the given keys are pressed and one of them are in the fired onKeyDown event */
-inline fun <T : Actor> T.onAllKeysDownEvent(
-  vararg keycodes: Int,
-  catchEvent: Boolean = false,
-  onlyWhenShown: Boolean = false,
-  crossinline listener: T.() -> Unit
-): EventListener {
+inline fun <T : Actor> T.onAllKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
     if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all {
@@ -188,12 +178,7 @@ inline fun <T : Actor> T.onAllKeysDownEvent(
 }
 
 /** Call listener when any of the given keys are pressed */
-inline fun <T : Actor> T.onAnyKeysDownEvent(
-  vararg keycodes: Int,
-  catchEvent: Boolean = false,
-  onlyWhenShown: Boolean = false,
-  crossinline listener: T.() -> Unit
-): EventListener {
+inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
     if ((!onlyWhenShown || isShown()) && eventKey in keycodes) {
@@ -203,12 +188,7 @@ inline fun <T : Actor> T.onAnyKeysDownEvent(
 }
 
 @Scene2dDsl
-fun StageWidget.confirmWindow(
-  title: String,
-  text: String,
-  whenDenied: KVisWindow.() -> Unit = {},
-  whenConfirmed: KVisWindow.() -> Unit
-): KVisWindow {
+fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindow.() -> Unit = {}, whenConfirmed: KVisWindow.() -> Unit): KVisWindow {
   return this.visWindow(title) {
     isMovable = false
     isModal = true
@@ -271,12 +251,7 @@ fun StageWidget.confirmWindow(
 }
 
 @Scene2dDsl
-fun StageWidget.okWindow(
-  title: String,
-  labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit>,
-  whenConfirmed: KVisWindow.() -> Unit,
-  text: () -> String
-): KVisWindow {
+fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit>, whenConfirmed: KVisWindow.() -> Unit, text: () -> String): KVisWindow {
   return visWindow(title) {
     isMovable = false
     isModal = true

@@ -55,12 +55,7 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  fun renderPreview(
-    island: Island,
-    previewWidth: Int,
-    previewHeight: Int,
-    metadata: FastIslandMetadata
-  ): FrameBuffer {
+  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, metadata: FastIslandMetadata): FrameBuffer {
     val islandScreen = PreviewIslandScreen(FastIslandMetadata(-1), island, true)
     islandScreen.resize(previewWidth, previewHeight)
 
@@ -169,15 +164,9 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  fun updateSelectPreview(
-    metadata: FastIslandMetadata,
-    maybeIsland: Island? = null
-  ): Job = KtxAsync.launch(Hex.asyncThread) { updateSelectPreviewNow(metadata, maybeIsland) }
+  fun updateSelectPreview(metadata: FastIslandMetadata, maybeIsland: Island? = null): Job = KtxAsync.launch(Hex.asyncThread) { updateSelectPreviewNow(metadata, maybeIsland) }
 
-  suspend fun updateSelectPreviewNow(
-    metadata: FastIslandMetadata,
-    maybeIsland: Island? = null
-  ) {
+  suspend fun updateSelectPreviewNow(metadata: FastIslandMetadata, maybeIsland: Island? = null) {
     val island = if (maybeIsland == null) {
       val islandFileName = getIslandFileName(metadata.id)
       if (!Hex.assets.isLoaded<Island>(islandFileName)) {

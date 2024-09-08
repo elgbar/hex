@@ -99,11 +99,23 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     stageScreen.render(delta)
   }
 
-  fun color(x: Float, y: Float, width: Float, height: Float, notSelectedColor: Color = NOT_SELECTED_COLOR): Color {
+  fun color(
+    x: Float,
+    y: Float,
+    width: Float,
+    height: Float,
+    notSelectedColor: Color = NOT_SELECTED_COLOR
+  ): Color {
     return if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else notSelectedColor
   }
 
-  private fun drawBox(x: Float, y: Float, width: Float, height: Float, notSelectedColor: Color = NOT_SELECTED_COLOR) {
+  private fun drawBox(
+    x: Float,
+    y: Float,
+    width: Float,
+    height: Float,
+    notSelectedColor: Color = NOT_SELECTED_COLOR
+  ) {
     lineRenderer.color = color(x, y, width, height, notSelectedColor)
     lineRenderer.rect(x, y, width, height)
   }

@@ -54,16 +54,8 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
  *
  * @return All (visible) connected hexagons to the start hexagon of the same team.
  */
-fun Island.connectedTerritoryHexagons(
-  hexagon: Hexagon<HexagonData>,
-  team: Team? = this.getData(hexagon).team
-): Set<Hexagon<HexagonData>> {
-  fun connectedTerritoryHexagons(
-    center: Hexagon<HexagonData>,
-    team: Team?,
-    visited: MutableSet<Hexagon<HexagonData>>,
-    island: Island
-  ): Set<Hexagon<HexagonData>> {
+fun Island.connectedTerritoryHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.getData(hexagon).team): Set<Hexagon<HexagonData>> {
+  fun connectedTerritoryHexagons(center: Hexagon<HexagonData>, team: Team?, visited: MutableSet<Hexagon<HexagonData>>, island: Island): Set<Hexagon<HexagonData>> {
     val data = island.getData(center)
     // only check a hexagon if they have the same color and haven't been visited
     if (center in visited || (team != null && data.team != team) || data.invisible) {
@@ -192,20 +184,14 @@ fun Island.ensureCapitalStartFunds() {
 fun Island.canAttack(hexagon: Hexagon<HexagonData>, strength: Int): Boolean = strength > min(calculateStrength(hexagon), KNIGHT_STRENGTH)
 fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canAttack(hexagon, with.strength)
 
-inline fun <reified T : Piece> Island.forEachPieceType(
-  action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit
-) {
+inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {
   for (hexagon in visibleHexagons) {
     val data = getData(hexagon)
     if (data.piece is T) action(hexagon, data, data.piece as T)
   }
 }
 
-inline fun Iterable<Hexagon<HexagonData>>.withData(
-  island: Island,
-  excludeInvisible: Boolean = true,
-  crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit
-) {
+inline fun Iterable<Hexagon<HexagonData>>.withData(island: Island, excludeInvisible: Boolean = true, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit) {
   for (hexagon in this) {
     val data = island.getData(hexagon)
     if (excludeInvisible && data.invisible) continue
@@ -271,11 +257,7 @@ fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
     coordinate.gridZ + NEIGHBORS[index][NEIGHBOR_Z_INDEX]
   )
 
-fun Island.calculateHexagonsWithinRadius(
-  hexagon: Hexagon<HexagonData>,
-  radius: Int,
-  includeThis: Boolean = true
-): Set<Hexagon<HexagonData>> {
+fun Island.calculateHexagonsWithinRadius(hexagon: Hexagon<HexagonData>, radius: Int, includeThis: Boolean = true): Set<Hexagon<HexagonData>> {
   val result = HashSet<Hexagon<HexagonData>>()
   if (includeThis) {
     result += hexagon

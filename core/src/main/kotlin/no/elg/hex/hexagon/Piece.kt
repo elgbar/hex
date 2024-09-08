@@ -246,12 +246,7 @@ class Capital(
     }
   }
 
-  override fun beginTurn(
-    island: Island,
-    pieceHex: Hexagon<HexagonData>,
-    data: HexagonData,
-    team: Team
-  ) {
+  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     val hexagons = island.getTerritoryHexagons(pieceHex)
     if (hexagons == null) {
       replaceWithTree(island, pieceHex)

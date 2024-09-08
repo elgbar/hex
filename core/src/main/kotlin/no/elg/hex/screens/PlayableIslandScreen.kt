@@ -214,9 +214,10 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
             cell.expandX()
             cell.left()
 
-            fun buyDisable(cost: Int): ((Territory?) -> Boolean) = { territory ->
-              territory == null || (!island.gameInteraction.cheating && territory.capital.balance < cost) || interactDisabled()
-            }
+            fun buyDisable(cost: Int): ((Territory?) -> Boolean) =
+              { territory ->
+                territory == null || (!island.gameInteraction.cheating && territory.capital.balance < cost) || interactDisabled()
+              }
 
             interactButton(
               tooltip = "Buy Peasant",

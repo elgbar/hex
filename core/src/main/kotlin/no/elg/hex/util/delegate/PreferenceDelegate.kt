@@ -41,10 +41,11 @@ open class PreferenceDelegate<T : Any>(
    */
   val onChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> T)? = null,
   private val shouldHide: (T) -> Boolean = { false },
+  // Impl note: 'invalidate' must be the last parameter
   /**
    * A function to test if a given value is **in**valid
    */
-  val invalidate: (T) -> Boolean = { false } // Note: this must be the last parameter
+  val invalidate: (T) -> Boolean = { false }
 ) {
 
   private var changed = false

@@ -295,10 +295,7 @@ class NotAsRandomAI(
     return Random.nextDouble() > BUY_CASTLE_CHANCE
   }
 
-  private fun bestPieceToMergeWith(
-    territory: Territory,
-    handPiece: LivingPiece
-  ): Hexagon<HexagonData>? {
+  private fun bestPieceToMergeWith(territory: Territory, handPiece: LivingPiece): Hexagon<HexagonData>? {
     think { "Will try to merge piece with another piece" }
     val maxBorderStr =
       territory.enemyTerritoryHexagons.maxOfOrNull { territory.island.getData(it).piece.strength }
