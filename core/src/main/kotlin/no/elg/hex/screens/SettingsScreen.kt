@@ -9,11 +9,9 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
-import kotlinx.coroutines.launch
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.actors.setScrollFocus
-import ktx.async.KtxAsync
 import ktx.collections.toGdxArray
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -169,7 +167,7 @@ class SettingsScreen : OverlayScreen() {
                 return@onClick
               }
 
-              KtxAsync.launch(Hex.asyncThread) { importIslands(progress) }
+              importIslands(progress)
             }
           }
           row()

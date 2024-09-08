@@ -10,8 +10,10 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ktx.assets.load
 import ktx.async.KtxAsync
+import ktx.async.MainDispatcher
 import ktx.collections.GdxArray
 import ktx.graphics.use
 import no.elg.hex.Hex
@@ -53,49 +55,12 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  private fun renderNextPreview() {
-    synchronized(internalPreviewRendererQueue) {
-      if (internalPreviewRendererQueue.isEmpty) {
-        return
-      }
-      lastPostedFrameId = Gdx.graphics.frameId
-      val runnable = internalPreviewRendererQueue.pop()
-      Gdx.app.postRunnable {
-        try {
-          runnable.run()
-        } finally {
-          renderingCount.decrementAndGet()
-          renderNextPreview()
-        }
-      }
-    }
-  }
-
   fun renderPreview(
     island: Island,
     previewWidth: Int,
     previewHeight: Int,
-    metadata: FastIslandMetadata,
-    onComplete: (preview: FrameBuffer) -> Unit
-  ) {
-    addPreviewRender(doRenderPreview(island, previewWidth, previewHeight, metadata, onComplete))
-    renderNextPreview()
-  }
-
-  private fun addPreviewRender(runnable: Runnable) {
-    renderingCount.incrementAndGet()
-    synchronized(internalPreviewRendererQueue) {
-      internalPreviewRendererQueue.add(runnable)
-    }
-  }
-
-  private fun doRenderPreview(
-    island: Island,
-    previewWidth: Int,
-    previewHeight: Int,
-    metadata: FastIslandMetadata,
-    onComplete: (preview: FrameBuffer) -> Unit
-  ) = Runnable {
+    metadata: FastIslandMetadata
+  ): FrameBuffer {
     val islandScreen = PreviewIslandScreen(FastIslandMetadata(-1), island, true)
     islandScreen.resize(previewWidth, previewHeight)
 
@@ -147,15 +112,18 @@ class IslandPreviewCollection : Disposable {
             drawAsset(Hex.assets.surrender)
             printText("Surrendered on round ${island.round}", belowAsset)
           }
+
           PreviewModifier.LOST -> {
             drawAsset(Hex.assets.grave)
             printText("Lost on round ${island.round}", belowAsset)
           }
+
           PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
           PreviewModifier.WON -> {
             drawAsset(Hex.assets.capital)
             printText("Won in ${island.round} rounds", belowAsset)
           }
+
           PreviewModifier.NOTHING ->
             if (!Hex.args.mapEditor) {
               printText("Round ${island.round}", belowAsset)
@@ -170,7 +138,7 @@ class IslandPreviewCollection : Disposable {
       Hex.setClearColorAlpha(1f)
     }
     islandScreen.dispose()
-    onComplete(buffer)
+    return buffer
   }
 
   fun renderPreviews() {
@@ -204,36 +172,41 @@ class IslandPreviewCollection : Disposable {
   fun updateSelectPreview(
     metadata: FastIslandMetadata,
     maybeIsland: Island? = null
-  ): Job =
-    KtxAsync.launch(Hex.asyncThread) {
-      val island = if (maybeIsland == null) {
-        val islandFileName = getIslandFileName(metadata.id)
-        if (!Hex.assets.isLoaded<Island>(islandFileName)) {
-          Gdx.app.trace("Update preview") { "Island ${metadata.id} was not loaded, waiting for it to be loaded now..." }
-          Hex.assets.load<Island>(islandFileName)
-          while (!Hex.assets.update()) {
-            Thread.yield()
-          }
-        }
-        Hex.assets.fetch(islandFileName)
-      } else {
-        maybeIsland
-      }
+  ): Job = KtxAsync.launch(Hex.asyncThread) { updateSelectPreviewNow(metadata, maybeIsland) }
 
-      renderPreview(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata) { preview ->
-        metadata.previewPixmap = preview.toBytes()
-        metadata.save()
-        synchronized(internalPreviewRendererQueue) {
-          val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
-          if (existingIndex == -1) {
-            fastIslandPreviews.add(metadata)
-          } else {
-            fastIslandPreviews.set(existingIndex, metadata)
-          }
-          dirty = true
+  suspend fun updateSelectPreviewNow(
+    metadata: FastIslandMetadata,
+    maybeIsland: Island? = null
+  ) {
+    val island = if (maybeIsland == null) {
+      val islandFileName = getIslandFileName(metadata.id)
+      if (!Hex.assets.isLoaded<Island>(islandFileName)) {
+        Gdx.app.trace("Update preview") { "Island ${metadata.id} was not loaded, waiting for it to be loaded now..." }
+        Hex.assets.load<Island>(islandFileName)
+        while (!Hex.assets.update()) {
+          Thread.yield()
         }
+      }
+      Hex.assets.fetch(islandFileName)
+    } else {
+      maybeIsland
+    }
+
+    withContext(MainDispatcher) {
+      val preview = renderPreview(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata)
+      metadata.previewPixmap = preview.toBytes()
+      metadata.save()
+      synchronized(internalPreviewRendererQueue) {
+        val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
+        if (existingIndex == -1) {
+          fastIslandPreviews.add(metadata)
+        } else {
+          fastIslandPreviews.set(existingIndex, metadata)
+        }
+        dirty = true
       }
     }
+  }
 
   private fun disposePreviews() {
     synchronized(internalPreviewRendererQueue) {
@@ -248,7 +221,7 @@ class IslandPreviewCollection : Disposable {
   }
 
   companion object {
-    private const val PREVIEW_SIZE = 1024
+    const val PREVIEW_SIZE = 1024
 
     val renderingCount = AtomicInteger(0)
     val renderingPreviews: Boolean get() = renderingCount.get() > 0

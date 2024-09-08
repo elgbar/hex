@@ -26,9 +26,13 @@ import com.kotcrab.vis.ui.widget.spinner.ArraySpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.SimpleFloatSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.assets.disposeSafely
+import ktx.async.KtxAsync
+import ktx.async.MainDispatcher
 import ktx.graphics.use
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
@@ -60,7 +64,7 @@ import com.badlogic.gdx.utils.Array as GdxArray
 class LevelCreationScreen : StageScreen(), ReloadableScreen {
 
   private val disableables = mutableListOf<Disableable>()
-  private val previewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
+  private val newIslandpreviewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
 
   private val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.entries.toTypedArray()))
   private val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
@@ -93,7 +97,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       // arbitrary initial value
 
       visTable { table ->
-        previewImage = visImage(Texture(previewSize, previewSize, RGBA8888)) {
+        previewImage = visImage(Texture(newIslandpreviewSize, newIslandpreviewSize, RGBA8888)) {
           this.setScaling(Scaling.fit)
           it.fillX()
         }
@@ -331,15 +335,14 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
     layoutSpinner.setCurrent(layoutSpinner.value, false)
 
     if (layoutSpinner.value.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
-      Hex.assets.islandPreviews.renderPreview(
-        createIsland(),
-        previewSize,
-        previewSize,
-        dummyMetadata
-      ) {
+      KtxAsync.launch(MainDispatcher) {
+        val preview = async {
+          Hex.assets.islandPreviews.renderPreview(createIsland(), newIslandpreviewSize, newIslandpreviewSize, dummyMetadata)
+        }.await()
+
         previewBuffer?.dispose()
-        previewBuffer = it
-        val region = TextureRegion(it.colorBufferTexture)
+        previewBuffer = preview
+        val region = TextureRegion(preview.colorBufferTexture)
         region.flip(false, true)
         previewImage.drawable = TextureRegionDrawable(region)
       }
