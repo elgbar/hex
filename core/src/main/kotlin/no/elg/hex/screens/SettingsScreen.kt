@@ -44,6 +44,7 @@ import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.platformCheckBoxSize
 import no.elg.hex.util.platformSpacing
 import no.elg.hex.util.playClick
+import no.elg.hex.util.playMoney
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
@@ -142,6 +143,7 @@ class SettingsScreen : OverlayScreen() {
               if (Hex.platform.writeToClipboard("Hex island export", progress)) {
                 MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
               }
+              playMoney()
             }
           }
 

@@ -13,7 +13,7 @@ fun getIslandProgress(id: Int, preview: Boolean = false): String? {
   if (Hex.args.mapEditor) {
     return null
   }
-  val pref = getPrefName(id)
+  val pref = getPrefName(id, preview)
   return islandPreferences.getString(pref, null)
 }
 
@@ -31,6 +31,6 @@ fun clearIslandProgress(metadata: FastIslandMetadata) {
   Gdx.app.debug("IS PROGRESS", "Clearing progress of island ${metadata.id}")
   metadata.modifier = PreviewModifier.NOTHING
   islandPreferences.remove(getPrefName(metadata.id))
-  islandPreferences.remove(getPrefName(metadata.id, true))
+  islandPreferences.remove(getPrefName(metadata.id, true)) // in case the preview is very old
   islandPreferences.flush()
 }
