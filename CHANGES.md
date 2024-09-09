@@ -18,9 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Only clear island progress when restarting island
 * Update ArTB, all times by Willy
+  * island 5 to 33 rounds
   * island 13 from 16 to 14 rounds
+  * island 10 from 60 to 36 rounds
+  * island 15 from 61 to 25 rounds
   * island 19 from 36 to 19 rounds
+  * island 21 to 33 rounds
+  * island 24 from 52 to 28 rounds
+  * island 25 from 55 to 23 rounds
   * island 34 from 9 to 7 rounds
+  * island 49 from 41 to 21 rounds
   * island 50 from 20 to 18 rounds
 
 ### Fixed
