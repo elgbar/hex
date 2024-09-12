@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add export and import of islands
   * Currently only to the clipboard
   * A screen will show the import progress
+* Add new island
 
 ### Changed
 
