@@ -176,20 +176,17 @@ class Island(
     hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
     team: Team
   ) {
-    val builder =
+    grid =
       HexagonalGridBuilder<HexagonData>()
         .setGridWidth(width)
         .setGridHeight(height)
         .setGridLayout(layout)
         .setOrientation(FLAT_TOP)
         .setRadius(GRID_RADIUS)
+        .build()
 
-    grid = builder.build()
-
-    if (hexagonData.isNotEmpty()) {
-      for ((coord, data) in hexagonData) {
-        grid.getByCubeCoordinate(coord).ifPresent { it.setSatelliteData(data) }
-      }
+    for ((coord, data) in hexagonData) {
+      grid.getByCubeCoordinate(coord).ifPresent { it.setSatelliteData(data) }
     }
     // This must be after
     recalculateVisibleIslands()

@@ -16,7 +16,7 @@ import no.elg.hex.util.playMoney
 
 class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadata, Island>?>>) : AbstractScreen() {
 
-  private var startTime: Long = System.currentTimeMillis()
+  private val startTime: Long = System.currentTimeMillis()
 
   private val layout by lazy { GlyphLayout() }
 
@@ -29,8 +29,8 @@ class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadat
         maxRenderingJobs--
         continue
       }
-      val (meta, isl) = await
-      Hex.assets.islandPreviews.updateSelectPreviewNow(meta, isl)
+      val (metadata, island) = await
+      Hex.assets.islandPreviews.updateSelectPreviewNow(metadata, island)
       renderingsDone++
       skipFrame()
     }
@@ -68,15 +68,10 @@ class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadat
   }
 
   override fun render(delta: Float) {
-    Gdx.app.log("IS SPLASH", "Importing ${jobs.count { it.isCompleted }} / ${jobs.size}")
     if (jobs.all { it.isCompleted } && loaderJob.isCompleted) {
       onDone()
     } else {
       onWaiting()
     }
-  }
-
-  override fun show() {
-    startTime = System.currentTimeMillis()
   }
 }
