@@ -20,6 +20,11 @@ abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
 
   abstract override fun render(delta: Float)
 
+  /**
+   * Called after the screen has been fully initialized and the hex field is ready to be interacted with
+   */
+  open fun afterShown() = Unit
+
   fun updateCamera() {
     camera.update()
     batch.projectionMatrix = camera.combined

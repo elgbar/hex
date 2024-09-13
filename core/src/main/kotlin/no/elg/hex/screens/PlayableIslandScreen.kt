@@ -448,7 +448,9 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     stageScreen.show()
     inputProcessor.show()
     super.show()
+  }
 
+  override fun afterShown() {
     if (island.isCurrentTeamAI()) {
       island.beginTurn()
     }

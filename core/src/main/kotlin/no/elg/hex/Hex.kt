@@ -119,6 +119,7 @@ object Hex : ApplicationAdapter() {
         value.resize(Gdx.graphics.width, Gdx.graphics.height)
         // Keep this last
         field = value
+        value.afterShown()
       }
       Gdx.graphics.requestRendering()
     }

@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix potential memory leak when updating previews
 * Fix tutorial screen showing vertical scroll bar on high w:h ratio devices
 * Fix possibility of the async thread not being disposed properly
+* Fix game not starting when the first player is an AI
 
 ### Removed
 
