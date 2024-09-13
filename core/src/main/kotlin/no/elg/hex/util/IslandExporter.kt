@@ -57,13 +57,13 @@ data class OngoingExportedIslandData(
 }
 
 @JsonTypeName("f")
-data class FinishedExportedIslandData(override val id: Int, val modifier: PreviewModifier, val winningTeam: Team) : ExportedIsland {
+data class FinishedExportedIslandData(override val id: Int, val modifier: PreviewModifier, val winningTeam: Team, val round: Int) : ExportedIsland {
   override fun import(metadata: FastIslandMetadata): Island? {
     metadata.modifier = modifier
-    metadata.winningTeam = winningTeam
     return try {
-      loadInitialIsland(id).apply {
-        fill(winningTeam)
+      loadInitialIsland(id).also { island ->
+        island.round = round
+        island.fill(winningTeam)
       }
     } catch (e: Exception) {
       MessagesRenderer.publishError("Failed to import finished island $id: ${e.message}")
@@ -73,11 +73,12 @@ data class FinishedExportedIslandData(override val id: Int, val modifier: Previe
 }
 
 fun exportIsland(metadata: FastIslandMetadata): ExportedIsland {
+  val island = loadIslandSync(metadata.id)
   return if (metadata.modifier == PreviewModifier.NOTHING) {
-    val progress = loadIslandSync(metadata.id).createDto().refine(loadInitialIsland(metadata.id)).hexagonData
+    val progress = island.createDto().refine(loadInitialIsland(metadata.id)).hexagonData
     OngoingExportedIslandData(metadata.id, progress)
   } else {
-    FinishedExportedIslandData(metadata.id, metadata.modifier, metadata.winningTeam ?: Team.LEAF)
+    FinishedExportedIslandData(metadata.id, metadata.modifier, island.winningTeam, island.round)
   }
 }
 

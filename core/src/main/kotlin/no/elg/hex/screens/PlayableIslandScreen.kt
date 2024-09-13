@@ -290,7 +290,6 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private fun onGameEnded(modifier: PreviewModifier) {
     island.history.disable()
     metadata.modifier = modifier
-    metadata.winningTeam = island.winningTeam
     Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
   }
 

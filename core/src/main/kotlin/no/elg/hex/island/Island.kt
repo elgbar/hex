@@ -79,12 +79,10 @@ class Island(
   handRestoreAction: String? = null,
   hexagonData: Map<CubeCoordinate, HexagonData> = emptyMap(),
   @JsonAlias("turn")
-  round: Int = 1,
+  var round: Int = 1,
   @JsonAlias("team")
   private val startTeam: Team = Settings.startTeam
 ) {
-  var round = round
-    private set
 
   val turn get() = (round - 1) * Team.entries.size + (currentTeam.ordinal - startTeam.ordinal)
 
