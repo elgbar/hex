@@ -8,6 +8,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import ktx.assets.disposeSafely
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
+import no.elg.hex.hexagon.Team
 import no.elg.hex.island.Island
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
@@ -26,7 +27,8 @@ class FastIslandMetadata(
    */
   var authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT,
 
-  var modifier: PreviewModifier = PreviewModifier.NOTHING
+  var modifier: PreviewModifier = PreviewModifier.NOTHING,
+  var winningTeam: Team? = null
 ) : Comparable<FastIslandMetadata>, Disposable {
 
   var previewPixmap: ByteArray? = previewPixmap

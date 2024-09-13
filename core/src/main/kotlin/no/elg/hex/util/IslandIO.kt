@@ -75,6 +75,8 @@ fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
   }
 }
 
+fun loadInitialIsland(id: Int): Island = Island.deserialize(getIslandFile(id))
+
 fun loadIslandSync(id: Int): Island {
   try {
     val progress = getIslandProgress(id)
@@ -84,7 +86,7 @@ fun loadIslandSync(id: Int): Island {
       Island.deserialize(progress)
     } else {
       Gdx.app.debug("IS SPLASH", "No progress found for island $id")
-      Island.deserialize(getIslandFile(id))
+      loadInitialIsland(id)
     }
   } catch (e: Exception) {
     Gdx.app.postRunnable {

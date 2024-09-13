@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
+import no.elg.hex.island.Island
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import java.util.SortedMap
 
 @JsonIgnoreProperties("handRestore", "authorRoundsToBeat")
-data class IslandDto(
+class IslandDto(
   val width: Int,
   val height: Int,
   val layout: HexagonalGridLayout,
@@ -25,7 +26,24 @@ data class IslandDto(
     require(hexagonData.values.none { it.invisible }) { "IslandDto was given invisible hexagon, all serialized hexagons must be visible" }
   }
 
-  fun copy(): IslandDto {
+  fun refine(island: Island): IslandDto = refine(island.hexagonCoordinateToData)
+  fun refine(islandDto: IslandDto): IslandDto = refine(islandDto.hexagonData)
+
+  /**
+   * Refine this island dto by only including changes from the given [dataMap].
+   *
+   * When restoring a refined islandDto the original islandDto must be passed as the base islandDto, so use with care
+   */
+  fun refine(dataMap: Map<CubeCoordinate, HexagonData>): IslandDto {
+    val filter = hexagonData.filter { (coord, _) -> hexagonData[coord] != dataMap[coord] }
+    return copy(filter.toSortedMap())
+  }
+
+  fun withInitialData(dataMap: Map<CubeCoordinate, HexagonData>): IslandDto {
+    return copy(hexagonData = (dataMap + hexagonData).toSortedMap())
+  }
+
+  fun copy(hexagonData: SortedMap<CubeCoordinate, HexagonData>? = null): IslandDto {
     return IslandDto(
       width = width,
       height = height,
@@ -34,7 +52,7 @@ data class IslandDto(
       handCoordinate = handCoordinate,
       handPiece = handPiece?.createDtoCopy(),
       handRestoreAction = handRestoreAction,
-      hexagonData = hexagonData.mapValues { (_, data) -> data.copy() }.toSortedMap { o1, o2 -> o1.compareTo(o2) },
+      hexagonData = hexagonData ?: this.hexagonData.mapValues { (_, data) -> data.copy() }.toSortedMap(),
       round = round,
       team = team
     )

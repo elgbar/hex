@@ -106,6 +106,8 @@ class Island(
   val visibleHexagons: Set<Hexagon<HexagonData>> get() = internalVisibleHexagons
   val invisibleHexagons: Set<Hexagon<HexagonData>> get() = allHexagons - visibleHexagons
 
+  val hexagonCoordinateToData: Map<CubeCoordinate, HexagonData> get() = visibleHexagons.associate { it.cubeCoordinate to getData(it).copy() }
+
   var hand: Hand? = null
     set(value) {
       field?.also {
@@ -731,7 +733,7 @@ class Island(
       handCoordinate = handCoordinate,
       handPiece = handPiece,
       handRestoreAction = handRestoreAction,
-      hexagonData = visibleHexagons.mapTo(HashSet()) { it.cubeCoordinate to getData(it).copy() }.toMap().toSortedMap(),
+      hexagonData = hexagonCoordinateToData.toSortedMap(),
       round = round,
       team = currentTeam
     )

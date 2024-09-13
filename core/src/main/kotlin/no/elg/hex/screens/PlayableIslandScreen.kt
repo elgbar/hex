@@ -51,6 +51,7 @@ import no.elg.hex.renderer.DebugGraphRenderer
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
+import no.elg.hex.util.fill
 import no.elg.hex.util.getData
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
@@ -83,12 +84,6 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   init {
     island.gameInteraction = GameInteraction(island, endGame = ::endGame)
     stage.actors {
-
-      fun onGameEnded(modifier: PreviewModifier) {
-        island.history.disable()
-        metadata.modifier = modifier
-        Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
-      }
 
       val toLevelSelectScreen: KVisWindow.() -> Unit = {
         Hex.screen = LevelSelectScreen()
@@ -292,9 +287,15 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     }
   }
 
-  private fun surrender() {
-    metadata.modifier = SURRENDER
+  private fun onGameEnded(modifier: PreviewModifier) {
+    island.history.disable()
+    metadata.modifier = modifier
+    metadata.winningTeam = island.winningTeam
     Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
+  }
+
+  private fun surrender() {
+    onGameEnded(SURRENDER)
     Hex.screen = LevelSelectScreen()
     Gdx.app.log("ISLAND", "Player surrendered on round ${island.round}")
   }

@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Value
@@ -30,7 +31,7 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.model.FastIslandMetadata
-import no.elg.hex.util.ExportedIslandData
+import no.elg.hex.util.ExportedIsland
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
@@ -134,6 +135,8 @@ class SettingsScreen : OverlayScreen() {
               val progress = Hex.assets.islandFiles.islandIds
                 .mapNotNull(FastIslandMetadata::loadProgress)
                 .map(::exportIsland)
+                .toTypedArray() // must be array to save type correctly
+
               if (progress.isEmpty()) {
                 MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
                 return@onClick
@@ -160,6 +163,7 @@ class SettingsScreen : OverlayScreen() {
                 Hex.mapper.readValue(clipboardText, islandsExportType)
               } catch (e: Exception) {
                 MessagesRenderer.publishError("Invalid island data found in clipboard")
+                Gdx.app.error("SettingsScreen", "Failed to parse islands from clipboard", e)
                 return@onClick
               }
               if (progress.isEmpty()) {
@@ -428,6 +432,6 @@ class SettingsScreen : OverlayScreen() {
   companion object {
     const val MIN_FIELD_WIDTH = 5f
 
-    val islandsExportType: TypeReference<List<ExportedIslandData>> = object : TypeReference<List<ExportedIslandData>>() {}
+    val islandsExportType: TypeReference<List<ExportedIsland>> = object : TypeReference<List<ExportedIsland>>() {}
   }
 }
