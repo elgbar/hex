@@ -13,13 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add export and import of islands
   * Currently only to the clipboard
   * A screen will show the import progress
-* Add new island
+* Add new island with ARtB of 15 rounds
 
 ### Changed
 
 * Only clear island progress when restarting island
 * Do not clear trees when AI is surrendering
 * Do not animate when rendering previews
+* Never fail on any properties
 * Update ArTB, all times by Willy
   * island 5 to 33 rounds
   * island 13 from 16 to 14 rounds

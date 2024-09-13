@@ -1,6 +1,5 @@
 package no.elg.hex.model
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
@@ -9,7 +8,6 @@ import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import java.util.SortedMap
 
-@JsonIgnoreProperties("handRestore", "authorRoundsToBeat")
 class IslandDto(
   val width: Int,
   val height: Int,

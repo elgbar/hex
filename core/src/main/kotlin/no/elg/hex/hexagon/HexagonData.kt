@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
@@ -23,7 +22,6 @@ import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
-@JsonIgnoreProperties("id", "isPassable")
 class HexagonData(
   /**
    * If this hexagon is disabled, meaning it will not be a part of the playable island

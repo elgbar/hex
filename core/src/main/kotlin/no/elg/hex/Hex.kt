@@ -12,6 +12,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglGraphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.dataformat.smile.databind.SmileMapper
@@ -52,16 +53,20 @@ object Hex : ApplicationAdapter() {
   const val LAUNCH_PREF = "launchPref"
 
   @JvmStatic
-  val smileMapper: SmileMapper = SmileMapper.builder().addModule(kotlinModule())
-    .build()
+  val smileMapper: SmileMapper =
+    SmileMapper.builder().apply {
+      addModule(kotlinModule())
+      configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }.build()
 
   @JvmStatic
   val mapper = jsonMapper {
     addModule(kotlinModule())
-    configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
     serializationInclusion(JsonInclude.Include.NON_DEFAULT)
     addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
     addModule(SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) })
+    configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
   }
 
   val AA_BUFFER_CLEAR =
