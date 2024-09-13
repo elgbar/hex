@@ -21,6 +21,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
 
   private val batch: SpriteBatch = SpriteBatch()
 
+  private val isNotPreview = !Hex.args.mapEditor && !islandScreen.isPreviewRenderer
+
   override fun frameUpdate() {
     val island = islandScreen.island
     batch.use(islandScreen.camera) {
@@ -28,7 +30,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
         val data = island.getData(hexagon)
 
         fun shouldAnimate(): Boolean {
-          return data.team == island.currentTeam && island.isCurrentTeamHuman() && !Hex.args.mapEditor
+          return data.team == island.currentTeam && island.isCurrentTeamHuman() && isNotPreview
         }
 
         val drawable = Hex.assets.getTexture(data.piece, shouldAnimate()) ?: continue@loop
@@ -43,7 +45,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
         )
       }
 
-      if (Settings.enableStrengthHint && island.isCurrentTeamHuman()) {
+      if (isNotPreview && Settings.enableStrengthHint && island.isCurrentTeamHuman()) {
         val territory = island.selected
         if (territory != null) {
           for (hexagon in territory.hexagons) {

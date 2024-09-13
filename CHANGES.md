@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Only clear island progress when restarting island
 * Do not clear trees when AI is surrendering
+* Do not animate when rendering previews
 * Update ArTB, all times by Willy
   * island 5 to 33 rounds
   * island 13 from 16 to 14 rounds
