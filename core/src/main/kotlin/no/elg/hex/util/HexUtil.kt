@@ -286,3 +286,21 @@ fun Island.calculateRing(hexagon: Hexagon<HexagonData>, radius: Int): Set<Hexago
 
   return result
 }
+
+/**
+ * Set all hexagons to the given team
+ */
+fun Island.fill(team: Team) {
+  for (hexagon in visibleHexagons) {
+    val data = getData(hexagon)
+    if (data.team == team) {
+      continue
+    }
+    data.team = team
+    if (data.piece !is TreePiece) {
+      data.setPiece<Empty>()
+    }
+  }
+  findCapital(visibleHexagons)
+  select(null)
+}

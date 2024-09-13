@@ -128,18 +128,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
         island.history.disable()
         island.history.clear()
 
-        for (hexagon in island.visibleHexagons) {
-          val data = island.getData(hexagon)
-          if (data.team == island.currentTeam) {
-            continue
-          }
-          data.team = island.currentTeam
-          data.setPiece<Empty>()
-        }
-
-        island.select(null)
-        island.select(island.visibleHexagons.first())
-        island.select(null)
+        island.fill(island.currentTeam)
         endGame(true)
       }
 
