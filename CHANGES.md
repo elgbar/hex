@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix tutorial screen showing vertical scroll bar on high w:h ratio devices
 * Fix possibility of the async thread not being disposed properly
 * Fix game not starting when the first player is an AI
+* Fix crash when exiting island when there are no hexagons visible
 
 ### Removed
 

@@ -211,7 +211,7 @@ class Island(
   }
 
   val hexagonsPerTeam by lazy { EnumMap<Team, Int>(Team::class.java).also { recountHexagons(it) } }
-  val winningTeam: Team get() = hexagonsPerTeam.maxBy { it.value }.key
+  val winningTeam: Team get() = hexagonsPerTeam.maxByOrNull(Map.Entry<Team, Int>::value)?.key ?: LEAF
 
   private val initialState: IslandDto
 
