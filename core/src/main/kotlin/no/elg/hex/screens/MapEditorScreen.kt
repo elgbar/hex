@@ -354,10 +354,6 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
                 editorsWindows.forEach { it.key.toggleShown(this@MapEditorScreen.stageScreen.stage) }
               }
             }
-            menuItem("Set Author Round to Beat (ARtB)") {
-              onInteract(this@MapEditorScreen.stageScreen.stage, Keys.F2) {
-              }
-            }
           }
 
           menu("Help") {
