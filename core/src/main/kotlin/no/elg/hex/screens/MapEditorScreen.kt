@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import com.kotcrab.vis.ui.widget.spinner.Spinner
 import ktx.actors.isShown
 import ktx.actors.minusAssign
 import ktx.actors.onChange
@@ -17,6 +18,7 @@ import ktx.actors.onClick
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
 import ktx.scene2d.actors
+import ktx.scene2d.button
 import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.menu
@@ -130,6 +132,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
         )
         row()
         spinner("", artbSpinner) {
+          textFieldEventPolicy = Spinner.TextFieldEventPolicy.ON_KEY_TYPED
           onChange {
             val parsedInt = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
             metadata.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
