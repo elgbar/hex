@@ -146,6 +146,7 @@ object Settings {
 
   var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.args.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { !Hex.debug })
+  var compressExport by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug })
 
   val deleteAllProgress = ResetSetting("Are you sure you want to delete all your progress?") {
     resetAllIslandProgress()
