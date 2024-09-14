@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Play a "bad click" sound when doing an action that does nothing
 * Add a highlight to actionable hexagons when trying to end turn
   * It can also be permanently enabled in the settings
+* Add randomize every team editor
 
 ### Changed
 

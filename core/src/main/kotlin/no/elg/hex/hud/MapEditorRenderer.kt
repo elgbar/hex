@@ -18,7 +18,7 @@ class MapEditorRenderer(private val mapEditorScreen: MapEditorScreen) : FrameUpd
       "Selected team: ",
       callable = { mapEditorScreen.editor },
       format = { editor ->
-        if (editor is TeamEditor.RandomizeTeam) {
+        if (editor is TeamEditor.RandomizeTeam || editor is TeamEditor.RandomizeEveryTeam) {
           color = Color.PURPLE
           "Random"
         } else {
