@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+# v2.2.0 - 2024-09-15
+
+### Added
+
 * Add export and import of islands
   * Currently only to the clipboard
   * A screen will show the import progress
