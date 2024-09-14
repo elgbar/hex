@@ -19,6 +19,7 @@ import no.elg.hex.util.createInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isPartOfATerritory
+import no.elg.hex.util.playBadClick
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.reflect.full.isSubclassOf
@@ -45,22 +46,25 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
       if (hexagon.isPartOfATerritory(island)) {
         island.select(hexagon)
       } else {
+        playBadClick()
         return false
       }
     }
     val territory = island.selected
     if (territory == null) {
+      playBadClick()
       Gdx.app.debug("PLACE", "Territory is still null after selecting it")
       return false
     }
-    val selectedTerritory = territory != oldTerritory && !cursorHexData.piece.movable
 
     fun playSound(action: Boolean) {
       if (action) {
         Hex.assets.pieceDownSound?.play(Settings.volume)
-      } else if (selectedTerritory) {
+      } else if (territory != oldTerritory) {
         val sound = if (territory.income > 0) Hex.assets.coinsSound else Hex.assets.emptyCoffersSound
         sound?.play(Settings.volume)
+      } else {
+        playBadClick()
       }
     }
 

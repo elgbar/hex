@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Currently only to the clipboard
   * A screen will show the import progress
 * Add new island with ARtB of 15 rounds
+* Play a "bad click" sound when doing an action that does nothing
 
 ### Changed
 

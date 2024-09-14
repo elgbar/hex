@@ -110,6 +110,7 @@ class Assets : AssetManager() {
 
     const val UNDO_ALL_SOUND = "sounds/undo_all.mp3"
     const val CLICK_SOUND = "sounds/click.mp3"
+    const val CLICK_BAD_SOUND = "sounds/click_bad.mp3"
 
     const val PIECE_DOWN_SOUND = "sounds/piece_down_%d.mp3"
     private val PIECE_DOWN_SOUND_RANGE = 1..11
@@ -203,6 +204,7 @@ class Assets : AssetManager() {
 
   val undoAllSound by SoundDelegate(UNDO_ALL_SOUND)
   val clickSound by SoundDelegate(CLICK_SOUND)
+  val clickBadSound by SoundDelegate(CLICK_BAD_SOUND)
 
   val pieceDownSound by SoundAlternativeDelegate(PIECE_DOWN_SOUND, PIECE_DOWN_SOUND_RANGE)
   val undoSound by SoundAlternativeDelegate(UNDO_SOUND, UNDO_SOUND_RANGE)
@@ -469,6 +471,7 @@ class Assets : AssetManager() {
     loadingInfo = "Sounds"
     load<Sound>(UNDO_ALL_SOUND)
     load<Sound>(CLICK_SOUND)
+    load<Sound>(CLICK_BAD_SOUND)
 
     fun loadSoundVariations(path: String, range: IntRange) {
       for (i in range) {
