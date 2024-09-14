@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add a highlight to actionable hexagons when trying to end turn
   * It can also be permanently enabled in the settings
 * Add randomize every team editor
+* `home` and `end` keys will now take you to the top and bottom of the level select screen respectively
 
 ### Changed
 
