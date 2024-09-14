@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Do not clear trees when AI is surrendering
 * Do not animate when rendering previews
 * Never fail on any properties
+* Allow AI to surrender when there is only a single real player left
+  * Even when playing against other players, the AI will surrender if there is only one player left
 * Update ArTB, all times by Willy
   * island 5 to 33 rounds
   * island 13 from 16 to 14 rounds

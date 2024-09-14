@@ -220,6 +220,11 @@ class Island(
   val realPlayers: Int get() = teamToPlayer.count { (_, ai) -> ai == null }
 
   /**
+   * @return If there is only one real player left
+   */
+  val singleAliveRealPlayer: Boolean get() = hexagonsPerTeam.filterValues { it > 0 }.keys.filter { isTeamHuman(it) }.size == 1
+
+  /**
    * How many of the current players are not real (i.e. an AI)
    */
   val aiPlayers: Int get() = Team.entries.size - realPlayers
@@ -334,7 +339,7 @@ class Island(
       if (capitals.isNotEmpty()) {
         beginTurn()
       } else {
-        if (isTeamHuman(newTeam) && realPlayers == 1) {
+        if (isTeamHuman(newTeam) && singleAliveRealPlayer) {
           gameInteraction.endGame(false)
         } else {
           Gdx.app.debug("TURN", "Team $newTeam have no territories, skipping their turn")
