@@ -91,7 +91,10 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
       batch.draw(metadata.preview, x, y, width, height)
       if (Hex.debugStage || (Hex.args.debug && metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT)) {
-        drawBox(x, y, width, height)
+        drawBox(x, y, width, height, Color.PURPLE)
+      }
+      if (Hex.args.debug && metadata.authorRoundsToBeat == Island.NEVER_BEATEN) {
+        drawBox(x, y, width, height, Color.RED)
       }
     }
     batch.end()

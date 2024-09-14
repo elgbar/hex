@@ -47,6 +47,7 @@ import no.elg.hex.input.editor.TeamEditor
 import no.elg.hex.input.editor.editorsList
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
+import no.elg.hex.island.Island.Companion.NEVER_BEATEN
 import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.IslandDto
@@ -127,6 +128,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
           """
            Previous ARtB: ${metadata.authorRoundsToBeat}
            $UNKNOWN_ROUNDS_TO_BEAT = not played, ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
+           $NEVER_BEATEN = never beaten
           """.trimIndent()
         )
         row()

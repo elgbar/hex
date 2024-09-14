@@ -702,6 +702,7 @@ class Island(
 
     const val NO_ENEMY_HEXAGONS = -1
     const val UNKNOWN_ROUNDS_TO_BEAT = 0
+    const val NEVER_BEATEN = 999
 
     fun Hand.createDtoPieceCopy(): Piece {
       return this.piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
