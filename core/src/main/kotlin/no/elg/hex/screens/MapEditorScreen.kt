@@ -1,6 +1,5 @@
 package no.elg.hex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
@@ -409,6 +408,5 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
   companion object {
     const val MAX_BRUSH_SIZE = 10
     const val MIN_BRUSH_SIZE = 1
-    private val shiftPressed get() = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)
   }
 }
