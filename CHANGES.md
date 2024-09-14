@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * island 34 from 9 to 7 rounds
   * island 49 from 41 to 21 rounds
   * island 50 from 20 to 18 rounds
+* Randomize teams on islands 1, 9, 16
 
 ### Fixed
 
