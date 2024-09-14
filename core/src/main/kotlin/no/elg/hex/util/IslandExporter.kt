@@ -17,7 +17,7 @@ import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.screens.ImportIslandsScreen
 import org.hexworks.mixite.core.api.CubeCoordinate
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@")
 @JsonSubTypes(
   value = [
     JsonSubTypes.Type(value = OngoingExportedIslandData::class, name = "o"),

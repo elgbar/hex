@@ -171,7 +171,7 @@ class SettingsScreen : OverlayScreen() {
                 return@onClick
               }
 
-              importIslands(progress)
+              importIslands(progress.toList())
             }
           }
           row()
@@ -432,6 +432,6 @@ class SettingsScreen : OverlayScreen() {
   companion object {
     const val MIN_FIELD_WIDTH = 5f
 
-    val islandsExportType: TypeReference<List<ExportedIsland>> = object : TypeReference<List<ExportedIsland>>() {}
+    val islandsExportType: TypeReference<Array<ExportedIsland>> = object : TypeReference<Array<ExportedIsland>>() {}
   }
 }
