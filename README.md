@@ -89,6 +89,15 @@ optional arguments:
 * Likewise, `F2` will buy a spearman, `F3` a knight, and `F4` a baron
 * Undo and redo can be done with `Ctrl-Z` and `Ctrl-Y` respectfully
 
+## Import/export
+
+### Format
+
+The progress is exported as a xz compressed json file then base85 encoded to make it smaller.
+The uncompressed json is either an ongoing game or a completed game.
+When the game is ongoing a list of hexagons that have changed from the initial map is stored
+When the game is completed the winner is stored.
+
 ## For maintainers
 
 ### Creating release files
