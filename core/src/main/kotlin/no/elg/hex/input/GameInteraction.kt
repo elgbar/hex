@@ -219,8 +219,9 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
           endGame()
         }
       }
+      return true
     }
-    return true
+    return false
   }
 
   private fun march(to: Hexagon<HexagonData>): Boolean {
