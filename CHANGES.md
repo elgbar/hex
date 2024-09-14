@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add export and import of islands
   * Currently only to the clipboard
   * A screen will show the import progress
-* Add new island with ARtB of 15 rounds
+* Add nine new islands
 * Play a "bad click" sound when doing an action that does nothing
 * Add a highlight to actionable hexagons when trying to end turn
   * It can also be permanently enabled in the settings
