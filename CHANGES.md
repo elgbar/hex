@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix game not starting when the first player is an AI
 * Fix crash when exiting island when there are no hexagons visible
 * Fix inputting ARtB would not update until the spinner lost focus
+* Fix team percentages not updating when hexagons changes
 
 ### Removed
 

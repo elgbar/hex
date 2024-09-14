@@ -25,7 +25,7 @@ import kotlin.collections.sort
 /** @author Elg */
 class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
 
-  private val listener: SimpleEventListener<HexagonChangedTeamEvent>
+  private var listener: SimpleEventListener<HexagonChangedTeamEvent>? = null
   private val fpsText: ScreenText
   private val debugLines: Array<ScreenText>
   private val teamPercent: MutableList<String> = mutableListOf()
@@ -100,20 +100,20 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     } else {
       debugLines = emptyArray()
     }
-
-    fun updatePercentages() {
-      teamPercent.clear()
-      teamHexagons.clear()
-      islandScreen.island.calculatePercentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
-      islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
-    }
-
-    listener = SimpleEventListener.create { updatePercentages() }
-
     updatePercentages()
   }
 
+  private fun updatePercentages() {
+    teamPercent.clear()
+    teamHexagons.clear()
+    islandScreen.island.calculatePercentagesHexagons().mapTo(teamPercent) { (team, percent) -> "$team ${"%2d".format((percent * 100).toInt())}%" }.sort()
+    islandScreen.island.hexagonsPerTeam.mapTo(teamHexagons) { (team, hexes) -> "$team ${"%3d".format(hexes)}" }.sort()
+  }
+
   override fun frameUpdate() {
+    if (listener == null) {
+      listener = SimpleEventListener.create { updatePercentages() }
+    }
     val showAll = (Hex.debug || Hex.args.mapEditor) && Settings.enableDebugHUD
     if (Settings.showFps || showAll) {
       ScreenRenderer.use {
