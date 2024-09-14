@@ -9,10 +9,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled
 import com.badlogic.gdx.utils.Disposable
 import ktx.graphics.use
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.screens.PreviewIslandScreen
+import no.elg.hex.util.actionableHexagons
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
@@ -40,9 +42,10 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
       Gdx.gl.glEnable(GL20.GL_BLEND)
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-      val hexagonsToRender = if (shouldDrawEdges || shouldDrawInvisible) islandScreen.island.allHexagons else islandScreen.island.visibleHexagons
+      val island = islandScreen.island
+      val hexagonsToRender = if (shouldDrawEdges || shouldDrawInvisible) island.allHexagons else island.visibleHexagons
       drawOutLines(hexagonsToRender) { hexagon, target ->
-        val data = islandScreen.island.getData(hexagon)
+        val data = island.getData(hexagon)
         if (data.edge) {
           if (shouldDrawEdges) target.set(Color.WHITE) else target.set(Color.CLEAR)
         } else if (shouldDrawInvisible && data.invisible) {
@@ -53,18 +56,18 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
         }
       }
 
-      if (islandScreen.island.isCurrentTeamHuman() && shouldDrawCurrentTeamHexagons) {
-        islandScreen.island.selected?.also {
+      if (island.isCurrentTeamHuman() && shouldDrawCurrentTeamHexagons) {
+        island.selected?.also {
           drawOutLines(it.hexagons) { _, target -> target.set(selectedColor) }
 
-          val hand = islandScreen.island.hand
+          val hand = island.hand
 
           if (hand != null && hand.piece is LivingPiece) {
             elapsedAnimationTime += Gdx.graphics.deltaTime
             val attackableLineWidth = attackableAnimation.getKeyFrame(elapsedAnimationTime)
-            val hexes = it.enemyBorderHexes.filter { hex -> islandScreen.island.canAttack(hex, hand.piece) }
+            val hexes = it.enemyBorderHexes.filter { hex -> island.canAttack(hex, hand.piece) }
             drawOutLines(hexes, attackableLineWidth) { hexagon, target ->
-              val str = islandScreen.island.calculateStrength(hexagon)
+              val str = island.calculateStrength(hexagon)
               target.set(attackColor(hand.piece.strength - str))
             }
             Gdx.graphics.requestRenderingIn(ATTACKABLE_OUTLINE_BLINK_PERIOD_SECONDS)
@@ -72,12 +75,16 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
             elapsedAnimationTime = 0f
           }
         }
+
+        if (Settings.enableActionHighlight || islandScreen.tempShowActionToDo) {
+          drawOutLines(island.actionableHexagons().toSet()) { _, target -> target.set(Color.GOLD) }
+        }
       }
     }
   }
 
   private inline fun drawOutLines(
-    hexes: Collection<Hexagon<HexagonData>>,
+    hexes: Iterable<Hexagon<HexagonData>>,
     lineWidth: Float = DEFAULT_RECT_LINE_WIDTH,
     color: (hexagon: Hexagon<HexagonData>, target: Color) -> Unit
   ) {

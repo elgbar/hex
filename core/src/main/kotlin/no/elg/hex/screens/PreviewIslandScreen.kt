@@ -27,6 +27,7 @@ open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Isl
   val basicIslandInputProcessor by lazy { BasicIslandInputProcessor(this) }
 
   var smoothTransition: SmoothTransition? = null
+  var tempShowActionToDo: Boolean = false
 
   private val visibleGridSize
     get() = if (Hex.args.mapEditor) {

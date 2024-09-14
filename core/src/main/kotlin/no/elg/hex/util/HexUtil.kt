@@ -1,21 +1,28 @@
 package no.elg.hex.util
 
+import com.badlogic.gdx.Gdx
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
+import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import no.elg.hex.hexagon.KNIGHT_STRENGTH
+import no.elg.hex.hexagon.LivingPiece
+import no.elg.hex.hexagon.PEASANT_STRENGTH
 import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.PineTree
+import no.elg.hex.hexagon.SPEARMAN_STRENGTH
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.screens.PlayableIslandScreen.Companion.CASTLE_PRICE
+import no.elg.hex.screens.PlayableIslandScreen.Companion.PEASANT_PRICE
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.math.max
@@ -303,4 +310,74 @@ fun Island.fill(team: Team) {
   }
   findCapital(visibleHexagons)
   select(null)
+}
+
+/**
+ * List of all hexagons that the current team can do an action on
+ */
+fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
+  val currentTeam = currentTeam
+  return visibleHexagons.asSequence().filter { hexagon ->
+    val data = getData(hexagon)
+    val piece = data.piece
+
+    if (data.team != currentTeam) {
+      // not our team
+      return@filter false
+    } else if (piece is Capital) {
+      val balance = piece.balance
+      if (balance < PEASANT_PRICE) {
+        // We cannot afford anything
+        return@filter false
+      }
+
+      val strength = when {
+        balance < PEASANT_PRICE * 2 -> PEASANT_STRENGTH
+        balance in PEASANT_PRICE * 2 until PEASANT_PRICE * 3 -> SPEARMAN_STRENGTH
+        balance in PEASANT_PRICE * 3 until PEASANT_PRICE * 4 -> KNIGHT_STRENGTH
+        else -> BARON_STRENGTH
+      }
+
+      val territory = findTerritory(hexagon)
+      if (territory == null) {
+        Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
+        return@filter false
+      }
+      val cannotBuyAndAttackAnything = territory.enemyBorderHexes.none { hex -> canAttack(hex, strength) }
+      val cannotBuyAndPlaceCastle = balance < CASTLE_PRICE || territory.hexagons.none { hex -> getData(hex).piece is Empty }
+      if (cannotBuyAndAttackAnything && cannotBuyAndPlaceCastle) {
+        return@filter false
+      }
+    } else if (piece is LivingPiece) {
+      if (piece.moved) {
+        // If the piece has moved, it cannot make another move!
+        return@filter false
+      }
+
+      val territory = findTerritory(hexagon)
+      if (territory == null) {
+        Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
+        return@filter false
+      }
+      val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> canAttack(hex, piece) }
+      val canNotMergeWithOtherPieceOrChopTree = territory.hexagons.none {
+        val terrPiece = getData(it).piece
+        return@none if (terrPiece === piece) {
+          false // can never merge with self
+        } else {
+          (terrPiece is LivingPiece && piece.canMerge(terrPiece)) || terrPiece is TreePiece
+        }
+      }
+      if (canNotAttackAnything && canNotMergeWithOtherPieceOrChopTree) {
+        // The current piece is able to move, but not attack any territory, nor buy any new pieces to merge with
+        return@filter false
+      }
+    } else {
+      // any other piece should be ignored
+      return@filter false
+    }
+
+    // We can do an action!
+    return@filter true
+  }
 }

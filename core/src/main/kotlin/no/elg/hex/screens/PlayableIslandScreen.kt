@@ -24,16 +24,8 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.hexagon.BARON_STRENGTH
-import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
-import no.elg.hex.hexagon.Empty
-import no.elg.hex.hexagon.KNIGHT_STRENGTH
-import no.elg.hex.hexagon.LivingPiece
-import no.elg.hex.hexagon.PEASANT_STRENGTH
 import no.elg.hex.hexagon.Peasant
-import no.elg.hex.hexagon.SPEARMAN_STRENGTH
-import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
@@ -48,11 +40,10 @@ import no.elg.hex.preview.PreviewModifier.NOTHING
 import no.elg.hex.preview.PreviewModifier.SURRENDER
 import no.elg.hex.preview.PreviewModifier.WON
 import no.elg.hex.renderer.DebugGraphRenderer
-import no.elg.hex.util.canAttack
+import no.elg.hex.util.actionableHexagons
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fill
-import no.elg.hex.util.getData
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.saveIslandProgress
@@ -104,8 +95,10 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
       confirmEndTurn = confirmWindow(
         "Confirm End Turn",
-        "There still are actions to perform.\nAre you sure you want to end your turn?"
+        "There still are actions to perform.\nAre you sure you want to end your turn?",
+        whenDenied = { tempShowActionToDo = true }
       ) {
+        tempShowActionToDo = false
         island.endTurn()
       }
 
@@ -312,6 +305,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   }
 
   private fun endTurn(allowAISurrender: Boolean = true) {
+    tempShowActionToDo = false
     island.select(null)
 
     val currentTeam = island.currentTeam
@@ -335,67 +329,9 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
     if (island.isCurrentTeamHuman() && Settings.confirmEndTurn) {
       // only display the confirm button if the user have any action to do left
-      for (hexagon in island.visibleHexagons) {
-        val data = island.getData(hexagon)
-        val piece = data.piece
-
-        if (data.team != currentTeam) {
-          // not our team
-          continue
-        } else if (piece is Capital) {
-          val balance = piece.balance
-          if (balance < PEASANT_PRICE) {
-            // We cannot afford anything
-            continue
-          }
-
-          val strength = when {
-            balance < PEASANT_PRICE * 2 -> PEASANT_STRENGTH
-            balance in PEASANT_PRICE * 2 until PEASANT_PRICE * 3 -> SPEARMAN_STRENGTH
-            balance in PEASANT_PRICE * 3 until PEASANT_PRICE * 4 -> KNIGHT_STRENGTH
-            else -> BARON_STRENGTH
-          }
-
-          val territory = island.findTerritory(hexagon)
-          if (territory == null) {
-            Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
-            continue
-          }
-          val cannotBuyAndAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, strength) }
-          val cannotBuyAndPlaceCastle = balance < CASTLE_PRICE || territory.hexagons.none { hex -> island.getData(hex).piece is Empty }
-          if (cannotBuyAndAttackAnything && cannotBuyAndPlaceCastle) {
-            continue
-          }
-        } else if (piece is LivingPiece) {
-          if (piece.moved) {
-            // If the piece has moved, it cannot make another move!
-            continue
-          }
-
-          val territory = island.findTerritory(hexagon)
-          if (territory == null) {
-            Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
-            continue
-          }
-          val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> island.canAttack(hex, piece) }
-          val canNotMergeWithOtherPieceOrChopTree = territory.hexagons.none {
-            val terrPiece = island.getData(it).piece
-            return@none if (terrPiece === piece) {
-              false // can never merge with self
-            } else {
-              (terrPiece is LivingPiece && piece.canMerge(terrPiece)) || terrPiece is TreePiece
-            }
-          }
-          if (canNotAttackAnything && canNotMergeWithOtherPieceOrChopTree) {
-            // The current piece is able to move, but not attack any territory, nor buy any new pieces to merge with
-            continue
-          }
-        } else {
-          // any other piece should be ignored
-          continue
-        }
-
-        // We can do an action! Let's warn users of ending their turn
+      if (island.actionableHexagons().any()) {
+        // Let's warn users of ending their turn
+        tempShowActionToDo = true
         confirmEndTurn.show(stage)
         return
       }
