@@ -24,22 +24,27 @@ open class PreferenceDelegate<T : Any>(
    */
   internal val requireRestart: Boolean = false,
   /**
-   * How far up this setting should be, lower means higher in the settings screen. If multiple settings have the same [priority] they are listed alphabetically
+   * How far up this setting should be.
+   * A lower number means the setting will be placed higher in the settings screen.
+   * If multiple settings have the same [priority] they are listed alphabetically
    */
   val priority: Int = 1000,
   /**
-   * If [onChange] should be called when the program starts
+   * If [afterChange] should be called when the program starts
    */
-  runOnChangeOnInit: Boolean = true,
+  runAfterChangeOnInit: Boolean = true,
 
   /**
-   * only apply settings when leaving the settings screen
+   * If [afterChange] should run when leaving settings screen
    */
-  val applyOnChangeOnSettingsHide: Boolean = false,
+  val applyAfterChangeOnSettingsHide: Boolean = false,
   /**
-   * Method to call when a change is applied. The first argument will always be `this`. If the onChange
+   * Method to call *after* a change is applied
    */
-  val onChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> T)? = null,
+  val afterChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> Unit)? = null,
+  /**
+   * If this setting should be hidden in the settings screen
+   */
   private val shouldHide: (T) -> Boolean = { false },
   // Impl note: 'invalidate' must be the last parameter
   /**
@@ -60,9 +65,9 @@ open class PreferenceDelegate<T : Any>(
     }
     require(!invalidate(initialValue)) { "The initial value cannot be invalid" }
 
-    if (runOnChangeOnInit) {
+    if (runAfterChangeOnInit) {
       Gdx.app.postRunnable {
-        onChange?.invoke(this, initialValue, currentValue ?: initialValue)
+        afterChange?.invoke(this, initialValue, currentValue ?: initialValue)
       }
     }
   }
@@ -121,56 +126,49 @@ open class PreferenceDelegate<T : Any>(
   operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
     val propertyName = property.name
     if (invalidate(value)) {
-      Gdx.app.trace("PREF") { "Will not set $propertyName to $value as it is invalid" }
+      Gdx.app.trace("SETTINGS") { "Will not set $propertyName to $value as it is invalid" }
       return
     }
 
     val old = currentValue ?: initialValue
-    val newValue = if (onChange != null && !applyOnChangeOnSettingsHide) {
-      Gdx.app.trace("PREF") { "Calling on change for setting $propertyName" }
-      onChange.invoke(this, old, value)
-    } else {
-      value
-    }
+    currentValue = value
 
-    if (invalidate(newValue)) {
-      Gdx.app.trace("PREF") { "Will not set $propertyName to $value as it is invalid" }
-      return
-    }
-
-    currentValue = newValue
-    if (currentValue != old) {
+    if (value != old) {
       if (!changed) {
         changed = true
-      } else if (initialLoadedValue == currentValue) {
+      } else if (initialLoadedValue == value) {
         changed = false
       }
     }
 
-    Gdx.app.debug("SETTINGS") { "Changing '$propertyName' from '$old' to '$currentValue'" }
+    Gdx.app.debug("SETTINGS") { "Changing '$propertyName' from '$old' to '$value'" }
 
     when (initialValue) {
-      is Boolean -> preferences.putBoolean(propertyName, currentValue as Boolean)
-      is Int -> preferences.putInteger(propertyName, currentValue as Int)
-      is Float -> preferences.putFloat(propertyName, currentValue as Float)
-      is CharSequence -> preferences.putString(propertyName, currentValue.toString())
-      is Long -> preferences.putLong(propertyName, currentValue as Long)
-      is Byte -> preferences.putInteger(propertyName, (currentValue as Byte).toInt())
-      is Char -> preferences.putInteger(propertyName, (currentValue as Char).code)
-      is Short -> preferences.putInteger(propertyName, (currentValue as Short).toInt())
-      is Double -> preferences.putFloat(propertyName, (currentValue as Double).toFloat())
-      is Enum<*> -> preferences.putString(propertyName, (currentValue as Enum<*>).name)
+      is Boolean -> preferences.putBoolean(propertyName, value as Boolean)
+      is Int -> preferences.putInteger(propertyName, value as Int)
+      is Float -> preferences.putFloat(propertyName, value as Float)
+      is CharSequence -> preferences.putString(propertyName, value.toString())
+      is Long -> preferences.putLong(propertyName, value as Long)
+      is Byte -> preferences.putInteger(propertyName, (value as Byte).toInt())
+      is Char -> preferences.putInteger(propertyName, (value as Char).code)
+      is Short -> preferences.putInteger(propertyName, (value as Short).toInt())
+      is Double -> preferences.putFloat(propertyName, (value as Double).toFloat())
+      is Enum<*> -> preferences.putString(propertyName, (value as Enum<*>).name)
       else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
     }
     preferences.flush()
+
+    if (!applyAfterChangeOnSettingsHide) {
+      afterChange?.invoke(this, old, value)
+    }
   }
 
   fun shouldHide(): Boolean = shouldHide(currentValue ?: initialValue)
 
   fun hide(property: KProperty<*>) {
-    if (applyOnChangeOnSettingsHide && changed) {
+    if (applyAfterChangeOnSettingsHide && changed) {
       val old = currentValue ?: initialValue
-      onChange?.invoke(this, old, getValue(null, property))
+      afterChange?.invoke(this, old, getValue(null, property))
     }
   }
 

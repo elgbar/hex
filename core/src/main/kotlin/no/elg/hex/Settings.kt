@@ -29,9 +29,8 @@ object Settings {
     priority = 200,
     preferences = Hex.launchPreference,
     shouldHide = { !Hex.platform.canToggleVsync },
-    onChange = { _, _, new ->
+    afterChange = { _, _, new ->
       Gdx.graphics.setVSync(new)
-      return@PreferenceDelegate new
     }
   )
 
@@ -64,75 +63,57 @@ object Settings {
 
   var startTeam by PreferenceDelegate(
     Team.LEAF,
-    runOnChangeOnInit = false,
-    applyOnChangeOnSettingsHide = true,
+    runAfterChangeOnInit = false,
+    applyAfterChangeOnSettingsHide = true,
     shouldHide = { !Hex.debug },
     priority = 100_000,
-    onChange = { _, _, new ->
-      gotoLevelSelect()
-      return@PreferenceDelegate new
-    }
+    afterChange = { _, _, _ -> gotoLevelSelect() }
   )
 
   var teamSunAI by PreferenceDelegate(
     Difficulty.HARD,
-    runOnChangeOnInit = false,
-    applyOnChangeOnSettingsHide = true,
+    runAfterChangeOnInit = false,
+    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    onChange = { _, _, new ->
-      gotoLevelSelect()
-      return@PreferenceDelegate new
-    }
+    afterChange = { _, _, _ -> gotoLevelSelect() }
   )
 
   var teamLeafAI by PreferenceDelegate(
     Difficulty.PLAYER,
-    runOnChangeOnInit = false,
-    applyOnChangeOnSettingsHide = true,
+    runAfterChangeOnInit = false,
+    applyAfterChangeOnSettingsHide = true,
     priority = 89,
-    onChange = { _, _, new ->
-      gotoLevelSelect()
-      return@PreferenceDelegate new
-    }
+    afterChange = { _, _, _ -> gotoLevelSelect() }
   )
   var teamForestAI by PreferenceDelegate(
     Difficulty.HARD,
-    runOnChangeOnInit = false,
-    applyOnChangeOnSettingsHide = true,
+    runAfterChangeOnInit = false,
+    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    onChange = { _, _, new ->
-      gotoLevelSelect()
-      return@PreferenceDelegate new
-    }
+    afterChange = { _, _, _ -> gotoLevelSelect() }
   )
 
   var teamEarthAI by PreferenceDelegate(
     Difficulty.HARD,
-    runOnChangeOnInit = false,
-    applyOnChangeOnSettingsHide = true,
+    runAfterChangeOnInit = false,
+    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    onChange = { _, _, new ->
-      gotoLevelSelect()
-      return@PreferenceDelegate new
-    }
+    afterChange = { _, _, _ -> gotoLevelSelect() }
   )
 
   var teamStoneAI by PreferenceDelegate(
     Difficulty.HARD,
-    runOnChangeOnInit = false,
-    applyOnChangeOnSettingsHide = true,
+    runAfterChangeOnInit = false,
+    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    onChange = { _, _, new ->
-      gotoLevelSelect()
-      return@PreferenceDelegate new
-    }
+    afterChange = { _, _, _ -> gotoLevelSelect() }
   )
 
   var enableGLDebugging by PreferenceDelegate(
     false,
     priority = 100_000,
     shouldHide = { !Hex.debug },
-    onChange = { _, old, new ->
+    afterChange = { _, old, new ->
       if (new != old) {
         if (new) {
           GLProfilerRenderer.enable()
@@ -140,8 +121,6 @@ object Settings {
           GLProfilerRenderer.disable()
         }
       }
-
-      return@PreferenceDelegate new
     }
   )
 
