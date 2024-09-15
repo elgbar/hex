@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.os.StrictMode
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
+import com.badlogic.gdx.backends.android.AndroidAudio
 import com.badlogic.gdx.backends.android.AndroidPreferences
+import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio
 import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
@@ -49,4 +51,7 @@ class AndroidLauncher : AndroidApplication() {
     Hex.platform.platformInit()
     initialize(Hex, config)
   }
+
+  override fun createAudio(context: Context?, config: AndroidApplicationConfiguration?): AndroidAudio =
+    AsynchronousAndroidAudio(context, config)
 }
