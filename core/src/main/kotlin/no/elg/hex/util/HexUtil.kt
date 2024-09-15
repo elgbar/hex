@@ -18,6 +18,7 @@ import no.elg.hex.hexagon.PineTree
 import no.elg.hex.hexagon.SPEARMAN_STRENGTH
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
+import no.elg.hex.hexagon.mergedType
 import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -365,7 +366,8 @@ fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
         return@none if (terrPiece === piece) {
           false // can never merge with self
         } else {
-          (terrPiece is LivingPiece && piece.canMerge(terrPiece)) || terrPiece is TreePiece
+          val affordableMerge = terrPiece is LivingPiece && piece.canMerge(terrPiece) && mergedType(piece, terrPiece).createHandInstance().price <= territory.capital.income
+          affordableMerge || terrPiece is TreePiece
         }
       }
       if (canNotAttackAnything && canNotMergeWithOtherPieceOrChopTree) {

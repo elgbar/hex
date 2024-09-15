@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Improve audio on android by using `AsynchronousAndroidAudio`
+* Do not prompt for end turn when the player cannot afford merging two pieces
 
 ### Removed
 
