@@ -59,10 +59,10 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
 
     fun playSound(action: Boolean) {
       if (action) {
-        Hex.assets.pieceDownSound?.play(Settings.volume)
+        Hex.assets.pieceDownSound?.play(Settings.masterVolume)
       } else if (territory != oldTerritory) {
         val sound = if (territory.income > 0) Hex.assets.coinsSound else Hex.assets.emptyCoffersSound
-        sound?.play(Settings.volume)
+        sound?.play(Settings.masterVolume)
       } else {
         playBadClick()
       }
@@ -121,7 +121,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
           island.hand = Hand(territory, piece)
         }
       }
-      Hex.assets.pieceDownSound?.play(Settings.volume)
+      Hex.assets.pieceDownSound?.play(Settings.masterVolume)
       return true
     }
     return false
@@ -273,7 +273,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
           }
         }
       }
-      Hex.assets.pieceDownSound?.play(Settings.volume)
+      Hex.assets.pieceDownSound?.play(Settings.masterVolume)
       return true
     }
     return false

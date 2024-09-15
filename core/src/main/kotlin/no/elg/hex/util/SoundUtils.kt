@@ -4,13 +4,13 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 
 fun playClick() {
-  Hex.assets.clickSound?.play(Settings.volume)
+  Hex.assets.clickSound?.play(Settings.masterVolume)
 }
 
 fun playBadClick() {
-  Hex.assets.clickBadSound?.play(Settings.volume)
+  Hex.assets.clickBadSound?.play(Settings.masterVolume)
 }
 
 fun playMoney() {
-  Hex.assets.coinsSound?.play(Settings.volume)
+  Hex.assets.coinsSound?.play(Settings.masterVolume)
 }

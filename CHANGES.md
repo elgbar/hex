@@ -10,7 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added music by Stey [SoundCloud](https://soundcloud.com/stey_music)
+
 ### Changed
+
+* Rename `volume` setting to `master volume`
 
 ### Fixed
 

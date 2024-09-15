@@ -34,7 +34,7 @@ object Settings {
     }
   )
 
-  var volume by PreferenceDelegate(
+  var masterVolume by PreferenceDelegate(
     1f,
     priority = 210,
     shouldHide = { !Hex.platform.canControlAudio }

@@ -77,22 +77,22 @@ class IslandHistory(val island: Island) {
   fun canRedo(): Boolean = (historyPointer - 1) in history.indices
 
   fun undo() {
-    Hex.assets.undoSound?.play(Settings.volume)
+    Hex.assets.undoSound?.play(Settings.masterVolume)
     changeHistory(historyPointer + 1, "un")
   }
 
   fun redo() {
-    Hex.assets.undoSound?.play(Settings.volume)
+    Hex.assets.undoSound?.play(Settings.masterVolume)
     changeHistory(historyPointer - 1, "re")
   }
 
   fun undoAll() {
-    Hex.assets.undoAllSound?.play(Settings.volume)
+    Hex.assets.undoAllSound?.play(Settings.masterVolume)
     changeHistory(history.size - 1, "un")
   }
 
   fun redoAll() {
-    Hex.assets.undoAllSound?.play(Settings.volume)
+    Hex.assets.undoAllSound?.play(Settings.masterVolume)
     changeHistory(0, "re")
   }
 
