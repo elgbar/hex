@@ -39,7 +39,7 @@ object Settings {
     priority = 210,
     shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled },
     afterChange = { _, _, _ ->
-      Hex.updateMusicVolume()
+      Hex.music.updateMusicVolume()
     }
   ) { it < 0f || it > 1f }
 
@@ -48,7 +48,7 @@ object Settings {
     priority = 210,
     shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled },
     afterChange = { _, _, _ ->
-      Hex.updateMusicVolume()
+      Hex.music.updateMusicVolume()
     }
   ) { it < 0f || it > 1f }
 

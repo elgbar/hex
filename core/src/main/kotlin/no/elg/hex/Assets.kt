@@ -215,6 +215,9 @@ class Assets : AssetManager() {
   val theWillToLiveMusic by lazy { fetchOrNull<Music>(THE_WILL_TO_LIVE_MUSIC) }
   val ventureToTheHorizonMusic by lazy { fetchOrNull<Music>(VENTURE_TO_THE_HORIZON_MUSIC) }
 
+  /** All available music */
+  val songs by lazy { listOf(freedomMusic, astroRiderMusic, neonDreamsMusic, theWillToLiveMusic, ventureToTheHorizonMusic).filterNotNull() }
+
   val undoAllSound by SoundDelegate(UNDO_ALL_SOUND)
   val clickSound by SoundDelegate(CLICK_SOUND)
   val clickBadSound by SoundDelegate(CLICK_BAD_SOUND)

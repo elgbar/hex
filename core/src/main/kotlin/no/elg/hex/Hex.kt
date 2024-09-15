@@ -8,7 +8,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Preferences
-import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.backends.lwjgl.LwjglGraphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
@@ -24,6 +23,7 @@ import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
+import no.elg.hex.audio.MusicHandler
 import no.elg.hex.event.Events
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
@@ -130,23 +130,7 @@ object Hex : ApplicationAdapter() {
       Gdx.graphics.requestRendering()
     }
 
-  var music: Music? = null
-    set(value) {
-      if (audioDisabled) {
-        return
-      }
-      field?.pause()
-      field = value
-      value?.apply {
-        isLooping = true
-        volume = Settings.masterVolume * Settings.musicVolume
-        play()
-      }
-    }
-
-  fun updateMusicVolume() {
-    music?.volume = Settings.masterVolume * Settings.musicVolume
-  }
+  val music: MusicHandler = MusicHandler()
 
   override fun create() {
     if (args.`reset-all`) {

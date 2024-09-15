@@ -373,6 +373,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     stageScreen.show()
     inputProcessor.show()
     super.show()
+    Hex.music.playRandom()
   }
 
   override fun afterShown() {
