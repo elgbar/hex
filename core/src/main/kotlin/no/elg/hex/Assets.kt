@@ -462,7 +462,7 @@ class Assets : AssetManager() {
     }
   }
 
-  private var audioLoaded = false
+  private var audioLoadCalled = false
 
   /**
    * @return If audio has been loaded
@@ -470,7 +470,7 @@ class Assets : AssetManager() {
   fun audioLoaded(wait: Boolean): Boolean {
     return when {
       !Settings.enableAudio || Hex.audioDisabled -> false
-      audioLoaded -> true
+      audioLoadCalled -> true
       else -> {
         loadAudio(wait)
         false
@@ -479,7 +479,7 @@ class Assets : AssetManager() {
   }
 
   private fun loadAudio(wait: Boolean) {
-    audioLoaded = true
+    audioLoadCalled = true
 
     loadingInfo = "Sounds"
     load<Sound>(UNDO_ALL_SOUND)
