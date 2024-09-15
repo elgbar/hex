@@ -8,6 +8,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Animation
@@ -123,6 +124,12 @@ class Assets : AssetManager() {
 
     const val EMPTY_COFFERS_SOUND = "sounds/empty_coffers_%d.mp3"
     private val EMPTY_COFFERS_SOUND_RANGE = 1..5
+
+    const val FREEDOM_MUSIC = "music/freedom.wav"
+    const val ASTRO_RIDER_MUSIC = "music/astro_rider.wav"
+    const val NEON_DREAMS_MUSIC = "music/neon_dreams.wav"
+    const val THE_WILL_TO_LIVE_MUSIC = "music/the_will_to_live.wav"
+    const val VENTURE_TO_THE_HORIZON_MUSIC = "music/venture_to_the_horizon.wav"
 
     private const val FONT_SIZE = 20
 
@@ -472,6 +479,12 @@ class Assets : AssetManager() {
     load<Sound>(UNDO_ALL_SOUND)
     load<Sound>(CLICK_SOUND)
     load<Sound>(CLICK_BAD_SOUND)
+
+    load<Music>(FREEDOM_MUSIC)
+    load<Music>(ASTRO_RIDER_MUSIC)
+    load<Music>(NEON_DREAMS_MUSIC)
+    load<Music>(THE_WILL_TO_LIVE_MUSIC)
+    load<Music>(VENTURE_TO_THE_HORIZON_MUSIC)
 
     fun loadSoundVariations(path: String, range: IntRange) {
       for (i in range) {
