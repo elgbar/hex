@@ -7,8 +7,8 @@ import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Animation
@@ -208,6 +208,12 @@ class Assets : AssetManager() {
   val settingsDown by lazy { findSprite("settings_selected") }
   val help by lazy { findSprite("help") }
   val helpDown by lazy { findSprite("help_selected") }
+
+  val freedomMusic by lazy { fetchOrNull<Music>(FREEDOM_MUSIC) }
+  val astroRiderMusic by lazy { fetchOrNull<Music>(ASTRO_RIDER_MUSIC) }
+  val neonDreamsMusic by lazy { fetchOrNull<Music>(NEON_DREAMS_MUSIC) }
+  val theWillToLiveMusic by lazy { fetchOrNull<Music>(THE_WILL_TO_LIVE_MUSIC) }
+  val ventureToTheHorizonMusic by lazy { fetchOrNull<Music>(VENTURE_TO_THE_HORIZON_MUSIC) }
 
   val undoAllSound by SoundDelegate(UNDO_ALL_SOUND)
   val clickSound by SoundDelegate(CLICK_SOUND)

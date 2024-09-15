@@ -37,7 +37,19 @@ object Settings {
   var masterVolume by PreferenceDelegate(
     1f,
     priority = 210,
-    shouldHide = { !Hex.platform.canControlAudio }
+    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled },
+    afterChange = { _, _, _ ->
+      Hex.updateMusicVolume()
+    }
+  ) { it < 0f || it > 1f }
+
+  var musicVolume by PreferenceDelegate(
+    .5f,
+    priority = 210,
+    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled },
+    afterChange = { _, _, _ ->
+      Hex.updateMusicVolume()
+    }
   ) { it < 0f || it > 1f }
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)

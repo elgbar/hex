@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Preferences
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.backends.lwjgl.LwjglGraphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
@@ -128,6 +129,24 @@ object Hex : ApplicationAdapter() {
       }
       Gdx.graphics.requestRendering()
     }
+
+  var music: Music? = null
+    set(value) {
+      if (audioDisabled) {
+        return
+      }
+      field?.pause()
+      field = value
+      value?.apply {
+        isLooping = true
+        volume = Settings.masterVolume * Settings.musicVolume
+        play()
+      }
+    }
+
+  fun updateMusicVolume() {
+    music?.volume = Settings.masterVolume * Settings.musicVolume
+  }
 
   override fun create() {
     if (args.`reset-all`) {
