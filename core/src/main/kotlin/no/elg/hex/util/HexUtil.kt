@@ -26,6 +26,8 @@ import no.elg.hex.screens.PlayableIslandScreen.Companion.CASTLE_PRICE
 import no.elg.hex.screens.PlayableIslandScreen.Companion.PEASANT_PRICE
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -199,9 +201,10 @@ inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<Hex
   }
 }
 
+@OptIn(ExperimentalContracts::class)
 inline fun Iterable<Hexagon<HexagonData>>.withData(island: Island, excludeInvisible: Boolean = true, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit) {
-  for (hexagon in this) {
-    val data = island.getData(hexagon)
+  contract { callsInPlace(action) }
+  for ((hexagon, data) in this.map { it to island.getData(it) }) {
     if (excludeInvisible && data.invisible) continue
     action(hexagon, data)
   }

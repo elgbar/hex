@@ -120,6 +120,7 @@ Run `gradle desktop:dist` output jar should be [here](./desktop/build/libs) as `
 * Reimplement `DefaultHexagonDataStorage` to use `IntMap` and where the key is a compacted key
 * Add fling support in the level select screen
 * When clicking an island to play it, zoom into the sprite while loading the island
+* Add support for ctrl-z and ctrl-y in the map editor
 
 #### Known bugs
 

@@ -311,22 +311,22 @@ class Island(
       }
 
       val capitals = mutableSetOf<Hexagon<HexagonData>>()
-      for (hexagon in visibleHexagons) {
-        val data = this@Island.getData(hexagon)
-        if (data.team != newTeam) continue
-        if (data.piece is Capital) {
-          capitals.add(hexagon)
-          continue
+      visibleHexagons.withData(this@Island) { hexagon, data ->
+        if (data.team == newTeam) {
+          if (data.piece is Capital) {
+            capitals.add(hexagon)
+          } else {
+            Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName} (${hexagon.gridX},${hexagon.gridZ})" }
+            data.piece.beginTurn(this@Island, hexagon, data, newTeam)
+          }
         }
-        Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName} (${hexagon.gridX},${hexagon.gridZ})" }
-        data.piece.beginTurn(this@Island, hexagon, data, newTeam)
       }
 
       // Process capitals last to ensure any pieces killed by bankruptcy
       // will not be turns into trees during the same turn
       for (capital in capitals) {
         val data = this@Island.getData(capital)
-        Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName}  (${capital.gridX},${capital.gridZ})" }
+        Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName} (${capital.gridX},${capital.gridZ})" }
         data.piece.beginTurn(this@Island, capital, data, newTeam)
       }
       Gdx.graphics.requestRendering()
