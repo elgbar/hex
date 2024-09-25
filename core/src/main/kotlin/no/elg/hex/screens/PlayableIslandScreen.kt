@@ -17,6 +17,7 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.table
+import ktx.scene2d.vis.KVisImageButton
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visTable
@@ -24,6 +25,8 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.events.SettingsChangeEvent
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hud.DebugInfoRenderer
@@ -46,6 +49,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fill
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.safeGetDelegate
 import no.elg.hex.util.saveIslandProgress
 import no.elg.hex.util.show
 
@@ -69,6 +73,16 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
   private val disableChecker: MutableMap<Disableable, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
+
+  private lateinit var toggleMusicButton: KVisImageButton
+
+  private val settingsChangeEventListener = SimpleEventListener.create<SettingsChangeEvent<Boolean>> { (delegate, _, _) ->
+    if (delegate == Settings::musicPaused.safeGetDelegate()) {
+      toggleMusicButton.style.imageUp = TextureRegionDrawable(Hex.music.icon)
+      toggleMusicButton.style.imageDown = TextureRegionDrawable(Hex.music.iconSelected)
+      toggleMusicButton.style.imageOver = TextureRegionDrawable(Hex.music.iconSelected)
+    }
+  }
 
   val stage: Stage get() = stageScreen.stage
 
@@ -156,14 +170,14 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
             disableCheck: ((Territory?) -> Boolean) = { interactDisabled() },
             vararg keyShortcut: Int,
             onClick: Button.() -> Unit
-          ) {
+          ): KVisImageButton {
             fun drawableToTextureRegion(drawable: TextureRegion): Drawable {
               val region = TextureRegion(drawable)
               region.flip(false, true)
               return TextureRegionDrawable(region)
             }
 
-            visImageButton {
+            return visImageButton {
               pad(10f)
 
               visTextTooltip(tooltip)
@@ -171,6 +185,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
               if (down != null) {
                 style.imageDown = drawableToTextureRegion(down)
+                style.imageOver = drawableToTextureRegion(down)
               }
               if (disabled != null) {
                 style.disabled = drawableToTextureRegion(disabled)
@@ -231,7 +246,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               tooltip = "Redo",
               up = Hex.assets.redo,
               disableCheck = { interactDisabled() || !island.history.canRedo() },
-              keyShortcut = intArrayOf(Keys.NUM_5)
+              keyShortcut = intArrayOf(Keys.NUM_4)
             ) {
               island.history.redo()
             }
@@ -239,7 +254,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               tooltip = "Undo All",
               up = Hex.assets.undoAll,
               disableCheck = { interactDisabled() || !island.history.canUndo() },
-              keyShortcut = intArrayOf(Keys.NUM_4)
+              keyShortcut = intArrayOf(Keys.NUM_5)
             ) {
               island.history.undoAll()
             }
@@ -256,6 +271,16 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               } else {
                 surrender()
               }
+            }
+
+            toggleMusicButton = interactButton(
+              tooltip = "Toggle music",
+              up = Hex.music.icon,
+              down = Hex.music.iconSelected,
+              playClick = true,
+              keyShortcut = intArrayOf(Keys.NUM_7)
+            ) {
+              Settings.musicPaused = !Settings.musicPaused
             }
           }
 
@@ -393,6 +418,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
     DebugGraphRenderer.dispose()
     debugRenderer.dispose()
+    settingsChangeEventListener.dispose()
   }
 
   companion object {

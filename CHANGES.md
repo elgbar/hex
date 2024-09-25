@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added music by Stey [SoundCloud](https://soundcloud.com/stey_music)
+  * New mute icon on the level select screen and in game
 * Add global shortcuts
   * `ctrl` + `m` to toggle music
   * `alt` + `enter` to toggle fullscreen
@@ -36,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # v2.2.0 - 2024-09-15
 
 ### Added
-****
+
 * Add export and import of islands
   * Currently only to the clipboard
   * A screen will show the import progress
