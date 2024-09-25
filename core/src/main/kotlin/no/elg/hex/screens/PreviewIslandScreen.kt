@@ -2,9 +2,9 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
-import no.elg.hex.event.HexagonChangedTeamEvent
-import no.elg.hex.event.HexagonVisibilityChanged
 import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.events.HexagonChangedTeamEvent
+import no.elg.hex.event.events.HexagonVisibilityChanged
 import no.elg.hex.input.BasicIslandInputProcessor
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MAX_ZOOM
 import no.elg.hex.input.BasicIslandInputProcessor.Companion.MIN_ZOOM

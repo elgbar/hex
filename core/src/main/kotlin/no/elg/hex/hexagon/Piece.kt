@@ -2,8 +2,8 @@ package no.elg.hex.hexagon
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.Hex
-import no.elg.hex.event.CapitalBalanceChanged
 import no.elg.hex.event.Events
+import no.elg.hex.event.events.CapitalBalanceChanged
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MAX_START_CAPITAL
 import no.elg.hex.util.createHandInstance

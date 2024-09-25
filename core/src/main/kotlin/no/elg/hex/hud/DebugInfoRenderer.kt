@@ -7,8 +7,8 @@ import ktx.assets.disposeSafely
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
-import no.elg.hex.event.HexagonChangedTeamEvent
 import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.events.HexagonChangedTeamEvent
 import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
 import no.elg.hex.hud.ScreenRenderer.draw
 import no.elg.hex.hud.ScreenRenderer.drawAll

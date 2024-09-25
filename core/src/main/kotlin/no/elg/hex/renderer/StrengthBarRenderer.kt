@@ -12,10 +12,10 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
-import no.elg.hex.event.HexagonChangedTeamEvent
-import no.elg.hex.event.HexagonVisibilityChanged
 import no.elg.hex.event.SimpleEventListener
-import no.elg.hex.event.TeamEndTurnEvent
+import no.elg.hex.event.events.HexagonChangedTeamEvent
+import no.elg.hex.event.events.HexagonVisibilityChanged
+import no.elg.hex.event.events.TeamEndTurnEvent
 import no.elg.hex.hexagon.Team
 import no.elg.hex.island.Island
 import kotlin.math.roundToInt

@@ -118,7 +118,7 @@ object Hex : ApplicationAdapter() {
         // clean up any mess the previous screen have made
         inputMultiplexer.clear()
         Gdx.input.setOnscreenKeyboardVisible(false)
-        Events.clear()
+        Events.clear(true)
 
         Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
         value.show()

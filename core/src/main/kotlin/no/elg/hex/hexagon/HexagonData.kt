@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
 import no.elg.hex.event.Events
-import no.elg.hex.event.HexagonChangedPieceEvent
-import no.elg.hex.event.HexagonChangedTeamEvent
+import no.elg.hex.event.events.HexagonChangedPieceEvent
+import no.elg.hex.event.events.HexagonChangedTeamEvent
 import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
 import org.hexworks.mixite.core.api.Hexagon

@@ -1,21 +1,19 @@
 @file:Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
 
-package no.elg.hex.event
+package no.elg.hex.event.events
 
-import com.badlogic.gdx.utils.Array
+import no.elg.hex.event.ClearOnScreenChange
+import no.elg.hex.event.EventListeners
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
-import com.badlogic.gdx.utils.Array as GdxUtilsArray
 
-open class EventListeners<T : Event>(val listeners: Array<(T) -> Unit> = GdxUtilsArray<(T) -> Unit>())
-
-sealed interface Event
-
+@ClearOnScreenChange
 sealed interface HexagonDataEvent : Event {
   val data: HexagonData
 }
 
+@ClearOnScreenChange
 data class TeamEndTurnEvent(val old: Team, val new: Team) : Event {
   init {
     require(old !== new) { "There is no team change if the old and the new team are the same!" }
@@ -24,6 +22,7 @@ data class TeamEndTurnEvent(val old: Team, val new: Team) : Event {
   companion object : EventListeners<TeamEndTurnEvent>()
 }
 
+@ClearOnScreenChange
 data class HandChangedEvent(val old: Piece?, val new: Piece?) : Event {
   companion object : EventListeners<HandChangedEvent>()
 }

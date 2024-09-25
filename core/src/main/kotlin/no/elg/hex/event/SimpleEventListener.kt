@@ -2,6 +2,7 @@ package no.elg.hex.event
 
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.event.SimpleEventListener.Companion.create
+import no.elg.hex.event.events.Event
 import kotlin.reflect.KClass
 
 /**

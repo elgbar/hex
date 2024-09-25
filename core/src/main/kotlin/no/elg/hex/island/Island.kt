@@ -15,9 +15,9 @@ import no.elg.hex.Settings
 import no.elg.hex.ai.AI
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.event.Events
-import no.elg.hex.event.HandChangedEvent
-import no.elg.hex.event.HexagonVisibilityChanged
-import no.elg.hex.event.TeamEndTurnEvent
+import no.elg.hex.event.events.HandChangedEvent
+import no.elg.hex.event.events.HexagonVisibilityChanged
+import no.elg.hex.event.events.TeamEndTurnEvent
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
 import no.elg.hex.hexagon.Empty
