@@ -238,7 +238,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
           this@MapEditorScreen.selectedPiece = it
           this@MapEditorScreen.editor = PieceEditor.SetPiece
         },
-        icon = { (Hex.assets.getTexture(it.createHandInstance(), false) ?: Hex.assets.background) to null }
+        icon = { (Hex.assets.getTexture(it.createHandInstance(), false) ?: Hex.assets.hand) to null }
       )
 
       itemsWindow(

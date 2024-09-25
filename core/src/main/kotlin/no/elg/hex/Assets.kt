@@ -188,7 +188,6 @@ class Assets : AssetManager() {
   }
 
   val hand by lazy { findSprite("hand") }
-  val background by lazy { findSprite("background") }
   val pine by lazy { findSprite("pine") }
   val palm by lazy { findSprite("palm") }
   val capital by lazy { findSprite("village") }
