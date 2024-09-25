@@ -46,6 +46,7 @@ import no.elg.hex.util.platformCheckBoxSize
 import no.elg.hex.util.platformSpacing
 import no.elg.hex.util.playClick
 import no.elg.hex.util.playMoney
+import no.elg.hex.util.safeGetDelegate
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
@@ -54,7 +55,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 class SettingsScreen : OverlayScreen() {
@@ -99,7 +99,7 @@ class SettingsScreen : OverlayScreen() {
           separator()
 
           val (settingsProperties, otherProperties) = Settings::class.declaredMemberProperties.partition {
-            it.also { it.isAccessible = true }.getDelegate(Settings) is PreferenceDelegate<*>
+            it.safeGetDelegate(Settings) is PreferenceDelegate<*>
           }
 
           val settings = settingsProperties.associateWith { it.getDelegate(Settings) } //
