@@ -76,8 +76,8 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     val id = getHoveringIslandId()
     Gdx.app.debug("SELECT", "Clicked on id $id")
     when {
-      id == -PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
-      id == -PREVIEWS_PER_ROW + 1 -> {
+      id == 0 - PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
+      id == 1 - PREVIEWS_PER_ROW -> {
         if (Hex.args.mapEditor) {
           Hex.screen = LevelCreationScreen()
         } else {
@@ -85,8 +85,8 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
         }
       }
 
-      id == -1 -> Hex.screen = TutorialScreen()
-      id in -PREVIEWS_PER_ROW..-1 -> return false
+      id == 2 - PREVIEWS_PER_ROW -> Settings.musicPaused = !Settings.musicPaused
+      id == 3 - PREVIEWS_PER_ROW -> Hex.screen = TutorialScreen()
       id != INVALID_ISLAND_INDEX -> {
         val metadata = FastIslandMetadata.load(id)
         if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.args.mapEditor) {

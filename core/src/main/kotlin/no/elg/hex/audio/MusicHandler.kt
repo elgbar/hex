@@ -1,6 +1,7 @@
 package no.elg.hex.audio
 
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import no.elg.hex.Hex
 import no.elg.hex.Hex.audioDisabled
 import no.elg.hex.Settings
@@ -23,6 +24,9 @@ class MusicHandler {
         }
       }
     }
+
+  val icon: TextureAtlas.AtlasRegion get() = if (Settings.musicPaused) Hex.assets.muted else Hex.assets.unmuted
+  val iconSelected: TextureAtlas.AtlasRegion get() = if (Settings.musicPaused) Hex.assets.mutedSelected else Hex.assets.unmutedSelected
 
   fun updateMusicVolume() {
     music?.volume = Settings.masterVolume * Settings.musicVolume
