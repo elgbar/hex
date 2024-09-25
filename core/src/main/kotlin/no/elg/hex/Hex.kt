@@ -28,6 +28,7 @@ import no.elg.hex.event.Events
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.ScreenRenderer
+import no.elg.hex.input.GlobalInputProcessor
 import no.elg.hex.island.Island
 import no.elg.hex.jackson.mixin.CubeCoordinateMixIn
 import no.elg.hex.jackson.serialization.HexagonDataDeserializerModifier
@@ -117,6 +118,7 @@ object Hex : ApplicationAdapter() {
 
         // clean up any mess the previous screen have made
         inputMultiplexer.clear()
+        inputMultiplexer.addProcessor(GlobalInputProcessor)
         Gdx.input.setOnscreenKeyboardVisible(false)
         Events.clear(true)
 

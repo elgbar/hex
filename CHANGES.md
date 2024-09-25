@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added music by Stey [SoundCloud](https://soundcloud.com/stey_music)
+* Add global shortcuts
+  * `ctrl` + `m` to toggle music
+  * `alt` + `enter` to toggle fullscreen
 
 ### Changed
 
