@@ -11,8 +11,8 @@ buildscript {
     ktxVersion = "1.12.1-rc2"
     visVersion = '1.5.3'
     jacksonVersion = "2.17.2"
-    junitVersion = "5.11.0"
-    kotlinCoroutineVersion = "1.9.0-RC.2"
+    junitVersion = "5.11.1"
+    kotlinCoroutineVersion = "1.9.0"
     argparserVersion = "2.0.7"
     spotlessVersion = "6.25.0"
     androidGradleToolsVersion = '8.6.0'
@@ -196,6 +196,7 @@ project(":core") {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     api "com.kotcrab.vis:vis-ui:$visVersion"
+    api platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$kotlinCoroutineVersion")
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
 
     api "io.github.libktx:ktx-app:$ktxVersion"
