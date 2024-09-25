@@ -2,6 +2,9 @@ package no.elg.hex.util.delegate
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
+import no.elg.hex.event.Events
+import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.events.SettingsChangeEvent
 import no.elg.hex.util.debug
 import no.elg.hex.util.toEnumOrNull
 import no.elg.hex.util.trace
@@ -57,6 +60,13 @@ open class PreferenceDelegate<T : Any>(
   private var currentValue: T? = null
   private lateinit var initialLoadedValue: T
 
+  @Suppress("unused")
+  private val eventListener = SimpleEventListener.create<SettingsChangeEvent<T>> { (delagate, old, new) ->
+    if (delagate === this) {
+      afterChange?.invoke(this, old, new)
+    }
+  }
+
   fun displayRestartWarning() = requireRestart && changed
 
   init {
@@ -67,7 +77,7 @@ open class PreferenceDelegate<T : Any>(
 
     if (runAfterChangeOnInit) {
       Gdx.app.postRunnable {
-        afterChange?.invoke(this, initialValue, currentValue ?: initialValue)
+        Events.fireEvent(SettingsChangeEvent(this, initialValue, currentValue ?: initialValue))
       }
     }
   }
@@ -159,7 +169,7 @@ open class PreferenceDelegate<T : Any>(
     preferences.flush()
 
     if (!applyAfterChangeOnSettingsHide) {
-      afterChange?.invoke(this, old, value)
+      Events.fireEvent(SettingsChangeEvent(this, old, value))
     }
   }
 
@@ -168,7 +178,8 @@ open class PreferenceDelegate<T : Any>(
   fun hide(property: KProperty<*>) {
     if (applyAfterChangeOnSettingsHide && changed) {
       val old = currentValue ?: initialValue
-      afterChange?.invoke(this, old, getValue(null, property))
+      val new = getValue(null, property)
+      Events.fireEvent(SettingsChangeEvent(this, old, new))
     }
   }
 
