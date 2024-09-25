@@ -14,13 +14,8 @@ import no.elg.hex.hud.ScreenRenderer.draw
 import no.elg.hex.hud.ScreenRenderer.drawAll
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
-import kotlin.collections.MutableList
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.count
-import kotlin.collections.mapTo
-import kotlin.collections.mutableListOf
-import kotlin.collections.sort
 
 /** @author Elg */
 class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
@@ -41,10 +36,30 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
       next = prefixText(" Delta (ms) ", Gdx.graphics::getDeltaTime) { "%.4f".format(it) }
     )
 
+    val basicInputHandler = islandScreen.basicIslandInputProcessor
+
+    val mapEditorInfo = arrayOf(
+      StaticScreenText(
+        "Pointing at hex ",
+        next =
+        nullCheckedText(
+          callable = basicInputHandler::cursorHex,
+          color = Color.YELLOW,
+          format = { cursorHex ->
+            "( %2d, % 2d) ${islandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
+          }
+        )
+      ),
+      prefixText("Team hexagons    ", ::teamHexagons),
+      prefixText("Team percentages ", ::teamPercent),
+      prefixText(
+        "Total Hexagons ",
+        islandScreen.island.allHexagons::size,
+        next = prefixText(" (visible ", islandScreen.island.visibleHexagons::size, next = END_PARENTHESIS)
+      )
+    )
+
     if (Hex.debug) {
-
-      val basicInputHandler = islandScreen.basicIslandInputProcessor
-
       debugLines = arrayOf(
         prefixText(
           "Island ",
@@ -70,19 +85,6 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
           next = END_PARENTHESIS
         ),
         StaticScreenText(
-          "Pointing at hex ",
-          next =
-          nullCheckedText(
-            callable = basicInputHandler::cursorHex,
-            color = Color.YELLOW,
-            format = { cursorHex ->
-              "( %2d, % 2d) ${islandScreen.island.getData(cursorHex)}".format(cursorHex.gridX, cursorHex.gridZ)
-            }
-          )
-        ),
-        prefixText("Team hexagons    ", ::teamHexagons),
-        prefixText("Team percentages ", ::teamPercent),
-        StaticScreenText(
           "Territory ",
           next =
           nullCheckedText(
@@ -91,12 +93,10 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
             format = { territory -> "Size: ${territory.hexagons.count()} Bordering Enemies ${territory.enemyBorderHexes.size}" }
           )
         ),
-        prefixText(
-          "Total Hexagons ",
-          islandScreen.island.allHexagons::size,
-          next = prefixText(" (visible ", islandScreen.island.visibleHexagons::size, next = END_PARENTHESIS)
-        )
+        *mapEditorInfo
       )
+    } else if (Hex.args.mapEditor) {
+      debugLines = mapEditorInfo
     } else {
       debugLines = emptyArray()
     }

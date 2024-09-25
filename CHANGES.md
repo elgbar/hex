@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Rename `volume` setting to `master volume`
 * Tweak island 62 to make it possible for leaf to win
+* Display more info in the map editor
 
 ### Fixed
 
