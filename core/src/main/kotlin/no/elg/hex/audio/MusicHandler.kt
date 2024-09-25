@@ -16,7 +16,11 @@ class MusicHandler {
       field = value
       value?.apply {
         volume = Settings.masterVolume * Settings.musicVolume
-        play()
+        if (Settings.musicPaused) {
+          pause()
+        } else {
+          play()
+        }
       }
     }
 
@@ -31,7 +35,6 @@ class MusicHandler {
     if (audioDisabled) {
       return
     }
-    music?.stop()
     music = Hex.assets.songs.randomOrNull()?.apply {
       isLooping = false
       setOnCompletionListener {
@@ -43,14 +46,33 @@ class MusicHandler {
   /**
    * Play the given music on a loop
    */
-  fun loop(newMusic: Music?)  {
+  fun loop(newMusic: Music?) {
     if (audioDisabled) {
       return
     }
-    music?.stop()
     music = newMusic?.apply {
       isLooping = true
       setOnCompletionListener(null)
     }
+  }
+
+  /**
+   * @return If the music was toggled
+   */
+  fun toggleMute(): Boolean {
+    if (audioDisabled) {
+      return false
+    }
+    music?.run {
+      if (isPlaying) {
+        pause()
+        return true
+      } else if (!isPlaying) {
+        play()
+        return true
+      }
+      return false
+    }
+    return false
   }
 }

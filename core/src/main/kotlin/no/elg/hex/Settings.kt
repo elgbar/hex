@@ -51,6 +51,7 @@ object Settings {
       Hex.music.updateMusicVolume()
     }
   ) { it < 0f || it > 1f }
+  var musicPaused by PreferenceDelegate(false, priority = 220, afterChange = { _, _, _ -> Hex.music.toggleMute() })
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
