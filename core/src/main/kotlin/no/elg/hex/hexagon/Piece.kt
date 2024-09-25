@@ -339,17 +339,19 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
 
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (hasGrown) {
-      Gdx.app.trace("Tree") { "Tree has already grown this round, skipping it" }
+      Gdx.app.trace("Tree") { "Tree has already grown this round, skipping it, last grown $lastGrownTurn (current turn: ${Hex.island?.turn})" }
       return
     }
+    Gdx.app.trace("Tree") { "Tree has not yet grown this round, last grown $lastGrownTurn (current turn: ${Hex.island?.turn})" }
     propagate(island, pieceHex)
+    markAsGrown()
   }
 
   fun markAsGrown() {
-    lastGrownTurn = Hex.island?.turn ?: 0
+    lastGrownTurn = Hex.island?.round ?: 0
   }
 
-  val hasGrown: Boolean get() = Hex.island?.turn == lastGrownTurn
+  val hasGrown: Boolean get() = Hex.island?.round == lastGrownTurn
 
   override fun toString() = "${this::class.simpleName}(placed? $placed, lastGrownRound: $lastGrownTurn)"
 
@@ -369,14 +371,14 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
 class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 0) : TreePiece(data, placed, lastGrownTurn) {
 
   override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
+    require(!hasGrown) { "Palm tree has not grown this round" }
     // Find all empty neighbor hexes that are empty
     val emptyNeighbors = island.getNeighbors(pieceHex).filter {
       island.getData(it).piece is Empty && island.treeType(it) == PineTree::class
     }.shuffled()
 
     for (hexagon in emptyNeighbors) {
-      // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to
-      // grow
+      // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
       val otherPines = island.getNeighbors(hexagon).filter {
         if (it == pieceHex) return@filter false
         val piece = island.getData(it).piece
@@ -387,7 +389,6 @@ class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 
         val neighborPine = island.getData(otherPines.random()).piece as TreePiece
         val placed = island.getData(hexagon).setPiece<PineTree> { it.markAsGrown() }
         if (placed) {
-          this@PineTree.markAsGrown()
           neighborPine.markAsGrown()
           break
         }
@@ -403,6 +404,7 @@ class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 
 class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 0) : TreePiece(data, placed, lastGrownTurn) {
 
   override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
+    require(!hasGrown) { "Palm tree has not grown this round" }
     // Find all empty neighbor hexes that are empty along the cost
     val neighbour = island.getNeighbors(pieceHex)
       .filter { island.getData(it).piece is Empty && island.treeType(it) == PalmTree::class }
@@ -410,7 +412,6 @@ class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 
 
     island.getData(neighbour).setPiece<PalmTree> {
       it.markAsGrown()
-      this.markAsGrown()
     }
   }
 
