@@ -29,6 +29,8 @@ import ktx.scene2d.vis.visTextField
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.events.SettingsChangeEvent
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.ExportedIsland
@@ -57,8 +59,11 @@ import kotlin.reflect.jvm.jvmErasure
 
 class SettingsScreen : OverlayScreen() {
 
-  private val onShowListeners = mutableListOf<() -> Unit>()
   private val onHideListeners = mutableListOf<() -> Unit>()
+  private val delegateToReadSettings: MutableMap<PreferenceDelegate<*>, () -> Unit> = mutableMapOf()
+  private val onSettingChange = SimpleEventListener.create<SettingsChangeEvent<*>> { (delegate, _, _) ->
+    delegateToReadSettings[delegate]?.invoke()
+  }
 
   init {
     stage.actors {
@@ -240,8 +245,10 @@ class SettingsScreen : OverlayScreen() {
     }
 
     val clazz = delegate.initialValue::class
-    val onChange: () -> Unit
+    val writeSetting: () -> Unit
+    val readSetting: () -> Unit
     if (clazz.java.isEnum) {
+      @Suppress("UNCHECKED_CAST")
       val enumValues = findEnumValues(clazz as KClass<out Enum<*>>).sortedBy { it.ordinal }.toGdxArray()
       visSelectBox<Enum<*>> {
         this.items = enumValues
@@ -250,20 +257,18 @@ class SettingsScreen : OverlayScreen() {
         cell.prefHeight(Value.percentHeight(0.03f, this@addSetting))
         commonStyle(cell, false)
 
-        onShowListeners += {
-          this.selected = property.get(Settings) as Enum<*>
-        }
-        onHideListeners += { delegate.hide(property) }
-
-        onChange = {
+        readSetting = { this.selected = property.get(Settings) as Enum<*> }
+        writeSetting = {
           property.set(Settings, this.selected)
+          readSetting()
           restartLabel.fire(ChangeEvent())
         }
 
         onClick { playClick() }
 
         onChange {
-          onChange()
+          playClick()
+          writeSetting()
         }
       }
     } else {
@@ -274,27 +279,23 @@ class SettingsScreen : OverlayScreen() {
             cell.size(platformCheckBoxSize)
           }
 
-          val readSetting: () -> Unit = { isChecked = property.get(Settings) as Boolean }
-          onShowListeners += readSetting
-          readSetting()
-
-          onHideListeners += { delegate.hide(property) }
+          readSetting = { isChecked = property.get(Settings) as Boolean }
 
           setProgrammaticChangeEvents(false)
-          onChange = {
+          writeSetting = {
             val wasChecked = property.get(Settings) as Boolean
             if (isChecked != wasChecked) {
               property.set(Settings, isChecked)
             } else {
               property.set(Settings, !wasChecked)
             }
-            isChecked = property.get(Settings) as Boolean
+            readSetting()
             restartLabel.fire(ChangeEvent())
           }
 
           onChange {
             playClick()
-            onChange()
+            writeSetting()
           }
         }
 
@@ -302,7 +303,7 @@ class SettingsScreen : OverlayScreen() {
           visTextField {
             commonStyle(it)
 
-            val readSetting: () -> Unit = {
+            readSetting = {
               text = property.get(Settings).toString()
 
               val chars =
@@ -311,45 +312,36 @@ class SettingsScreen : OverlayScreen() {
                 )
               it.minWidth(Hex.assets.fontSize * chars)
             }
-            onShowListeners += readSetting
-            readSetting()
-
-            onHideListeners += { delegate.hide(property) }
 
             programmaticChangeEvents = false
-            onChange = {
+            writeSetting = {
               property.set(Settings, text)
-              text = property.get(Settings).toString()
+              readSetting()
               restartLabel.fire(ChangeEvent())
             }
 
             onChange {
               playClick()
-              onChange()
+              writeSetting()
             }
           }
 
         Int::class ->
           spinner("", IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
             commonStyle(it)
-
-            onShowListeners += {
-              (model as IntSpinnerModel).value = property.get(Settings) as Int
-            }
-
-            onHideListeners += { delegate.hide(property) }
+            val intModel = model as IntSpinnerModel
 
             isProgrammaticChangeEvents = false
-            onChange = {
-              val intModel = model as IntSpinnerModel
+            readSetting = { intModel.value = property.get(Settings) as Int }
+            writeSetting = {
               property.set(Settings, intModel.value)
-              intModel.value = property.get(Settings) as Int
+              readSetting()
               restartLabel.fire(ChangeEvent())
             }
 
             onChange {
               playClick()
-              onChange()
+              writeSetting()
             }
           }
 
@@ -365,24 +357,19 @@ class SettingsScreen : OverlayScreen() {
             )
           ) {
             commonStyle(it)
-
-            onShowListeners += {
-              (model as FloatSpinnerModel).value = (property.get(Settings) as Float).toBigDecimal()
-            }
-
-            onHideListeners += { delegate.hide(property) }
+            val floatModel = model as FloatSpinnerModel
 
             isProgrammaticChangeEvents = false
-            onChange = {
-              val floatModel = model as FloatSpinnerModel
+            readSetting = { floatModel.value = (property.get(Settings) as Float).toBigDecimal() }
+            writeSetting = {
               property.set(Settings, floatModel.value.toFloat())
-              floatModel.value = (property.get(Settings) as Float).toBigDecimal()
+              readSetting()
               restartLabel.fire(ChangeEvent())
             }
 
             onChange {
               playClick()
-              onChange()
+              writeSetting()
             }
           }
 
@@ -393,7 +380,7 @@ class SettingsScreen : OverlayScreen() {
     horizontalGroup {
       onClick {
         playClick()
-        onChange()
+        writeSetting()
       }
       settingsStyle(it)
       it.minWidth(Value.percentWidth(minWidth, this@addSetting))
@@ -405,6 +392,9 @@ class SettingsScreen : OverlayScreen() {
 
       addActor(restartLabel)
     }
+
+    onHideListeners += { delegate.hide(property) }
+    delegateToReadSettings[delegate] = readSetting
     row()
   }
 
@@ -417,13 +407,14 @@ class SettingsScreen : OverlayScreen() {
 
   override fun show() {
     super.show()
-    for (function in onShowListeners) {
+    for (function in delegateToReadSettings.values) {
       function()
     }
   }
 
   override fun hide() {
     super.hide()
+    onSettingChange.dispose()
     for (function in onHideListeners) {
       function()
     }
