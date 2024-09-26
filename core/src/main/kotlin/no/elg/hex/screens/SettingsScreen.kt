@@ -65,6 +65,14 @@ class SettingsScreen : OverlayScreen() {
     delegateToReadSettings[delegate]?.invoke()
   }
 
+  private var allowedToPlayClick = false
+
+  private fun tryPlayClick() {
+    if (allowedToPlayClick) {
+      playClick()
+    }
+  }
+
   init {
     stage.actors {
 
@@ -136,7 +144,7 @@ class SettingsScreen : OverlayScreen() {
           visTextButton("Export islands", "export") {
             otherSettingsStyle(it)
             onClick {
-              playClick()
+              tryPlayClick()
               val progress = Hex.assets.islandFiles.islandIds
                 .mapNotNull(FastIslandMetadata::loadProgress)
                 .map(::exportIsland)
@@ -157,7 +165,7 @@ class SettingsScreen : OverlayScreen() {
           visTextButton("Import islands", "export") {
             otherSettingsStyle(it)
             onClick {
-              playClick()
+              tryPlayClick()
               val clipboardText = Hex.platform.readFromClipboard()
               if (clipboardText == null) {
                 MessagesRenderer.publishWarning("No valid text found in clipboard")
@@ -247,6 +255,7 @@ class SettingsScreen : OverlayScreen() {
     val clazz = delegate.initialValue::class
     val writeSetting: () -> Unit
     val readSetting: () -> Unit
+
     if (clazz.java.isEnum) {
       @Suppress("UNCHECKED_CAST")
       val enumValues = findEnumValues(clazz as KClass<out Enum<*>>).sortedBy { it.ordinal }.toGdxArray()
@@ -264,12 +273,7 @@ class SettingsScreen : OverlayScreen() {
           restartLabel.fire(ChangeEvent())
         }
 
-        onClick { playClick() }
-
-        onChange {
-          playClick()
-          writeSetting()
-        }
+        onClick { tryPlayClick() }
       }
     } else {
       when (clazz) {
@@ -291,11 +295,6 @@ class SettingsScreen : OverlayScreen() {
             }
             readSetting()
             restartLabel.fire(ChangeEvent())
-          }
-
-          onChange {
-            playClick()
-            writeSetting()
           }
         }
 
@@ -319,11 +318,6 @@ class SettingsScreen : OverlayScreen() {
               readSetting()
               restartLabel.fire(ChangeEvent())
             }
-
-            onChange {
-              playClick()
-              writeSetting()
-            }
           }
 
         Int::class ->
@@ -337,11 +331,6 @@ class SettingsScreen : OverlayScreen() {
               property.set(Settings, intModel.value)
               readSetting()
               restartLabel.fire(ChangeEvent())
-            }
-
-            onChange {
-              playClick()
-              writeSetting()
             }
           }
 
@@ -366,20 +355,21 @@ class SettingsScreen : OverlayScreen() {
               readSetting()
               restartLabel.fire(ChangeEvent())
             }
-
-            onChange {
-              playClick()
-              writeSetting()
-            }
           }
 
         else -> error("The class $clazz is not yet supported as a settings")
+      }
+    }.apply {
+      // Common config
+      onChange {
+        tryPlayClick()
+        writeSetting()
       }
     }
 
     horizontalGroup {
       onClick {
-        playClick()
+        tryPlayClick()
         writeSetting()
       }
       settingsStyle(it)
@@ -410,9 +400,11 @@ class SettingsScreen : OverlayScreen() {
     for (function in delegateToReadSettings.values) {
       function()
     }
+    allowedToPlayClick = true
   }
 
   override fun hide() {
+    allowedToPlayClick = false
     super.hide()
     onSettingChange.dispose()
     for (function in onHideListeners) {
