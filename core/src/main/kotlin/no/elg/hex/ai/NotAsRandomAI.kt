@@ -16,6 +16,7 @@ import no.elg.hex.hexagon.NO_STRENGTH
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.SPEARMAN_STRENGTH
+import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.mergedType
@@ -237,7 +238,12 @@ class NotAsRandomAI(
           return@run connectingHex
             ?: tryAttack(Capital::class)
             ?: tryAttack(Castle::class)
-            ?: tryAttack(LivingPiece::class)
+
+            ?: tryAttack(Baron::class)
+            ?: tryAttack(Knight::class)
+            ?: tryAttack(Spearman::class)
+            ?: tryAttack(Peasant::class)
+
             // Take over territory which is well defended, also helps with mass attacks
             ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
             ?: kotlin.run {
