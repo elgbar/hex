@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Tweak island 62 to make it possible for leaf to win
 * Display more info in the map editor
 * Tune AI
+  * Disallow hard AI to buy castles on the first round
+  * Double the number of rounds before normal AI can buy castles
   * It will try to attack enemy living pieces in the order of baron, knight, spearman, peasant
   * It will try to attack enemy trees 
   * Add special case when there is only a single least defended hexagon, will try to place it adjacent to it if possible to protect the living piece 
