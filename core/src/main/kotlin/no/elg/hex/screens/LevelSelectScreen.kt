@@ -90,7 +90,8 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
         break
       }
 
-      batch.draw(metadata.preview, x, y, width, height)
+      val preview = metadata.preview ?: continue
+      batch.draw(preview, x, y, width, height)
       if (Hex.debugStage || (Hex.args.debug && metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT)) {
         drawBox(x, y, width, height, Color.PURPLE)
       }
