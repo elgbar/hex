@@ -26,6 +26,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
+import no.elg.hex.util.coordinates
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
@@ -120,17 +121,18 @@ class NotAsRandomAI(
   }
 
   private fun pickUp(territory: Territory, gameInteraction: GameInteraction): Boolean {
+    val island = territory.island
     think { "Picking up a piece" }
-    if (territory.island.hand?.piece != null) {
-      think { "Already holding a piece! (${territory.island.hand?.piece})" }
+    if (island.hand?.piece != null) {
+      think { "Already holding a piece! (${island.hand?.piece})" }
       return true
     }
 
     if (hexPickupPritoryList.isNotEmpty()) {
       val hex = hexPickupPritoryList.removeLast()
       think {
-        val data = territory.island.getData(hex)
-        "Picking up priority piece ${data.piece} at ${hex.cubeCoordinate.toAxialKey()}"
+        val data = island.getData(hex)
+        "Picking up priority piece ${data.piece} at ${hex.coordinates}"
       }
       gameInteraction.click(hex)
       return true
@@ -140,7 +142,7 @@ class NotAsRandomAI(
     val pickUpHexes =
       HashSet<Hexagon<HexagonData>>(
         territory.hexagons.filter {
-          val piece = territory.island.getData(it).piece
+          val piece = island.getData(it).piece
           piece is LivingPiece && !piece.moved && it !in hexBlacklist && canUseStrength(piece.strength)
         }
       )
@@ -151,15 +153,14 @@ class NotAsRandomAI(
       gameInteraction.click(pickUpHexes.random())
       true
     } else {
+      think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
       buy(territory, gameInteraction)
     }
-    think { "I am now holding ${territory.island.hand?.piece}" }
+    think { "I am now holding ${island.hand?.piece}" }
     return isHolding
   }
 
   private fun buy(territory: Territory, gameInteraction: GameInteraction): Boolean {
-    think { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
-
     val pieceToBuy = kotlin.run {
       if (allowedToBuyCastle(territory) && shouldBuyCastle() && existsEmptyHexagon(territory) && territory.capital.canBuy(Castle::class)) {
         // No upkeep for castles so as long as there is an empty hexagon, we can buy a castle
@@ -228,10 +229,14 @@ class NotAsRandomAI(
             return null
           }
 
-          val connectingHex = attackableHexes.firstOrNull {
-            island.getNeighbors(it).filter { fit ->
-              fit !in territory.hexagons
-            }.any { ait -> island.getData(ait).team == territory.team }
+          val connectingHex = attackableHexes.firstOrNull { attackable ->
+            island.getNeighbors(attackable)
+              .asSequence()
+              .filter { hex ->
+                hex !in territory.hexagons
+              }.any { hex ->
+                island.getData(hex).team == territory.team
+              }
           }
           think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.cubeCoordinate})" }
 
@@ -246,7 +251,7 @@ class NotAsRandomAI(
 
             // Take over territory which is well defended, also helps with mass attacks
             ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
-            ?: kotlin.run {
+            ?: run {
               think { "Failed to attack anything" }
               return
             }
@@ -261,7 +266,7 @@ class NotAsRandomAI(
 
           val mergeHex = bestPieceToMergeWith(territory, handPiece)
           if (mergeHex != null) {
-            think { "Merging hand with ${territory.island.getData(mergeHex).piece}" }
+            think { "Merging hand with ${island.getData(mergeHex).piece}" }
             resetBlacklists()
             hexPickupPritoryList += mergeHex
             return@run mergeHex
@@ -282,7 +287,7 @@ class NotAsRandomAI(
         }
       }
       think {
-        "Placing piece $handPiece at ${hexagon.cubeCoordinate.toAxialKey()} " +
+        "Placing piece $handPiece at ${hexagon.coordinates} " +
           "(which is a ${island.getData(hexagon).piece} of team ${island.getData(hexagon).team})"
       }
       gameInteraction.click(hexagon)

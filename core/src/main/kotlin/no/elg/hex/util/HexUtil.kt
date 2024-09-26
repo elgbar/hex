@@ -386,3 +386,5 @@ fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
     return@filter true
   }
 }
+
+val Hexagon<*>.coordinates get() = cubeCoordinate.toAxialKey()
