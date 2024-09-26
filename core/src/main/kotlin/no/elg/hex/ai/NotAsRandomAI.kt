@@ -31,6 +31,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
+import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.Arrays
@@ -426,18 +427,17 @@ class NotAsRandomAI(
           val neighbors = island.getNeighbors(hex)
           val strength = island.calculateStrength(hex).toDouble()
 
+          val neighborStrength = neighbors.map { neighbor ->
+            // how much the strength an enemy neighbor has
+            island.getNeighbors(neighbor)
+              .filter { island.getData(it).team != team && it.isPartOfATerritory(island) } // only count hexagons in actual territories
+              .maxOfOrNull { island.calculateStrength(it) }
+              ?: 0
+          }
+
           // we don't want to be placed on the border, but if we must then do it where there is the least defence
           if (neighbors.any { island.getData(it).team != team }) {
             return@associateWith -strength
-          }
-
-          val neighborStrength = neighbors.map { neighbor ->
-
-            // how much the strength an enemy neighbor has
-            island.getNeighbors(neighbor)
-              .filter { island.getData(it).team != team }
-              .maxOfOrNull { island.calculateStrength(it) }
-              ?: 0
           }
 
           val normalizedNeighborStrength = neighborStrength.sum().toDouble() / neighborStrength.size
@@ -453,6 +453,30 @@ class NotAsRandomAI(
 
     // shuffle the list to make the selection more uniform
     leastDefendedHexes.shuffle()
+
+    if (leastDefendedHexes.size == 1) {
+      // Special case if there is only one hexagon to place the piece on
+      // We want to try and find a neighbor that is more defended and place the piece there to cover both the piece and the hexagon
+      val leastDefendedHexagon = leastDefendedHexes.first()
+      val selectedStrength = island.calculateStrength(leastDefendedHexagon)
+      val betterDefendedNeighbor = island.getNeighbors(leastDefendedHexagon)
+        .filter {
+          val data = island.getData(it)
+          data.team == team
+            && island.calculateStrength(it) > selectedStrength
+            && data.piece is Empty
+        }
+        .maxByOrNull { island.calculateStrength(it) }
+      think {
+        if (betterDefendedNeighbor != null) {
+          "Was going to place piece defensively at ${leastDefendedHexagon.coordinates}, but the neighbor ${betterDefendedNeighbor.coordinates} is better defended and still covers the least defended hexagon"
+        } else {
+          "Placing piece defensively at ${leastDefendedHexagon.coordinates}, found no better defended neighbor we can place the piece on"
+        }
+      }
+      return betterDefendedNeighbor ?: leastDefendedHexagon
+    }
+    think { "There are ${leastDefendedHexes.size} equally badly defended hexagons to place the piece on" }
 
     // there are multiple hexagons that are defended as badly, choose the hexagon that will protect
     // the most hexagons
