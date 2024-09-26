@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * It will try to attack enemy living pieces in the order of baron, knight, spearman, peasant
   * It will try to attack enemy trees 
   * Add special case when there is only a single least defended hexagon, will try to place it adjacent to it if possible to protect the living piece 
+  * Only prioritize cutting down trees that will propagate into the territory
 
 ### Fixed
 

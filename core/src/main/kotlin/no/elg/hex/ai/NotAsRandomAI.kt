@@ -206,13 +206,20 @@ class NotAsRandomAI(
       think { "Best placement for this castle is ${hexagon.coordinates}" }
       gameInteraction.click(hexagon)
     } else if (handPiece is LivingPiece) {
-      val treeHexagons =
-        territory.hexagons.filter { island.getData(it).piece is TreePiece }
+      val (mustAttackTrees, mehAttackTrees) =
+        territory.hexagons.filter {
+          val piece = island.getData(it).piece
+          piece is TreePiece
+        }.partition {
+          val piece = island.getData(it).piece as TreePiece
+          // Only care about trees that will spread in our territory
+          piece.propagateCandidates(island, it).any { hex -> hex in territory.hexagons }
+        }
 
-      val hexagon = kotlin.run {
-        if (treeHexagons.isNotEmpty()) {
-          think { "There is a piece of tree in my territory, must tear it down!" }
-          return@run treeHexagons.random()
+      val hexagon = run {
+        if (mustAttackTrees.isNotEmpty()) {
+          think { "There are ${mustAttackTrees.size} must attack trees in my territory, must tear it down! ${mustAttackTrees.map { it.coordinates }}" }
+          return@run mustAttackTrees.random()
         }
 
         val attackableHexes = attackableHexagons(territory, handPiece)
@@ -253,40 +260,42 @@ class NotAsRandomAI(
             ?: tryAttack(TreePiece::class)
             // Take over territory which is well defended, also helps with mass attacks
             ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
-            ?: run {
-              think { "Failed to attack anything" }
-              return
-            }
-        } else {
-          think { "No enemy territory is attackable" }
-
-          val graveHexagons = territory.hexagons.filter { island.getData(it).piece is Grave }
-          if (graveHexagons.isNotEmpty()) {
-            think { "But there is a hexagon in my territory with a grave, lets clean it up early" }
-            return@run graveHexagons.random()
-          }
-
-          val mergeHex = bestPieceToMergeWith(territory, handPiece)
-          if (mergeHex != null) {
-            think { "Merging hand with ${island.getData(mergeHex).piece}" }
-            resetBlacklists()
-            hexPickupPritoryList += mergeHex
-            return@run mergeHex
-          } else {
-            think { "Found no acceptable pieces to merge held item with" }
-          }
-
-          cannotUseStrength(handPiece.strength)
-          think { "Placing the held piece in the best defensive position, nothing else to do" }
-          val emptyHex = calculateBestLivingDefencePosition(territory)
-          if (emptyHex != null) {
-            hexBlacklist += emptyHex
-          } else {
-            think { "Failed to place held piece on any hexagons" }
-            return
-          }
-          return@run emptyHex
+            ?: attackableHexes.random()
         }
+
+        think { "No enemy territory is attackable with held piece" }
+
+        if (mehAttackTrees.isNotEmpty()) {
+          think { "There are ${mehAttackTrees.size} trees in my territory that will not propagate in my territory, ${mehAttackTrees.map { it.coordinates }}" }
+          return@run mehAttackTrees.random()
+        }
+
+        val graveHexagons = territory.hexagons.filter { island.getData(it).piece is Grave }
+        if (graveHexagons.isNotEmpty()) {
+          think { "But there is a hexagon in my territory with a grave, lets clean it up early" }
+          return@run graveHexagons.random()
+        }
+
+        val mergeHex = bestPieceToMergeWith(territory, handPiece)
+        if (mergeHex != null) {
+          think { "Merging hand with ${island.getData(mergeHex).piece}" }
+          resetBlacklists()
+          hexPickupPritoryList += mergeHex
+          return@run mergeHex
+        } else {
+          think { "Found no acceptable pieces to merge held item with" }
+        }
+
+        cannotUseStrength(handPiece.strength)
+        think { "Placing the held piece in the best defensive position, nothing else to do" }
+        val emptyHex = calculateBestLivingDefencePosition(territory)
+        if (emptyHex != null) {
+          hexBlacklist += emptyHex
+        } else {
+          think { "Failed to place held piece on any hexagons" }
+          return
+        }
+        return@run emptyHex
       }
       think {
         "Placing piece $handPiece at ${hexagon.coordinates} " +
@@ -467,14 +476,15 @@ class NotAsRandomAI(
         .asSequence()
         .filter {
           val data = island.getData(it)
-          data.team == team
-            && island.calculateStrength(it) > selectedStrength
-            && data.piece is Empty
+          data.team == team &&
+            island.calculateStrength(it) > selectedStrength &&
+            data.piece is Empty
         }
         .maxByOrNull { island.calculateStrength(it) }
       think {
         if (betterDefendedNeighbor != null) {
-          "Was going to place piece defensively at ${leastDefendedHexagon.coordinates}, but the neighbor ${betterDefendedNeighbor.coordinates} is better defended and still covers the least defended hexagon"
+          "Was going to place piece defensively at ${leastDefendedHexagon.coordinates}, " +
+            "but the neighbor ${betterDefendedNeighbor.coordinates} is better defended and still covers the least defended hexagon"
         } else {
           "Placing piece defensively at ${leastDefendedHexagon.coordinates}, found no better defended neighbor we can place the piece on"
         }
@@ -492,8 +502,7 @@ class NotAsRandomAI(
   }
 
   private fun attackableHexagons(territory: Territory, piece: LivingPiece): List<Hexagon<HexagonData>> {
-    return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) } +
-      territory.hexagons.filter { hex -> territory.island.getData(hex).piece is TreePiece }
+    return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) }
   }
 
   private fun canPieceAttack(territory: Territory, piece: LivingPiece): Boolean {

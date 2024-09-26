@@ -165,6 +165,7 @@ fun forEachPieceSubClass(sealed: (KClass<out Piece>) -> Unit = {}, instance: (KC
         sealed(pieceKClass)
         pieceKClass.sealedSubclasses.forEach { addAllSubclasses(it) }
       }
+
       else -> instance(pieceKClass)
     }
   }
@@ -337,6 +338,11 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
    */
   protected abstract fun propagate(island: Island, pieceHex: Hexagon<HexagonData>)
 
+  /**
+   * What hexagons the tree can propagate to
+   */
+  abstract fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>>
+
   override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (hasGrown) {
       Gdx.app.trace("Tree") { "Tree has already grown this round, skipping it, last grown $lastGrownTurn (current turn: ${Hex.island?.turn})" }
@@ -370,29 +376,35 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
 
 class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 0) : TreePiece(data, placed, lastGrownTurn) {
 
+  override fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>> = propagateCandidates0(island, pieceHex).map { it.first }
+
+  private fun propagateCandidates0(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Pair<Hexagon<HexagonData>, Hexagon<HexagonData>>> =
+    island.getNeighbors(pieceHex)
+      .asSequence()
+      .filter {
+        island.getData(it).piece is Empty && island.treeType(it) == PineTree::class
+      }.flatMap { hexagon ->
+        // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
+        island.getNeighbors(hexagon)
+          .asSequence()
+          .filter { it != pieceHex }
+          .filter {
+            val piece = island.getData(it).piece
+            piece is PineTree && !piece.hasGrown
+          }
+          .map { otherPine -> hexagon to otherPine }
+      }
+
   override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
     require(!hasGrown) { "Palm tree has not grown this round" }
     // Find all empty neighbor hexes that are empty
-    val emptyNeighbors = island.getNeighbors(pieceHex).filter {
-      island.getData(it).piece is Empty && island.treeType(it) == PineTree::class
-    }.shuffled()
+    val (hexagon, otherPine) = propagateCandidates0(island, pieceHex).toSet().randomOrNull() ?: return
 
-    for (hexagon in emptyNeighbors) {
-      // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
-      val otherPines = island.getNeighbors(hexagon).filter {
-        if (it == pieceHex) return@filter false
-        val piece = island.getData(it).piece
-        return@filter piece is PineTree && !piece.hasGrown
-      }
-      if (otherPines.isNotEmpty()) {
-        // Grow a tree between this pine and another pine
-        val neighborPine = island.getData(otherPines.random()).piece as TreePiece
-        val placed = island.getData(hexagon).setPiece<PineTree> { it.markAsGrown() }
-        if (placed) {
-          neighborPine.markAsGrown()
-          break
-        }
-      }
+    // Grow a tree between this pine and another pine
+    val neighborPine = island.getData(otherPine).piece as TreePiece
+    val placed = island.getData(hexagon).setPiece<PineTree> { it.markAsGrown() }
+    if (placed) {
+      neighborPine.markAsGrown()
     }
   }
 
@@ -403,12 +415,13 @@ class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 
 
 class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 0) : TreePiece(data, placed, lastGrownTurn) {
 
+  // Find all empty neighbor hexes that are empty along the cost
+  override fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>> =
+    island.getNeighbors(pieceHex).asSequence().filter { island.getData(it).piece is Empty && island.treeType(it) == PalmTree::class }
+
   override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
     require(!hasGrown) { "Palm tree has not grown this round" }
-    // Find all empty neighbor hexes that are empty along the cost
-    val neighbour = island.getNeighbors(pieceHex)
-      .filter { island.getData(it).piece is Empty && island.treeType(it) == PalmTree::class }
-      .randomOrNull() ?: return
+    val neighbour = propagateCandidates(island, pieceHex).toSet().randomOrNull() ?: return
 
     island.getData(neighbour).setPiece<PalmTree> {
       it.markAsGrown()
