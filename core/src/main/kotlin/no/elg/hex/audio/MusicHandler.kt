@@ -68,14 +68,13 @@ class MusicHandler {
       return false
     }
     music?.run {
-      if (isPlaying) {
+      if (Settings.musicPaused) {
         pause()
         return true
-      } else if (!isPlaying) {
+      } else {
         play()
         return true
       }
-      return false
     }
     return false
   }
