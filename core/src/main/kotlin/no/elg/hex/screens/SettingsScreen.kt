@@ -159,6 +159,7 @@ class SettingsScreen : OverlayScreen() {
               }
               playMoney()
             }
+            pack()
           }
 
           row()
@@ -186,6 +187,7 @@ class SettingsScreen : OverlayScreen() {
 
               importIslands(progress.toList())
             }
+            pack()
           }
           row()
 
@@ -206,6 +208,7 @@ class SettingsScreen : OverlayScreen() {
                 onClick {
                   confirmResetWindow.show(stage)
                 }
+                pack()
               }
             }
           }
@@ -225,7 +228,9 @@ class SettingsScreen : OverlayScreen() {
             it.prefWidth(Value.percentHeight(0.2f, this@visTable))
             it.prefHeight(Value.percentHeight(0.05f, this@visTable))
             it.space(0f)
+            pack()
           }
+          pack()
         }
       }
     }
@@ -365,6 +370,7 @@ class SettingsScreen : OverlayScreen() {
         tryPlayClick()
         writeSetting()
       }
+      pack()
     }
 
     horizontalGroup {
@@ -381,11 +387,14 @@ class SettingsScreen : OverlayScreen() {
       }
 
       addActor(restartLabel)
+      pack()
     }
 
+    readSetting()
     onHideListeners += { delegate.hide(property) }
     delegateToReadSettings[delegate] = readSetting
     row()
+    pack()
   }
 
   @Scene2dDsl

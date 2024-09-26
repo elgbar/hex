@@ -54,6 +54,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
           } ?: MessagesRenderer.publishError("Failed to restart island, try disabling the 'Confirm Restart Island' setting")
         }
       )
+      confirmWindow.pack()
     }
   }
 

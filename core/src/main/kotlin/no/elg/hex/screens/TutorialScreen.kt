@@ -125,6 +125,7 @@ class TutorialScreen : OverlayScreen(false) {
         addBackButton {
           it.fill(0.66f, it.fillY)
         }
+        pack()
       }
 
       visScrollPane {
