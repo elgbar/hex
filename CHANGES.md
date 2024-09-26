@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Do not prompt for end turn when the player cannot afford merging two pieces
 * Trees are only allowed grow once per round, but it does grow after each turn
 * Fix UI wiggle when interacting with it
+* Fix lag when scrolling through the level select screen
 
 ### Removed
 

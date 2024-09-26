@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import ktx.assets.load
 import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
+import ktx.async.skipFrame
 import ktx.collections.GdxArray
 import ktx.graphics.use
 import no.elg.hex.Hex
@@ -32,7 +33,6 @@ class IslandPreviewCollection : Disposable {
   private val fastIslandPreviews = GdxArray<FastIslandMetadata>()
   private var dirty = true
   private val internalPreviewRendererQueue = GdxArray<Runnable>()
-  private var lastPostedFrameId = 0L
 
   fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> {
     synchronized(internalPreviewRendererQueue) {
@@ -147,18 +147,21 @@ class IslandPreviewCollection : Disposable {
       }
       return
     }
-
     disposePreviews()
 
-    for (id in Hex.assets.islandFiles.islandIds) {
-      val metadata = FastIslandMetadata.load(id)
-      if (Hex.args.`update-previews`) {
-        updateSelectPreview(metadata)
-        continue
-      }
-      synchronized(internalPreviewRendererQueue) {
-        fastIslandPreviews.add(metadata)
-        dirty = true
+    KtxAsync.launch(MainDispatcher) {
+      for (id in Hex.assets.islandFiles.islandIds) {
+        val metadata = FastIslandMetadata.load(id)
+        if (Hex.args.`update-previews`) {
+          updateSelectPreview(metadata)
+          continue
+        }
+        metadata.preview
+        synchronized(internalPreviewRendererQueue) {
+          fastIslandPreviews.add(metadata)
+          dirty = true
+        }
+        skipFrame()
       }
     }
   }
