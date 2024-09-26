@@ -203,7 +203,7 @@ class NotAsRandomAI(
         think { "No valid hexagon to place the castle!" }
         return
       }
-      think { "Best placement for this castle is ${hexagon.cubeCoordinate.toAxialKey()}" }
+      think { "Best placement for this castle is ${hexagon.coordinates}" }
       gameInteraction.click(hexagon)
     } else if (handPiece is LivingPiece) {
       val treeHexagons =
@@ -250,6 +250,7 @@ class NotAsRandomAI(
             ?: tryAttack(Spearman::class)
             ?: tryAttack(Peasant::class)
 
+            ?: tryAttack(TreePiece::class)
             // Take over territory which is well defended, also helps with mass attacks
             ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
             ?: run {
@@ -449,7 +450,7 @@ class NotAsRandomAI(
     val maxStr = placeableHexes.values.maxOrNull() ?: return null
 
     val leastDefendedHexes =
-      placeableHexes.filter { (_, str) -> str >= maxStr }.mapTo(ArrayList()) { it.key }
+      placeableHexes.filter { (_, str) -> str >= maxStr }.mapTo(mutableListOf()) { it.key }
 
     // shuffle the list to make the selection more uniform
     leastDefendedHexes.shuffle()

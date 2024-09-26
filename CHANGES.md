@@ -5,7 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
 
 ### Added
@@ -23,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Display more info in the map editor
 * Tune AI
   * It will try to attack enemy living pieces in the order of baron, knight, spearman, peasant
+  * It will try to attack enemy trees 
   * Add special case when there is only a single least defended hexagon, will try to place it adjacent to it if possible to protect the living piece 
 
 ### Fixed
@@ -73,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * island 34 from 9 to 7 rounds
   * island 49 from 41 to 21 rounds
   * island 50 from 20 to 18 rounds
-* Randomize teams on islands 1, 9, 16
+* Randomize teams on islands 1, 9, 16 as they were impossible to win with leaf on
 
 ### Fixed
 
