@@ -390,17 +390,23 @@ class NotAsRandomAI(
       territory.hexagons
         .filter {
           // all legal hexagons we can place a castle at (which is all empty hexes)
-          island.getData(it).piece is Empty
+          val piece = island.getData(it).piece
+          piece is Empty || (piece is LivingPiece && !piece.moved)
         }
         .associateWith {
-          val neighborStrength =
-            island.getNeighbors(it).map { neighbor -> island.calculateStrength(neighbor) }
-
-          island.calculateStrength(it) + (neighborStrength.sum().toDouble() / neighborStrength.size)
+          val originData = island.getData(it)
+          // We should not consider the piece curr the hexagon itself, as it will not be there when we place the castle
+          val filter: (data: HexagonData) -> Boolean = { data ->
+            // Living pieces will no
+            data.piece !is LivingPiece || data.piece !is Capital || data == originData
+          }
+          val neighborStrength = island.getNeighbors(it).map { neighbor -> island.calculateStrength(neighbor, filter = filter) }
+          island.calculateStrength(it, filter = filter) + (neighborStrength.sum().toDouble() / neighborStrength.size)
         }
 
     // find any hexagon with that is protected the least
     val minStr = placeableHexes.values.minOrNull() ?: return null
+    think { "The least defended hexagon has a strength of $minStr, castle candidates are ${placeableHexes.mapKeys { it.key.coordinates }}" }
 
     val leastDefendedHexes =
       placeableHexes.filter { (hex, str) ->

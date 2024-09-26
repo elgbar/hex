@@ -124,18 +124,25 @@ fun Island.treeType(hexagon: Hexagon<HexagonData>): KClass<out TreePiece> {
  * The strength of a hexagon is how much [Piece.strength] is needed to take a given hexagon. A hexagon defends its surrounding hexes.
  *
  * @param pretendedTeam The team to pretend to be, if null then use the actual team. Useful for calculated potential strength if it was another team
+ * @param filter A filter if the given hexagon should be filtered out as a neighbor. The team of the data is guaranteed to be the same as [pretendedTeam] or the actual team
  * @return the strength of the given hexagon
  */
-fun Island.calculateStrength(hexagon: Hexagon<HexagonData>, pretendedTeam: Team? = null): Int {
+fun Island.calculateStrength(hexagon: Hexagon<HexagonData>, pretendedTeam: Team? = null, filter: ((data: HexagonData) -> Boolean)? = null): Int {
   val data = getData(hexagon)
   val team = pretendedTeam ?: data.team
   val neighborStrength =
     getNeighbors(hexagon)
+      .asSequence()
       .map { getData(it) }
       .filter { it.team == team }
+      .filter { filter == null || filter(it) }
       .maxOfOrNull { it.piece.strength }
-      ?: 0
-  return max(data.piece.strength, neighborStrength)
+      ?: Empty.strength
+  return if (filter?.invoke(data) == false) {
+    neighborStrength
+  } else {
+    max(data.piece.strength, neighborStrength)
+  }
 }
 
 fun Island.regenerateCapitals() {

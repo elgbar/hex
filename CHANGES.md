@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * It will try to attack enemy trees 
   * Add special case when there is only a single least defended hexagon, will try to place it adjacent to it if possible to protect the living piece 
   * Only prioritize cutting down trees that will propagate into the territory
+  * Improve castle placement to be onto movable pieces
+  * Improve castle placement to ignore capitals and living pieces to more fairly distribute them regardless of how the pieces are placed
 
 ### Fixed
 
