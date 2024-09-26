@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rename `volume` setting to `master volume`
 * Tweak island 62 to make it possible for leaf to win
 * Display more info in the map editor
+* Update the ARtB of the smaller islands (id 57-63)
 * Tune AI
   * Disallow hard AI to buy castles on the first round
   * Double the number of rounds before normal AI can buy castles
