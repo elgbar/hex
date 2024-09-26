@@ -397,7 +397,10 @@ class NotAsRandomAI(
       placeableHexes.filter { (hex, str) ->
         str <= minStr &&
           // Never place a castle next to another castle
-          island.getNeighbors(hex).map { island.getData(it) }.filter { it.team == island.getData(hex).team }
+          island.getNeighbors(hex)
+            .asSequence()
+            .map { island.getData(it) }
+            .filter { it.team == team }
             .none { it.piece is Castle }
       }.mapTo(ArrayList()) { it.key }
 
@@ -416,7 +419,6 @@ class NotAsRandomAI(
 
   private fun calculateBestLivingDefencePosition(territory: Territory): Hexagon<HexagonData>? {
     val island = territory.island
-    val team = territory.team
     val placeableHexes =
       territory.hexagons
         .filter {
@@ -431,6 +433,7 @@ class NotAsRandomAI(
           val neighborStrength = neighbors.map { neighbor ->
             // how much the strength an enemy neighbor has
             island.getNeighbors(neighbor)
+              .asSequence()
               .filter { island.getData(it).team != team && it.isPartOfATerritory(island) } // only count hexagons in actual territories
               .maxOfOrNull { island.calculateStrength(it) }
               ?: 0
@@ -461,6 +464,7 @@ class NotAsRandomAI(
       val leastDefendedHexagon = leastDefendedHexes.first()
       val selectedStrength = island.calculateStrength(leastDefendedHexagon)
       val betterDefendedNeighbor = island.getNeighbors(leastDefendedHexagon)
+        .asSequence()
         .filter {
           val data = island.getData(it)
           data.team == team
