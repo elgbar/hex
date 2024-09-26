@@ -20,7 +20,11 @@ object Settings {
     priority = 200,
     preferences = Hex.launchPreference,
     requireRestart = true,
-    shouldHide = { !Hex.platform.canControlAudio }
+    shouldHide = { !Hex.platform.canControlAudio },
+    afterChange = { _, _, new ->
+      Hex.audioDisabled = !new
+      Hex.music.toggleMute()
+    }
   )
 
   const val VSYNC_PATH = "vsync" // Settings::vsync.name

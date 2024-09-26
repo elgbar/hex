@@ -64,11 +64,8 @@ class MusicHandler {
    * @return If the music was toggled
    */
   fun toggleMute(): Boolean {
-    if (audioDisabled) {
-      return false
-    }
     music?.run {
-      if (Settings.musicPaused) {
+      if (Settings.musicPaused || audioDisabled) {
         pause()
         return true
       } else {
