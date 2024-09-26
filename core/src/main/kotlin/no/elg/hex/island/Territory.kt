@@ -5,6 +5,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Team
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.util.connectedTerritoryHexagons
+import no.elg.hex.util.coordinates
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -70,7 +71,7 @@ data class Territory(
       }
       require(data.team == team) {
         "Found a hex that does not have the same team as the rest of the hexagons. " +
-          "Expected every team to be on team $team but hex at ${hexagon.cubeCoordinate} is on team ${data.team}"
+          "Expected every team to be on team $team but hex at ${hexagon.coordinates} is on team ${data.team}"
       }
     }
 

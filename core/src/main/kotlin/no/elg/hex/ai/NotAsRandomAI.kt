@@ -162,7 +162,7 @@ class NotAsRandomAI(
   }
 
   private fun buy(territory: Territory, gameInteraction: GameInteraction): Boolean {
-    val pieceToBuy = kotlin.run {
+    val pieceToBuy = run {
       if (allowedToBuyCastle(territory) && shouldBuyCastle() && existsEmptyHexagon(territory) && territory.capital.canBuy(Castle::class)) {
         // No upkeep for castles so as long as there is an empty hexagon, we can buy a castle
         return@run Castle::class.createHandInstance()
@@ -239,7 +239,7 @@ class NotAsRandomAI(
                 island.getData(hex).team == territory.team
               }
           }
-          think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.cubeCoordinate})" }
+          think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.coordinates})" }
 
           return@run connectingHex
             ?: tryAttack(Capital::class)

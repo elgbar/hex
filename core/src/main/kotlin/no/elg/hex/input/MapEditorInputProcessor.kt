@@ -9,6 +9,7 @@ import no.elg.hex.input.editor.Editor
 import no.elg.hex.island.Island
 import no.elg.hex.screens.MapEditorScreen
 import no.elg.hex.util.calculateHexagonsWithinRadius
+import no.elg.hex.util.coordinates
 import no.elg.hex.util.getData
 import no.elg.hex.util.trace
 import no.elg.hex.util.withData
@@ -37,7 +38,7 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : AbstractInp
     metaEditor = editor
     val hexagons = screen.island.calculateHexagonsWithinRadius(cursorHex, screen.brushRadius - 1)
     hexagons.withData(metadata.island, excludeInvisible = false) { hex, data ->
-      Gdx.app.trace("Editor") { "Editing ${hex.cubeCoordinate.toAxialKey()}" }
+      Gdx.app.trace("Editor") { "Editing ${hex.coordinates}" }
       editor.edit(hex, data, metadata)
     }
     editor.postEdit(metadata)

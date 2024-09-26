@@ -41,6 +41,7 @@ import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.connectedTerritoryHexagons
+import no.elg.hex.util.coordinates
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.forEachPieceType
@@ -149,7 +150,7 @@ class Island(
     for (hexagon in allHexagons) {
       val data = this.getData(hexagon)
       require(data.piece == Empty || data == data.piece.data) {
-        "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.cubeCoordinate.toAxialKey()}"
+        "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.coordinates}"
       }
       if (data.visible) {
         internalVisibleHexagons += hexagon
@@ -400,7 +401,7 @@ class Island(
       selected = null
     }
 
-    Gdx.app.trace("SELECT") { "Selecting hexagon ${hexagon?.cubeCoordinate}" }
+    Gdx.app.trace("SELECT") { "Selecting hexagon ${hexagon?.coordinates}" }
 
     if (hexagon == null) {
       if (oldSelected != null) {
@@ -540,13 +541,13 @@ class Island(
     }
 
     require(contenders.isNotEmpty()) {
-      "No capital contenders found in ${hexagons.map { "@${it.cubeCoordinate.toAxialKey()} | data ${getData(it)}" }}"
+      "No capital contenders found in ${hexagons.map { "@${it.coordinates} | data ${getData(it)}" }}"
     }
 
     Gdx.app.trace("ISLAND") {
       "Contenders are ${
         contenders.joinToString(prefix = "\n", separator = "\n") {
-          "${getData(it)}@${it.cubeCoordinate.let { coord -> coord.gridX to coord.gridZ }} dist of ${findDistanceToClosestEnemyHex(it)}"
+          "${getData(it)}@${it.coordinates} dist of ${findDistanceToClosestEnemyHex(it)}"
         }
       }"
     }
@@ -576,7 +577,7 @@ class Island(
       }
     }
 
-    Gdx.app.trace("ISLAND") { "Best capital found was ${getData(currBest!!)}@${currBest.cubeCoordinate} with a score of $currBestScore" }
+    Gdx.app.trace("ISLAND") { "Best capital found was ${getData(currBest!!)}@${currBest.coordinates} with a score of $currBestScore" }
 
     return currBest ?: error("No best!?")
   }
@@ -624,7 +625,7 @@ class Island(
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         for (invalidTerrHex in connectedHexes) {
           if (this.getData(invalidTerrHex).piece is Capital) {
-            publishError("Hexagon ${invalidTerrHex.cubeCoordinate.toAxialKey()} is a capital, even though its territory has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
+            publishError("Hexagon ${invalidTerrHex.coordinates} is a capital, even though its territory has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
             valid = false
           }
         }
@@ -633,10 +634,10 @@ class Island(
 
       val capitalCount = connectedHexes.count { this.getData(it).piece is Capital }
       if (capitalCount < 1) {
-        publishError("There exists a territory with no capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
+        publishError("There exists a territory with no capital. Hexagon ${hexagon.coordinates} is within it.")
         valid = false
       } else if (capitalCount > 1) {
-        publishError("There exists a territory with more than one capital. Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is within it.")
+        publishError("There exists a territory with more than one capital. Hexagon ${hexagon.coordinates} is within it.")
         valid = false
       }
     }
@@ -646,7 +647,7 @@ class Island(
       val data = this.getData(hexagon)
       if (data.piece is TreePiece && data.piece::class != this.treeType(hexagon)) {
         publishError(
-          "Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${this.treeType(hexagon).simpleName}"
+          "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${this.treeType(hexagon).simpleName}"
         )
         valid = false
       }
@@ -684,7 +685,7 @@ class Island(
     for (hexagon in invisibleHexagons) {
       val data = this.getData(hexagon)
       if (data.piece !is Empty) {
-        publishError("Hexagon ${hexagon.cubeCoordinate.toAxialKey()} is invisible but has a piece on it! ${data.piece}")
+        publishError("Hexagon ${hexagon.coordinates} is invisible but has a piece on it! ${data.piece}")
         valid = false
       }
     }
