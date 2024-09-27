@@ -125,11 +125,11 @@ class Assets : AssetManager() {
     const val EMPTY_COFFERS_SOUND = "sounds/empty_coffers_%d.mp3"
     private val EMPTY_COFFERS_SOUND_RANGE = 1..5
 
-    const val FREEDOM_MUSIC = "music/freedom.wav"
-    const val ASTRO_RIDER_MUSIC = "music/astro_rider.wav"
-    const val NEON_DREAMS_MUSIC = "music/neon_dreams.wav"
-    const val THE_WILL_TO_LIVE_MUSIC = "music/the_will_to_live.wav"
-    const val VENTURE_TO_THE_HORIZON_MUSIC = "music/venture_to_the_horizon.wav"
+    const val FREEDOM_MUSIC = "music/freedom.ogg"
+    const val ASTRO_RIDER_MUSIC = "music/astro_rider.ogg"
+    const val NEON_DREAMS_MUSIC = "music/neon_dreams.ogg"
+    const val THE_WILL_TO_LIVE_MUSIC = "music/the_will_to_live.ogg"
+    const val VENTURE_TO_THE_HORIZON_MUSIC = "music/venture_to_the_horizon.ogg"
 
     private const val FONT_SIZE = 20
 

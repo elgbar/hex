@@ -38,6 +38,7 @@ android {
       excludes += ['sounds/**']
       excludes += ['icons/**']
       excludes += ['shaders/**']
+      excludes += ['music/**']
     }
   }
   defaultConfig {
