@@ -39,6 +39,15 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     val basicInputHandler = islandScreen.basicIslandInputProcessor
 
     val mapEditorInfo = arrayOf(
+      prefixText(
+        "Island ",
+        callable = { islandScreen.island },
+        format = { island ->
+          val gridData = island.grid.gridData
+          "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()} " +
+            (Hex.screen as? PreviewIslandScreen)?.metadata?.let { metadata -> "ARtB ${metadata.authorRoundsToBeat} Id ${metadata.id} " }
+        }
+      ),
       StaticScreenText(
         "Pointing at hex ",
         next =
@@ -61,15 +70,6 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
 
     if (Hex.debug) {
       debugLines = arrayOf(
-        prefixText(
-          "Island ",
-          callable = { islandScreen.island },
-          format = { island ->
-            val gridData = island.grid.gridData
-            "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()} " +
-              (Hex.screen as? PreviewIslandScreen)?.metadata?.let { metadata -> "ARtB ${metadata.authorRoundsToBeat} Id ${metadata.id} " }
-          }
-        ),
         prefixText(
           "Current team is ",
           islandScreen.island::currentTeam
