@@ -278,6 +278,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               up = Hex.music.icon,
               down = Hex.music.iconSelected,
               playClick = true,
+              disableCheck = { false },
               keyShortcut = intArrayOf(Keys.NUM_7)
             ) {
               Settings.musicPaused = !Settings.musicPaused
