@@ -166,6 +166,8 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       Keys.BACK -> Hex.platform.pause()
       Keys.HOME -> scroll(Float.NEGATIVE_INFINITY)
       Keys.END -> scroll(Float.POSITIVE_INFINITY)
+      Keys.PAGE_UP -> scroll(-Gdx.graphics.height.toFloat())
+      Keys.PAGE_DOWN -> scroll(Gdx.graphics.height.toFloat())
 
       else -> return false
     }
