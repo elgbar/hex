@@ -56,7 +56,7 @@ class FastIslandMetadata(
         }
       }
     )
-      .thenComparing(comparingInt(FastIslandMetadata::id).reversed())
+      .thenComparing(comparingInt(FastIslandMetadata::id))
       .compare(this, other)
 
   /**
