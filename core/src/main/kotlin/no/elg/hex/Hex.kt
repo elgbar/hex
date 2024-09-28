@@ -102,6 +102,7 @@ object Hex : ApplicationAdapter() {
   val debugStage by lazy { trace || args.`stage-debug` }
   val debug by lazy { args.debug || args.trace }
   val trace by lazy { args.trace }
+  val mapEditor by lazy { args.mapEditor }
   val scale by lazy {
     if (args.scale <= 0) Assets.nativeScale else args.scale
   }

@@ -2,9 +2,11 @@ package no.elg.hex.util
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.kotcrab.vis.ui.widget.MenuItem
@@ -126,10 +128,17 @@ fun Button.onInteract(
   }
 }
 
-/** Add and fade in this window if it is is not [isShown] */
+/** Add and fade in this window if it is not [isShown] */
 fun VisWindow.show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
   if (!isShown()) {
-    stage.addActor(fadeIn(fadeTime))
+    stage.addActor(this)
+    setColor(1f, 1f, 1f, 0f)
+    Gdx.graphics.isContinuousRendering = true
+    val actions = Actions.sequence(
+      Actions.fadeIn(fadeTime, Interpolation.fade),
+      Actions.run { Gdx.graphics.isContinuousRendering = false }
+    )
+    addAction(actions)
     if (center) {
       centerWindow()
     }
