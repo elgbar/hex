@@ -93,17 +93,16 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
       val preview = metadata.preview ?: continue
       batch.draw(preview, x, y, width, height)
-      if(Hex.debug) {
+      if (Hex.debug || Hex.mapEditor) {
         val color = if (metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) {
           Color.PURPLE
-        }
-        else if (metadata.authorRoundsToBeat == Island.NEVER_BEATEN) {
+        } else if (metadata.authorRoundsToBeat == Island.NEVER_BEATEN) {
           Color.RED
-        }else if (metadata.authorRoundsToBeat == Int.MAX_VALUE) {
+        } else if (metadata.authorRoundsToBeat == Int.MAX_VALUE) {
           Color.GOLD
         } else if (Hex.debugStage) {
           NOT_SELECTED_COLOR
-        } else{
+        } else {
           null
         }
         color?.let { drawBox(x, y, width, height, it) }
