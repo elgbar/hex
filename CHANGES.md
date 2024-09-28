@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Sort islands without ARtB by their id in ascending order
+* Change color of boxes on the level select screen
 
 ### Fixed
 
