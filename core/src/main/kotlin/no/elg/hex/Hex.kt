@@ -121,6 +121,7 @@ object Hex : ApplicationAdapter() {
         inputMultiplexer.clear()
         inputMultiplexer.addProcessor(GlobalInputProcessor)
         Gdx.input.setOnscreenKeyboardVisible(false)
+        Gdx.graphics.isContinuousRendering = false
         Events.clear(true)
 
         Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
