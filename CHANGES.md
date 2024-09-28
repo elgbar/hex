@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Sort islands without ARtB by their id in ascending order
 * Change color of boxes on the level select screen
 * Show island info on map editor screen
+* Show the number of rounds it took for AI to be done with a map
 * Show map ARtB status when in map editor mode
 
 ### Fixed

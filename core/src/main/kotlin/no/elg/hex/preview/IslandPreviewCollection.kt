@@ -112,7 +112,10 @@ class IslandPreviewCollection : Disposable {
             printText("Lost on round ${island.round}", belowAsset)
           }
 
-          PreviewModifier.AI_DONE -> drawAsset(Hex.assets.castle)
+          PreviewModifier.AI_DONE -> {
+            drawAsset(Hex.assets.castle)
+            printText("Done on round ${island.round}", belowAsset)
+          }
           PreviewModifier.WON -> {
             drawAsset(Hex.assets.capital)
             printText("Won in ${island.round} rounds", belowAsset)
