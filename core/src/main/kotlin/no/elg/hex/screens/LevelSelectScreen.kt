@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Align
 import ktx.actors.isShown
+import ktx.graphics.use
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
@@ -65,59 +66,58 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     if (LevelSelectInputProcessor.lastY != camera.position.y) {
       input.restoreScrollPosition()
     }
-    lineRenderer.begin(Line)
-    batch.begin()
+    lineRenderer.use(Line) {
+      batch.use {
+        val (_, sy, _, sheight) = input.slotRect(0, NON_ISLAND_SCALE, 0f)
 
-    val (_, sy, _, sheight) = input.slotRect(0, NON_ISLAND_SCALE, 0f)
+        // Draw the first row of non-islands
+        if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
+          drawScreenSprite(Hex.assets.settingsDown, Hex.assets.settings, 0)
+          drawScreenSprite(Hex.music.iconSelected, Hex.music.icon, PREVIEWS_PER_ROW - 2)
+          drawScreenSprite(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
 
-    // Draw the first row of non-islands
-    if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
-      drawScreenSprite(Hex.assets.settingsDown, Hex.assets.settings, 0)
-      drawScreenSprite(Hex.music.iconSelected, Hex.music.icon, PREVIEWS_PER_ROW - 2)
-      drawScreenSprite(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
-
-      if (Hex.args.mapEditor) {
-        drawLevelCreationIcon()
-      }
-    }
-
-    for ((i, metadata) in Hex.assets.islandPreviews.islandWithIndex()) {
-      val (x, y, width, height) = input.slotRect(i + PREVIEWS_PER_ROW)
-
-      if (y + height < camera.position.y - camera.viewportHeight / 2f) {
-        // island is above camera, no need to render
-        continue
-      }
-
-      if (y > camera.position.y + camera.viewportHeight / 2f) {
-        // the island is below the camera, no need to render further
-        break
-      }
-
-      val preview = metadata.preview ?: continue
-      batch.draw(preview, x, y, width, height)
-      if (Hex.debug || Hex.mapEditor) {
-        val color = if (metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) {
-          Color.PURPLE
-        } else if (metadata.authorRoundsToBeat == Island.NEVER_BEATEN) {
-          Color.RED
-        } else if (metadata.authorRoundsToBeat == Int.MAX_VALUE) {
-          Color.GOLD
-        } else if (Hex.debugStage) {
-          NOT_SELECTED_COLOR
-        } else {
-          null
+          if (Hex.args.mapEditor) {
+            drawLevelCreationIcon()
+          }
         }
-        color?.let { drawBox(x, y, width, height, it) }
+
+        for ((i, metadata) in Hex.assets.islandPreviews.islandWithIndex()) {
+          val (x, y, width, height) = input.slotRect(i + PREVIEWS_PER_ROW)
+
+          if (y + height < camera.position.y - camera.viewportHeight / 2f) {
+            // island is above camera, no need to render
+            continue
+          }
+
+          if (y > camera.position.y + camera.viewportHeight / 2f) {
+            // the island is below the camera, no need to render further
+            break
+          }
+
+          val preview = metadata.preview ?: continue
+          batch.draw(preview, x, y, width, height)
+          if (Hex.debug || Hex.mapEditor) {
+            val color = if (metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT) {
+              Color.PURPLE
+            } else if (metadata.authorRoundsToBeat == Island.NEVER_BEATEN) {
+              Color.RED
+            } else if (metadata.authorRoundsToBeat == Int.MAX_VALUE) {
+              Color.GOLD
+            } else if (Hex.debugStage) {
+              NOT_SELECTED_COLOR
+            } else {
+              null
+            }
+            color?.let { drawBox(x, y, width, height, it) }
           }
 
           if (Hex.mapEditor) {
             layout.setText(Hex.assets.regularItalicFont, "id: ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.center, true)
             Hex.assets.regularItalicFont.draw(batch, layout, x, y + height - Hex.assets.regularItalicFont.lineHeight * 2)
           }
+        }
+      }
     }
-    batch.end()
-    lineRenderer.end()
     stageScreen.render(delta)
   }
 
