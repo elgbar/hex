@@ -2,9 +2,11 @@ package no.elg.hex.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.utils.Align
 import ktx.actors.isShown
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
@@ -27,6 +29,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
 
   private val stageScreen by lazy { StageScreen() }
   val stage: Stage get() = stageScreen.stage
+  private val layout by lazy { GlyphLayout() }
 
   internal val input by lazy { LevelSelectInputProcessor(this) }
   private val mouseX get() = input.mouseX
@@ -106,7 +109,12 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
           null
         }
         color?.let { drawBox(x, y, width, height, it) }
-      }
+          }
+
+          if (Hex.mapEditor) {
+            layout.setText(Hex.assets.regularItalicFont, "id: ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.center, true)
+            Hex.assets.regularItalicFont.draw(batch, layout, x, y + height - Hex.assets.regularItalicFont.lineHeight * 2)
+          }
     }
     batch.end()
     lineRenderer.end()
