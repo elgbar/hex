@@ -197,14 +197,14 @@ class SettingsScreen : OverlayScreen() {
             if (property.returnType.jvmErasure.isSubclassOf(ResetSetting::class)) {
               val delegate = property.get(Settings) as ResetSetting
               val confirmResetWindow = this@actors.confirmWindow(name, delegate.confirmText) {
-                delegate.onResetConfirmed()
                 MessagesRenderer.publishWarning("Resetting $name")
-                Hex.screen = SplashScreen(LevelSelectScreen())
+                delegate.onResetConfirmed()
               }
               row()
               visTextButton(name, "dangerous") {
                 otherSettingsStyle(it)
                 onClick {
+                  tryPlayClick()
                   confirmResetWindow.show(stage)
                 }
                 pack()

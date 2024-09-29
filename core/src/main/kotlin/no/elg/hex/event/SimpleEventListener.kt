@@ -17,11 +17,11 @@ class SimpleEventListener<T : Event>(clazz: KClass<T>, private val run: (T) -> U
 
   init {
     require(!clazz.isAbstract) { "Cannot create a listener for an abstract event: $clazz" }
-    eventList.add(run)
+    eventList += run
   }
 
   override fun dispose() {
-    eventList.removeValue(run, true)
+    eventList -= run
   }
 
   companion object {

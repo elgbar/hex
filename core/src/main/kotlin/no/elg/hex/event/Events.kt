@@ -1,7 +1,6 @@
 package no.elg.hex.event
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.utils.Array
 import kotlinx.coroutines.runBlocking
 import ktx.async.onRenderingThread
 import no.elg.hex.event.events.Event
@@ -41,9 +40,9 @@ object Events {
   }
 
   inline fun <reified T : Event> fireEvent(event: T) {
-    val listeners: Array<(T) -> Unit> = getEventList(T::class)
+    val listeners = getEventList(T::class)
 
-    if (listeners.isEmpty) return
+    if (listeners.isEmpty()) return
     Gdx.app.trace("Event") { "Firing event $event" }
 
     runBlocking {
@@ -62,7 +61,7 @@ object Events {
   /**
    * Internal function to get the list of listener for an event
    */
-  fun <T : Event> getEventList(eventClass: KClass<T>): Array<(T) -> Unit> {
+  fun <T : Event> getEventList(eventClass: KClass<T>): MutableList<(T) -> Unit> {
     val companionInstance = eventClass.companionObjectInstance ?: error("No companion object found for ${eventClass.simpleName}")
 
     @Suppress("UNCHECKED_CAST")
