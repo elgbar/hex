@@ -3,29 +3,11 @@ package no.elg.hex.renderer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex
 import no.elg.hex.Settings
-import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
 
-object DebugGraphRenderer : FrameUpdatable, Disposable, Resizable {
-
-  private const val RELATIVE_GRAPH_WIDTH = 0.25f
-
-  private const val COL_WIDTH = 2
-  private const val COLOR_SIZE = 6
-
-  private lateinit var fbo: FrameBuffer
-  private var batch = SpriteBatch()
-
-  private var clearFbo = true
-  private var fboWidth: Int = 0
-  private var fboHeight: Int = 0
+class DebugGraphRenderer : ScissorRenderer(), Resizable {
 
   private var fpsIndex: Int = 0 // frames per second
 
@@ -43,37 +25,15 @@ object DebugGraphRenderer : FrameUpdatable, Disposable, Resizable {
 
   private var fpsDeltaAcc = 0f
 
-  val isEnabled: Boolean get() = Settings.enableDebugFPSGraph && Hex.debug
-
   override fun frameUpdate() {
     fpsDeltaAcc += Gdx.graphics.deltaTime
     val updateFps = Gdx.graphics.frameId % COL_WIDTH == 0L
-
     if (updateFps) {
-      begin()
-      drawFps()
-      end()
+      use {
+        drawFps()
+      }
     }
-    batch.begin()
-    batch.draw(fbo.colorBufferTexture, 0f, fboHeight.toFloat())
-    batch.end()
-  }
-
-  private fun begin() {
-    fbo.begin()
-    if (clearFbo) {
-      Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-      clearFbo = false
-    }
-    // https://www.khronos.org/opengl/wiki/Scissor_Test
-    Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST)
-  }
-
-  private fun end() {
-    Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
-    fbo.end()
-    Hex.resetClearColor()
+    drawFbo(0f, fboHeight.toFloat())
   }
 
   private fun drawFps() {
@@ -108,22 +68,19 @@ object DebugGraphRenderer : FrameUpdatable, Disposable, Resizable {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
   }
 
-  override fun resize(width: Int, height: Int) {
-    batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-    fboWidth = width
-    fboHeight = (height / 3).coerceAtLeast(1)
-    fpsIndex = Int.MAX_VALUE
+  override fun calculateFboWidth(width: Int, height: Int): Int = width
+  override fun calculateFboHeight(width: Int, height: Int): Int = height / 3
 
-    if (::fbo.isInitialized) {
-      fbo.dispose()
-    }
-    fbo = FrameBuffer(Pixmap.Format.RGBA4444, fboWidth, fboHeight, false)
-    clearFbo = true
+  override fun resize(width: Int, height: Int) {
+    super.resize(width, height)
+    fpsIndex = Int.MAX_VALUE
   }
 
-  override fun dispose() {
-    if (::fbo.isInitialized) {
-      fbo.dispose()
-    }
+  companion object {
+    val isEnabled: Boolean get() = Settings.enableDebugFPSGraph && Hex.debug
+    private const val RELATIVE_GRAPH_WIDTH = 0.25f
+
+    private const val COL_WIDTH = 2
+    private const val COLOR_SIZE = 6
   }
 }

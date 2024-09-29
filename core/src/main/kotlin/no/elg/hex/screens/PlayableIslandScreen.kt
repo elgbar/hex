@@ -60,6 +60,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private val inputProcessor by lazy { GameInputProcessor(this) }
 
   private val frameUpdatable by lazy { GameInfoRenderer(this) }
+  private val debugFPSGraphRenderer by lazy { DebugGraphRenderer() }
   private val debugRenderer: DebugInfoRenderer by lazy { DebugInfoRenderer(this) }
 
   private val confirmEndTurn: VisWindow
@@ -375,8 +376,9 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   override fun render(delta: Float) {
     super.render(delta)
     if (DebugGraphRenderer.isEnabled) {
-      DebugGraphRenderer.frameUpdate()
+      debugFPSGraphRenderer.frameUpdate()
     }
+
     debugRenderer.frameUpdate()
     frameUpdatable.frameUpdate()
     stageScreen.render(delta)
@@ -390,9 +392,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     super.resize(width, height)
     stageScreen.resize(width, height)
     frameUpdatable.resize(width, height)
-    if (DebugGraphRenderer.isEnabled) {
-      DebugGraphRenderer.resize(width, height)
-    }
+    debugFPSGraphRenderer.resize(width, height)
   }
 
   override fun show() {
@@ -417,7 +417,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       saveIslandProgress()
     }
 
-    DebugGraphRenderer.dispose()
+    debugFPSGraphRenderer.dispose()
     debugRenderer.dispose()
     settingsChangeEventListener.dispose()
   }
