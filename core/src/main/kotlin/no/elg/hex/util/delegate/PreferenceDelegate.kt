@@ -38,10 +38,6 @@ open class PreferenceDelegate<T : Any>(
   runAfterChangeOnInit: Boolean = true,
 
   /**
-   * If [afterChange] should run when leaving settings screen
-   */
-  val applyAfterChangeOnSettingsHide: Boolean = false,
-  /**
    * Method to call *after* a change is applied
    */
   val afterChange: ((delegate: PreferenceDelegate<T>, old: T, new: T) -> Unit)? = null,
@@ -167,21 +163,10 @@ open class PreferenceDelegate<T : Any>(
       else -> error("Preferences of type ${initialValue::class.simpleName} is not allowed")
     }
     preferences.flush()
-
-    if (!applyAfterChangeOnSettingsHide) {
-      Events.fireEvent(SettingsChangeEvent(this, old, value))
-    }
+    Events.fireEvent(SettingsChangeEvent(this, old, value))
   }
 
   fun shouldHide(): Boolean = shouldHide(currentValue ?: initialValue)
-
-  fun hide(property: KProperty<*>) {
-    if (applyAfterChangeOnSettingsHide && changed) {
-      val old = currentValue ?: initialValue
-      val new = getValue(null, property)
-      Events.fireEvent(SettingsChangeEvent(this, old, new))
-    }
-  }
 
   companion object {
     private val preferences: Preferences by lazy {

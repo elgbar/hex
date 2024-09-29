@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
-import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.resetAllIslandProgress
@@ -17,43 +16,43 @@ object Settings {
   const val ENABLE_AUDIO_PATH = "enableAudio" // Settings::enableAudio.name
   var enableAudio by PreferenceDelegate(
     true,
-    priority = 200,
     preferences = Hex.launchPreference,
     requireRestart = true,
-    shouldHide = { !Hex.platform.canControlAudio },
+    priority = 200,
     afterChange = { _, _, new ->
       Hex.audioDisabled = !new
       Hex.music.toggleMute()
-    }
+    },
+    shouldHide = { !Hex.platform.canControlAudio }
   )
 
   const val VSYNC_PATH = "vsync" // Settings::vsync.name
   var vsync by PreferenceDelegate(
     true,
-    priority = 200,
     preferences = Hex.launchPreference,
-    shouldHide = { !Hex.platform.canToggleVsync },
+    priority = 200,
     afterChange = { _, _, new ->
       Gdx.graphics.setVSync(new)
-    }
+    },
+    shouldHide = { !Hex.platform.canToggleVsync }
   )
 
   var masterVolume by PreferenceDelegate(
     1f,
     priority = 210,
-    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled },
     afterChange = { _, _, _ ->
       Hex.music.updateMusicVolume()
-    }
+    },
+    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
   ) { it < 0f || it > 1f }
 
   var musicVolume by PreferenceDelegate(
     .5f,
     priority = 210,
-    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled },
     afterChange = { _, _, _ ->
       Hex.music.updateMusicVolume()
-    }
+    },
+    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
   ) { it < 0f || it > 1f }
   var musicPaused by PreferenceDelegate(false, priority = 220, afterChange = { _, _, _ -> Hex.music.toggleMute() })
 
@@ -80,56 +79,43 @@ object Settings {
 
   var startTeam by PreferenceDelegate(
     Team.LEAF,
-    runAfterChangeOnInit = false,
-    applyAfterChangeOnSettingsHide = true,
-    shouldHide = { !Hex.debug },
     priority = 100_000,
-    afterChange = { _, _, _ -> gotoLevelSelect() }
+    runAfterChangeOnInit = false,
+    shouldHide = { !Hex.debug }
   )
 
   var teamSunAI by PreferenceDelegate(
     Difficulty.HARD,
-    runAfterChangeOnInit = false,
-    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    afterChange = { _, _, _ -> gotoLevelSelect() }
+    runAfterChangeOnInit = false
   )
 
   var teamLeafAI by PreferenceDelegate(
     Difficulty.PLAYER,
-    runAfterChangeOnInit = false,
-    applyAfterChangeOnSettingsHide = true,
     priority = 89,
-    afterChange = { _, _, _ -> gotoLevelSelect() }
+    runAfterChangeOnInit = false
   )
   var teamForestAI by PreferenceDelegate(
     Difficulty.HARD,
-    runAfterChangeOnInit = false,
-    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    afterChange = { _, _, _ -> gotoLevelSelect() }
+    runAfterChangeOnInit = false
   )
 
   var teamEarthAI by PreferenceDelegate(
     Difficulty.HARD,
-    runAfterChangeOnInit = false,
-    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    afterChange = { _, _, _ -> gotoLevelSelect() }
+    runAfterChangeOnInit = false
   )
 
   var teamStoneAI by PreferenceDelegate(
     Difficulty.HARD,
-    runAfterChangeOnInit = false,
-    applyAfterChangeOnSettingsHide = true,
     priority = 90,
-    afterChange = { _, _, _ -> gotoLevelSelect() }
+    runAfterChangeOnInit = false
   )
 
   var enableGLDebugging by PreferenceDelegate(
     false,
     priority = 100_000,
-    shouldHide = { !Hex.debug },
     afterChange = { _, old, new ->
       if (new != old) {
         if (new) {
@@ -138,7 +124,8 @@ object Settings {
           GLProfilerRenderer.disable()
         }
       }
-    }
+    },
+    shouldHide = { !Hex.debug }
   )
 
   var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.args.mapEditor })
@@ -149,27 +136,17 @@ object Settings {
     resetAllIslandProgress()
   }
 
-  @Suppress("UNCHECKED_CAST")
   val resetSettings = ResetSetting("Are you sure you want reset all settings?") {
     Gdx.app.postRunnable {
       for (
-      (property, loopDelegate) in Settings::class.declaredMemberProperties //
-        .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) } //
-        .filterValues { it is PreferenceDelegate<*> && it !is ResetSetting } //
+      (property, loopDelegate) in Settings::class.declaredMemberProperties
+        .associateWith { it.also { it.isAccessible = true }.getDelegate(Settings) }
+        .filterValues { it is PreferenceDelegate<*> }
       ) {
         // Nullable types are not allowed, this is ok cast
+        @Suppress("UNCHECKED_CAST")
         (loopDelegate as PreferenceDelegate<Any>).setValue(Settings, property, loopDelegate.initialValue)
       }
-    }
-  }
-
-  private var lastGotoCalled = 0L
-  private fun gotoLevelSelect() {
-    val frameId = Gdx.graphics.frameId
-    if (lastGotoCalled != frameId) {
-      lastGotoCalled = frameId
-      // do next frame to fix cyclic problem
-      Gdx.app.postRunnable { Hex.screen = LevelSelectScreen() }
     }
   }
 }

@@ -59,7 +59,6 @@ import kotlin.reflect.jvm.jvmErasure
 
 class SettingsScreen : OverlayScreen() {
 
-  private val onHideListeners = mutableListOf<() -> Unit>()
   private val delegateToReadSettings: MutableMap<PreferenceDelegate<*>, () -> Unit> = mutableMapOf()
   private val onSettingChange = SimpleEventListener.create<SettingsChangeEvent<*>> { (delegate, _, _) ->
     delegateToReadSettings[delegate]?.invoke()
@@ -110,8 +109,8 @@ class SettingsScreen : OverlayScreen() {
             it.safeGetDelegate(Settings) is PreferenceDelegate<*>
           }
 
-          val settings = settingsProperties.associateWith { it.getDelegate(Settings) } //
-            .filterValues { it is PreferenceDelegate<*> && !it.shouldHide() } //
+          val settings = settingsProperties.associateWith { it.getDelegate(Settings) }
+            .filterValues { it is PreferenceDelegate<*> && !it.shouldHide() }
             .toSortedMap { o1, o2 ->
               val delegate1Pri = (o1.getDelegate(Settings) as PreferenceDelegate<*>).priority
               val delegate2Pri = (o2.getDelegate(Settings) as PreferenceDelegate<*>).priority
@@ -391,7 +390,6 @@ class SettingsScreen : OverlayScreen() {
     }
 
     readSetting()
-    onHideListeners += { delegate.hide(property) }
     delegateToReadSettings[delegate] = readSetting
     row()
     pack()
@@ -416,9 +414,6 @@ class SettingsScreen : OverlayScreen() {
     allowedToPlayClick = false
     super.hide()
     onSettingChange.dispose()
-    for (function in onHideListeners) {
-      function()
-    }
   }
 
   companion object {
