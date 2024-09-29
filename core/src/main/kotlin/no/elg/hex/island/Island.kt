@@ -224,6 +224,7 @@ class Island(
    * @return If there is only one real player left
    */
   val singleAliveRealPlayer: Boolean get() = hexagonsPerTeam.filterValues { it > 0 }.keys.filter { isTeamHuman(it) }.size == 1
+  val onlyAIPlayers: Boolean get() = realPlayers == 0
 
   /**
    * How many of the current players are not real (i.e. an AI)

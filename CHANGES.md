@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Show island info on map editor screen
 * Show the number of rounds it took for AI to be done with a map
 * Show map ARtB status when in map editor mode
+* Always allow surrendering when there is AIs playing against each other
 
 ### Fixed
 

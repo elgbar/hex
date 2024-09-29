@@ -3,6 +3,7 @@ package no.elg.hex.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Value
@@ -47,6 +48,7 @@ import no.elg.hex.util.actionableHexagons
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fill
+import no.elg.hex.util.hide
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.safeGetDelegate
@@ -69,6 +71,8 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private val youWon: KVisWindow
   private val youLost: KVisWindow
   private val aiDone: KVisWindow
+
+  private val windows get() = sequenceOf(confirmEndTurn, confirmSurrender, acceptAISurrender, youWon, youLost, aiDone)
 
   private val buttonGroup: VisTable
 
@@ -151,14 +155,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
           val size = Value.percentWidth(0.08f, this@table)
 
           val interactDisabled: () -> Boolean = {
-            island.isCurrentTeamAI() ||
-              youWon.isShown() ||
-              youLost.isShown() ||
-              aiDone.isShown() ||
-              acceptAISurrender.isShown() ||
-              confirmEndTurn.isShown() ||
-              confirmSurrender.isShown() ||
-              island.history.disabled
+            island.isCurrentTeamAI() || windows.any(Actor::isShown) || island.history.disabled
           }
 
           @Scene2dDsl
@@ -264,11 +261,11 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               tooltip = "Surrender",
               up = Hex.assets.surrender,
               playClick = true,
+              disableCheck = { if (island.onlyAIPlayers) false else interactDisabled() },
               keyShortcut = intArrayOf(Keys.NUM_6)
             ) {
-
               if (Settings.confirmSurrender) {
-                confirmSurrender.show(stage)
+                showWindow(confirmSurrender)
               } else {
                 surrender()
               }
@@ -307,6 +304,16 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     }
   }
 
+  private fun showWindow(window: VisWindow) {
+    if (window is KVisWindow) {
+      labelUpdater[window]?.also { action ->
+        action.invoke(window)
+      }
+    }
+    windows.filter { it != window }.forEach(VisWindow::hide)
+    window.show(stage)
+  }
+
   private fun onGameEnded(modifier: PreviewModifier) {
     island.history.disable()
     metadata.modifier = modifier
@@ -320,15 +327,13 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   }
 
   private fun endGame(win: Boolean) {
-    val window = when {
-      island.realPlayers == 0 -> aiDone
-      win -> youWon
-      else -> youLost
-    }
-    labelUpdater[window]?.also { action ->
-      action.invoke(window)
-    }
-    window.show(stage)
+    showWindow(
+      when {
+        island.onlyAIPlayers -> aiDone
+        win -> youWon
+        else -> youLost
+      }
+    )
   }
 
   private fun endTurn(allowAISurrender: Boolean = true) {
@@ -349,7 +354,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       if (teamPercentages >= PERCENT_HEXES_OWNED_TO_WIN ||
         percentagesHexagons.all { (team, percent) -> team === currentTeam || percent < MAX_PERCENT_HEXES_AI_OWN_TO_SURRENDER }
       ) {
-        acceptAISurrender.show(stage)
+        showWindow(acceptAISurrender)
         return
       }
     }
@@ -359,7 +364,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       if (island.actionableHexagons().any()) {
         // Let's warn users of ending their turn
         tempShowActionToDo = true
-        confirmEndTurn.show(stage)
+        showWindow(confirmEndTurn)
         return
       }
     }
