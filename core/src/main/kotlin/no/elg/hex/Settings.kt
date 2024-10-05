@@ -54,7 +54,7 @@ object Settings {
     },
     shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
   ) { it < 0f || it > 1f }
-  var musicPaused by PreferenceDelegate(false, priority = 220, afterChange = { _, _, _ -> Hex.music.toggleMute() })
+  var musicPaused by PreferenceDelegate(false, priority = 211, afterChange = { _, _, _ -> Hex.music.toggleMute() })
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
@@ -65,6 +65,9 @@ object Settings {
   var enableStrengthHint by PreferenceDelegate(true, priority = 100)
   var enableStrengthBar by PreferenceDelegate(true, priority = 100)
   var enableActionHighlight by PreferenceDelegate(false, priority = 100)
+
+  var enableStrengthHintEverywhere by PreferenceDelegate(true, priority = 220, shouldHide = { !Hex.debug && !Hex.mapEditor })
+  var enableStrengthHintInPlayerTerritories by PreferenceDelegate(false, priority = 221, shouldHide = { !Hex.debug })
 
   var showFps by PreferenceDelegate(false, priority = 109, shouldHide = { !Hex.debug })
 
