@@ -47,9 +47,20 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
         callable = ::island,
         format = { island ->
           val gridData = island.grid.gridData
-          "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()} " +
-            (Hex.screen as? PreviewIslandScreen)?.metadata?.let { metadata -> "ARtB ${metadata.authorRoundsToBeat} Id ${metadata.id} " }
-        }
+          "${gridData.gridWidth} x ${gridData.gridHeight} ${gridData.gridLayout.getName()}"
+        },
+        next = prefixText(
+          " ARtB ",
+          islandScreen.metadata::authorRoundsToBeat,
+          next = prefixText(
+            " id ",
+            islandScreen.metadata::id,
+            next = prefixText(
+              " for testing ",
+              islandScreen.metadata::forTesting
+            )
+          )
+        )
       ),
       StaticScreenText(
         "Pointing at hex ",
@@ -66,7 +77,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
             next = booleanText(
               callable = { basicInputHandler.cursorHex?.let { island.isInTerritory(it) } == true },
               next = prefixNullableText(
-                prefix = "strength ",
+                prefix = " strength ",
                 callable = basicInputHandler::cursorHex,
                 format = { cursorHex ->
                   val data = island.getData(cursorHex)

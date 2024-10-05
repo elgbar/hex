@@ -3,9 +3,11 @@ package no.elg.hex.island
 import com.badlogic.gdx.Gdx
 import ktx.assets.load
 import no.elg.hex.Hex
+import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.debug
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
+import no.elg.hex.util.info
 import no.elg.hex.util.isLoaded
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.trace
@@ -46,6 +48,12 @@ class IslandFiles {
           val fileName = getIslandFileName(id)
           Gdx.app.trace(TAG) { "Found island $fileName" }
           nonExistentFilesInRow = 0
+
+          if (FastIslandMetadata.loadInitial(id)?.forTesting == true && (!Hex.debug && !Hex.mapEditor)) {
+            Gdx.app.info(TAG) { "Skipping island $id as it is for debugging purposes only" }
+            FastIslandMetadata.clearInitialIslandMetadataCache(id)
+            continue
+          }
 
           if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded<Island>(fileName)) {
             Hex.assets.load<Island>(fileName)

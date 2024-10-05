@@ -14,6 +14,8 @@ import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.textureFromBytes
 import java.util.Comparator.comparingInt
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import java.util.function.ToIntFunction
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -26,7 +28,11 @@ class FastIslandMetadata(
    */
   var authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT,
 
-  var modifier: PreviewModifier = PreviewModifier.NOTHING
+  var modifier: PreviewModifier = PreviewModifier.NOTHING,
+  /**
+   * If this island is for debugging and testing purposes only
+   */
+  var forTesting: Boolean = false
 ) : Comparable<FastIslandMetadata>, Disposable {
 
   var previewPixmap: ByteArray? = previewPixmap
@@ -108,15 +114,20 @@ class FastIslandMetadata(
 
     fun getFileHandle(id: Int, isForWriting: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
 
-    fun loadInitial(id: Int): FastIslandMetadata? {
-      return try {
-        val serialized = getFileHandle(id, false).readBytes() ?: return null
-        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
-      } catch (e: Exception) {
-        Gdx.app.error("IslandMetadataDto", "Failed to load initial island metadata for island $id", e)
-        null
+    private val initialIslandMetadata: ConcurrentMap<Int, FastIslandMetadata> = ConcurrentHashMap()
+
+    fun clearInitialIslandMetadataCache(id: Int) = initialIslandMetadata.remove(id)
+
+    fun loadInitial(id: Int): FastIslandMetadata? =
+      initialIslandMetadata.computeIfAbsent(id) {
+        try {
+          val serialized = getFileHandle(id, false).readBytes() ?: return@computeIfAbsent null
+          Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+        } catch (e: Exception) {
+          Gdx.app.error("IslandMetadataDto", "Failed to load initial island metadata for island $id", e)
+          null
+        }
       }
-    }
 
     @OptIn(ExperimentalEncodingApi::class)
     fun loadProgress(id: Int): FastIslandMetadata? {
@@ -127,6 +138,9 @@ class FastIslandMetadata(
       } catch (e: Exception) {
         Gdx.app.error("IslandMetadataDto", "Failed to load island metadata progress for island $id", e)
         null
+      }?.also {
+        // Clear up some memory by unloading
+        initialIslandMetadata.remove(id)
       }
     }
 

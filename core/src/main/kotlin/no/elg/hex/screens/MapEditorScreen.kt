@@ -1,5 +1,6 @@
 package no.elg.hex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
@@ -18,13 +19,13 @@ import ktx.actors.onClickEvent
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
 import ktx.scene2d.actors
-import ktx.scene2d.button
 import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.menu
 import ktx.scene2d.vis.menuBar
 import ktx.scene2d.vis.menuItem
 import ktx.scene2d.vis.spinner
+import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
@@ -116,22 +117,45 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
         }
       )
 
-      visWindow("Enter ARtB") {
-        visTextTooltip(
-          """
-           Author Round to Beat (ARtB) is the 
-           lowest number of rounds to beat
-           this level and used to calculate 
-           the difficulty  of the level.
-          """.trimIndent()
-        )
+      visWindow("Additional options") {
+        visTable {
+
+          visTable {
+            visTextTooltip(
+              """
+              Test maps are not shown in the level 
+              select screen unless either map editor
+              mode or debug mode is enabled.
+              """.trimIndent()
+            )
+            visLabel("Is test map? ")
+            visCheckBox("") {
+              isChecked = metadata.forTesting
+              onChange {
+                metadata.forTesting = isChecked
+              }
+            }
+          }
+          row()
+          separator()
+          row()
+
+          visTable {
+            visTextTooltip(
+              """
+              Author Round to Beat (ARtB) is the 
+              lowest number of rounds to beat
+              this level and used to calculate 
+              the difficulty  of the level.
+              """.trimIndent()
+            )
 
             visLabel(
               """
-               Previous ARtB: ${metadata.authorRoundsToBeat}
-               $UNKNOWN_ROUNDS_TO_BEAT = not played
-               ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
-               $NEVER_BEATEN = never beaten
+              Previous ARtB: ${metadata.authorRoundsToBeat}
+              $UNKNOWN_ROUNDS_TO_BEAT = not played
+              ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
+              $NEVER_BEATEN = never beaten
               """.trimIndent()
             )
             row()
@@ -143,7 +167,9 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
               }
               it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
             }
-        pack()
+            pack()
+          }
+        }
         keepWithinStage()
         pack()
       }.also {
