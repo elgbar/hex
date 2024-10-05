@@ -2,6 +2,7 @@ package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.yield
+import no.elg.hex.Hex
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -31,6 +32,7 @@ import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.getTerritories
+import no.elg.hex.util.info
 import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
@@ -69,8 +71,14 @@ class NotAsRandomAI(
   private val endTurnChance: Float
 ) : AI {
 
+  private val tag = "NARAI-$team"
+  
   private fun think(words: () -> String) {
-    Gdx.app.trace("NARAI-$team", message = words)
+    if (Hex.args.`ai-debug`) {
+      Gdx.app.info(tag, message = words)
+    } else {
+      Gdx.app.trace(tag, message = words)
+    }
   }
 
   /**

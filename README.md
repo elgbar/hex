@@ -31,12 +31,12 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 
 ## Help page
 
-*Accurate as of version 2.3.0*
+*Accurate as of version 2.4.0-snapshot*
 
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
        [--draw-edges] [--stage-debug] [--update-previews]
-       [--update-saved-islands] [--load-all-islands] [--reset-all]
+       [--update-saved-islands] [--load-all-islands] [--reset-all] [--ai-debug]
        [--scale SCALE] [--profile]
 
 optional arguments:
@@ -68,6 +68,8 @@ optional arguments:
                              played
 
   --reset-all                Resetting settings and progress
+
+  --ai-debug                 Listen to the AI thinking
 
   --scale SCALE              Scale of UI, if <= 0 default scale apply
 

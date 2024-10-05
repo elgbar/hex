@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Draw island id and ARtB on the island previews when in map editor mode
 * Show strength for each hexagon in map editor mode, and can be toggled in the settings
 * Add debug option to show strength hint for all player territories
+* Add program flag `--ai-debug` to print what the AI is thinking
 
 ### Changed
 
