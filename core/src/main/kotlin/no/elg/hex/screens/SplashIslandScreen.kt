@@ -104,7 +104,7 @@ class SplashIslandScreen(val metadata: FastIslandMetadata, var island: Island? =
     }
 
     fun createIslandScreen(metadata: FastIslandMetadata, island: Island) =
-      if (Hex.args.mapEditor) {
+      if (Hex.mapEditor) {
         MapEditorScreen(metadata, island)
       } else {
         PlayableIslandScreen(metadata, island)

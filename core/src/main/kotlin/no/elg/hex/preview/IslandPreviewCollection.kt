@@ -47,7 +47,7 @@ class IslandPreviewCollection : Disposable {
 
   fun sortIslands() {
     dirty = false
-    if (!Hex.args.mapEditor) {
+    if (!Hex.mapEditor) {
       synchronized(internalPreviewRendererQueue) {
         fastIslandPreviews.sort()
       }
@@ -122,12 +122,12 @@ class IslandPreviewCollection : Disposable {
           }
 
           PreviewModifier.NOTHING ->
-            if (!Hex.args.mapEditor) {
+            if (!Hex.mapEditor) {
               printText("Round ${island.round}", belowAsset)
             }
         }
 
-        if (Hex.debug && !Hex.args.mapEditor) {
+        if (Hex.debug && !Hex.mapEditor) {
           val aboveAsset = -height / 1.5f
           printText("id ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", aboveAsset)
         }
@@ -142,7 +142,7 @@ class IslandPreviewCollection : Disposable {
     if (Hex.assets.islandFiles.size == 0) {
       if (!Hex.args.`disable-island-loading`) {
         MessagesRenderer.publishError("Failed to find any islands to load")
-        if (Hex.args.mapEditor) {
+        if (Hex.mapEditor) {
           MessagesRenderer.publishWarning("Do you have the correct island symbolic link in the project?")
           MessagesRenderer.publishWarning("There should be a error printed in the gradle logs")
           MessagesRenderer.publishWarning("To fix on windows you can enable Developer Mode")

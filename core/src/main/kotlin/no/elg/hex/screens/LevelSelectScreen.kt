@@ -76,7 +76,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
           drawScreenSprite(Hex.music.iconSelected, Hex.music.icon, PREVIEWS_PER_ROW - 2)
           drawScreenSprite(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
 
-          if (Hex.args.mapEditor) {
+          if (Hex.mapEditor) {
             drawLevelCreationIcon()
           }
         }

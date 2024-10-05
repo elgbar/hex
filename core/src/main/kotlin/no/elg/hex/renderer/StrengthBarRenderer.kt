@@ -43,7 +43,7 @@ class StrengthBarRenderer(val island: Island) : ScissorRenderer() {
     val color = team.color
     val endX = (fboWidth * percent).roundToInt()
 
-    if (currentTeam && !Hex.args.mapEditor) {
+    if (currentTeam && !Hex.mapEditor) {
       Gdx.gl.glScissor(xOffset, (fboHeight * RELATIVE_HIGHLIGHT_BORDER_PERCENT).toInt(), xOffset + endX, fboHeight)
       val highlight = Color.WHITE
       Gdx.gl.glClearColor(highlight.r, highlight.g, highlight.b, 1f)
@@ -83,7 +83,7 @@ class StrengthBarRenderer(val island: Island) : ScissorRenderer() {
   init {
     hexagonChangeListener = SimpleEventListener.create { redrawBar() }
     endTurnListener = SimpleEventListener.create { redrawBar() }
-    visibilityChangedListener = if (Hex.args.mapEditor) {
+    visibilityChangedListener = if (Hex.mapEditor) {
       SimpleEventListener.create {
         redrawBar()
       }

@@ -120,7 +120,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
         ),
         *mapEditorInfo
       )
-    } else if (Hex.args.mapEditor) {
+    } else if (Hex.mapEditor) {
       debugLines = mapEditorInfo
     } else {
       debugLines = emptyArray()
@@ -139,7 +139,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
     if (listener == null) {
       listener = SimpleEventListener.create { updatePercentages() }
     }
-    val showAll = (Hex.debug || Hex.args.mapEditor) && Settings.enableDebugHUD
+    val showAll = (Hex.debug || Hex.mapEditor) && Settings.enableDebugHUD
     if (Settings.showFps || showAll) {
       ScreenRenderer.use {
         fpsText.draw(1, TOP_LEFT)

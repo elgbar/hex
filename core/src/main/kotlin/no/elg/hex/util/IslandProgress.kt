@@ -10,7 +10,7 @@ import no.elg.hex.screens.PreviewIslandScreen
 val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
 fun getPrefName(id: Int, preview: Boolean = false) = "$id${if (preview) "-preview" else ""}"
 fun getIslandProgress(id: Int, preview: Boolean = false): String? {
-  if (Hex.args.mapEditor) {
+  if (Hex.mapEditor) {
     return null
   }
   val pref = getPrefName(id, preview)

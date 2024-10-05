@@ -30,7 +30,7 @@ open class PreviewIslandScreen(val metadata: FastIslandMetadata, val island: Isl
   var tempShowActionToDo: Boolean = false
 
   private val visibleGridSize
-    get() = if (Hex.args.mapEditor) {
+    get() = if (Hex.mapEditor) {
       island.calculateGridSize()
     } else {
       lazyVisibleGridSize

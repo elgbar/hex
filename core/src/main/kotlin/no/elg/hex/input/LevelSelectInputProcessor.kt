@@ -78,7 +78,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     when {
       id == 0 - PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
       id == 1 - PREVIEWS_PER_ROW -> {
-        if (Hex.args.mapEditor) {
+        if (Hex.mapEditor) {
           Hex.screen = LevelCreationScreen()
         } else {
           return false
@@ -89,7 +89,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       id == 3 - PREVIEWS_PER_ROW -> Hex.screen = TutorialScreen()
       id != INVALID_ISLAND_INDEX -> {
         val metadata = FastIslandMetadata.load(id)
-        if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.args.mapEditor) {
+        if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.mapEditor) {
           if (metadata.modifier != PreviewModifier.NOTHING) {
             clearIslandProgress(metadata)
           }
@@ -133,7 +133,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     if (ignoreInput) return false
     when (keycode) {
       Keys.FORWARD_DEL, Keys.DEL -> {
-        if (Hex.args.mapEditor) {
+        if (Hex.mapEditor) {
           val id = getHoveringIslandId()
           if (id == INVALID_ISLAND_INDEX) return false
           Gdx.app.debug("SELECT", "Deleting island $id")

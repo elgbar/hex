@@ -34,8 +34,8 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
 
   private val allowedToDrawInvisible get() = !islandScreen.isPreviewRenderer
   private val shouldDrawEdges get() = Hex.args.`draw-edges` && allowedToDrawInvisible
-  private val shouldDrawInvisible get() = Hex.args.mapEditor && allowedToDrawInvisible
-  private val shouldDrawCurrentTeamHexagons get() = !Hex.args.mapEditor && allowedToDrawInvisible
+  private val shouldDrawInvisible get() = Hex.mapEditor && allowedToDrawInvisible
+  private val shouldDrawCurrentTeamHexagons get() = !Hex.mapEditor && allowedToDrawInvisible
 
   override fun frameUpdate() {
     lineRenderer.use(Filled, islandScreen.camera) {

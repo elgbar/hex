@@ -58,7 +58,7 @@ object Settings {
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)
-  var confirmRestartIsland by PreferenceDelegate(true, priority = 100, shouldHide = { Hex.args.mapEditor }) // does nothing when in map editor
+  var confirmRestartIsland by PreferenceDelegate(true, priority = 100, shouldHide = { Hex.mapEditor }) // does nothing when in map editor
   var allowAIToSurrender by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug })
 
   var enableHoldToMarch by PreferenceDelegate(true, priority = 100)
@@ -128,7 +128,7 @@ object Settings {
     shouldHide = { !Hex.debug }
   )
 
-  var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.args.mapEditor })
+  var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { !Hex.debug })
   var compressExport by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug })
 

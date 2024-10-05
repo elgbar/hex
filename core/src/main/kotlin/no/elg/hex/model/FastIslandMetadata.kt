@@ -67,7 +67,7 @@ class FastIslandMetadata(
     require(id >= 0) { "Island id must be positive, is $id" }
     requireNotNull(previewPixmap) { "A preview have not been generated" }
     requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
-    if (Hex.args.mapEditor) {
+    if (Hex.mapEditor) {
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
 
       val fileHandle = getFileHandle(id, true)
@@ -131,7 +131,7 @@ class FastIslandMetadata(
     }
 
     fun load(id: Int): FastIslandMetadata {
-      val savedMetadata = if (Hex.args.mapEditor || !islandPreferences.contains(getMetadataFileName(id))) {
+      val savedMetadata = if (Hex.mapEditor || !islandPreferences.contains(getMetadataFileName(id))) {
         loadInitial(id)
       } else {
         loadProgress(id)

@@ -53,7 +53,7 @@ class HexagonData(
       }
     }
 
-  var team: Team = team ?: if (Hex.args.mapEditor) Team.entries.toTypedArray().random() else Team.STONE
+  var team: Team = team ?: if (Hex.mapEditor) Team.entries.toTypedArray().random() else Team.STONE
     set(value) {
       if (field === value) return
 

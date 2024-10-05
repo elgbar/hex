@@ -89,7 +89,7 @@ sealed class Piece {
    * @return If the placement was successful
    */
   open fun place(onto: HexagonData): Boolean {
-    return if (Hex.args.mapEditor || onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }) {
+    return if (Hex.mapEditor || onto.piece is Empty || canBePlacedOn.any { it.isInstance(onto.piece) }) {
       true
     } else {
       Gdx.app.debug("${this::class.simpleName}-${this::place.name}") {

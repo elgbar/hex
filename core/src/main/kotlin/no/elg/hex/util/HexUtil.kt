@@ -35,7 +35,7 @@ import kotlin.reflect.KClass
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
   return hexagon.satelliteData.orElseGet {
-    (if (isEdgeHexagon(hexagon) || !Hex.args.mapEditor) EDGE_DATA else HexagonData(disabled = true, Team.EARTH)).also {
+    (if (isEdgeHexagon(hexagon) || !Hex.mapEditor) EDGE_DATA else HexagonData(disabled = true, Team.EARTH)).also {
       hexagon.setSatelliteData(it)
     }
   }
@@ -54,7 +54,7 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
   return this.grid.getByPixelCoordinate(x, y).let {
     if (it.isEmpty()) return@let null
     val data = this.getData(it.get())
-    if (data.edge || (!Hex.args.mapEditor && data.invisible)) null else it.get()
+    if (data.edge || (!Hex.mapEditor && data.invisible)) null else it.get()
   }
 }
 

@@ -525,7 +525,7 @@ class Assets : AssetManager() {
     Hex.platform.version?.also { v ->
       title += " v$v"
     }
-    if (Hex.args.mapEditor) {
+    if (Hex.mapEditor) {
       title += " - Map Editor"
     }
     if (Hex.args.trace) {
