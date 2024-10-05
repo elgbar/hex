@@ -18,13 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Sort islands without ARtB by their id in ascending order
-* Change color of boxes on the level select screen
-* Show island info on map editor screen
-* Show the number of rounds it took for AI to be done with a map
+* Change color of boxes in the level select screen based on the ARtB
+* Show more info about the current island and hovered hexagon when in map editor mode
+* Show the number of rounds it took for AI to be done with a map on the island preview
 * Do not render the ARtB and id on the preview
   * Instead, render it dynamically and show it when in debug or in map editor
 * Always allow surrendering when there is AIs playing against each other
-* Do not go out of the settings screen when resetting
+* Remain in the settings screen when resetting setting/progress
 * Tune AI
   *  Prioritize attacking hexagons that are a part of a territory
 
