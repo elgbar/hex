@@ -427,12 +427,15 @@ class Island(
    *
    * @return The territory the hexagon is part of or `null` if no capital can be found
    */
-  fun findTerritory(hexagon: Hexagon<HexagonData>): Territory? {
+  fun findTerritory(maybeHex: Hexagon<HexagonData>?): Territory? {
+    val hexagon = maybeHex ?: return null
     val territoryHexes = getTerritoryHexagons(hexagon) ?: return null
 
     val capital = findCapital(territoryHexes)
     return if (capital != null) Territory(this, capital, territoryHexes) else null
   }
+
+  fun isInTerritory(hexagon: Hexagon<HexagonData>): Boolean = connectedTerritoryHexagons(hexagon).size >= MIN_HEX_IN_TERRITORY
 
   /**
    * Finds the best capital of the collection of hexagons.

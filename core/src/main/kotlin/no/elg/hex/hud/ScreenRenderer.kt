@@ -253,6 +253,32 @@ fun <T : Any> prefixText(
   }
 }
 
+fun <T : Any> prefixNullableText(
+  prefix: String,
+  callable: () -> T?,
+  prefixColor: Color = WHITE,
+  variableColor: Color = YELLOW,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  next: ScreenText? = null,
+  format: (ScreenText.(T) -> String)? = null
+): ScreenText {
+  return staticTextPool.obtain().also {
+    it.text = prefix
+    it.color = prefixColor
+    it.bold = bold
+    it.italic = italic
+    it.next = nullCheckedText(
+      callable = callable,
+      bold = bold,
+      italic = italic,
+      color = variableColor,
+      format = format,
+      next = next
+    )
+  }
+}
+
 private val nullText = StaticScreenText("null", color = RED)
 
 fun nullText() = nullText
