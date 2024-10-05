@@ -17,7 +17,9 @@ import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.SplashIslandScreen
 
 fun getIslandFileName(id: Int, preview: Boolean = false): String {
-  return "${if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR}/island-$id.${if (preview) "png" else ISLAND_FILE_ENDING}"
+  val dir = if (preview) ISLAND_PREVIEWS_DIR else ISLAND_SAVES_DIR
+  val ending = if (preview) "png" else ISLAND_FILE_ENDING
+  return "$dir/island-$id.$ending"
 }
 
 fun getIslandFile(id: Int, preview: Boolean = false, allowInternal: Boolean = true): FileHandle {
@@ -36,7 +38,6 @@ fun getIslandFile(path: String, allowInternal: Boolean): FileHandle {
   }
 }
 
-fun play(id: UInt, island: Island? = null): Boolean = play(FastIslandMetadata(id.toInt()), island)
 fun play(metadata: FastIslandMetadata, island: Island? = null): Boolean {
   if (SplashIslandScreen.loading) {
     publishWarning("Already loading an island!")

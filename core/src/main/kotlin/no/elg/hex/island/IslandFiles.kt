@@ -37,7 +37,8 @@ class IslandFiles {
 
       var nonExistentFilesInRow = 0
       for (id in 0..Int.MAX_VALUE) {
-        val file = getIslandFile(id, allowInternal = !Hex.mapEditor)
+        val fileName = getIslandFileName(id)
+        val file = getIslandFile(fileName, allowInternal = !Hex.mapEditor)
         if (file.exists()) {
           if (file.isDirectory) continue
           if (nonExistentFilesInRow > 0) {
@@ -45,7 +46,6 @@ class IslandFiles {
               "Missing the islands ${(id - nonExistentFilesInRow until id).map { getIslandFileName(it) }}"
             }
           }
-          val fileName = getIslandFileName(id)
           Gdx.app.trace(TAG) { "Found island $fileName" }
           nonExistentFilesInRow = 0
 
