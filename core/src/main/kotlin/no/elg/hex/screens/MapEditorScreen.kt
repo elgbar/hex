@@ -125,27 +125,30 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
            the difficulty  of the level.
           """.trimIndent()
         )
-        visLabel(
-          """
-           Previous ARtB: ${metadata.authorRoundsToBeat}
-           $UNKNOWN_ROUNDS_TO_BEAT = not played, ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
-           $NEVER_BEATEN = never beaten
-          """.trimIndent()
-        )
-        row()
-        spinner("", artbSpinner) {
-          textFieldEventPolicy = Spinner.TextFieldEventPolicy.ON_KEY_TYPED
-          onChange {
-            val parsedInt = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
-            metadata.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
-          }
-          it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
-        }
+
+            visLabel(
+              """
+               Previous ARtB: ${metadata.authorRoundsToBeat}
+               $UNKNOWN_ROUNDS_TO_BEAT = not played
+               ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
+               $NEVER_BEATEN = never beaten
+              """.trimIndent()
+            )
+            row()
+            spinner("ARtB", artbSpinner) {
+              textFieldEventPolicy = Spinner.TextFieldEventPolicy.ON_KEY_TYPED
+              onChange {
+                val parsedInt = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
+                metadata.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
+              }
+              it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
+            }
+        pack()
+        keepWithinStage()
         pack()
       }.also {
         editorsWindows[it] = {
-          centerWindow()
-          setPosition(0f, y * 3f / 2f)
+          setPosition(Gdx.graphics.width.toFloat() - MIN_DIST_FROM_EDGE - width, MIN_DIST_FROM_EDGE)
         }
       }
 
@@ -222,7 +225,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
         title = "Team",
         items = listOf(Team.entries),
         stringifyItem = { it.name.lowercase() },
-        onResize = { setPosition(0f, y) },
+        onResize = { setPosition(MIN_DIST_FROM_EDGE, y) },
         onButtonClick = {
           this@MapEditorScreen.selectedTeam = it
           this@MapEditorScreen.editor = TeamEditor.SetTeam
@@ -234,7 +237,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
         title = "Piece",
         items = PIECES_ORGANIZED,
         stringifyItem = { it.simpleName ?: it.jvmName },
-        onResize = { setPosition(0f, y / 2) },
+        onResize = { setPosition(MIN_DIST_FROM_EDGE, y / 2) },
         onButtonClick = {
           this@MapEditorScreen.selectedPiece = it
           this@MapEditorScreen.editor = PieceEditor.SetPiece
@@ -246,7 +249,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
         title = "Editors",
         items = editorsList,
         stringifyItem = { it::class.simpleName ?: it::class.jvmName },
-        onResize = { setPosition(parent.width, 0f) },
+        onResize = { setPosition(MIN_DIST_FROM_EDGE, MIN_DIST_FROM_EDGE) },
         onButtonClick = { this@MapEditorScreen.editor = it },
         onOtherClicked = { item, button ->
           button.isDisabled = item == this@MapEditorScreen.editor
@@ -411,5 +414,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
   companion object {
     const val MAX_BRUSH_SIZE = 10
     const val MIN_BRUSH_SIZE = 1
+
+    const val MIN_DIST_FROM_EDGE = 5f
   }
 }

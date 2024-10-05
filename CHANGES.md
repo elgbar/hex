@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Win text on the islands preview was worded differently to the other results
 * Fix AI not calculating the strength of attackable territories correctly
 * Fix click were going through windows in map editor
+* Move windows in map editor a bit from the edge
 
 ### Removed
 
