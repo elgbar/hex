@@ -21,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Change color of boxes on the level select screen
 * Show island info on map editor screen
 * Show the number of rounds it took for AI to be done with a map
-* Show map ARtB status when in map editor mode
+* Do not render the ARtB and id on the preview
+  * Instead, render it dynamically and show it when in debug or in map editor
 * Always allow surrendering when there is AIs playing against each other
 * Do not go out of the settings screen when resetting
 * Tune AI

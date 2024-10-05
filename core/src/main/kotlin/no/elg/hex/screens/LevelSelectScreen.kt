@@ -111,7 +111,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
             color?.let { drawBox(x, y, width, height, it) }
           }
 
-          if (Hex.mapEditor) {
+          if (Hex.mapEditor || Hex.debug) {
             layout.setText(Hex.assets.regularItalicFont, "id: ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.center, true)
             Hex.assets.regularItalicFont.draw(batch, layout, x, y + height - Hex.assets.regularItalicFont.lineHeight * 2)
           }

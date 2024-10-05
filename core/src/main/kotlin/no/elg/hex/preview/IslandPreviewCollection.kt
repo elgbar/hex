@@ -126,11 +126,6 @@ class IslandPreviewCollection : Disposable {
               printText("Round ${island.round}", belowAsset)
             }
         }
-
-        if (Hex.debug && !Hex.mapEditor) {
-          val aboveAsset = -height / 1.5f
-          printText("id ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", aboveAsset)
-        }
       }
       Hex.setClearColorAlpha(1f)
     }
