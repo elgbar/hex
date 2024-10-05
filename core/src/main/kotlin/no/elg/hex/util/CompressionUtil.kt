@@ -20,18 +20,14 @@ fun compressB85(text: String): String? {
   }
 }
 
-fun decompressB85(b64Compressed: String): String? {
+fun decompressB85(b85Compressed: String): String? {
   if (Settings.compressExport) {
-    val decompressed = decompressB85ByteArray(b64Compressed) ?: return null
+    val decoded = Base85.getZ85Decoder().decode(b85Compressed.toByteArray(US_ASCII))
+    val decompressed = decompress(decoded) ?: return null
     return String(decompressed, UTF_8)
   } else {
-    return b64Compressed
+    return b85Compressed
   }
-}
-
-fun decompressB85ByteArray(b64Compressed: String): ByteArray? {
-  val decoded = Base85.getZ85Decoder().decode(b64Compressed.toByteArray(US_ASCII))
-  return decompress(decoded)
 }
 
 fun compress(bArray: ByteArray): ByteArray? =
