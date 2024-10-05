@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Show map ARtB status when in map editor mode
 * Always allow surrendering when there is AIs playing against each other
 * Do not go out of the settings screen when resetting
+* Tune AI
+  *  Prioritize attacking hexagons that are a part of a territory
 
 ### Fixed
 

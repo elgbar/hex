@@ -72,7 +72,7 @@ class NotAsRandomAI(
 ) : AI {
 
   private val tag = "NARAI-$team"
-  
+
   private fun think(words: () -> String) {
     if (Hex.args.`ai-debug`) {
       Gdx.app.info(tag, message = words)
@@ -235,11 +235,23 @@ class NotAsRandomAI(
           think { "I can attack an enemy hexagon with this piece" }
 
           fun tryAttack(type: KClass<out Piece>): Hexagon<HexagonData>? {
-            val attackableOfType =
-              attackableHexes.filter { type.isInstance(island.getData(it).piece) }
+            val attackableOfType = attackableHexes.filter { type.isInstance(island.getData(it).piece) }
             if (attackableOfType.isNotEmpty()) {
-              think { "Will attack a ${type.simpleName}" }
-              return attackableOfType.random()
+              think { "Will attack a ${type.simpleName} (there are ${attackableOfType.size} alternatives)" }
+              val (hexagonsInTerritory, hexagonsNotInTerritory) = attackableOfType.partition { island.isInTerritory(it) }
+              think {
+                "Out of the ${attackableOfType.size} alternatives, ${hexagonsInTerritory.size} hexagons are in a territory, " +
+                  "and hexagons ${hexagonsNotInTerritory.size} are not in a territory "
+              }
+              if (hexagonsInTerritory.isNotEmpty()) {
+                think { "Found ${hexagonsInTerritory.size} attackable hexagons in a territory, will try to attack the hexagon with the highest possible defence" }
+                val mostDefendedHex = hexagonsInTerritory.maxBy { island.calculateStrength(it, island.getData(it).team) }
+                think { "The most defended attackable hexagon is ${mostDefendedHex.coordinates}" }
+                return mostDefendedHex
+              } else {
+                think { "None of the attackable hexagons are in a territory, will attack a random hexagon not in a territory" }
+                return hexagonsNotInTerritory.random()
+              }
             }
             think { "Cannot find any ${type.simpleName} to attack" }
             return null
@@ -254,7 +266,7 @@ class NotAsRandomAI(
                 island.getData(hex).team == territory.team
               }
           }
-          think { "Is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.coordinates})" }
+          think { "Before attacking: is there a nearby friendly territory? ${connectingHex != null} (${connectingHex?.coordinates})" }
 
           return@run connectingHex
             ?: tryAttack(Capital::class)
@@ -369,7 +381,7 @@ class NotAsRandomAI(
       }
 
       val mergedType = mergedType(piece, handPiece).createHandInstance()
-      val canMergedAttackAnything = canPieceAttack(territory, mergedType)
+      val canMergedAttackAnything = canPieceAttackOrCutDownTree(territory, mergedType)
       val canAttack = !piece.moved && !handPiece.moved && canMergedAttackAnything
 
       // If we have not yet placed the held piece (ie directly merging it) we do not pay upkeep on it
@@ -519,20 +531,20 @@ class NotAsRandomAI(
     return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) }
   }
 
-  private fun canPieceAttack(territory: Territory, piece: LivingPiece): Boolean {
+  private fun canPieceAttackOrCutDownTree(territory: Territory, piece: LivingPiece): Boolean {
     return territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, piece) } ||
       territory.hexagons.any { hex -> territory.island.getData(hex).piece is TreePiece }
   }
 
   private fun canAttackOrMergePiece(territory: Territory, piece: LivingPiece): Boolean {
-    if (canPieceAttack(territory, piece)) {
+    if (canPieceAttackOrCutDownTree(territory, piece)) {
       return true
     }
     val mergeWith = bestPieceToMergeWith(territory, piece) ?: return false
     val mergePiece = territory.island.getData(mergeWith).piece
     require(mergePiece is LivingPiece) { "Merge piece is not a living piece" }
     val mergedType = mergedType(piece, mergePiece).createHandInstance()
-    return canPieceAttack(territory, mergedType)
+    return canPieceAttackOrCutDownTree(territory, mergedType)
   }
 
   private fun existsEmptyHexagon(territory: Territory): Boolean {
@@ -548,7 +560,7 @@ class NotAsRandomAI(
     return territory.capital.canBuy(piece) && isEconomicalToCreatePiece(
       newBalance,
       newIncome,
-      canPieceAttack(territory, piece)
+      canPieceAttackOrCutDownTree(territory, piece)
     )
   }
 
