@@ -14,6 +14,7 @@ import ktx.actors.isShown
 import ktx.actors.minusAssign
 import ktx.actors.onChange
 import ktx.actors.onClick
+import ktx.actors.onClickEvent
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
 import ktx.scene2d.actors
@@ -190,7 +191,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
               visTextButton(stringifyItem(item).toTitleCase(), style = "mapeditor-editor-item") {
                 pad(5f)
                 editorsButtons += { onOtherClicked(item, this) }
-                onClick {
+                onClickEvent { _ ->
                   lastChecked?.isDisabled = false
                   this.isDisabled = true
                   lastChecked = this
