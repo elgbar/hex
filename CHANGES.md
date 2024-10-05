@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Toggle music button was disabled when island interaction was disabled
 * Fix UI sometimes lagging when fading in windows
 * Win text on the islands preview was worded differently to the other results
+* Fix AI not calculating the strength of attackable territories correctly
 
 ### Removed
 

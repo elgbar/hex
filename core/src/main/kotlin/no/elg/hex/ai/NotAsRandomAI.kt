@@ -267,7 +267,7 @@ class NotAsRandomAI(
 
             ?: tryAttack(TreePiece::class)
             // Take over territory which is well defended, also helps with mass attacks
-            ?: attackableHexes.maxByOrNull { island.calculateStrength(it, territory.team) }
+            ?: attackableHexes.maxByOrNull { island.calculateStrength(it, island.getData(it).team) }
             ?: attackableHexes.random()
         }
 
