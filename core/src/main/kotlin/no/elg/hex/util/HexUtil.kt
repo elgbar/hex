@@ -204,8 +204,12 @@ fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canA
 inline fun Island.filterByData(crossinline filter: (data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
   visibleHexagons.asSequence().filter { hexagon -> filter(getData(hexagon)) }
 
-inline fun <reified T : Piece> Island.filterIsPiece(): Sequence<Hexagon<HexagonData>> =
-  visibleHexagons.asSequence().filter { hexagon -> getData(hexagon).piece is T }
+inline fun <reified T : Piece> Island.filterIsPiece(): Sequence<Hexagon<HexagonData>> = visibleHexagons.asSequence().filterIsPiece<T>(this)
+inline fun <reified T : Piece> Territory.filterIsPiece(): Sequence<Hexagon<HexagonData>> = hexagons.asSequence().filterIsPiece<T>(island)
+inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsPiece(island: Island): Sequence<Hexagon<HexagonData>> =
+  filter { hexagon -> island.getData(hexagon).piece is T }
+inline fun <reified T : Piece> Collection<Hexagon<HexagonData>>.filterIsPiece(island: Island): Collection<Hexagon<HexagonData>> =
+  filter { hexagon -> island.getData(hexagon).piece is T }
 
 inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {
   for (hexagon in visibleHexagons) {
@@ -325,7 +329,7 @@ fun Island.fill(team: Team) {
       data.setPiece<Empty>()
     }
   }
-  findCapital(visibleHexagons)
+  findOrCreateCapital(visibleHexagons)
   select(null)
 }
 
