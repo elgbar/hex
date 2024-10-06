@@ -435,8 +435,6 @@ class Island(
     return Territory(this, getData(capitalHex).piece as Capital, territoryHexes, capitalHex)
   }
 
-  fun isInTerritory(hexagon: Hexagon<HexagonData>): Boolean = connectedTerritoryHexagons(hexagon).size >= MIN_HEX_IN_TERRITORY
-
   /**
    * Finds the best capital of the collection of hexagons.
    * This method assumes all hexagons are within the same team, no checks will be done in this regard.

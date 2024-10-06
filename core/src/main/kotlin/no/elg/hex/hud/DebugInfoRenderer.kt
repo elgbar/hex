@@ -17,6 +17,7 @@ import no.elg.hex.hud.ScreenRenderer.drawAll
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
+import no.elg.hex.util.isPartOfATerritory
 import kotlin.collections.component1
 import kotlin.collections.component2
 
@@ -75,7 +76,7 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUp
           next = StaticScreenText(
             " in territory? ",
             next = booleanText(
-              callable = { basicInputHandler.cursorHex?.let { island.isInTerritory(it) } == true },
+              callable = { basicInputHandler.cursorHex?.isPartOfATerritory(island) == true },
               next = prefixNullableText(
                 prefix = " strength ",
                 callable = basicInputHandler::cursorHex,

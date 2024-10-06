@@ -238,7 +238,7 @@ class NotAsRandomAI(
             val attackableOfType = attackableHexes.filter { type.isInstance(island.getData(it).piece) }
             if (attackableOfType.isNotEmpty()) {
               think { "Will attack a ${type.simpleName} (there are ${attackableOfType.size} alternatives)" }
-              val (hexagonsInTerritory, hexagonsNotInTerritory) = attackableOfType.partition { island.isInTerritory(it) }
+              val (hexagonsInTerritory, hexagonsNotInTerritory) = attackableOfType.partition { it.isPartOfATerritory(island) }
               think {
                 "Out of the ${attackableOfType.size} alternatives, ${hexagonsInTerritory.size} hexagons are in a territory, " +
                   "and hexagons ${hexagonsNotInTerritory.size} are not in a territory "
