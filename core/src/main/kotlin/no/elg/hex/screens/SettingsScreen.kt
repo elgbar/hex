@@ -324,19 +324,27 @@ class SettingsScreen : OverlayScreen() {
             }
           }
 
-        Int::class ->
-          spinner("", IntSpinnerModel(property.get(Settings) as Int, Int.MIN_VALUE, Int.MAX_VALUE)) {
+        Int::class, Long::class -> {
+          fun propToInt(): Int = (property.get(Settings) as Number).toInt()
+          spinner("", IntSpinnerModel(propToInt(), Int.MIN_VALUE, Int.MAX_VALUE)) {
             commonStyle(it)
             val intModel = model as IntSpinnerModel
 
             isProgrammaticChangeEvents = false
-            readSetting = { intModel.value = property.get(Settings) as Int }
+            readSetting = {
+              intModel.value = propToInt()
+            }
             writeSetting = {
-              property.set(Settings, intModel.value)
+              if (clazz == Long::class) {
+                property.set(Settings, intModel.value.toLong())
+              } else {
+                property.set(Settings, intModel.value)
+              }
               readSetting()
               restartLabel.fire(ChangeEvent())
             }
           }
+        }
 
         Float::class, Double::class ->
           spinner(
