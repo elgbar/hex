@@ -106,16 +106,6 @@ class NotAsRandomAI(
     strengthUsable[str - 1] = false
   }
 
-  private val buyablePieces =
-    arrayOf(
-      Castle::class,
-      Peasant::class,
-      Peasant::class
-//      Spearman::class,
-//      Knight::class,
-//      Baron::class,
-    )
-
   override suspend fun action(island: Island, gameInteraction: GameInteraction) {
     val capitals = island.filterIsPiece<Capital>(team)
     for (capitalHexagon in capitals) {
@@ -166,6 +156,7 @@ class NotAsRandomAI(
     }
 
     if (hexPickupPritoryList.isNotEmpty()) {
+      @Suppress("NewApi")
       val hex = hexPickupPritoryList.removeLast()
       think(territory) {
         val data = island.getData(hex)
@@ -176,13 +167,10 @@ class NotAsRandomAI(
     }
 
     // hexagons we can pick up pieces from
-    val pickUpHexes =
-      HashSet<Hexagon<HexagonData>>(
-        territory.hexagons.filter {
-          val piece = island.getData(it).piece
-          piece is LivingPiece && !piece.moved && it !in hexBlacklist && canUseStrength(piece.strength)
-        }
-      )
+    val pickUpHexes = territory.hexagons.filter {
+      val piece = island.getData(it).piece
+      piece is LivingPiece && !piece.moved && it !in hexBlacklist && canUseStrength(piece.strength)
+    }.toSet()
 
     // only buy if there are no more units to move
     val isHolding = if (pickUpHexes.isNotEmpty()) {
@@ -199,11 +187,12 @@ class NotAsRandomAI(
 
   private fun buy(territory: Territory, gameInteraction: GameInteraction): Boolean {
     val pieceToBuy = run {
-      if (allowedToBuyCastle(territory) && shouldBuyCastle() && existsEmptyHexagon(territory) && territory.capital.canBuy(Castle::class)) {
+      if (allowedToBuyCastle(territory.island.round) && shouldBuyCastle() && territory.capital.canBuy<Castle>() && existsEmptyHexagon(territory)) {
         // No upkeep for castles so as long as there is an empty hexagon, we can buy a castle
         return@run Castle::class.createHandInstance()
       } else {
-        for (living in LivingPiece::class.sealedSubclasses.map { it.createHandInstance() }.sortedBy { it.strength }) {
+        for (livingClass in LivingPiece.subclassedSortedByStrength) {
+          val living = livingClass.createHandInstance()
           if (isEconomicalToBuyPiece(territory, living) && canAttackOrMergePiece(territory, living)) {
             // If we can do something with a lower strength piece, then it is preferred
             return@run living
@@ -242,12 +231,8 @@ class NotAsRandomAI(
       think(territory) { "Best placement for this castle is ${hexagon.coordinates}" }
       gameInteraction.click(hexagon)
     } else if (handPiece is LivingPiece) {
-      val (mustAttackTrees, mehAttackTrees) =
-        territory.hexagons.filter {
-          val piece = island.getData(it).piece
-          piece is TreePiece
-        }.partition {
-          val piece = island.getData(it).piece as TreePiece
+      val (mustAttackTrees, mehAttackTrees) = territory.filterIsPiece<TreePiece>().partition {
+        val piece = island.getData(it).piece as TreePiece
         // Only care about trees that will spread in our territory
         piece.propagateCandidates(island, it).any { hex -> hex in territory.hexagons }
       }
@@ -318,7 +303,7 @@ class NotAsRandomAI(
           return@run mehAttackTrees.random()
         }
 
-        val graveHexagons = territory.hexagons.filter { island.getData(it).piece is Grave }
+        val graveHexagons = territory.filterIsPiece<Grave>().toSet()
         if (graveHexagons.isNotEmpty()) {
           think(territory) { "But there is a hexagon in my territory with a grave, lets clean it up early" }
           return@run graveHexagons.random()
@@ -328,7 +313,7 @@ class NotAsRandomAI(
         if (mergeHex != null) {
           think(territory) { "Merging hand with ${island.getData(mergeHex).piece}" }
           resetBlacklists()
-          hexPickupPriorityList += mergeHex
+          hexPickupPritoryList += mergeHex
           return@run mergeHex
         } else {
           think(territory) { "Found no acceptable pieces to merge held item with" }
@@ -357,8 +342,8 @@ class NotAsRandomAI(
    *  UTILITY METHODS
    * *************************************************************************/
 
-  private fun allowedToBuyCastle(territory: Territory): Boolean {
-    return territory.island.round > castleDelay
+  private fun allowedToBuyCastle(round: Int): Boolean {
+    return round > castleDelay
   }
 
   private fun shouldBuyCastle(): Boolean {
@@ -379,8 +364,8 @@ class NotAsRandomAI(
       }
     }
 
-    val knights = territory.hexagons.count { territory.island.getData(it).piece is Knight }
-    val barons = territory.hexagons.count { territory.island.getData(it).piece is Baron }
+    val knights = territory.filterIsPiece<Knight>().count()
+    val barons = territory.filterIsPiece<Baron>().count()
 
     think(territory) { "There are $knights knights and $barons barons in this territory" }
 
@@ -531,8 +516,8 @@ class NotAsRandomAI(
         .filter {
           val data = island.getData(it)
           data.team == team &&
-            island.calculateStrength(it) > selectedStrength &&
-            data.piece is Empty
+            data.piece is Empty &&
+            island.calculateStrength(it) > selectedStrength
         }
         .maxByOrNull { island.calculateStrength(it) }
       think(territory) {
@@ -561,7 +546,7 @@ class NotAsRandomAI(
 
   private fun canPieceAttackOrCutDownTree(territory: Territory, piece: LivingPiece): Boolean {
     return territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, piece) } ||
-      territory.hexagons.any { hex -> territory.island.getData(hex).piece is TreePiece }
+      territory.filterIsPiece<TreePiece>().any()
   }
 
   private fun canAttackOrMergePiece(territory: Territory, piece: LivingPiece): Boolean {
@@ -575,11 +560,7 @@ class NotAsRandomAI(
     return canPieceAttackOrCutDownTree(territory, mergedType)
   }
 
-  private fun existsEmptyHexagon(territory: Territory): Boolean {
-    return territory.hexagons.any {
-      territory.island.getData(it).piece is Empty
-    }
-  }
+  private fun existsEmptyHexagon(territory: Territory): Boolean = territory.filterIsPiece<Empty>().any()
 
   private fun isEconomicalToBuyPiece(territory: Territory, piece: LivingPiece): Boolean {
     // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
@@ -593,7 +574,6 @@ class NotAsRandomAI(
   }
 
   companion object {
-    const val BUY_CASTLE_CHANCE = 1.0 / 10.0
 
     const val MAX_TOTAL_BARONS = 5
     const val MAX_TOTAL_KNIGHTS = 15

@@ -65,8 +65,8 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
           if (hand != null && hand.piece is LivingPiece) {
             elapsedAnimationTime += Gdx.graphics.deltaTime
             val attackableLineWidth = attackableAnimation.getKeyFrame(elapsedAnimationTime)
-            val hexes = it.enemyBorderHexes.filter { hex -> island.canAttack(hex, hand.piece) }
-            drawOutLines(hexes, attackableLineWidth) { hexagon, target ->
+            val attackableHexes = it.enemyBorderHexes.filter { hex -> island.canAttack(hex, hand.piece) }
+            drawOutLines(attackableHexes, attackableLineWidth) { hexagon, target ->
               val str = island.calculateStrength(hexagon)
               target.set(attackColor(hand.piece.strength - str))
             }

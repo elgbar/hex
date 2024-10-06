@@ -270,7 +270,7 @@ class Capital(
 
   fun calculateIncome(hexagons: Iterable<Hexagon<HexagonData>>, island: Island) = hexagons.sumOf { island.getData(it).piece.income }
 
-  fun canBuy(piece: KClass<out Piece>): Boolean = canBuy(piece.createHandInstance())
+  inline fun <reified T : Piece> canBuy(): Boolean = canBuy(T::class.createHandInstance())
 
   fun canBuy(piece: Piece): Boolean = balance >= piece.price
 
@@ -495,6 +495,11 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
 
   companion object {
     val PLACEABLE_CLASSES = arrayOf(LivingPiece::class, StationaryPiece::class)
+
+    /**
+     * Sorted list of all subclasses of [LivingPiece] sorted by strength
+     */
+    val subclassedSortedByStrength: List<KClass<out LivingPiece>> = LivingPiece::class.sealedSubclasses.sortedBy { it.createHandInstance().strength }
   }
 }
 
