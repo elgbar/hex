@@ -5,10 +5,14 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.debug
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * @author Elg
  */
+@OptIn(ExperimentalContracts::class)
 class IslandHistory(val island: Island) {
 
   private val history = ArrayDeque<IslandDto>()
@@ -20,7 +24,6 @@ class IslandHistory(val island: Island) {
    * If [remember] will record any remember request.
    */
   var enabled = true
-    private set
   val disabled get() = !enabled
 
   /**
@@ -44,9 +47,11 @@ class IslandHistory(val island: Island) {
   /**
    * Record the events within the [event] scope as a single event. Will call [remember] after [event]
    */
-  fun remember(note: String, event: () -> Unit) {
-    ignore(event)
-    remember(note)
+  inline fun <R> remember(note: String, event: () -> R): R {
+    contract { callsInPlace(event, InvocationKind.EXACTLY_ONCE) }
+    return ignore(event).also {
+      remember(note)
+    }
   }
 
   fun remember(note: String) {
@@ -66,11 +71,13 @@ class IslandHistory(val island: Island) {
   /**
    * Ignore anything that happens within [event]
    */
-  fun ignore(event: () -> Unit) {
+  inline fun <R> ignore(event: () -> R): R {
+    contract { callsInPlace(event, InvocationKind.EXACTLY_ONCE) }
     val wasRemembering = enabled
     enabled = false
-    event()
-    enabled = wasRemembering // only re-enable if it was enabled before
+    return event().also {
+      enabled = wasRemembering // only re-enable if it was enabled before
+    }
   }
 
   fun canUndo(): Boolean = (historyPointer + 1) in history.indices
