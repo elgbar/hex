@@ -46,6 +46,7 @@ class HexagonData(
   @JsonAlias("isOpaque")
   override var isDisabled: Boolean = disabled
     set(disable) {
+      require(Hex.mapEditor) { "Cannot disable hexagons in game" }
       if (field != disable) {
         field = disable
         Hex.island?.updateHexagonVisibility(this)

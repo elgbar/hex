@@ -201,6 +201,12 @@ fun Island.ensureCapitalStartFunds() {
 fun Island.canAttack(hexagon: Hexagon<HexagonData>, strength: Int): Boolean = strength > min(calculateStrength(hexagon), KNIGHT_STRENGTH)
 fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canAttack(hexagon, with.strength)
 
+inline fun Island.filterByData(crossinline filter: (data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
+  visibleHexagons.asSequence().filter { hexagon -> filter(getData(hexagon)) }
+
+inline fun <reified T : Piece> Island.filterIsPiece(): Sequence<Hexagon<HexagonData>> =
+  visibleHexagons.asSequence().filter { hexagon -> getData(hexagon).piece is T }
+
 inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {
   for (hexagon in visibleHexagons) {
     val data = getData(hexagon)
@@ -351,7 +357,7 @@ fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
 
       val territory = findTerritory(hexagon)
       if (territory == null) {
-        Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
+        Gdx.app.error("ISLAND", "Hexagon ${hexagon.coordinates} is not a part of a territory!")
         return@filter false
       }
       val cannotBuyAndAttackAnything = territory.enemyBorderHexes.none { hex -> canAttack(hex, strength) }
@@ -367,7 +373,7 @@ fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
 
       val territory = findTerritory(hexagon)
       if (territory == null) {
-        Gdx.app.error("ISLAND", "Hexagon ${hexagon.id} is not a part of a territory!")
+        Gdx.app.error("ISLAND", "Hexagon ${hexagon.coordinates} is not a part of a territory!")
         return@filter false
       }
       val canNotAttackAnything = territory.enemyBorderHexes.none { hex -> canAttack(hex, piece) }
@@ -375,9 +381,11 @@ fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
         val terrPiece = getData(it).piece
         return@none if (terrPiece === piece) {
           false // can never merge with self
+        } else if (terrPiece is TreePiece) {
+          true // can always cut down trees
         } else {
-          val affordableMerge = terrPiece is LivingPiece && piece.canMerge(terrPiece) && mergedType(piece, terrPiece).createHandInstance().price <= territory.capital.income
-          affordableMerge || terrPiece is TreePiece
+          // Check if we can and should merge with the pieces
+          terrPiece is LivingPiece && piece.canMerge(terrPiece) && mergedType(piece, terrPiece).createHandInstance().price <= territory.capital.income
         }
       }
       if (canNotAttackAnything && canNotMergeWithOtherPieceOrChopTree) {

@@ -45,6 +45,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     if ((oldTerritory == null || !oldTerritory.hexagons.contains(hexagon)) && cursorHexData.team == island.currentTeam) {
       if (hexagon.isPartOfATerritory(island)) {
         island.select(hexagon)
+        // Do not return to allow the player to pick up a piece
       } else {
         playBadClick()
         return false

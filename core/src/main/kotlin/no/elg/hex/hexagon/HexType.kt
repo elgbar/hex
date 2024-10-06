@@ -141,7 +141,7 @@ enum class HexType(private vararg val surfaces: Surface) {
     Surface(6, 3, 4, 0.98f)
   );
 
-  fun render(verticesRenderer: VerticesRenderer, color: Color, hexagon: Hexagon<HexagonData>, brightness: Float = 1f) {
+  fun render(verticesRenderer: VerticesRenderer, color: Color, hexagon: Hexagon<HexagonData>) {
     for ((i, element) in hexagon.vertices.withIndex()) {
       points[i] = element.toFloat()
     }
@@ -151,7 +151,7 @@ enum class HexType(private vararg val surfaces: Surface) {
     points[13] = center.coordinateY.toFloat()
 
     for (surface in surfaces) {
-      surface.render(verticesRenderer, color, brightness, points)
+      surface.render(verticesRenderer, color, points)
     }
   }
 
@@ -174,7 +174,7 @@ enum class HexType(private vararg val surfaces: Surface) {
       require(shade in 0.0..1.0) { "The shade must be between 1 and 0" }
     }
 
-    fun render(verticesRenderer: VerticesRenderer, color: Color, brightness: Float, points: FloatArray) {
+    fun render(verticesRenderer: VerticesRenderer, color: Color, points: FloatArray) {
       vertices[0] = points[v1 * 2]
       vertices[1] = points[v1 * 2 + 1]
 
@@ -183,7 +183,7 @@ enum class HexType(private vararg val surfaces: Surface) {
 
       vertices[4] = points[v3 * 2]
       vertices[5] = points[v3 * 2 + 1]
-      verticesRenderer.drawTriangle(color.cpy().dim(shade * brightness).toFloatBits(), vertices)
+      verticesRenderer.drawTriangle(color.cpy().dim(shade).toFloatBits(), vertices)
     }
 
     companion object {

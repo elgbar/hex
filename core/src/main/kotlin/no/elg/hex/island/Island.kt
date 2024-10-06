@@ -148,7 +148,7 @@ class Island(
     internalAllHexagons.addAll(grid.hexagons)
 
     for (hexagon in allHexagons) {
-      val data = this.getData(hexagon)
+      val data = getData(hexagon)
       require(data.piece == Empty || data == data.piece.data) {
         "Found a mismatch between the piece team and the hexagon data team! FML coords ${hexagon.coordinates}"
       }
@@ -210,8 +210,6 @@ class Island(
   val hexagonsPerTeam by lazy { EnumMap<Team, Int>(Team::class.java).also { recountHexagons(it) } }
   val winningTeam: Team get() = hexagonsPerTeam.maxByOrNull(Map.Entry<Team, Int>::value)?.key ?: LEAF
 
-  private val initialState: IslandDto
-
   var selected: Territory? = null
     private set
 
@@ -239,7 +237,7 @@ class Island(
   private val teamToPlayer =
     EnumMap<Team, AI?>(Team::class.java).apply {
       // if we create more teams this makes sure they are playing along
-      this.putAll(Team.entries.map { it to Difficulty.HARD.aiConstructor(it) })
+      putAll(Team.entries.map { it to Difficulty.HARD.aiConstructor(it) })
 
       put(SUN, Settings.teamSunAI.aiConstructor(SUN))
       put(LEAF, Settings.teamLeafAI.aiConstructor(LEAF))
@@ -253,7 +251,6 @@ class Island(
   init {
     restoreState(width, height, layout, territoryCoordinate, handCoordinate, handPiece, handRestoreAction, hexagonData, startTeam)
     history.clear()
-    initialState = createDto().copy()
   }
 
   fun isTeamAI(team: Team) = teamToPlayer[team] != null
@@ -277,10 +274,10 @@ class Island(
   //  Gameplay  //
   // ////////// //
 
-  private fun recountHexagons(hexagonsPerTeam: EnumMap<Team, Int> = this.hexagonsPerTeam) {
-    hexagonsPerTeam.clear()
+  private fun recountHexagons(hexagonsPerTeamMap: EnumMap<Team, Int> = hexagonsPerTeam) {
+    hexagonsPerTeamMap.clear()
     visibleHexagons.withData(this) { _, data ->
-      hexagonsPerTeam.compute(data.team) { _, old -> 1 + (old ?: 0) }
+      hexagonsPerTeamMap.compute(data.team) { _, old -> 1 + (old ?: 0) }
     }
   }
 
@@ -393,7 +390,11 @@ class Island(
     }
   }
 
-  /** Select the hex under the cursor */
+  /**
+   * Select the territory which [hexagon] is a part of, given the hexagon is a part of a territory and is the [currentTeam]
+   *
+   * @return if the selection was successful
+   * */
   fun select(hexagon: Hexagon<HexagonData>?): Boolean {
     val oldSelected = selected
 
@@ -430,9 +431,8 @@ class Island(
   fun findTerritory(maybeHex: Hexagon<HexagonData>?): Territory? {
     val hexagon = maybeHex ?: return null
     val territoryHexes = getTerritoryHexagons(hexagon) ?: return null
-
-    val capital = findCapital(territoryHexes)
-    return if (capital != null) Territory(this, capital, territoryHexes) else null
+    val capitalHex = findOrCreateCapital(territoryHexes) ?: return null
+    return Territory(this, getData(capitalHex).piece as Capital, territoryHexes, capitalHex)
   }
 
   fun isInTerritory(hexagon: Hexagon<HexagonData>): Boolean = connectedTerritoryHexagons(hexagon).size >= MIN_HEX_IN_TERRITORY
@@ -515,9 +515,8 @@ class Island(
    * [MIN_HEX_IN_TERRITORY]
    */
   private fun calculateBestCapitalPlacement(hexagons: Collection<Hexagon<HexagonData>>): Hexagon<HexagonData> {
-    require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "There must be at least $MIN_HEX_IN_TERRITORY hexagons in the given set!" }
-    val hexTeam = this.getData(hexagons.first()).team
-    require(hexagons.all { this.getData(it).team == hexTeam }) { "All hexagons given must be on the same team" }
+    val hexTeam = getData(hexagons.first()).team
+    require(hexagons.all { getData(it).team == hexTeam }) { "All hexagons given must be on the same team" }
 
     // Capitals should prefer a worse location in favor of overwriting another piece
     val maxPlacementPreference = hexagons.minOf { getData(it).piece.capitalReplacementResistance }
@@ -528,8 +527,8 @@ class Island(
 
     fun findDistanceToClosestEnemyHex(hex: Hexagon<HexagonData>): Int {
       for (radius in 1..maxRadius) {
-        val isAnyEnemies = this.calculateRing(hex, radius).any {
-          val data = this.getData(it)
+        val isAnyEnemies = calculateRing(hex, radius).any {
+          val data = getData(it)
           data.team != hexTeam && data.visible && it.isPartOfATerritory(this)
         }
         if (isAnyEnemies) {
@@ -565,9 +564,9 @@ class Island(
     var currBestScore = -1.0
 
     for (origin in contenders) {
-      val ring = this.getNeighbors(origin, onlyVisible = false)
+      val ring = getNeighbors(origin, onlyVisible = false)
       val calcScore = ring.sumOf {
-        val data = this.getData(it)
+        val data = getData(it)
         when {
           data.team == hexTeam && data.piece is Castle -> 2.0
           data.team == hexTeam -> 1.0
@@ -623,12 +622,12 @@ class Island(
     for (hexagon in visibleHexagons) {
       if (territoryHexagons.contains(hexagon)) continue
 
-      val connectedHexes = this.connectedTerritoryHexagons(hexagon)
+      val connectedHexes = connectedTerritoryHexagons(hexagon)
       territoryHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         for (invalidTerrHex in connectedHexes) {
-          if (this.getData(invalidTerrHex).piece is Capital) {
+          if (getData(invalidTerrHex).piece is Capital) {
             publishError("Hexagon ${invalidTerrHex.coordinates} is a capital, even though its territory has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
             valid = false
           }
@@ -636,7 +635,7 @@ class Island(
         continue
       }
 
-      val capitalCount = connectedHexes.count { this.getData(it).piece is Capital }
+      val capitalCount = connectedHexes.count { getData(it).piece is Capital }
       if (capitalCount < 1) {
         publishError("There exists a territory with no capital. Hexagon ${hexagon.coordinates} is within it.")
         valid = false
@@ -648,10 +647,10 @@ class Island(
 
     // Check rules which apply to each visible hexagon
     for (hexagon in visibleHexagons) {
-      val data = this.getData(hexagon)
-      if (data.piece is TreePiece && data.piece::class != this.treeType(hexagon)) {
+      val data = getData(hexagon)
+      if (data.piece is TreePiece && data.piece::class != treeType(hexagon)) {
         publishError(
-          "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${this.treeType(hexagon).simpleName}"
+          "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${treeType(hexagon).simpleName}"
         )
         valid = false
       }
@@ -687,7 +686,7 @@ class Island(
 
     // Check rules which apply to each invisible hexagon
     for (hexagon in invisibleHexagons) {
-      val data = this.getData(hexagon)
+      val data = getData(hexagon)
       if (data.piece !is Empty) {
         publishError("Hexagon ${hexagon.coordinates} is invisible but has a piece on it! ${data.piece}")
         valid = false
@@ -710,7 +709,7 @@ class Island(
     const val NEVER_BEATEN = 999
 
     fun Hand.createDtoPieceCopy(): Piece {
-      return this.piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
+      return piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
     }
 
     fun deserialize(json: String): Island = Hex.mapper.readValue(json)

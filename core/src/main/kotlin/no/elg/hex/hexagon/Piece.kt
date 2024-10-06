@@ -6,6 +6,7 @@ import no.elg.hex.event.Events
 import no.elg.hex.event.events.CapitalBalanceChanged
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MAX_START_CAPITAL
+import no.elg.hex.util.coordinates
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.debug
 import no.elg.hex.util.error
@@ -52,7 +53,7 @@ fun mergedType(piece1: LivingPiece, piece2: LivingPiece) = strengthToType(piece1
 fun replaceWithTree(island: Island, hex: Hexagon<HexagonData>) {
   val data = island.getData(hex)
   val pieceType = island.treeType(hex)
-  Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.gridX},${hex.gridZ}) with tree $pieceType" }
+  Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.coordinates}) with tree $pieceType" }
   data.setPiece(pieceType)
 }
 
