@@ -62,13 +62,19 @@ class NotAsRandomAI(
    */
   private val castleDelay: Int,
   /**
-   * How likely it is that the AI will end it's turn.
+   * How likely it is that the AI will end its turn.
    * A value of `0` means it will never end its turn before it has tried to pick up all it's pieces
-   * while a value of `1` means it will only try a single action before ending it's turn
+   * while a value of `1` means it will only try a single action before ending its turn
    *
    * That is, a lower value will make this a harder AI
    */
-  private val endTurnChance: Float
+  private val endTurnChance: Double,
+  /**
+   * How likely it is that the AI will buy a castle given it is allowed to buy castles
+   *
+   * Value should be between `0` and `1`
+   */
+  private val buyCastleChance: Double
 ) : AI {
 
   private val tag = "NARAI-$team"
@@ -334,7 +340,7 @@ class NotAsRandomAI(
   }
 
   private fun shouldBuyCastle(): Boolean {
-    return Random.nextDouble() > BUY_CASTLE_CHANCE
+    return Random.nextDouble() > buyCastleChance
   }
 
   private fun bestPieceToMergeWith(territory: Territory, handPiece: LivingPiece): Hexagon<HexagonData>? {
