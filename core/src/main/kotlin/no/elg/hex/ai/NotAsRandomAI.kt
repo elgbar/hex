@@ -29,13 +29,12 @@ import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.coordinates
 import no.elg.hex.util.createHandInstance
-import no.elg.hex.util.filterByData
 import no.elg.hex.util.filterIsPiece
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
-import no.elg.hex.util.getTerritories
 import no.elg.hex.util.info
 import no.elg.hex.util.isPartOfATerritory
+import no.elg.hex.util.isPiece
 import no.elg.hex.util.trace
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.Arrays
@@ -118,19 +117,39 @@ class NotAsRandomAI(
     )
 
   override suspend fun action(island: Island, gameInteraction: GameInteraction) {
-    island.select(island.visibleHexagons.first())
-    val territories = island.getTerritories(team)
-    for (territory in territories) {
-      resetBlacklists()
+    val capitals = island.filterIsPiece<Capital>(team)
+    for (capitalHexagon in capitals) {
+      if (!capitalHexagon.isPiece<Capital>(island)) {
+        think(null) { "Next capital is not a capital anymore, it must have been merged with another territory" }
+        continue
+      }
+
       do {
         yield()
-        island.select(territory.hexagons.first())
-        val sel = territory.island.selected ?: continue
+        island.hand?.also { hand ->
+          think(hand.territory) { "uh-oh when starting an action I am still holding $hand" }
+          island.select(null) // make sure we don't have any selected hexagons when going for the next hexagon
+        }
 
-        if (!pickUp(sel, gameInteraction)) {
+        // Select the territory by selecting the capital
+        // By selecting the capital we are use we don't pick up any piece in the territory
+        island.select(capitalHexagon)
+        val territory = island.selected
+        if(territory == null) {
+          think(null) { "Could not select territory for capital at ${capitalHexagon.coordinates}" }
           break
         }
-        place(sel, gameInteraction)
+
+        if (!territory.checkWeaklyValid()) {
+          think(territory) { "This territory is not longer weakly valid, skipping to next territory" }
+          break
+        }
+
+        if (!pickUpOrBuy(territory, gameInteraction)) {
+          think(territory) { "No piece to buy or pick up, skipping to next territory" }
+          break
+        }
+        place(territory, gameInteraction)
       } while (random.nextFloat() > endTurnChance)
     }
     think(null) { "Ending turn" }
@@ -138,7 +157,7 @@ class NotAsRandomAI(
     resetBlacklists()
   }
 
-  private fun pickUp(territory: Territory, gameInteraction: GameInteraction): Boolean {
+  private fun pickUpOrBuy(territory: Territory, gameInteraction: GameInteraction): Boolean {
     val island = territory.island
     think(territory) { "Picking up a piece" }
     if (island.hand?.piece != null) {

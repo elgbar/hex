@@ -8,15 +8,17 @@ import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.coordinates
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
-import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
 data class Territory(
   val island: Island,
   val capital: Capital,
-  val hexagons: Collection<Hexagon<HexagonData>>
+  val hexagons: Collection<Hexagon<HexagonData>>,
+  val capitalHexagon: Hexagon<HexagonData>
 ) {
+
+  val team: Team = capital.data.team
 
   val income: Int
     get() {
@@ -31,62 +33,62 @@ data class Territory(
 
   /** All enemy hexes that border this territory */
   val enemyBorderHexes: Collection<Hexagon<HexagonData>> by lazy {
-    val enemyHexes = HashSet<Hexagon<HexagonData>>()
-    for (hexagon in hexagons) {
-      enemyHexes.addAll(
-        island.getNeighbors(hexagon).filter { island.getData(it).team != island.currentTeam }
-      )
-    }
-    return@lazy enemyHexes
+    hexagons
+      .asSequence()
+      .flatMap { island.getNeighbors(it) }
+      .filter { island.getData(it).team != team }
+      .toSet()
   }
 
+  /**
+   * All hexagons that are in enemy territory that border this territory
+   */
   val enemyTerritoryHexagons: Collection<Hexagon<HexagonData>> by lazy {
-    val enemyHexes = HashSet<Hexagon<HexagonData>>()
-    for (hexagon in hexagons) {
-
-      val enemyHex = island.getNeighbors(hexagon).filter { island.getData(it).team != island.currentTeam }.flatMap {
-        island.connectedTerritoryHexagons(it)
-      }
-      enemyHexes.addAll(enemyHex)
-    }
-    return@lazy enemyHexes
+    enemyBorderHexes.flatMap { island.connectedTerritoryHexagons(it) }
   }
 
-  val team: Team
+  /**
+   * A quick check of the validity of this territory.
+   * * The capital hexagon still has *the* capital piece
+   */
+  fun checkWeaklyValid(): Boolean = capitalHexHasCorrectCapitalPiece()
 
-  val capitalCoordinates: CubeCoordinate
+  /**
+   * A complete check of the validity of this territory.
+   *
+   * * All [hexagons] in this territory is on our [team]
+   * * There are no new hexagons in this territory
+   * * The capital hexagon still has *the* capital piece (i.e., [checkWeaklyValid])
+   */
+  fun checkStronglyValid(): Boolean =
+    capitalHexHasCorrectCapitalPiece() &&
+      onlyFriendlyHexagons() &&
+      checkNoBorderingFriendlyHexagons() &&
+      checkOnlyOneCapital()
+
+  private fun capitalHexHasCorrectCapitalPiece() = island.getData(capitalHexagon).piece === capital
+  private fun onlyFriendlyHexagons() = hexagons.all { island.getData(it).team == team }
+  private fun checkOnlyOneCapital() = hexagons.count { island.getData(it).piece is Capital } == 1
+
+  private fun checkNoBorderingFriendlyHexagons() =
+    hexagons
+      .asSequence()
+      .flatMap { island.getNeighbors(it) }
+      .filter { it !in hexagons }
+      .none { island.getData(it).team == team }
 
   init {
+    // Only need to check these on creation
     require(hexagons.size >= MIN_HEX_IN_TERRITORY) { "Too few hexagons in territory must be at least $MIN_HEX_IN_TERRITORY" }
+    require(capitalHexagon in hexagons) { "The capital hexagon must be one of the hexagons" }
 
-    var someCapitalCoordinates: CubeCoordinate? = null
-    var foundCapital = 0
-    team = island.getData(hexagons.first()).team
-
-    for (hexagon in hexagons) {
-      val data = island.getData(hexagon)
-      if (data.piece === capital) {
-        someCapitalCoordinates = hexagon.cubeCoordinate
-        foundCapital += 1
-      }
-      require(data.team == team) {
-        "Found a hex that does not have the same team as the rest of the hexagons. " +
-          "Expected every team to be on team $team but hex at ${hexagon.coordinates} is on team ${data.team}"
-      }
-    }
-
-    require(foundCapital == 1) {
-      if (foundCapital < 1) {
-        "Failed to find the capital among the hexagons in the given hexagons"
-      } else {
-        "Found $foundCapital capitals! There can only be one capital in a territory"
-      }
-    }
-    requireNotNull(someCapitalCoordinates)
-    capitalCoordinates = someCapitalCoordinates
+    // Make sure the territory is valid when created
+    require(capitalHexHasCorrectCapitalPiece()) { "The capital hexagon has *the* capital piece" }
+    require(onlyFriendlyHexagons()) { "All hexagons in this territory is on our team" }
+    require(checkOnlyOneCapital()) { "There are not only one capital found these ${hexagons.filter { island.getData(it).piece is Capital }.joinToString { it.coordinates } }" }
   }
 
   override fun toString(): String {
-    return "Territory of team ${capital.data.team}@${capitalCoordinates.let { "(${it.gridX}, ${it.gridZ})" }}"
+    return "Territory of team ${capital.data.team}@${capitalHexagon.coordinates}"
   }
 }

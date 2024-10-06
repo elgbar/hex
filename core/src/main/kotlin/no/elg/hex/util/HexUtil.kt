@@ -203,12 +203,27 @@ fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canA
 
 inline fun Island.filterByData(crossinline filter: (data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
   visibleHexagons.asSequence().filter { hexagon -> filter(getData(hexagon)) }
+inline fun Sequence<Hexagon<HexagonData>>.filterByData(island: Island, crossinline filter: (data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
+  filter { hexagon -> filter(island.getData(hexagon)) }
 
-inline fun <reified T : Piece> Island.filterIsPiece(): Sequence<Hexagon<HexagonData>> = visibleHexagons.asSequence().filterIsPiece<T>(this)
-inline fun <reified T : Piece> Territory.filterIsPiece(): Sequence<Hexagon<HexagonData>> = hexagons.asSequence().filterIsPiece<T>(island)
-inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsPiece(island: Island): Sequence<Hexagon<HexagonData>> =
-  filter { hexagon -> island.getData(hexagon).piece is T }
-inline fun <reified T : Piece> Collection<Hexagon<HexagonData>>.filterIsPiece(island: Island): Collection<Hexagon<HexagonData>> =
+
+/**
+ * @param island The island to check on
+ * @param team The team to check for, if `null` then all teams are ok
+ * @return A function that checks if a hexagon is of a given type and team
+ */
+inline fun <reified T : Piece> checkIsPieceAndTeam(island: Island, team: Team? = null): ((hexagon: Hexagon<HexagonData>) -> Boolean) = { hexagon ->
+  val data = island.getData(hexagon)
+  data.piece is T && (team == null || data.team == team)
+}
+
+inline fun <reified T : Piece> Hexagon<HexagonData>.isPiece(island: Island, team: Team? = null): Boolean = checkIsPieceAndTeam<T>(island, team).invoke(this)
+inline fun <reified T : Piece> Island.filterIsPiece(team: Team? = null): Sequence<Hexagon<HexagonData>> = visibleHexagons.asSequence().filter(checkIsPieceAndTeam<T>(this, team))
+inline fun <reified T : Piece> Territory.filterIsPiece(team: Team? = null): Sequence<Hexagon<HexagonData>> = hexagons.asSequence().filter(checkIsPieceAndTeam<T>(island, team))
+inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsPiece(island: Island, team: Team? = null): Sequence<Hexagon<HexagonData>> = filter(checkIsPieceAndTeam<T>(island, team))
+inline fun <reified T : Piece> Collection<Hexagon<HexagonData>>.filterIsPiece(island: Island, team: Team? = null): Collection<Hexagon<HexagonData>> = filter(checkIsPieceAndTeam<T>(island, team))
+
+inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsTeam(island: Island): Sequence<Hexagon<HexagonData>> =
   filter { hexagon -> island.getData(hexagon).piece is T }
 
 inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {

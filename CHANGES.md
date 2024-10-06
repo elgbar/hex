@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Prioritize attacking hexagons that are a part of a territory
   * Change chances of AI to buy a castle based on the difficulty
   * Increase the chance of easy and normal AI to end their turn early
+  * Fix AI holding a piece when it does not think it does
 
 ### Fixed
 

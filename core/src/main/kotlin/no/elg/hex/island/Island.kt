@@ -446,37 +446,37 @@ class Island(
    *
    * @return The best capital within the collection of hexagons.
    */
-  fun findCapital(territoryHexes: Collection<Hexagon<HexagonData>>): Capital? {
-    val capitals = territoryHexes.filter { this.getData(it).piece is Capital }
+  fun findOrCreateCapital(territoryHexes: Collection<Hexagon<HexagonData>>): Hexagon<HexagonData>? {
+    val capitals = territoryHexes.filter { getData(it).piece is Capital }
     if (capitals.isEmpty()) {
       // No capital found, generate a new capital
-      val capHexData = this.getData(calculateBestCapitalPlacement(territoryHexes))
-      return if (capHexData.setPiece<Capital>()) capHexData.piece as Capital else null
+      val hexagon = calculateBestCapitalPlacement(territoryHexes)
+      val capHexData = getData(hexagon)
+
+      return if (capHexData.setPiece<Capital>()) {
+        hexagon
+      } else {
+        Gdx.app.error("Island", "Failed to set capital at ${hexagon.coordinates}, there is a ${capHexData.piece} there")
+        null
+      }
     } else if (capitals.size == 1) {
-      return this.getData(capitals.first()).piece as Capital
+      return capitals.first()
     }
     // No capital found, generate a new capital
 
-    // there might be multiple capitals in the set of hexagons. Find the best one, transfer all
-    // assets and delete the others
+    // there might be multiple capitals in the set of hexagons.
+    // Find the best one, transfer all assets and delete the others
 
     val bestCapitalHex = calculateBestCapitalPlacement(capitals)
-    val bestData = this.getData(bestCapitalHex).piece as Capital
+    val bestData = getData(bestCapitalHex).piece as Capital
     for (capital in capitals) {
       if (capital === bestCapitalHex) continue
-      val data = this.getData(capital)
-      val otherCapital = data.piece
-      if (otherCapital !is Capital) {
-        Gdx.app.log(
-          "FIND CAPITAL",
-          "A piece which was a capital is no longer a capital, but a ${otherCapital::class.simpleName} piece. Data: $data"
-        )
-        continue
-      }
+      val data = getData(capital)
+      val otherCapital = data.piece as Capital
       otherCapital.transfer(bestData)
       data.setPiece<Empty>()
     }
-    return bestData
+    return bestCapitalHex
   }
 
   /**

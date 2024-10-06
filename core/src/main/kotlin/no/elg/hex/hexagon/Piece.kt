@@ -255,7 +255,9 @@ class Capital(
       return
     }
 
-    require(island.findCapital(hexagons) === this) { "Mismatch between this piece and the capital of the territory!" }
+    val findOrCreateCapital = island.findOrCreateCapital(hexagons)
+    requireNotNull(findOrCreateCapital) { "Failed to find or create a capital for the territory" }
+    require(island.getData(findOrCreateCapital).piece === this) { "Mismatch between this piece and the capital of the territory!" }
 
     if (island.round > 1) {
       balance += calculateIncome(hexagons, island)
