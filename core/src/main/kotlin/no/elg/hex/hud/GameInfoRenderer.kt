@@ -115,7 +115,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
     batch.color = WHITE
     batch.use { batch ->
 
-      if (screen.island.isCurrentTeamHuman()) {
+      if (screen.island.isCurrentTeamHuman() || Settings.debugAIAction) {
         fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {
           val height = (Gdx.graphics.height * heightPercent)
           val width = height * (region.packedWidth / region.packedHeight.toFloat())

@@ -1,8 +1,10 @@
 package no.elg.hex.ai
 
 import com.badlogic.gdx.Gdx
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -139,7 +141,13 @@ class NotAsRandomAI(
           think(territory) { "No piece to buy or pick up, skipping to next territory" }
           break
         }
+        if (Hex.debug && Settings.debugAIAction) {
+          delay(Settings.debugAIActionDelayMillis)
+        }
         place(territory, gameInteraction)
+        if (Hex.debug && Settings.debugAIAction) {
+          delay(Settings.debugAIActionDelayMillis)
+        }
       } while (random.nextFloat() > endTurnChance)
     }
     think(null) { "Ending turn" }

@@ -35,7 +35,6 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
   private val allowedToDrawInvisible get() = !islandScreen.isPreviewRenderer
   private val shouldDrawEdges get() = Hex.args.`draw-edges` && allowedToDrawInvisible
   private val shouldDrawInvisible get() = Hex.mapEditor && allowedToDrawInvisible
-  private val shouldDrawCurrentTeamHexagons get() = !Hex.mapEditor && allowedToDrawInvisible
 
   override fun frameUpdate() {
     lineRenderer.use(Filled, islandScreen.camera) {
@@ -56,7 +55,8 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
         }
       }
 
-      if (island.isCurrentTeamHuman() && shouldDrawCurrentTeamHexagons) {
+      val shouldDrawCurrentTeamHexagons = (island.isCurrentTeamHuman() && !Hex.mapEditor && allowedToDrawInvisible) || (Hex.debug && Settings.debugAITerritory)
+      if (shouldDrawCurrentTeamHexagons) {
         island.selected?.also {
           drawOutLines(it.hexagons) { _, target -> target.set(selectedColor) }
 
