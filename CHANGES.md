@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Fix AI holding a piece when it does not think it does
 * Added remaining ARtB to existing islands
 * Rename the `UNKNOWN_ROUNDS_TO_BEAT` constant to `NEVER_PLAYED` to make it clear what it means
+* Add settings, which defaults to `false`, to toggle double tapping to zoom
 
 ### Fixed
 

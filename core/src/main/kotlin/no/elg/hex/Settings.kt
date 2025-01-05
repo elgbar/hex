@@ -65,6 +65,7 @@ object Settings {
   var enableStrengthHint by PreferenceDelegate(true, priority = 100)
   var enableStrengthBar by PreferenceDelegate(true, priority = 100)
   var enableActionHighlight by PreferenceDelegate(false, priority = 100)
+  var enableDoubleTapToZoom by PreferenceDelegate(false, priority = 100)
 
   var enableStrengthHintEverywhere by PreferenceDelegate(true, priority = 220, shouldHide = { !Hex.debug && !Hex.mapEditor })
   var enableStrengthHintInPlayerTerritories by PreferenceDelegate(false, priority = 221, shouldHide = { !Hex.debug })

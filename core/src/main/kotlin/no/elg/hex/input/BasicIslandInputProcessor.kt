@@ -142,7 +142,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
   }
 
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
-    if (count % 2 == 0 && screen.smoothTransition == null && isCorrectButtonPressed()) {
+    if (Settings.enableDoubleTapToZoom && count % 2 == 0 && screen.smoothTransition == null && isCorrectButtonPressed()) {
       smoothZoom(TAP_ZOOM_AMOUNT)
       return true
     }
