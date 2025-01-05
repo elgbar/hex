@@ -95,13 +95,14 @@ class Assets : AssetManager() {
 
   companion object {
 
-    private val MIN_ISLAND =
-      """{"width":3,"height":3,"layout":"HEXAGONAL","hexagonData":{
-        |"1,1":{"@id":1,"team":"STONE"},
-        |"1,0":{"@id":2,"edge":true,"isOpaque":true,"isPassable":false,"team":"SUN"},
-        |"2,1":2,"2,0":2,"0,2":2,"0,1":2,"1,2":2},
-        |"selectedCoordinate":null,"piece":null}
-      """.replaceIndentByMargin("")
+    private val WARMUP_ISLAND =
+      """{"height":5,"hexagonData":{
+        |"1,1":{"@id":1,"team":"SUN","data":0,"pieceType":"PalmTree"},"1,2":{"@id":2,"team":"LEAF","data":4,"pieceType":"Capital"}
+        |,"1,3":{"@id":3,"team":"LEAF","data":true,"pieceType":"Spearman"},"2,0":{"@id":4,"team":"EARTH","pieceType":"Castle"}
+        |,"2,1":{"@id":5,"team":"FOREST","data":0,"pieceType":"PineTree"},"2,2":{"@id":6,"team":"FOREST","data":9,"pieceType":"Capital"}
+        |,"3,0":{"@id":7,"team":"STONE","data":true,"pieceType":"Peasant"},"3,1":{"@id":8,"team":"STONE","data":true,"pieceType":"Knight"}
+        |,"3,2":{"@id":9,"team":"STONE","data":-5,"pieceType":"Capital"}
+        |},"layout":"RECTANGULAR","round":1,"team":"LEAF","width":5}""".trimMargin()
 
     const val ISLAND_SAVES_DIR = "islands"
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"
@@ -269,7 +270,7 @@ class Assets : AssetManager() {
         val warmUpStart = TimeUtils.millis()
         for (i in 1..25) {
           val deserStart = TimeUtils.millis()
-          Island.deserialize(MIN_ISLAND)
+          Island.deserialize(WARMUP_ISLAND)
           Gdx.app.trace("WARMUP") { "Warmup pass $i took ${TimeUtils.timeSinceMillis(deserStart)} ms" }
         }
         Gdx.app.debug("WARMUP") { "Island deserialization warmup complete in ${TimeUtils.timeSinceMillis(warmUpStart)} ms" }
