@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add shortcut `ctrl` + `N` to create a new island in the map editor
 * Add button to create new islands directly from the level creation screen
 * New islands validation rule: There must be at least two different teams with a capital
+* Show the island id to make it easier to communicate about islands
 
 ### Changed
 

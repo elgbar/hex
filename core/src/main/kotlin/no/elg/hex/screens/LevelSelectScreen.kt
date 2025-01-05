@@ -12,6 +12,7 @@ import ktx.graphics.use
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
@@ -107,10 +108,18 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
             }
             color?.let { drawBox(x, y, width, height, it) }
           }
+          val font = Hex.assets.regularItalicFont
+          val vertOffset = font.lineHeight
+
+          val showIslandId = Hex.mapEditor || Hex.debug || Settings.showIslandId
+          if(showIslandId) {
+            layout.setText(font, "Island ${metadata.id}", Color.WHITE, width, Align.left, true)
+            font.draw(batch, layout, x, y + vertOffset)
+          }
 
           if (Hex.mapEditor || Hex.debug) {
-            layout.setText(Hex.assets.regularItalicFont, "id: ${metadata.id} ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.center, true)
-            Hex.assets.regularItalicFont.draw(batch, layout, x, y + height - Hex.assets.regularItalicFont.lineHeight * 2)
+            layout.setText(font, "ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.left, true)
+            font.draw(batch, layout, x, y + vertOffset * 2)
           }
         }
       }

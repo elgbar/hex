@@ -35,6 +35,7 @@ import no.elg.hex.hud.GameInfoRenderer
 import no.elg.hex.input.GameInputProcessor
 import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.NEVER_PLAYED
 import no.elg.hex.island.Territory
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.preview.PreviewModifier
@@ -317,6 +318,9 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private fun onGameEnded(modifier: PreviewModifier) {
     island.history.disable()
     metadata.modifier = modifier
+    if(metadata.userRoundsToBeat == NEVER_PLAYED || metadata.userRoundsToBeat > island.round) {
+      metadata.userRoundsToBeat = island.round
+    }
     Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
   }
 
