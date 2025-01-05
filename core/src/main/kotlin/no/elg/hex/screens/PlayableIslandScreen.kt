@@ -318,7 +318,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private fun onGameEnded(modifier: PreviewModifier) {
     island.history.disable()
     metadata.modifier = modifier
-    if (metadata.userRoundsToBeat == NEVER_PLAYED || metadata.userRoundsToBeat > island.round) {
+    if (modifier == WON && (metadata.userRoundsToBeat == NEVER_PLAYED || metadata.userRoundsToBeat > island.round)) {
       metadata.userRoundsToBeat = island.round
     }
     Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
