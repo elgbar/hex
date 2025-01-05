@@ -9,6 +9,7 @@ import ktx.assets.disposeSafely
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.NEVER_BEATEN
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
@@ -32,8 +33,11 @@ class FastIslandMetadata(
   /**
    * If this island is for debugging and testing purposes only
    */
-  var forTesting: Boolean = false
+  var forTesting: Boolean = false,
+  var userRoundsToBeat: Int = Island.NEVER_PLAYED,
 ) : Comparable<FastIslandMetadata>, Disposable {
+
+  fun isUserBetterThanAuthor(): Boolean = userRoundsToBeat != Island.NEVER_PLAYED && userRoundsToBeat < authorRoundsToBeat
 
   var previewPixmap: ByteArray? = previewPixmap
     set(value) {
@@ -75,6 +79,7 @@ class FastIslandMetadata(
     requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
     if (Hex.mapEditor) {
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
+      require(userRoundsToBeat == Island.NEVER_PLAYED) { "userRoundsToBeat must be ${Island.NEVER_PLAYED} when saving initial island, is $userRoundsToBeat" }
 
       val fileHandle = getFileHandle(id, true)
       fileHandle.parent().mkdirs()
