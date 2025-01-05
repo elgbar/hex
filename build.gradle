@@ -92,8 +92,6 @@ subprojects {
       endWithNewline()
     }
   }
-  assemble.dependsOn(spotlessApply)
-
 
   tasks.withType(KotlinCompilationTask).configureEach {
     compilerOptions {
@@ -192,6 +190,8 @@ project(":core") {
   apply plugin: "kotlin"
 
   classes {
+
+    dependsOn spotlessApply
     doFirst {
       layout.buildDirectory.file("resources/main/version.properties").get().asFile.withWriter { writer ->
         Properties properties = new Properties()
