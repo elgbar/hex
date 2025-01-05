@@ -6,8 +6,7 @@ package org.hexworks.mixite.core.api
  * Note that the y coordinate is not stored in this object since it can be
  * calculated.
  */
-@Suppress("DataClassPrivateConstructor")
-data class CubeCoordinate private constructor(val gridX: Int, val gridZ: Int) : Comparable<CubeCoordinate> {
+data class CubeCoordinate(val gridX: Int, val gridZ: Int) : Comparable<CubeCoordinate> {
 
   val gridY: Int
     get() = -(gridX + gridZ)
