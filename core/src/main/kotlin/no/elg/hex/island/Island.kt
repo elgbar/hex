@@ -609,6 +609,7 @@ class Island(
    * one island)
    * * No capital pieces in territories with size smaller than [MIN_HEX_IN_TERRITORY]
    * * There must be exactly one capital per territory
+   * * There must be at least two different teams with a capital
    *
    * @return If this island is valid.
    */
@@ -617,10 +618,12 @@ class Island(
 
     // Check rules which apply to whole territories
     val territoryHexagons = HashSet<Hexagon<HexagonData>>()
+    val totalCapitalCount = EnumMap<Team, Int>(Team::class.java)
     for (hexagon in visibleHexagons) {
       if (territoryHexagons.contains(hexagon)) continue
 
-      val connectedHexes = connectedTerritoryHexagons(hexagon)
+      val team = this.getData(hexagon).team
+      val connectedHexes = connectedTerritoryHexagons(hexagon, team)
       territoryHexagons.addAll(connectedHexes)
 
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
@@ -641,6 +644,14 @@ class Island(
         publishError("There exists a territory with more than one capital. Hexagon ${hexagon.coordinates} is within it.")
         valid = false
       }
+
+      totalCapitalCount[team] = totalCapitalCount.getOrDefault(team, 0) + capitalCount
+    }
+
+    val teamsWithCapital = totalCapitalCount.filterValues { it >= 1 }.size
+    if (teamsWithCapital < 2) {
+      publishError("There are $teamsWithCapital teams with a capital, there must be at least 2 different teams with a capitals")
+      valid = false
     }
 
     // Check rules which apply to each visible hexagon
