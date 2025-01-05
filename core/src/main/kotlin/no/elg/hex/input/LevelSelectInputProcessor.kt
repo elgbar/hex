@@ -168,6 +168,9 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       Keys.END -> scroll(Float.POSITIVE_INFINITY)
       Keys.PAGE_UP -> scroll(-Gdx.graphics.height.toFloat())
       Keys.PAGE_DOWN -> scroll(Gdx.graphics.height.toFloat())
+      Keys.N -> if (Hex.mapEditor && (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT))) {
+        Hex.screen = LevelCreationScreen()
+      }
 
       else -> return false
     }

@@ -175,7 +175,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
         pack()
       }.also {
         editorsWindows[it] = {
-          setPosition(Gdx.graphics.width.toFloat() - MIN_DIST_FROM_EDGE - width, MIN_DIST_FROM_EDGE)
+          setPosition(Gdx.graphics.width.toFloat() - MIN_DIST_FROM_EDGE - width, Gdx.graphics.height.toFloat() /2f - height / 2f)
         }
       }
 
