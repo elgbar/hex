@@ -71,6 +71,8 @@ object Hex : ApplicationAdapter() {
     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
   }
 
+  private const val RENDER_FAILED_THRESHOLD = 3
+
   val AA_BUFFER_CLEAR =
     lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
@@ -89,6 +91,8 @@ object Hex : ApplicationAdapter() {
 
   var paused = false
     private set
+
+  private var renderFailures = 0
 
   val assetsAvailable: Boolean get() = Hex::assets.isInitialized
 
@@ -204,18 +208,22 @@ object Hex : ApplicationAdapter() {
       ScreenRenderer.camera.resetHdpi()
       MessagesRenderer.frameUpdate()
       GLProfilerRenderer.frameUpdate()
+      renderFailures = 0
     } catch (e: Throwable) {
       e.printStackTrace()
       MessagesRenderer.publishError("Threw exception when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
-
-      Gdx.app.postRunnable {
-        screen = LevelSelectScreen()
+      if (++renderFailures > RENDER_FAILED_THRESHOLD) {
+        Gdx.app.error("RENDER", "Too many render failures, exiting")
+        Gdx.app.postRunnable {
+          screen = LevelSelectScreen()
+        }
       }
     }
   }
 
   override fun resume() {
     paused = false
+    renderFailures = 0
     resetClearColor()
     ScreenRenderer.resume()
 

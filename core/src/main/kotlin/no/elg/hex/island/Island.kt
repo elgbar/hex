@@ -434,7 +434,8 @@ class Island(
     val hexagon = maybeHex ?: return null
     val territoryHexes = getTerritoryHexagons(hexagon) ?: return null
     val capitalHex = findOrCreateCapital(territoryHexes) ?: return null
-    return Territory(this, getData(capitalHex).piece as Capital, territoryHexes, capitalHex)
+    val capital = getData(capitalHex).piece as? Capital ?: return null
+    return Territory(this, capital, territoryHexes, capitalHex)
   }
 
   /**
@@ -470,12 +471,12 @@ class Island(
     // Find the best one, transfer all assets and delete the others
 
     val bestCapitalHex = calculateBestCapitalPlacement(capitals)
-    val bestData = getData(bestCapitalHex).piece as Capital
+    val bestData = getData(bestCapitalHex).piece as? Capital ?: return null
     for (capital in capitals) {
       if (capital === bestCapitalHex) continue
       val data = getData(capital)
-      val otherCapital = data.piece as Capital
-      otherCapital.transfer(bestData)
+      val otherCapital = data.piece as? Capital
+      otherCapital?.transfer(bestData)
       data.setPiece<Empty>()
     }
     return bestCapitalHex
