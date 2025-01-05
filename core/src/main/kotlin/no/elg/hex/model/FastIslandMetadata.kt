@@ -9,7 +9,6 @@ import ktx.assets.disposeSafely
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.Companion.NEVER_BEATEN
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
@@ -34,7 +33,7 @@ class FastIslandMetadata(
    * If this island is for debugging and testing purposes only
    */
   var forTesting: Boolean = false,
-  var userRoundsToBeat: Int = Island.NEVER_PLAYED,
+  var userRoundsToBeat: Int = Island.NEVER_PLAYED
 ) : Comparable<FastIslandMetadata>, Disposable {
 
   fun isUserBetterThanAuthor(): Boolean = userRoundsToBeat != Island.NEVER_PLAYED && userRoundsToBeat < authorRoundsToBeat

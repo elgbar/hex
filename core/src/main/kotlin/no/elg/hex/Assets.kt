@@ -102,7 +102,8 @@ class Assets : AssetManager() {
         |,"2,1":{"@id":5,"team":"FOREST","data":0,"pieceType":"PineTree"},"2,2":{"@id":6,"team":"FOREST","data":9,"pieceType":"Capital"}
         |,"3,0":{"@id":7,"team":"STONE","data":true,"pieceType":"Peasant"},"3,1":{"@id":8,"team":"STONE","data":true,"pieceType":"Knight"}
         |,"3,2":{"@id":9,"team":"STONE","data":-5,"pieceType":"Capital"}
-        |},"layout":"RECTANGULAR","round":1,"team":"LEAF","width":5}""".trimMargin()
+        |},"layout":"RECTANGULAR","round":1,"team":"LEAF","width":5}
+      """.trimMargin()
 
     const val ISLAND_SAVES_DIR = "islands"
     const val ISLAND_PREVIEWS_DIR = "$ISLAND_SAVES_DIR/previews"

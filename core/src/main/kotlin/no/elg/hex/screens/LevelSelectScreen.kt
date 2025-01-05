@@ -112,14 +112,14 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
           val vertOffset = font.lineHeight
 
           val showIslandId = Hex.mapEditor || Hex.debug || Settings.showIslandId
-          if(showIslandId) {
+          if (showIslandId) {
             layout.setText(font, "Island ${metadata.id}", Color.WHITE, width, Align.left, true)
             font.draw(batch, layout, x, y + vertOffset)
           }
 
           if (metadata.userRoundsToBeat != Island.NEVER_PLAYED) {
             val color = if (metadata.isUserBetterThanAuthor()) Color.GOLD else Color.WHITE
-            val align = if(showIslandId) Align.right else Align.center
+            val align = if (showIslandId) Align.right else Align.center
             layout.setText(font, "Best: ${metadata.userRoundsToBeat} rounds", color, width, align, true)
             font.draw(batch, layout, x, y + vertOffset)
           }
