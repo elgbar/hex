@@ -8,7 +8,6 @@ import no.elg.hex.event.events.SettingsChangeEvent
 import no.elg.hex.util.debug
 import no.elg.hex.util.toEnumOrNull
 import no.elg.hex.util.trace
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 open class PreferenceDelegate<T : Any>(
@@ -122,8 +121,7 @@ open class PreferenceDelegate<T : Any>(
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
       is Char -> preferences.getInteger(propertyName, (initialValue as Char).code).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
-      is Enum<*> -> preferences.getString(propertyName, initialValue.toString())
-        .toEnumOrNull(initialValue::class as KClass<out Enum<*>>)
+      is Enum<*> -> preferences.getString(propertyName, null)?.toEnumOrNull(initialValue::class) ?: initialValue
 
       else -> error("Nullable types are not allowed")
     } as T
