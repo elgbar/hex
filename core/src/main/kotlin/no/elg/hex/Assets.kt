@@ -1,3 +1,5 @@
+@file:Suppress("jol")
+
 package no.elg.hex
 
 import com.badlogic.gdx.Application.ApplicationType.Android
