@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.utils.Align
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.AbstractInput
@@ -16,6 +15,7 @@ import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.loadIslandSync
 import no.elg.hex.util.playClick
+import no.elg.hex.util.safeUse
 
 class SplashIslandScreen(val metadata: FastIslandMetadata, var island: Island? = null) : AbstractScreen() {
 
@@ -56,7 +56,7 @@ class SplashIslandScreen(val metadata: FastIslandMetadata, var island: Island? =
       Hex.screen = createIslandScreen(metadata, currIsland)
       Gdx.app.log("IS SPLASH", "Loaded island ${metadata.id} in ${System.currentTimeMillis() - startTime} ms")
     } else {
-      batch.use {
+      batch.safeUse {
         val txt =
           """
           |Loading Island ${metadata.id}

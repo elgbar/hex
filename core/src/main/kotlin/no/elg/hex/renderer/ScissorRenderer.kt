@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import ktx.assets.disposeSafely
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
+import no.elg.hex.util.safeUse
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -26,7 +26,7 @@ abstract class ScissorRenderer : FrameUpdatable, Disposable, Resizable {
 
   fun drawFbo(x: Float, y: Float) {
     fbo?.colorBufferTexture?.also { texture ->
-      batch.use {
+      batch.safeUse {
         it.draw(texture, x, y)
       }
     }
@@ -34,7 +34,7 @@ abstract class ScissorRenderer : FrameUpdatable, Disposable, Resizable {
 
   protected fun use(block: (FrameBuffer) -> Unit) {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-    fbo?.use {
+    fbo?.safeUse {
       if (clearFbo) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)

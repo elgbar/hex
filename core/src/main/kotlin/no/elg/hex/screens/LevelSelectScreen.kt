@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Align
 import ktx.actors.isShown
-import ktx.graphics.use
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
@@ -24,6 +23,7 @@ import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.play
+import no.elg.hex.util.safeUse
 import no.elg.hex.util.show
 
 /** @author Elg */
@@ -67,8 +67,8 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     if (LevelSelectInputProcessor.lastY != camera.position.y) {
       input.restoreScrollPosition()
     }
-    lineRenderer.use(Line) {
-      batch.use {
+    lineRenderer.safeUse(Line) {
+      batch.safeUse {
         val (_, sy, _, sheight) = input.slotRect(0, NON_ISLAND_SCALE, 0f)
 
         // Draw the first row of non-islands

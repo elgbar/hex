@@ -2,7 +2,6 @@ package no.elg.hex.renderer
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
@@ -19,6 +18,7 @@ import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getAllTerritories
 import no.elg.hex.util.getData
 import no.elg.hex.util.getTerritories
+import no.elg.hex.util.safeUse
 
 /** @author Elg */
 class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
@@ -27,7 +27,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
 
   override fun frameUpdate() {
     val island = islandScreen.island
-    batch.use(islandScreen.camera) {
+    batch.safeUse(islandScreen.camera) {
       loop@ for (hexagon in island.visibleHexagons) {
         val data = island.getData(hexagon)
 

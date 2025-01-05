@@ -12,14 +12,13 @@ import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
-import ktx.graphics.use
 import java.util.Timer
 import java.util.TimerTask
 import java.util.zip.Deflater
 import kotlin.concurrent.schedule
 
 fun FrameBuffer.takeScreenshot(fileHandle: FileHandle) {
-  this.use {
+  this.safeUse {
     val bufferWidth = this.width
     val bufferHeight = this.height
     val pixels = ScreenUtils.getFrameBufferPixels(0, 0, bufferWidth, bufferHeight, false)

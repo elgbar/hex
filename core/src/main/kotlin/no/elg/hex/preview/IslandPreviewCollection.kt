@@ -16,7 +16,6 @@ import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
 import ktx.async.skipFrame
 import ktx.collections.GdxArray
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
@@ -25,6 +24,7 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.isLoaded
+import no.elg.hex.util.safeUse
 import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
 
@@ -64,7 +64,7 @@ class IslandPreviewCollection : Disposable {
       previewHeight.coerceAtLeast(1),
       false
     )
-    buffer.use {
+    buffer.safeUse {
       Hex.setClearColorAlpha(0f)
       Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
@@ -100,7 +100,7 @@ class IslandPreviewCollection : Disposable {
       }
 
       val belowAsset = height / 2f
-      islandScreen.batch.use(camera) {
+      islandScreen.batch.safeUse(camera) {
         when (metadata.modifier) {
           PreviewModifier.SURRENDER -> {
             drawAsset(Hex.assets.surrender)

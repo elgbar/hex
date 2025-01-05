@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
@@ -28,6 +27,7 @@ import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hud.ScreenDrawPosition.TOP_CENTER
 import no.elg.hex.hud.ScreenDrawPosition.TOP_RIGHT
 import no.elg.hex.screens.PlayableIslandScreen
+import no.elg.hex.util.safeUse
 
 /** @author Elg */
 class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable, Disposable {
@@ -113,7 +113,7 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatabl
 
   override fun frameUpdate() {
     batch.color = WHITE
-    batch.use { batch ->
+    batch.safeUse { batch ->
 
       if (screen.island.isCurrentTeamHuman() || Settings.debugAIAction) {
         fun calcSize(region: AtlasRegion, heightPercent: Float = 0.1f): Pair<Float, Float> {

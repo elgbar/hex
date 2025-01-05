@@ -4,10 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.utils.Align
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.util.play
+import no.elg.hex.util.safeUse
 
 /** @author Elg */
 class SplashScreen(private var nextScreen: AbstractScreen?) : AbstractScreen(), ReloadableScreen {
@@ -38,7 +38,7 @@ class SplashScreen(private var nextScreen: AbstractScreen?) : AbstractScreen(), 
       }
       Gdx.app.log("SPLASH", "All assets finished loading in ${System.currentTimeMillis() - startTime} ms")
     } else {
-      batch.use {
+      batch.safeUse {
         val txt = if (assetsDone) {
           val totalIslands = Hex.assets.islandFiles.size
           """

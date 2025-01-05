@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled
 import com.badlogic.gdx.utils.Disposable
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.FrameUpdatable
@@ -19,6 +18,7 @@ import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.getData
 import no.elg.hex.util.requestRenderingIn
+import no.elg.hex.util.safeUse
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author kheba */
@@ -37,7 +37,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
   private val shouldDrawInvisible get() = Hex.mapEditor && allowedToDrawInvisible
 
   override fun frameUpdate() {
-    lineRenderer.use(Filled, islandScreen.camera) {
+    lineRenderer.safeUse(Filled, islandScreen.camera) {
       Gdx.gl.glEnable(GL20.GL_BLEND)
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 

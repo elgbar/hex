@@ -8,11 +8,11 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.async.skipFrame
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.playMoney
+import no.elg.hex.util.safeUse
 
 class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadata, Island>?>>) : AbstractScreen() {
 
@@ -44,7 +44,7 @@ class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadat
   }
 
   private fun onWaiting() {
-    batch.use {
+    batch.safeUse {
       val txt =
         """
           |Importing Islands

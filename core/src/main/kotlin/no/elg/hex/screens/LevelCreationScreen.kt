@@ -33,7 +33,6 @@ import ktx.actors.onClick
 import ktx.assets.disposeSafely
 import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
-import ktx.graphics.use
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
@@ -55,6 +54,7 @@ import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.removeSmallerIslands
+import no.elg.hex.util.safeUse
 import no.elg.hex.util.saveInitialIsland
 import no.elg.hex.util.value
 import org.hexworks.mixite.core.api.HexagonalGridLayout
@@ -404,14 +404,14 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       }
 
       val buffer = FrameBuffer(RGBA8888, NOISE_SIZE, NOISE_SIZE, false)
-      buffer.use {
+      buffer.safeUse {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         val texture = Texture(pixmap).also { texture ->
           texture.setFilter(Nearest, Nearest)
         }
 
-        batch.use { batch ->
+        batch.safeUse { batch ->
           batch.draw(texture, 0f, 0f, NOISE_SIZE.toFloat(), NOISE_SIZE.toFloat())
         }
       }

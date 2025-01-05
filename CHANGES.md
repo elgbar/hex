@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Move windows in map editor a bit from the edge
 * Fix island deletion crashing the game
 * Fix do not leave the playing island when a single exception occurs
+* Harden against exceptions within a start/end block
 
 ### Removed
 
