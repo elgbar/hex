@@ -165,10 +165,11 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  fun updateSelectPreview(metadata: FastIslandMetadata, maybeIsland: Island? = null, onDone: () -> Unit = {}): Job = KtxAsync.launch(Hex.asyncThread) {
-    updateSelectPreviewNow(metadata, maybeIsland)
-    onDone()
-  }
+  fun updateSelectPreview(metadata: FastIslandMetadata, maybeIsland: Island? = null, onDone: () -> Unit = {}): Job =
+    KtxAsync.launch(Hex.asyncThread) {
+      updateSelectPreviewNow(metadata, maybeIsland)
+      onDone()
+    }
 
   suspend fun updateSelectPreviewNow(metadata: FastIslandMetadata, maybeIsland: Island? = null) {
     val island = if (maybeIsland == null) {

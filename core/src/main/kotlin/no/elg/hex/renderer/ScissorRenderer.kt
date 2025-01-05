@@ -35,7 +35,7 @@ abstract class ScissorRenderer : FrameUpdatable, Disposable, Resizable {
 
   @OptIn(ExperimentalContracts::class)
   protected fun use(block: (FrameBuffer) -> Unit) {
-    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     fbo?.use {
       if (clearFbo) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)

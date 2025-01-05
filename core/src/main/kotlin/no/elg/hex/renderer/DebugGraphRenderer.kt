@@ -11,18 +11,6 @@ class DebugGraphRenderer : ScissorRenderer(), Resizable {
 
   private var fpsIndex: Int = 0 // frames per second
 
-  private val colors = Array<Color>(COLOR_SIZE) {
-    when (it) {
-      0 -> Color.GREEN
-      1 -> Color.LIME
-      2 -> Color.YELLOW
-      3 -> Color.GOLD
-      4 -> Color.ORANGE
-      5 -> Color.RED
-      else -> Color.BLUE
-    }
-  }
-
   private var fpsDeltaAcc = 0f
 
   override fun frameUpdate() {
@@ -54,7 +42,7 @@ class DebugGraphRenderer : ScissorRenderer(), Resizable {
     val pillarHeight = (fboHeight - height.toInt()).coerceAtLeast(0)
 
     val colorIndex = (height / fboHeight * COLOR_SIZE.toFloat()).toInt()
-    val color = colors.getOrNull(colorIndex) ?: Color.RED
+    val color = colors.getOrNull(colorIndex) ?: Color.BLUE
 
     // 0 is top, height is bottom, pillarHeight is how far up the pillar should go
     // Fill from the top to pillarHeight with transparent pixels
@@ -77,10 +65,23 @@ class DebugGraphRenderer : ScissorRenderer(), Resizable {
   }
 
   companion object {
+
     val isEnabled: Boolean get() = Settings.enableDebugFPSGraph && Hex.debug
     private const val RELATIVE_GRAPH_WIDTH = 0.25f
 
     private const val COL_WIDTH = 2
     private const val COLOR_SIZE = 6
+
+    val colors = Array<Color>(COLOR_SIZE) {
+      when (it) {
+        0 -> Color.GREEN
+        1 -> Color.LIME
+        2 -> Color.YELLOW
+        3 -> Color.GOLD
+        4 -> Color.ORANGE
+        5 -> Color.RED
+        else -> Color.BLUE
+      }
+    }
   }
 }

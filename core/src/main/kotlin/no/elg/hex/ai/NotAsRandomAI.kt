@@ -127,7 +127,7 @@ class NotAsRandomAI(
         // By selecting the capital we are use we don't pick up any piece in the territory
         island.select(capitalHexagon)
         val territory = island.selected
-        if(territory == null) {
+        if (territory == null) {
           think(null) { "Could not select territory for capital at ${capitalHexagon.coordinates}" }
           break
         }
