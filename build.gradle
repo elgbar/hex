@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import java.nio.file.Files
@@ -92,6 +94,16 @@ subprojects {
   }
   assemble.dependsOn(spotlessApply)
 
+
+  tasks.withType(KotlinCompilationTask).configureEach {
+    compilerOptions {
+      progressiveMode = true
+      optIn = ["kotlin.contracts.ExperimentalContracts"]
+      freeCompilerArgs.add("-Xwhen-guards") // https://github.com/Kotlin/KEEP/blob/guards/proposals/guards.md
+      freeCompilerArgs.add("-Xnon-local-break-continue") // https://github.com/Kotlin/KEEP/blob/guards/proposals/break-continue-in-inline-lambdas.md (beta in 2.1)
+//      allWarningsAsErrors = true
+    }
+  }
 }
 
 allprojects {

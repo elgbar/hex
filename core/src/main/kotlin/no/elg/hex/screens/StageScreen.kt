@@ -10,7 +10,6 @@ import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.visTable
 import no.elg.hex.Hex
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 
@@ -23,7 +22,6 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   private lateinit var internalRootTable: KVisTable
 
   @Scene2dDsl
-  @OptIn(ExperimentalContracts::class)
   inline fun rootTable(init: (@Scene2dDsl KVisTable).() -> Unit) {
     contract { callsInPlace(init, EXACTLY_ONCE) }
     require(useRootTable) { "Root table not enabled" }

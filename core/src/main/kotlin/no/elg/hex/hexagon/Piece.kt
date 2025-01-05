@@ -16,7 +16,6 @@ import no.elg.hex.util.isNotPartOfATerritory
 import no.elg.hex.util.trace
 import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
@@ -126,7 +125,6 @@ sealed class Piece {
     return equalsWithoutData(other) && data == other.data
   }
 
-  @OptIn(ExperimentalContracts::class)
   fun equalsWithoutData(other: Any?): Boolean {
     contract { returns(true) implies (other is Piece) }
     if (this === other) return true

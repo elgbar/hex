@@ -22,7 +22,6 @@ import no.elg.hex.hud.ScreenDrawPosition.TOP_LEFT
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.BOTTOM
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.TOP
 import no.elg.hex.hud.ScreenDrawPosition.VerticalPosition.VERTICAL_CENTER
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.math.sign
@@ -384,7 +383,6 @@ object ScreenRenderer : Disposable, Resizable {
     batch?.projectionMatrix = camera.combined
   }
 
-  @OptIn(ExperimentalContracts::class)
   fun use(block: (SpriteBatch) -> Unit) {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     batch?.also {

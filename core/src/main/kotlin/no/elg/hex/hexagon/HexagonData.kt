@@ -16,7 +16,6 @@ import no.elg.hex.island.Island
 import no.elg.hex.util.createInstance
 import org.hexworks.mixite.core.api.Hexagon
 import org.hexworks.mixite.core.api.contract.SatelliteData
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
@@ -84,13 +83,11 @@ class HexagonData(
   /**
    * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type [T].
    */
-  @OptIn(ExperimentalContracts::class)
   inline fun <reified T : Piece> setPiece(crossinline init: (T) -> Unit = { }): Boolean {
     contract { callsInPlace(init, InvocationKind.AT_MOST_ONCE) }
     return setPiece(T::class, init)
   }
 
-  @OptIn(ExperimentalContracts::class)
   inline fun <T : Piece> setPiece(pieceType: KClass<out T>, init: (T) -> Unit = { }): Boolean {
     contract { callsInPlace(init, InvocationKind.AT_MOST_ONCE) }
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }

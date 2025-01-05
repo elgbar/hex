@@ -12,7 +12,6 @@ import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.api.Resizable
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -33,7 +32,6 @@ abstract class ScissorRenderer : FrameUpdatable, Disposable, Resizable {
     }
   }
 
-  @OptIn(ExperimentalContracts::class)
   protected fun use(block: (FrameBuffer) -> Unit) {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     fbo?.use {

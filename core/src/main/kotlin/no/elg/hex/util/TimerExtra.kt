@@ -2,7 +2,6 @@ package no.elg.hex.util
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Timer
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -18,7 +17,6 @@ fun schedule(delaySeconds: Float, task: () -> Unit) {
 /**
  * Executes the given [block] and returns elapsed time in milliseconds.
  */
-@OptIn(ExperimentalContracts::class)
 inline fun <T> returningMeasureTimeMillis(block: () -> T): Pair<T, Long> {
   contract {
     callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -28,7 +26,6 @@ inline fun <T> returningMeasureTimeMillis(block: () -> T): Pair<T, Long> {
   return returned to System.currentTimeMillis() - start
 }
 
-@OptIn(ExperimentalContracts::class)
 inline fun <T> reportTiming(actionName: String, minSignificantTimeMs: Long = 10L, action: () -> T): T {
   contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
   val (returned, time) = returningMeasureTimeMillis(action)

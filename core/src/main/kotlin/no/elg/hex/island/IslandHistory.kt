@@ -5,14 +5,12 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.debug
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
  * @author Elg
  */
-@OptIn(ExperimentalContracts::class)
 class IslandHistory(val island: Island) {
 
   private val history = ArrayDeque<IslandDto>()
