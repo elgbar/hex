@@ -166,6 +166,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
                 metadata.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
               }
               it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
+              it.prefWidth(Value.percentHeight(0.5f, this@visWindow))
             }
             pack()
           }
