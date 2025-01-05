@@ -18,6 +18,7 @@ import no.elg.hex.screens.LevelSelectScreen.Companion.paddingX
 import no.elg.hex.screens.LevelSelectScreen.Companion.paddingY
 import no.elg.hex.screens.LevelSelectScreen.Companion.shownPreviewSize
 import no.elg.hex.screens.SettingsScreen
+import no.elg.hex.screens.SplashScreen
 import no.elg.hex.screens.TutorialScreen
 import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.component1
@@ -154,12 +155,14 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
                 Thread.yield()
               }
             }
-            Hex.assets.unload(getIslandFileName(id))
+            Hex.assets.unload(getIslandFileName(id, preview = false))
+            Hex.assets.unload(getIslandFileName(id, preview = true))
+            Hex.assets.islandPreviews.removeIsland(id)
             Hex.assets.islandFiles.fullFilesSearch()
-            screen.dispose()
+
             publishMessage("Deleted island $id", color = Color.GREEN)
+            Hex.screen = SplashScreen(LevelSelectScreen())
           }
-          Hex.screen = screen
         }
       }
 

@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix AI not calculating the strength of attackable territories correctly
 * Fix click were going through windows in map editor
 * Move windows in map editor a bit from the edge
+* Fix island deletion crashing the game
 
 ### Removed
 

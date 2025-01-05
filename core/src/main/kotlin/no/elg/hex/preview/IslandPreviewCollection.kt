@@ -192,11 +192,22 @@ class IslandPreviewCollection : Disposable {
       metadata.save()
       synchronized(internalPreviewRendererQueue) {
         val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
-        if (existingIndex == -1) {
+        if (existingIndex == NOT_IN_COLLECTION) {
           fastIslandPreviews.add(metadata)
         } else {
           fastIslandPreviews.set(existingIndex, metadata)
         }
+        dirty = true
+      }
+    }
+  }
+
+  fun removeIsland(id: Int) {
+    synchronized(internalPreviewRendererQueue) {
+      val index = fastIslandPreviews.indexOfFirst { it.id == id }
+      if (index != NOT_IN_COLLECTION) {
+        val removeIndex = fastIslandPreviews.removeIndex(index)
+        removeIndex.dispose()
         dirty = true
       }
     }
@@ -216,5 +227,6 @@ class IslandPreviewCollection : Disposable {
 
   companion object {
     const val PREVIEW_SIZE = 1024
+    const val NOT_IN_COLLECTION = -1
   }
 }
