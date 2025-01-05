@@ -63,11 +63,12 @@ fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
   return try {
     file.writeString(island.createDto().serialize(), false)
     publishMessage("Successfully saved island '${file.name()}'", color = Color.GREEN)
-    if (!existed) {
-      Hex.assets.islandFiles.fullFilesSearch()
+    Hex.assets.islandPreviews.updateSelectPreview(metadata, island) {
+      if (!existed) {
+        Hex.assets.islandFiles.fullFilesSearch()
+      }
+      Hex.assets.islandPreviews.sortIslands()
     }
-    Hex.assets.islandPreviews.updateSelectPreview(metadata)
-    Hex.assets.islandPreviews.sortIslands()
     true
   } catch (e: Throwable) {
     publishError("Failed to saved island '${file.name()}'")

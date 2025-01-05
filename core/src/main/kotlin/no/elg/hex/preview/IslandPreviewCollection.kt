@@ -116,6 +116,7 @@ class IslandPreviewCollection : Disposable {
             drawAsset(Hex.assets.castle)
             printText("Done on round ${island.round}", belowAsset)
           }
+
           PreviewModifier.WON -> {
             drawAsset(Hex.assets.capital)
             printText("Won on round ${island.round}", belowAsset)
@@ -164,7 +165,10 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  fun updateSelectPreview(metadata: FastIslandMetadata, maybeIsland: Island? = null): Job = KtxAsync.launch(Hex.asyncThread) { updateSelectPreviewNow(metadata, maybeIsland) }
+  fun updateSelectPreview(metadata: FastIslandMetadata, maybeIsland: Island? = null, onDone: () -> Unit = {}): Job = KtxAsync.launch(Hex.asyncThread) {
+    updateSelectPreviewNow(metadata, maybeIsland)
+    onDone()
+  }
 
   suspend fun updateSelectPreviewNow(metadata: FastIslandMetadata, maybeIsland: Island? = null) {
     val island = if (maybeIsland == null) {
