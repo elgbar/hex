@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Queue
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIncludeProperties
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.CancellationException
@@ -66,6 +67,7 @@ import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 /** @author Elg */
+@JsonIncludeProperties("width", "height", "layout", "territoryCoordinate", "handCoordinate", "handPiece", "handRestoreAction", "hexagonData", "round", "startTeam")
 class Island(
   width: Int,
   height: Int,
