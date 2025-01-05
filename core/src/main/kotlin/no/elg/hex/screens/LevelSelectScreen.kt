@@ -99,7 +99,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
           if (Hex.debug || Hex.mapEditor) {
             val color = when {
               metadata.forTesting -> Color.RED
-              metadata.authorRoundsToBeat == Island.UNKNOWN_ROUNDS_TO_BEAT -> Color.MAGENTA
+              metadata.authorRoundsToBeat == Island.NEVER_PLAYED -> Color.MAGENTA
               metadata.authorRoundsToBeat == Island.NEVER_BEATEN -> Color.YELLOW
               metadata.authorRoundsToBeat == Int.MAX_VALUE -> Color.FOREST
               Hex.debugStage -> NOT_SELECTED_COLOR

@@ -43,7 +43,6 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.Companion.NEVER_BEATEN
 import no.elg.hex.island.IslandGeneration
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
@@ -276,7 +275,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
           "Creating island $nextId with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value} (seed: ${seedField.text})"
         )
 
-        val metadata = FastIslandMetadata(nextId, authorRoundsToBeat = NEVER_BEATEN)
+        val metadata = FastIslandMetadata(nextId)
         val island = createIsland()
         val showIslandCreationScreen = if (instantly) {
           island.removeSmallerIslands()

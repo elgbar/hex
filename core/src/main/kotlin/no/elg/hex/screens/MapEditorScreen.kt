@@ -50,7 +50,7 @@ import no.elg.hex.input.editor.editorsList
 import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.Companion.NEVER_BEATEN
-import no.elg.hex.island.Island.Companion.UNKNOWN_ROUNDS_TO_BEAT
+import no.elg.hex.island.Island.Companion.NEVER_PLAYED
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
@@ -153,17 +153,17 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
             visLabel(
               """
               Previous ARtB: ${metadata.authorRoundsToBeat}
-              $UNKNOWN_ROUNDS_TO_BEAT = not played
-              ${UNKNOWN_ROUNDS_TO_BEAT - 1} = always last
-              $NEVER_BEATEN = never beaten
+              $NEVER_PLAYED = not played
+              ${NEVER_PLAYED - 1} = always last
+              $NEVER_BEATEN = never beaten (but played)
               """.trimIndent()
             )
             row()
             spinner("ARtB", artbSpinner) {
               textFieldEventPolicy = Spinner.TextFieldEventPolicy.ON_KEY_TYPED
               onChange {
-                val parsedInt = textField.text?.toIntOrNull() ?: UNKNOWN_ROUNDS_TO_BEAT
-                metadata.authorRoundsToBeat = if (parsedInt == UNKNOWN_ROUNDS_TO_BEAT - 1) Int.MAX_VALUE else parsedInt
+                val parsedInt = textField.text?.toIntOrNull() ?: NEVER_PLAYED
+                metadata.authorRoundsToBeat = if (parsedInt == NEVER_PLAYED - 1) Int.MAX_VALUE else parsedInt
               }
               it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
               it.prefWidth(Value.percentHeight(0.5f, this@visWindow))

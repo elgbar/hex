@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Increase the chance of easy and normal AI to end their turn early
   * Fix AI holding a piece when it does not think it does
 * Added remaining ARtB to existing islands
+* Rename the `UNKNOWN_ROUNDS_TO_BEAT` constant to `NEVER_PLAYED` to make it clear what it means
 
 ### Fixed
 

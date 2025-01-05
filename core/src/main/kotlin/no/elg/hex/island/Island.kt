@@ -703,7 +703,15 @@ class Island(
     const val MAX_START_CAPITAL = 25
 
     const val NO_ENEMY_HEXAGONS = -1
-    const val UNKNOWN_ROUNDS_TO_BEAT = 0
+
+    /**
+     * The map have never been played, so we don't know how hard it is
+     */
+    const val NEVER_PLAYED = 0
+
+    /**
+     * The map have been played but never beaten, i.e., it might be impossible/extremely hard to beat
+     */
     const val NEVER_BEATEN = 999
 
     fun Hand.createDtoPieceCopy(): Piece {

@@ -26,7 +26,7 @@ class FastIslandMetadata(
   /**
    * The number of rounds the author has beaten the island in
    */
-  var authorRoundsToBeat: Int = Island.UNKNOWN_ROUNDS_TO_BEAT,
+  var authorRoundsToBeat: Int = Island.NEVER_PLAYED,
 
   var modifier: PreviewModifier = PreviewModifier.NOTHING,
   /**
@@ -55,7 +55,7 @@ class FastIslandMetadata(
   override fun compareTo(other: FastIslandMetadata): Int =
     comparingInt(
       ToIntFunction<FastIslandMetadata> { metadata ->
-        if (Island.UNKNOWN_ROUNDS_TO_BEAT == metadata.authorRoundsToBeat) {
+        if (Island.NEVER_PLAYED == metadata.authorRoundsToBeat) {
           Int.MAX_VALUE / 2
         } else {
           metadata.authorRoundsToBeat

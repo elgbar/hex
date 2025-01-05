@@ -42,9 +42,9 @@ class MapEditorInputProcessor(private val screen: MapEditorScreen) : AbstractInp
       editor.edit(hex, data, metadata)
     }
     editor.postEdit(metadata)
-    if (screen.artbSpinner.value != Island.UNKNOWN_ROUNDS_TO_BEAT) {
+    if (screen.artbSpinner.value != Island.NEVER_PLAYED) {
       MessagesRenderer.publishWarning("Resetting rounds to beat to unknown as the map has been edited")
-      screen.artbSpinner.setValue(Island.UNKNOWN_ROUNDS_TO_BEAT, true)
+      screen.artbSpinner.setValue(Island.NEVER_PLAYED, true)
     }
   }
 
