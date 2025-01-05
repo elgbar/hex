@@ -43,14 +43,20 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.NEVER_BEATEN
 import no.elg.hex.island.IslandGeneration
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
 import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_OCTAVES
 import no.elg.hex.island.IslandGeneration.INITIAL_FREQUENCY
 import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
+import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
+import no.elg.hex.util.regenerateCapitals
+import no.elg.hex.util.removeSmallerIslands
+import no.elg.hex.util.saveInitialIsland
 import no.elg.hex.util.value
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
@@ -263,18 +269,47 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
 
       row()
 
+      fun createNewIsland(instantly: Boolean) {
+        val nextId = Hex.assets.islandFiles.nextIslandId
+        Gdx.app.debug(
+          "CREATOR",
+          "Creating island $nextId with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value} (seed: ${seedField.text})"
+        )
+
+        val metadata = FastIslandMetadata(nextId, authorRoundsToBeat = NEVER_BEATEN)
+        val island = createIsland()
+        val showIslandCreationScreen = if (instantly) {
+          island.removeSmallerIslands()
+          island.fixWrongTreeTypes()
+          island.regenerateCapitals()
+          island.cleanPiecesOnInvisibleHexagons()
+
+          !saveInitialIsland(metadata, island)
+        } else {
+          true
+        }
+        if (showIslandCreationScreen) {
+          play(metadata, island)
+        } else {
+          Hex.screen = LevelSelectScreen()
+        }
+      }
+
       horizontalGroup {
         space(10f)
         visTextButton("Create island") {
           disableables.add(this)
           onClick {
             if (this.isDisabled) return@onClick
-            val nextId = Hex.assets.islandFiles.nextIslandId
-            Gdx.app.debug(
-              "CREATOR",
-              "Creating island $nextId with a dimension of " + "${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value}"
-            )
-            play(FastIslandMetadata(nextId), createIsland())
+            createNewIsland(false)
+          }
+        }
+
+        visTextButton("Instantly create") {
+          disableables.add(this)
+          onClick {
+            if (this.isDisabled) return@onClick
+            createNewIsland(true)
           }
         }
 

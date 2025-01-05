@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add program flag `--ai-debug` to print what the AI is thinking
 * Add test islands to persist test maps in VCS
 * Add shortcut `ctrl` + `N` to create a new island in the map editor
+* Add button to create new islands directly from the level creation screen
 
 ### Changed
 

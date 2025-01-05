@@ -170,6 +170,8 @@ fun Island.removeSmallerIslands() {
       getData(hexagon).isDisabled = true
     }
   }
+
+  recalculateVisibleIslands()
 }
 
 fun Island.findIslands(): Set<Set<Hexagon<HexagonData>>> {
