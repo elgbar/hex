@@ -108,7 +108,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
             }
             color?.let { drawBox(x, y, width, height, it) }
           }
-          val font = Hex.assets.regularItalicFont
+          val font = Hex.assets.regularFontNotScaled
           val vertOffset = font.lineHeight
 
           val showIslandId = Hex.mapEditor || Hex.debug || Settings.showIslandId
