@@ -42,7 +42,7 @@ class MusicHandler {
     music = Hex.assets.songs.randomOrNull()?.apply {
       isLooping = false
       setOnCompletionListener {
-        music = Hex.assets.songs.filter { it != this }.randomOrNull()
+        music = Hex.assets.songs.filter { it != this }.randomOrNull() ?: this
       }
     }
   }

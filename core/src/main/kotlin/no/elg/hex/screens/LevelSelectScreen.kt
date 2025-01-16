@@ -207,7 +207,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     input.show()
     initStage()
     stageScreen.show()
-    Hex.music.loop(Hex.assets.freedomMusic)
+    Hex.assets.songs.firstOrNull().also { song -> Hex.music.loop(song) }
   }
 
   override fun hide() {

@@ -129,11 +129,7 @@ class Assets : AssetManager() {
     const val EMPTY_COFFERS_SOUND = "sounds/empty_coffers_%d.mp3"
     private val EMPTY_COFFERS_SOUND_RANGE = 1..5
 
-    const val FREEDOM_MUSIC = "music/freedom.ogg"
-    const val ASTRO_RIDER_MUSIC = "music/astro_rider.ogg"
-    const val NEON_DREAMS_MUSIC = "music/neon_dreams.ogg"
-    const val THE_WILL_TO_LIVE_MUSIC = "music/the_will_to_live.ogg"
-    const val VENTURE_TO_THE_HORIZON_MUSIC = "music/venture_to_the_horizon.ogg"
+    const val WILLY_HEX1_MUSIC = "music/hex1.ogg"
 
     private const val FONT_SIZE = 20
 
@@ -219,14 +215,10 @@ class Assets : AssetManager() {
   val mutedSelected by lazy { findSprite("muted_selected") }
   val unmutedSelected by lazy { findSprite("unmuted_selected") }
 
-  val freedomMusic by lazy { fetchOrNull<Music>(FREEDOM_MUSIC) }
-  val astroRiderMusic by lazy { fetchOrNull<Music>(ASTRO_RIDER_MUSIC) }
-  val neonDreamsMusic by lazy { fetchOrNull<Music>(NEON_DREAMS_MUSIC) }
-  val theWillToLiveMusic by lazy { fetchOrNull<Music>(THE_WILL_TO_LIVE_MUSIC) }
-  val ventureToTheHorizonMusic by lazy { fetchOrNull<Music>(VENTURE_TO_THE_HORIZON_MUSIC) }
+  val hex1Music: Music? by lazy { fetchOrNull<Music>(WILLY_HEX1_MUSIC) }
 
   /** All available music */
-  val songs by lazy { listOf(freedomMusic, astroRiderMusic, neonDreamsMusic, theWillToLiveMusic, ventureToTheHorizonMusic).filterNotNull() }
+  val songs by lazy { listOfNotNull(hex1Music) }
 
   val undoAllSound by SoundDelegate(UNDO_ALL_SOUND)
   val clickSound by SoundDelegate(CLICK_SOUND)
@@ -503,11 +495,7 @@ class Assets : AssetManager() {
     load<Sound>(CLICK_SOUND)
     load<Sound>(CLICK_BAD_SOUND)
 
-    load<Music>(FREEDOM_MUSIC)
-    load<Music>(ASTRO_RIDER_MUSIC)
-    load<Music>(NEON_DREAMS_MUSIC)
-    load<Music>(THE_WILL_TO_LIVE_MUSIC)
-    load<Music>(VENTURE_TO_THE_HORIZON_MUSIC)
+    load<Music>(WILLY_HEX1_MUSIC)
 
     fun loadSoundVariations(path: String, range: IntRange) {
       for (i in range) {
