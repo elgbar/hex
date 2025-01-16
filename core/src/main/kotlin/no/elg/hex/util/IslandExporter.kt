@@ -15,6 +15,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.screens.ImportIslandsScreen
+import no.elg.hex.util.ExportedIsland.Companion.importBest
 import org.hexworks.mixite.core.api.CubeCoordinate
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@")
@@ -26,20 +27,46 @@ import org.hexworks.mixite.core.api.CubeCoordinate
 )
 sealed interface ExportedIsland {
 
+  /**
+   * Island id
+   * @see FastIslandMetadata.id
+   */
   val id: Int
 
+  /**
+   * Users best score for this island
+   * @see FastIslandMetadata.userRoundsToBeat
+   */
+  val best: Int
+
   fun import(metadata: FastIslandMetadata): Island?
+
+  companion object {
+    fun ExportedIsland.importBest(metadata: FastIslandMetadata) {
+      val metadataIsHasScore = metadata.userRoundsToBeat != Island.NEVER_PLAYED
+      val exportedHasScore = best != Island.NEVER_PLAYED
+      if (metadataIsHasScore && exportedHasScore && best < metadata.userRoundsToBeat) {
+        // We have a better score than the current one
+        metadata.userRoundsToBeat = best
+      } else if (!metadataIsHasScore && exportedHasScore) {
+        // Export has a score while the metadata does not
+        metadata.userRoundsToBeat = best
+      }
+    }
+  }
 }
 
 @JsonTypeName("o")
 data class OngoingExportedIslandData(
   override val id: Int,
+  override val best: Int,
   @JsonDeserialize(keyAs = CubeCoordinate::class, contentAs = HexagonData::class)
   val progress: Map<CubeCoordinate, HexagonData> = emptyMap()
 ) : ExportedIsland {
 
   override fun import(metadata: FastIslandMetadata): Island? {
     metadata.modifier = PreviewModifier.NOTHING
+    importBest(metadata)
     return try {
       loadIslandSync(id).also { island ->
         val dto = island.createDto().withInitialData(progress)
@@ -57,9 +84,16 @@ data class OngoingExportedIslandData(
 }
 
 @JsonTypeName("f")
-data class FinishedExportedIslandData(override val id: Int, val modifier: PreviewModifier, val winningTeam: Team, val round: Int) : ExportedIsland {
+data class FinishedExportedIslandData(
+  override val id: Int,
+  override val best: Int,
+  val modifier: PreviewModifier,
+  val winningTeam: Team,
+  val round: Int
+) : ExportedIsland {
   override fun import(metadata: FastIslandMetadata): Island? {
     metadata.modifier = modifier
+    importBest(metadata)
     return try {
       loadInitialIsland(id).also { island ->
         island.round = round
@@ -76,9 +110,9 @@ fun exportIsland(metadata: FastIslandMetadata): ExportedIsland {
   val island = loadIslandSync(metadata.id)
   return if (metadata.modifier == PreviewModifier.NOTHING) {
     val progress = island.createDto().refine(loadInitialIsland(metadata.id)).hexagonData
-    OngoingExportedIslandData(metadata.id, progress)
+    OngoingExportedIslandData(metadata.id, metadata.userRoundsToBeat, progress)
   } else {
-    FinishedExportedIslandData(metadata.id, metadata.modifier, island.winningTeam, island.round)
+    FinishedExportedIslandData(metadata.id, metadata.userRoundsToBeat, metadata.modifier, island.winningTeam, island.round)
   }
 }
 
