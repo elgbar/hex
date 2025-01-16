@@ -39,10 +39,15 @@ class MusicHandler {
     if (audioDisabled) {
       return
     }
-    music = Hex.assets.songs.randomOrNull()?.apply {
-      isLooping = false
-      setOnCompletionListener {
-        music = Hex.assets.songs.filter { it != this }.randomOrNull() ?: this
+    if (Hex.assets.songs.size <= 1) {
+      // Only one song, play it on a loop
+      loop(Hex.assets.songs.firstOrNull())
+    } else {
+      music = Hex.assets.songs.randomOrNull()?.apply {
+        isLooping = false
+        setOnCompletionListener {
+          music = Hex.assets.songs.filter { it != this }.randomOrNull()
+        }
       }
     }
   }
