@@ -78,8 +78,8 @@ object Hex : ApplicationAdapter() {
 
   lateinit var args: ApplicationArgumentsParser
 
-  lateinit var assets: Assets
-    private set
+  private var assets0: Assets? = null
+  val assets: Assets get() = assets0 ?: error("Assets not initialized")
 
   val asyncThread: AsyncExecutorDispatcher get() = internalAsyncThread ?: error("Async thread not initialized")
 
@@ -94,7 +94,7 @@ object Hex : ApplicationAdapter() {
 
   private var renderFailures = 0
 
-  val assetsAvailable: Boolean get() = Hex::assets.isInitialized
+  val assetsAvailable: Boolean get() = assets0 != null
 
   val inputMultiplexer = InputMultiplexer()
 
@@ -229,10 +229,11 @@ object Hex : ApplicationAdapter() {
 
     internalAsyncThread = newSingleThreadAsyncContext()
 
-    assets = Assets()
-    Gdx.app.postRunnable {
+    if (assets0 == null) {
+      assets0 = Assets()
       assets.loadAssets()
-
+    }
+    Gdx.app.postRunnable {
       // must be last
       assets.finishMain()
     }
@@ -243,12 +244,10 @@ object Hex : ApplicationAdapter() {
     inputMultiplexer.clear()
     Gdx.app.postRunnable {
       screen = SplashScreen(screen)
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
     }
-    assets.dispose()
+    assets.unready()
     internalAsyncThread = null
     ScreenRenderer.dispose()
-    VisUI.dispose(false)
   }
 
   override fun resize(width: Int, height: Int) {

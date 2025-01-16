@@ -164,6 +164,8 @@ class Assets : AssetManager() {
 
   private val resolver: FileHandleResolver
 
+  val ready: Boolean get() = isLoaded(SPRITE_ATLAS)
+
   private fun findSprite(regionName: String): AtlasRegion {
     val region: AtlasRegion = try {
       sprites.findRegion(regionName)
@@ -465,6 +467,10 @@ class Assets : AssetManager() {
   fun finishMain() {
     Gdx.app.trace("ASSET") { "Main finished" }
     mainFinishedLoading = true
+  }
+
+  fun unready() {
+    mainFinishedLoading = false
   }
 
   override fun unload(fileName: String?) {
