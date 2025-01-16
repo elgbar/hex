@@ -3,16 +3,22 @@ project.ext.assetsDir = new File("../core/src/main/resources")
 
 int androidSdkVersion = 35
 int androidVersionCode = Integer.parseInt(androidVersionCode)
+int javaCompileVersion = Integer.parseInt(javaVersion)
+
 
 android {
   compileSdk androidSdkVersion
 
+  namespace 'no.elg.hex'
+
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.toVersion(javaCompileVersion)
+    targetCompatibility = JavaVersion.toVersion(javaCompileVersion)
   }
 
-  namespace 'no.elg.hex'
+  kotlinOptions {
+    jvmTarget = javaCompileVersion.toString()
+  }
 
   sourceSets {
     main {
@@ -44,8 +50,8 @@ android {
   defaultConfig {
     applicationId "no.elg.hex"
     minSdkVersion 26
-      targetSdkVersion androidSdkVersion
-      versionCode androidVersionCode
+    targetSdkVersion androidSdkVersion
+    versionCode androidVersionCode
     versionName fullVersion
   }
   buildTypes {

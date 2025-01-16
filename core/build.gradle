@@ -1,5 +1,1 @@
-apply plugin: "kotlin"
-
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
 project.ext.assetsDir = new File("/src/main/resources")

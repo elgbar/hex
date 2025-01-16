@@ -9,7 +9,7 @@ buildscript {
   ext {
     appName = "Hex"
     kotlinVersion = "2.1.0"
-    gdxVersion = '1.13.0'
+    gdxVersion = '1.13.1'
     ktxVersion = "1.12.1-rc2"
     visVersion = '1.5.3'
     jacksonVersion = "2.18.2"
@@ -45,14 +45,7 @@ def isNonStable = { String version ->
   return !stableKeyword && !(version ==~ regex)
 }
 
-tasks.withType(KotlinCompile).configureEach {
-  it.kotlinJavaToolchainProvider.languageVersion.set(JavaLanguageVersion.of(17))
 
-  compilerOptions {
-    progressiveMode = true
-    freeCompilerArgs.add("-Xnon-local-break-continue") // https://github.com/Kotlin/KEEP/blob/guards/proposals/break-continue-in-inline-lambdas.md
-  }
-}
 
 subprojects {
   apply plugin: "com.diffplug.spotless"
@@ -93,7 +86,7 @@ subprojects {
     }
   }
 
-  tasks.withType(KotlinCompilationTask).configureEach {
+  tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]
@@ -112,6 +105,7 @@ allprojects {
       isNonStable(it.candidate.version)
     }
   }
+
 }
 
 tasks.named('wrapper') {
@@ -166,6 +160,12 @@ project(":desktop") {
     duplicatesStrategy = DuplicatesStrategy.WARN
   }
 
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(javaVersion.toInteger())
+    }
+  }
+
   classes {
     doFirst {
       // Automatically create a soft link to the island folder to allow map-editor to work
@@ -186,7 +186,6 @@ project(":desktop") {
 }
 
 project(":core") {
-
   apply plugin: "kotlin"
 
   classes {
@@ -236,5 +235,11 @@ project(":core") {
     testApi "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testApi "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+  }
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(javaVersion.toInteger())
+    }
   }
 }
