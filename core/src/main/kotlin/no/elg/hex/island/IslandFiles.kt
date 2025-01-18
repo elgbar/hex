@@ -31,7 +31,7 @@ class IslandFiles {
     }
 
   fun fullFilesSearch() {
-    reportTiming("do a fill files search") {
+    reportTiming("do a full files search") {
       if (Hex.args.`disable-island-loading`) return
       islandIds.clear()
 

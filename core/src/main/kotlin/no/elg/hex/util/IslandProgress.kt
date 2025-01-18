@@ -23,7 +23,7 @@ fun PreviewIslandScreen.saveIslandProgress() {
   islandPreferences.putString(getPrefName(metadata.id), island.createDto().serialize())
   islandPreferences.flush()
   if (!Hex.paused) {
-    Hex.assets.islandPreviews.updateSelectPreview(metadata, island)
+    Hex.assets.islandPreviews.updatePreviewFromIsland(metadata, island)
   }
 }
 

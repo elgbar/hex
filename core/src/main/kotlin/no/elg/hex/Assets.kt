@@ -160,8 +160,6 @@ class Assets : AssetManager() {
 
   private val resolver: FileHandleResolver
 
-  val ready: Boolean get() = isLoaded(SPRITE_ATLAS)
-
   private fun findSprite(regionName: String): AtlasRegion {
     val region: AtlasRegion = try {
       sprites.findRegion(regionName)
@@ -400,7 +398,7 @@ class Assets : AssetManager() {
       loadingInfo = "islands"
 
       islandFiles.fullFilesSearch() // find all island files
-      islandPreviews.renderPreviews()
+      islandPreviews.updateAllPreviewsFromMetadata()
     }
   }
 

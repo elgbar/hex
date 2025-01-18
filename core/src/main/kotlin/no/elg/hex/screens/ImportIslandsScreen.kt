@@ -30,7 +30,7 @@ class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadat
         continue
       }
       val (metadata, island) = await
-      Hex.assets.islandPreviews.updateSelectPreviewNow(metadata, island)
+      Hex.assets.islandPreviews.updatePreviewFromIslandSync(metadata, island)
       renderingsDone++
       skipFrame()
     }

@@ -32,10 +32,11 @@ class IslandPreviewCollection : Disposable {
 
   private val fastIslandPreviews = GdxArray<FastIslandMetadata>()
   private var dirty = true
-  private val internalPreviewRendererQueue = GdxArray<Runnable>()
+
+  val size get() = fastIslandPreviews.size
 
   fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> {
-    synchronized(internalPreviewRendererQueue) {
+    synchronized(fastIslandPreviews) {
       if (dirty) {
         sortIslands()
       }
@@ -43,18 +44,16 @@ class IslandPreviewCollection : Disposable {
     }
   }
 
-  val size get() = fastIslandPreviews.size
-
   fun sortIslands() {
     dirty = false
     if (!Hex.mapEditor) {
-      synchronized(internalPreviewRendererQueue) {
+      synchronized(fastIslandPreviews) {
         fastIslandPreviews.sort()
       }
     }
   }
 
-  fun renderPreview(island: Island, previewWidth: Int, previewHeight: Int, metadata: FastIslandMetadata): FrameBuffer {
+  fun createPreviewFromIsland(island: Island, previewWidth: Int, previewHeight: Int, metadata: FastIslandMetadata): FrameBuffer {
     val islandScreen = PreviewIslandScreen(FastIslandMetadata(-1), island, true)
     islandScreen.resize(previewWidth, previewHeight)
 
@@ -134,7 +133,7 @@ class IslandPreviewCollection : Disposable {
     return buffer
   }
 
-  fun renderPreviews() {
+  fun updateAllPreviewsFromMetadata() {
     if (Hex.assets.islandFiles.size == 0) {
       if (!Hex.args.`disable-island-loading`) {
         MessagesRenderer.publishError("Failed to find any islands to load")
@@ -152,26 +151,26 @@ class IslandPreviewCollection : Disposable {
       for (id in Hex.assets.islandFiles.islandIds) {
         val metadata = FastIslandMetadata.load(id)
         if (Hex.args.`update-previews`) {
-          updateSelectPreview(metadata)
-          continue
-        }
-        metadata.preview // Load the preview
-        synchronized(internalPreviewRendererQueue) {
-          fastIslandPreviews.add(metadata)
-          dirty = true
+          updatePreviewFromIsland(metadata)
+        } else {
+          synchronized(fastIslandPreviews) {
+            metadata.preview // Load the preview
+            fastIslandPreviews.add(metadata)
+            dirty = true
+          }
         }
         skipFrame()
       }
     }
   }
 
-  fun updateSelectPreview(metadata: FastIslandMetadata, maybeIsland: Island? = null, onDone: () -> Unit = {}): Job =
+  fun updatePreviewFromIsland(metadata: FastIslandMetadata, maybeIsland: Island? = null, onDone: () -> Unit = {}): Job =
     KtxAsync.launch(Hex.asyncThread) {
-      updateSelectPreviewNow(metadata, maybeIsland)
+      updatePreviewFromIslandSync(metadata, maybeIsland)
       onDone()
     }
 
-  suspend fun updateSelectPreviewNow(metadata: FastIslandMetadata, maybeIsland: Island? = null) {
+  suspend fun updatePreviewFromIslandSync(metadata: FastIslandMetadata, maybeIsland: Island? = null) {
     val island = if (maybeIsland == null) {
       val islandFileName = getIslandFileName(metadata.id)
       if (!Hex.assets.isLoaded<Island>(islandFileName)) {
@@ -187,10 +186,10 @@ class IslandPreviewCollection : Disposable {
     }
 
     withContext(MainDispatcher) {
-      val preview = renderPreview(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata)
+      val preview = createPreviewFromIsland(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata)
       metadata.previewPixmap = preview.toBytes()
       metadata.save()
-      synchronized(internalPreviewRendererQueue) {
+      synchronized(fastIslandPreviews) {
         val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
         if (existingIndex == NOT_IN_COLLECTION) {
           fastIslandPreviews.add(metadata)
@@ -203,7 +202,7 @@ class IslandPreviewCollection : Disposable {
   }
 
   fun removeIsland(id: Int) {
-    synchronized(internalPreviewRendererQueue) {
+    synchronized(fastIslandPreviews) {
       val index = fastIslandPreviews.indexOfFirst { it.id == id }
       if (index != NOT_IN_COLLECTION) {
         val removeIndex = fastIslandPreviews.removeIndex(index)
@@ -214,7 +213,7 @@ class IslandPreviewCollection : Disposable {
   }
 
   private fun disposePreviews() {
-    synchronized(internalPreviewRendererQueue) {
+    synchronized(fastIslandPreviews) {
       fastIslandPreviews.map(Disposable::dispose)
       fastIslandPreviews.clear()
     }

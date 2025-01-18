@@ -63,7 +63,7 @@ fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
   return try {
     file.writeString(island.createDto().serialize(), false)
     publishMessage("Successfully saved island '${file.name()}'", color = Color.GREEN)
-    Hex.assets.islandPreviews.updateSelectPreview(metadata, island) {
+    Hex.assets.islandPreviews.updatePreviewFromIsland(metadata, island) {
       if (!existed) {
         Hex.assets.islandFiles.fullFilesSearch()
       }
@@ -105,7 +105,7 @@ fun loadIslandSync(id: Int): Island {
 fun resetAllIslandProgress() {
   islandPreferences.clear()
   islandPreferences.flush()
-  Hex.assets.islandPreviews.renderPreviews()
+  Hex.assets.islandPreviews.updateAllPreviewsFromMetadata()
 }
 
 fun IslandDto.serialize(): String = Hex.mapper.writeValueAsString(this)

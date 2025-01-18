@@ -371,7 +371,7 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
     if (layoutSpinner.value.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
       KtxAsync.launch(MainDispatcher) {
         val preview = async {
-          Hex.assets.islandPreviews.renderPreview(createIsland(), newIslandpreviewSize, newIslandpreviewSize, dummyMetadata)
+          Hex.assets.islandPreviews.createPreviewFromIsland(createIsland(), newIslandpreviewSize, newIslandpreviewSize, dummyMetadata)
         }.await()
 
         previewBuffer?.dispose()
