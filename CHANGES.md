@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix previews incorrectly using disposed textures after resetting settings
 * Fix wrong team exported as winning team
+* Fix island not being saved correctly when game ends
 
 ### Removed
 

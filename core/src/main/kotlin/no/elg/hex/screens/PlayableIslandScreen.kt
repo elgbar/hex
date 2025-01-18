@@ -322,7 +322,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
     if (modifier == WON && (metadata.userRoundsToBeat == NEVER_PLAYED || metadata.userRoundsToBeat > island.round)) {
       metadata.userRoundsToBeat = island.round
     }
-    Hex.assets.islandPreviews.updatePreviewFromIsland(metadata, island)
+    saveIslandProgress()
   }
 
   private fun surrender() {
