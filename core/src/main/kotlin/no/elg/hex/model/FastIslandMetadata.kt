@@ -40,19 +40,23 @@ class FastIslandMetadata(
 
   var previewPixmap: ByteArray? = previewPixmap
     set(value) {
-      internalPreview.disposeSafely()
-      internalPreview = null
+      clearPreviewTexture()
       field = value
     }
 
-  private var internalPreview: Texture? = null
+  private var internalPreviewTexture: Texture? = null
+
+  fun clearPreviewTexture() {
+    internalPreviewTexture.disposeSafely()
+    internalPreviewTexture = null
+  }
 
   @get:JsonIgnore
   val preview: Texture?
     get() {
-      if (internalPreview != null) return internalPreview
-      internalPreview = textureFromBytes(previewPixmap ?: return null)
-      return internalPreview
+      if (internalPreviewTexture != null) return internalPreviewTexture
+      internalPreviewTexture = textureFromBytes(previewPixmap ?: return null)
+      return internalPreviewTexture
     }
 
   override fun compareTo(other: FastIslandMetadata): Int =
@@ -91,7 +95,7 @@ class FastIslandMetadata(
   }
 
   override fun dispose() {
-    internalPreview.disposeSafely()
+    internalPreviewTexture.disposeSafely()
   }
 
   override fun equals(other: Any?): Boolean {
@@ -149,7 +153,7 @@ class FastIslandMetadata(
     }
 
     fun load(id: Int): FastIslandMetadata {
-      val savedMetadata = if (Hex.mapEditor || !islandPreferences.contains(getMetadataFileName(id))) {
+      val savedMetadata = if (Hex.mapEditor || getMetadataFileName(id) !in islandPreferences) {
         loadInitial(id)
       } else {
         loadProgress(id)

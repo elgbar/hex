@@ -154,6 +154,7 @@ class IslandPreviewCollection : Disposable {
           updatePreviewFromIsland(metadata)
         } else {
           synchronized(fastIslandPreviews) {
+            metadata.clearPreviewTexture()
             metadata.preview // Load the preview
             fastIslandPreviews.add(metadata)
             dirty = true
