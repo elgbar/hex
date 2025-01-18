@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Add debug setting to allow loading already completed/won/lost islands
+* Add cheat on F9 which sets half the hexagons to the current team
+  * Used to test real AI surrendering
 
 ### Changed
 

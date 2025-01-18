@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Keys.ESCAPE
 import com.badlogic.gdx.Input.Keys.F10
 import com.badlogic.gdx.Input.Keys.F11
 import com.badlogic.gdx.Input.Keys.F12
+import com.badlogic.gdx.Input.Keys.F9
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.Input.Keys.Y
 import com.badlogic.gdx.Input.Keys.Z
@@ -23,6 +24,7 @@ import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.getData
 import no.elg.hex.util.isKeyPressed
 import no.elg.hex.util.toggleShown
+import kotlin.random.Random
 
 /** @author Elg */
 class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true) {
@@ -56,6 +58,13 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
         screen.island.selected?.hexagons?.forEach {
           val piece = screen.island.getData(it).piece
           (piece as? LivingPiece)?.moved = false
+        }
+      }
+      F9 -> if (gameInteraction.cheating) {
+        val island = screen.island
+        island.visibleHexagons.filter { Random.nextBoolean() }.forEach {
+          val data = island.getData(it)
+          data.team = island.currentTeam
         }
       }
 
