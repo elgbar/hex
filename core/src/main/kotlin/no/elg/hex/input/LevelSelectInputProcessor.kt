@@ -90,7 +90,9 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       id == 3 - PREVIEWS_PER_ROW -> Hex.screen = TutorialScreen()
       id != INVALID_ISLAND_INDEX -> {
         val metadata = FastIslandMetadata.load(id)
-        if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.mapEditor) {
+        if (Settings.loadedAlreadyCompletedIslands) {
+          play(metadata)
+        } else if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.mapEditor) {
           if (metadata.modifier != PreviewModifier.NOTHING) {
             clearIslandProgress(metadata)
           }

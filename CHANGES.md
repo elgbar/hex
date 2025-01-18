@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add debug setting to allow loading already completed/won/lost islands
+
 ### Changed
 
 * When the AI surrenders exit to the level select screen after accepting it
