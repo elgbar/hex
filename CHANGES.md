@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* When the AI surrenders exit to the level select screen after accepting it
+
 ### Fixed
 
 * Fix previews incorrectly using disposed textures after resetting settings

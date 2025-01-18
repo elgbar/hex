@@ -137,7 +137,8 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
         island.history.clear()
 
         island.fill(island.currentTeam)
-        endGame(true)
+        onGameEnded(WON)
+        Hex.screen = LevelSelectScreen()
       }
 
       table {
