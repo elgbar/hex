@@ -14,6 +14,8 @@ import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.preview.PreviewModifier
+import no.elg.hex.preview.PreviewModifier.NOTHING
+import no.elg.hex.preview.PreviewModifier.WON
 import no.elg.hex.screens.ImportIslandsScreen
 import no.elg.hex.util.ExportedIsland.Companion.importBest
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -65,7 +67,7 @@ data class OngoingExportedIslandData(
 ) : ExportedIsland {
 
   override fun import(metadata: FastIslandMetadata): Island? {
-    metadata.modifier = PreviewModifier.NOTHING
+    metadata.modifier = NOTHING
     importBest(metadata)
     return try {
       loadIslandSync(id).also { island ->
@@ -108,11 +110,15 @@ data class FinishedExportedIslandData(
 
 fun exportIsland(metadata: FastIslandMetadata): ExportedIsland {
   val island = loadIslandSync(metadata.id)
-  return if (metadata.modifier == PreviewModifier.NOTHING) {
+  return if (metadata.modifier == NOTHING) {
     val progress = island.createDto().refine(loadInitialIsland(metadata.id)).hexagonData
     OngoingExportedIslandData(metadata.id, metadata.userRoundsToBeat, progress)
   } else {
-    FinishedExportedIslandData(metadata.id, metadata.userRoundsToBeat, metadata.modifier, island.winningTeam, island.round)
+    val team = when (metadata.modifier) {
+      WON -> island.currentTeam
+      else -> island.hexagonsPerTeam.filter { it.key != island.currentTeam }.maxByOrNull { it.value }?.key ?: Team.SUN
+    }
+    FinishedExportedIslandData(metadata.id, metadata.userRoundsToBeat, metadata.modifier, team, island.round)
   }
 }
 
