@@ -22,7 +22,9 @@ import no.elg.hex.util.safeUse
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author kheba */
-class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
+class OutlineRenderer(private val islandScreen: PreviewIslandScreen) :
+  FrameUpdatable,
+  Disposable {
 
   private val lineRenderer: ShapeRenderer = ShapeRenderer(1000)
 
@@ -116,14 +118,13 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpda
 
     private const val ATTACKABLE_OUTLINE_BLINK_PERIOD_SECONDS = .75f
 
-    fun attackColor(str: Int): Color {
-      return when (str) {
+    fun attackColor(str: Int): Color =
+      when (str) {
         1 -> attackColor
         2 -> attackColor2
         3 -> attackColor3
         else -> attackColor4
       }
-    }
 
     private val attackColor: Color = Color.valueOf("#FF0000")
     private val attackColor2: Color = Color.valueOf("#FF3D3D")

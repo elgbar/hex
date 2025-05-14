@@ -86,13 +86,7 @@ data class OngoingExportedIslandData(
 }
 
 @JsonTypeName("f")
-data class FinishedExportedIslandData(
-  override val id: Int,
-  override val best: Int,
-  val modifier: PreviewModifier,
-  val winningTeam: Team,
-  val round: Int
-) : ExportedIsland {
+data class FinishedExportedIslandData(override val id: Int, override val best: Int, val modifier: PreviewModifier, val winningTeam: Team, val round: Int) : ExportedIsland {
   override fun import(metadata: FastIslandMetadata): Island? {
     metadata.modifier = modifier
     importBest(metadata)

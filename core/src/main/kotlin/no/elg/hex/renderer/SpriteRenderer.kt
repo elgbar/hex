@@ -21,7 +21,9 @@ import no.elg.hex.util.getTerritories
 import no.elg.hex.util.safeUse
 
 /** @author Elg */
-class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
+class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
+  FrameUpdatable,
+  Disposable {
 
   private val batch: SpriteBatch = SpriteBatch()
 
@@ -31,9 +33,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdat
       loop@ for (hexagon in island.visibleHexagons) {
         val data = island.getData(hexagon)
 
-        fun shouldAnimate(): Boolean {
-          return data.team == island.currentTeam && island.isCurrentTeamHuman() && !Hex.mapEditor && !islandScreen.isPreviewRenderer
-        }
+        fun shouldAnimate(): Boolean = data.team == island.currentTeam && island.isCurrentTeamHuman() && !Hex.mapEditor && !islandScreen.isPreviewRenderer
 
         val drawable = Hex.assets.getTexture(data.piece, shouldAnimate()) ?: continue@loop
 

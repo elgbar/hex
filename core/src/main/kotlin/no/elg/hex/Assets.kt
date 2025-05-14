@@ -474,8 +474,8 @@ class Assets : AssetManager() {
   /**
    * @return If audio has been loaded
    */
-  fun audioLoaded(wait: Boolean): Boolean {
-    return when {
+  fun audioLoaded(wait: Boolean): Boolean =
+    when {
       !Settings.enableAudio || Hex.audioDisabled -> false
       audioLoadCalled -> true
       else -> {
@@ -483,7 +483,6 @@ class Assets : AssetManager() {
         false
       }
     }
-  }
 
   private fun loadAudio(wait: Boolean) {
     audioLoadCalled = true
@@ -512,9 +511,7 @@ class Assets : AssetManager() {
   }
 
   @Deprecated("Does not care about type", replaceWith = ReplaceWith("fetch(fileName)"), level = DeprecationLevel.ERROR)
-  override fun <T : Any?> get(fileName: String?): T {
-    return super.get(fileName)
-  }
+  override fun <T : Any?> get(fileName: String?): T = super.get(fileName)
 
   private fun updateTitle() {
     var title = "Hex"

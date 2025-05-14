@@ -11,12 +11,7 @@ import no.elg.hex.util.getNeighbors
 import org.hexworks.mixite.core.api.Hexagon
 
 /** @author Elg */
-data class Territory(
-  val island: Island,
-  val capital: Capital,
-  val hexagons: Collection<Hexagon<HexagonData>>,
-  val capitalHexagon: Hexagon<HexagonData>
-) {
+data class Territory(val island: Island, val capital: Capital, val hexagons: Collection<Hexagon<HexagonData>>, val capitalHexagon: Hexagon<HexagonData>) {
 
   val team: Team = capital.data.team
 
@@ -88,7 +83,5 @@ data class Territory(
     require(checkOnlyOneCapital()) { "There are not only one capital found these ${hexagons.filter { island.getData(it).piece is Capital }.joinToString { it.coordinates } }" }
   }
 
-  override fun toString(): String {
-    return "Territory of team ${capital.data.team}@${capitalHexagon.coordinates}"
-  }
+  override fun toString(): String = "Territory of team ${capital.data.team}@${capitalHexagon.coordinates}"
 }

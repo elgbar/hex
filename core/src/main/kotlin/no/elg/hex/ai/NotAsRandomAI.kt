@@ -350,13 +350,9 @@ class NotAsRandomAI(
    *  UTILITY METHODS
    * *************************************************************************/
 
-  private fun allowedToBuyCastle(round: Int): Boolean {
-    return round > castleDelay
-  }
+  private fun allowedToBuyCastle(round: Int): Boolean = round > castleDelay
 
-  private fun shouldBuyCastle(): Boolean {
-    return Random.nextDouble() > buyCastleChance
-  }
+  private fun shouldBuyCastle(): Boolean = Random.nextDouble() > buyCastleChance
 
   private fun bestPieceToMergeWith(territory: Territory, handPiece: LivingPiece): Hexagon<HexagonData>? {
     think(territory) { "Will try to merge piece with another piece" }
@@ -548,14 +544,13 @@ class NotAsRandomAI(
     }
   }
 
-  private fun attackableHexagons(territory: Territory, piece: LivingPiece): List<Hexagon<HexagonData>> {
-    return territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) }
-  }
+  private fun attackableHexagons(territory: Territory, piece: LivingPiece): List<Hexagon<HexagonData>> = territory.enemyBorderHexes.filter { territory.island.canAttack(it, piece) }
 
-  private fun canPieceAttackOrCutDownTree(territory: Territory, piece: LivingPiece): Boolean {
-    return territory.enemyBorderHexes.any { hexagon -> territory.island.canAttack(hexagon, piece) } ||
+  private fun canPieceAttackOrCutDownTree(territory: Territory, piece: LivingPiece): Boolean =
+    territory.enemyBorderHexes.any { hexagon ->
+      territory.island.canAttack(hexagon, piece)
+    } ||
       territory.filterIsPiece<TreePiece>().any()
-  }
 
   private fun canAttackOrMergePiece(territory: Territory, piece: LivingPiece): Boolean {
     if (canPieceAttackOrCutDownTree(territory, piece)) {

@@ -9,8 +9,8 @@ import no.elg.hex.Hex
 
 const val LOG_TRACE = LOG_DEBUG + 1
 
-fun logLevelToName(level: Int): String {
-  return when (level) {
+fun logLevelToName(level: Int): String =
+  when (level) {
     LOG_TRACE -> "trace"
     LOG_DEBUG -> "debug"
     LOG_INFO -> "info"
@@ -18,7 +18,6 @@ fun logLevelToName(level: Int): String {
     LOG_NONE -> "none"
     else -> "Unknown (given: $level)"
   }
-}
 
 fun Application.trace(tag: String, exception: Throwable? = null, message: () -> String) {
   if (logLevel >= LOG_TRACE) Hex.platform.trace(tag, exception, message())

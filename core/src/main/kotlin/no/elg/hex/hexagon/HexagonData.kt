@@ -144,9 +144,7 @@ class HexagonData(
     }
   }
 
-  override fun toString(): String {
-    return "team: $team piece: $piece"
-  }
+  override fun toString(): String = "team: $team piece: $piece"
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

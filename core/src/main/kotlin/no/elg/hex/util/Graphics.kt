@@ -38,9 +38,7 @@ fun FrameBuffer.toBytes(): ByteArray {
   }
 }
 
-fun textureFromBytes(encoded: ByteArray): Texture {
-  return Texture(Pixmap(encoded, 0, encoded.size))
-}
+fun textureFromBytes(encoded: ByteArray): Texture = Texture(Pixmap(encoded, 0, encoded.size))
 
 fun Camera.resetHdpi() = HdpiUtils.glViewport(0, 0, viewportWidth.toInt(), viewportHeight.toInt())
 

@@ -66,7 +66,9 @@ import kotlin.random.Random
 import com.badlogic.gdx.utils.Array as GdxArray
 
 /** @author Elg */
-class LevelCreationScreen : StageScreen(), ReloadableScreen {
+class LevelCreationScreen :
+  StageScreen(),
+  ReloadableScreen {
 
   private val disableables = mutableListOf<Disableable>()
   private val newIslandpreviewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
@@ -323,8 +325,8 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
     }
   }
 
-  override fun recreate(): AbstractScreen {
-    return LevelCreationScreen().also {
+  override fun recreate(): AbstractScreen =
+    LevelCreationScreen().also {
       it.layoutSpinner.value = layoutSpinner.value
       it.widthSpinner.value = widthSpinner.value
       it.heightSpinner.value = heightSpinner.value
@@ -332,7 +334,6 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
       validator.validateInput(null)
       renderPreview()
     }
-  }
 
   override fun render(delta: Float) {
     super.render(delta)
@@ -346,14 +347,13 @@ class LevelCreationScreen : StageScreen(), ReloadableScreen {
     }
   }
 
-  private fun createIsland(): Island {
-    return IslandGeneration.generate(
+  private fun createIsland(): Island =
+    IslandGeneration.generate(
       seedField.text.hashCode(),
       widthSpinner.value + 2,
       heightSpinner.value + 2,
       layoutSpinner.value
     )
-  }
 
   private var lastRequestedReRender = 0L
 

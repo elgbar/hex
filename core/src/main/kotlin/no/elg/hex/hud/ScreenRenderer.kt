@@ -50,12 +50,7 @@ enum class ScreenDrawPosition(val vertical: VerticalPosition, val horizontal: Ho
   }
 }
 
-sealed class ScreenText(
-  open var color: Color = WHITE,
-  open var bold: Boolean = false,
-  open var italic: Boolean = false,
-  open var next: ScreenText? = null
-) {
+sealed class ScreenText(open var color: Color = WHITE, open var bold: Boolean = false, open var italic: Boolean = false, open var next: ScreenText? = null) {
 
   abstract val text: String
 
@@ -123,13 +118,9 @@ class IfScreenText(val ifUpon: () -> ScreenText) : ScreenText() {
 
 val staticTextPool = pool { StaticScreenText("") }
 
-class StaticScreenText(
-  override var text: String,
-  color: Color = WHITE,
-  bold: Boolean = false,
-  italic: Boolean = false,
-  next: ScreenText? = null
-) : ScreenText(color, bold, italic, next), Poolable {
+class StaticScreenText(override var text: String, color: Color = WHITE, bold: Boolean = false, italic: Boolean = false, next: ScreenText? = null) :
+  ScreenText(color, bold, italic, next),
+  Poolable {
   override fun reset() {
     text = ""
     color = Color.LIGHT_GRAY
@@ -162,8 +153,8 @@ fun <T : Number> signColoredText(
   italic: Boolean = false,
   next: ScreenText? = null,
   format: (ScreenText.(T) -> String)? = null
-): ScreenText {
-  return VariableScreenText(callable, bold = bold, italic = italic, next = next) { value ->
+): ScreenText =
+  VariableScreenText(callable, bold = bold, italic = italic, next = next) { value ->
     this.color = when (sign(value.toFloat())) {
       1f -> GREEN
       -1f -> RED
@@ -171,7 +162,6 @@ fun <T : Number> signColoredText(
     }
     format?.invoke(this, value) ?: value.toString()
   }
-}
 
 /**
  * Display the value if it is outside the given range
@@ -188,12 +178,11 @@ fun <T : Comparable<T>> validatedText(
   italic: Boolean = false,
   next: ScreenText? = null,
   format: (ScreenText.(T) -> String)? = null
-): ScreenText {
-  return VariableScreenText(callable, color, bold, italic, next) { value ->
+): ScreenText =
+  VariableScreenText(callable, color, bold, italic, next) { value ->
     this.color = if (value < min || value > max) RED else color
     format?.invoke(this, value) ?: value.toString()
   }
-}
 
 fun <T : Comparable<T>> variableText(
   prefix: String,
@@ -206,8 +195,8 @@ fun <T : Comparable<T>> variableText(
   italic: Boolean = false,
   next: ScreenText? = null,
   format: (ScreenText.(T) -> String)? = null
-): ScreenText {
-  return StaticScreenText(
+): ScreenText =
+  StaticScreenText(
     prefix,
     color = prefixColor,
     bold = bold,
@@ -224,7 +213,6 @@ fun <T : Comparable<T>> variableText(
       next = next
     )
   )
-}
 
 fun <T : Any> prefixText(
   prefix: String,
@@ -235,8 +223,8 @@ fun <T : Any> prefixText(
   italic: Boolean = false,
   next: ScreenText? = null,
   format: (ScreenText.(T) -> String)? = null
-): ScreenText {
-  return staticTextPool.obtain().also {
+): ScreenText =
+  staticTextPool.obtain().also {
     it.text = prefix
     it.color = prefixColor
     it.bold = bold
@@ -250,7 +238,6 @@ fun <T : Any> prefixText(
       next = next
     )
   }
-}
 
 fun <T : Any> prefixNullableText(
   prefix: String,
@@ -261,8 +248,8 @@ fun <T : Any> prefixNullableText(
   italic: Boolean = false,
   next: ScreenText? = null,
   format: (ScreenText.(T) -> String)? = null
-): ScreenText {
-  return staticTextPool.obtain().also {
+): ScreenText =
+  staticTextPool.obtain().also {
     it.text = prefix
     it.color = prefixColor
     it.bold = bold
@@ -276,7 +263,6 @@ fun <T : Any> prefixNullableText(
       next = next
     )
   }
-}
 
 private val nullText = StaticScreenText("null", color = RED)
 

@@ -157,11 +157,10 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
     const val TAP_ZOOM_AMOUNT = -1.5f
 
-    fun isCorrectButtonPressed(): Boolean {
-      return when (Hex.platform.type) {
+    fun isCorrectButtonPressed(): Boolean =
+      when (Hex.platform.type) {
         PlatformType.MOBILE -> true
         PlatformType.DESKTOP -> Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)
       }
-    }
   }
 }

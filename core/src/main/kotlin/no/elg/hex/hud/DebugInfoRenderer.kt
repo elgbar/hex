@@ -22,7 +22,9 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 
 /** @author Elg */
-class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
+class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) :
+  FrameUpdatable,
+  Disposable {
 
   private var listener: SimpleEventListener<HexagonChangedTeamEvent>? = null
   private val debugLines: Array<ScreenText>

@@ -34,7 +34,8 @@ class FastIslandMetadata(
    */
   var forTesting: Boolean = false,
   var userRoundsToBeat: Int = Island.NEVER_PLAYED
-) : Comparable<FastIslandMetadata>, Disposable {
+) : Comparable<FastIslandMetadata>,
+  Disposable {
 
   fun isUserBetterThanAuthor(): Boolean = userRoundsToBeat != Island.NEVER_PLAYED && userRoundsToBeat < authorRoundsToBeat
 

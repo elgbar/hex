@@ -2,14 +2,7 @@ package no.elg.hex.util
 
 import no.elg.hex.island.Island
 
-data class GridSize(
-  val maxX: Double,
-  val minX: Double,
-  val maxY: Double,
-  val minY: Double,
-  val maxInvX: Double,
-  val maxInvY: Double
-) {
+data class GridSize(val maxX: Double, val minX: Double, val maxY: Double, val minY: Double, val maxInvX: Double, val maxInvY: Double) {
 
   companion object {
     private val EMPTY = GridSize(.0, .0, .0, .0, .0, .0)

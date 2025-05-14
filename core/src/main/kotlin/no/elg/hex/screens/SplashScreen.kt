@@ -10,7 +10,9 @@ import no.elg.hex.util.play
 import no.elg.hex.util.safeUse
 
 /** @author Elg */
-class SplashScreen(private var nextScreen: AbstractScreen?) : AbstractScreen(), ReloadableScreen {
+class SplashScreen(private var nextScreen: AbstractScreen?) :
+  AbstractScreen(),
+  ReloadableScreen {
 
   private var startTime: Long = System.currentTimeMillis()
 

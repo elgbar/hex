@@ -4,13 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Interpolation
 import no.elg.hex.screens.PreviewIslandScreen
 
-data class SmoothTransition(
-  private val screen: PreviewIslandScreen,
-  val zoomTarget: Float,
-  val xTarget: Float?,
-  val yTarget: Float?,
-  val transitionDurationSeconds: Float = .25f
-) {
+data class SmoothTransition(private val screen: PreviewIslandScreen, val zoomTarget: Float, val xTarget: Float?, val yTarget: Float?, val transitionDurationSeconds: Float = .25f) {
 
   private var timeToTarget = transitionDurationSeconds
 

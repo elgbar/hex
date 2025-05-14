@@ -30,7 +30,10 @@ import no.elg.hex.screens.PlayableIslandScreen
 import no.elg.hex.util.safeUse
 
 /** @author Elg */
-class GameInfoRenderer(private val screen: PlayableIslandScreen) : FrameUpdatable, Resizable, Disposable {
+class GameInfoRenderer(private val screen: PlayableIslandScreen) :
+  FrameUpdatable,
+  Resizable,
+  Disposable {
 
   private val batch = SpriteBatch()
   private val shapeRenderer = ShapeRenderer()

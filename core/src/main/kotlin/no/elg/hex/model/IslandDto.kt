@@ -37,12 +37,10 @@ class IslandDto(
     return copy(filter.toSortedMap())
   }
 
-  fun withInitialData(dataMap: Map<CubeCoordinate, HexagonData>): IslandDto {
-    return copy(hexagonData = (dataMap + hexagonData).toSortedMap())
-  }
+  fun withInitialData(dataMap: Map<CubeCoordinate, HexagonData>): IslandDto = copy(hexagonData = (dataMap + hexagonData).toSortedMap())
 
-  fun copy(hexagonData: SortedMap<CubeCoordinate, HexagonData>? = null): IslandDto {
-    return IslandDto(
+  fun copy(hexagonData: SortedMap<CubeCoordinate, HexagonData>? = null): IslandDto =
+    IslandDto(
       width = width,
       height = height,
       layout = layout,
@@ -54,7 +52,6 @@ class IslandDto(
       round = round,
       team = team
     )
-  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -91,8 +88,6 @@ class IslandDto(
   }
 
   companion object {
-    fun Piece?.createDtoCopy(): Piece? {
-      return this?.let { it.copyTo(it.data.copy()) }
-    }
+    fun Piece?.createDtoCopy(): Piece? = this?.let { it.copyTo(it.data.copy()) }
   }
 }

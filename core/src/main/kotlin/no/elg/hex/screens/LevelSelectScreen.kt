@@ -27,7 +27,9 @@ import no.elg.hex.util.safeUse
 import no.elg.hex.util.show
 
 /** @author Elg */
-class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
+class LevelSelectScreen :
+  AbstractScreen(),
+  ReloadableScreen {
 
   private val stageScreen by lazy { StageScreen() }
   val stage: Stage get() = stageScreen.stage
@@ -140,9 +142,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     width: Float,
     height: Float,
     notSelectedColor: Color = NOT_SELECTED_COLOR
-  ): Color {
-    return if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else notSelectedColor
-  }
+  ): Color = if (mouseX in x..x + width && mouseY in y..y + height) SELECT_COLOR else notSelectedColor
 
   private fun drawBox(
     x: Float,
@@ -199,9 +199,7 @@ class LevelSelectScreen : AbstractScreen(), ReloadableScreen {
     }
   }
 
-  override fun recreate(): AbstractScreen {
-    return LevelSelectScreen()
-  }
+  override fun recreate(): AbstractScreen = LevelSelectScreen()
 
   override fun show() {
     input.show()

@@ -175,10 +175,13 @@ inline fun <T : Actor> T.onKeyDown(keycode: Int, catchEvent: Boolean = false, on
 inline fun <T : Actor> T.onAllKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
-    if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all {
-        it == eventKey || Gdx.input.isKeyPressed(
-          it
-        )
+    if ((!onlyWhenShown || isShown()) &&
+      eventKey in keycodes &&
+      keycodes.all {
+        it == eventKey ||
+          Gdx.input.isKeyPressed(
+            it
+          )
       }
     ) {
       listener()
@@ -197,8 +200,8 @@ inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Bo
 }
 
 @Scene2dDsl
-fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindow.() -> Unit = {}, whenConfirmed: KVisWindow.() -> Unit): KVisWindow {
-  return this.visWindow(title) {
+fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindow.() -> Unit = {}, whenConfirmed: KVisWindow.() -> Unit): KVisWindow =
+  this.visWindow(title) {
     isMovable = false
     isModal = true
     hide()
@@ -257,11 +260,10 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindo
     pack()
     fadeOut(0f)
   }
-}
 
 @Scene2dDsl
-fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit>, whenConfirmed: KVisWindow.() -> Unit, text: () -> String): KVisWindow {
-  return visWindow(title) {
+fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit>, whenConfirmed: KVisWindow.() -> Unit, text: () -> String): KVisWindow =
+  visWindow(title) {
     isMovable = false
     isModal = true
     val label = visLabel("")
@@ -291,4 +293,3 @@ fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVi
     centerWindow()
     hide()
   }
-}

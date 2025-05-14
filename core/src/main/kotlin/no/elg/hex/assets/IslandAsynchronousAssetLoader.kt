@@ -13,14 +13,11 @@ import no.elg.hex.util.reportTiming
 import no.elg.hex.util.serialize
 
 /** @author Elg */
-class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) :
-  AsynchronousAssetLoader<Island, IslandAssetLoaderParameters>(resolver) {
+class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) : AsynchronousAssetLoader<Island, IslandAssetLoaderParameters>(resolver) {
 
   private var island: Island? = null
 
-  override fun loadSync(manager: AssetManager, fileName: String, file: FileHandle, parameter: IslandAssetLoaderParameters?): Island? {
-    return island?.also { island = null }
-  }
+  override fun loadSync(manager: AssetManager, fileName: String, file: FileHandle, parameter: IslandAssetLoaderParameters?): Island? = island?.also { island = null }
 
   override fun getDependencies(fileName: String, file: FileHandle, parameter: IslandAssetLoaderParameters?) = null
 

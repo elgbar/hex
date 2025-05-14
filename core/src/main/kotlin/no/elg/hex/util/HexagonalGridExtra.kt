@@ -18,8 +18,8 @@ fun HexagonalGrid<HexagonData>.getByCubeCoordinate(coordinate: CubeCoordinate?):
   return if (maybe.isPresent) maybe.get() else null
 }
 
-fun GridLayoutStrategy.toEnumValue(): HexagonalGridLayout {
-  return try {
+fun GridLayoutStrategy.toEnumValue(): HexagonalGridLayout =
+  try {
     HexagonalGridLayout.valueOf(getName())
   } catch (e: IllegalArgumentException) {
     throw IllegalArgumentException(
@@ -27,4 +27,3 @@ fun GridLayoutStrategy.toEnumValue(): HexagonalGridLayout {
       e
     )
   }
-}

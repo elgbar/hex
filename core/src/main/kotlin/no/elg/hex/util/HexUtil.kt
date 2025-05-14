@@ -32,13 +32,12 @@ import kotlin.math.min
 import kotlin.reflect.KClass
 
 /** @return HexagonData of this hexagon */
-fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData {
-  return hexagon.satelliteData.orElseGet {
+fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData =
+  hexagon.satelliteData.orElseGet {
     (if (isEdgeHexagon(hexagon) || !Hex.mapEditor) EDGE_DATA else HexagonData(disabled = true, Team.EARTH)).also {
       hexagon.setSatelliteData(it)
     }
   }
-}
 
 /**
  * @param x screen x

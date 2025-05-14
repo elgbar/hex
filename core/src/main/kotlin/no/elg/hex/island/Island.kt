@@ -728,9 +728,7 @@ class Island(
      */
     const val NEVER_BEATEN = 999
 
-    fun Hand.createDtoPieceCopy(): Piece {
-      return piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
-    }
+    fun Hand.createDtoPieceCopy(): Piece = piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
 
     fun deserialize(json: String): Island = Hex.mapper.readValue(json)
     fun deserialize(file: FileHandle): Island = deserialize(file.readString())

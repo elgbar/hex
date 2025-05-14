@@ -7,7 +7,9 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.api.Resizable
 
-class DebugGraphRenderer : ScissorRenderer(), Resizable {
+class DebugGraphRenderer :
+  ScissorRenderer(),
+  Resizable {
 
   private var fpsIndex: Int = 0 // frames per second
 

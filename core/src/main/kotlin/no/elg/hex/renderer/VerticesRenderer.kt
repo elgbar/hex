@@ -13,7 +13,9 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.getData
 
-class VerticesRenderer(private val islandScreen: PreviewIslandScreen) : FrameUpdatable, Disposable {
+class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
+  FrameUpdatable,
+  Disposable {
 
   private val mesh: Mesh =
     Mesh(

@@ -15,7 +15,10 @@ import no.elg.hex.util.safeUse
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-abstract class ScissorRenderer : FrameUpdatable, Disposable, Resizable {
+abstract class ScissorRenderer :
+  FrameUpdatable,
+  Disposable,
+  Resizable {
 
   private var fbo: FrameBuffer? = null
   private val batch = SpriteBatch()
