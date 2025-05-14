@@ -8,27 +8,27 @@ import java.nio.file.Paths
 buildscript {
   ext {
     appName = "Hex"
-    kotlinVersion = "2.1.0"
-    gdxVersion = '1.13.1'
-    ktxVersion = "1.12.1-rc2"
-    visVersion = '1.5.3'
-    jacksonVersion = "2.18.2"
-    junitVersion = "5.11.4"
-    kotlinCoroutineVersion = "1.10.1"
+    kotlinVersion = "2.1.21"
+    gdxVersion = '1.13.5'
+    ktxVersion = "1.13.1-rc1"
+    visVersion = '1.5.5'
+    jacksonVersion = "2.19.0"
+    junitVersion = "5.12.2"
+    kotlinCoroutineVersion = "1.10.2"
     argparserVersion = "2.0.7"
-    spotlessVersion = "6.25.0"
-    androidGradleToolsVersion = '8.8.0'
+    spotlessVersion = "7.0.3"
+    androidGradleToolsVersion = '8.10.0'
     ktlintVersion = "0.48.2"
-    gradleVersions = "0.51.0"
+    gradleVersions = "0.52.0"
   }
 
   repositories {
     mavenLocal()
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     mavenCentral()
-    maven { url "https://plugins.gradle.org/m2/" }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    gradlePluginPortal()
     google()
+    gradlePluginPortal()
+    maven { url "https://plugins.gradle.org/m2/" }
   }
 
   dependencies {
@@ -44,8 +44,6 @@ def isNonStable = { String version ->
   def regex = /^[0-9,.v-]+(-r)?$/
   return !stableKeyword && !(version ==~ regex)
 }
-
-
 
 subprojects {
   apply plugin: "com.diffplug.spotless"
@@ -81,7 +79,7 @@ subprojects {
 
       // define the steps to apply to those files
       trimTrailingWhitespace()
-      indentWithSpaces(2)
+      leadingTabsToSpaces(2)
       endWithNewline()
     }
   }
@@ -210,7 +208,7 @@ project(":core") {
     api "com.kotcrab.vis:vis-ui:$visVersion"
     api platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$kotlinCoroutineVersion")
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
-    api "org.jetbrains:annotations:26.0.1"
+    api "org.jetbrains:annotations:26.0.2"
 
     api "io.github.libktx:ktx-app:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
@@ -235,6 +233,10 @@ project(":core") {
     testApi "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testApi "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+
+    constraints {
+      implementation("net.java.jinput:jinput:2.0.10")
+    }
   }
 
   java {
