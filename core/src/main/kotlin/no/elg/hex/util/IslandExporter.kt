@@ -18,7 +18,9 @@ import no.elg.hex.preview.PreviewModifier.NOTHING
 import no.elg.hex.preview.PreviewModifier.WON
 import no.elg.hex.screens.ImportIslandsScreen
 import no.elg.hex.util.ExportedIsland.Companion.importBest
+import no.elg.hex.util.FinishedExportedIslandData.Companion.DEFAULT_ROUND
 import org.hexworks.mixite.core.api.CubeCoordinate
+import kotlin.math.round
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@")
 @JsonSubTypes(
@@ -86,19 +88,22 @@ data class OngoingExportedIslandData(
 }
 
 @JsonTypeName("f")
-data class FinishedExportedIslandData(override val id: Int, override val best: Int, val modifier: PreviewModifier, val winningTeam: Team, val round: Int) : ExportedIsland {
+data class FinishedExportedIslandData(override val id: Int, override val best: Int, val modifier: PreviewModifier, val winningTeam: Team, val round: Int?) : ExportedIsland {
   override fun import(metadata: FastIslandMetadata): Island? {
     metadata.modifier = modifier
     importBest(metadata)
     return try {
       loadInitialIsland(id).also { island ->
-        island.round = round
+        island.round = round ?: DEFAULT_ROUND
         island.fill(winningTeam)
       }
     } catch (e: Exception) {
       MessagesRenderer.publishError("Failed to import finished island $id: ${e.message}")
       null
     }
+  }
+  companion object {
+    const val DEFAULT_ROUND = 1
   }
 }
 
@@ -112,7 +117,8 @@ fun exportIsland(metadata: FastIslandMetadata): ExportedIsland {
       WON -> island.currentTeam
       else -> island.hexagonsPerTeam.filter { it.key != island.currentTeam }.maxByOrNull { it.value }?.key ?: Team.SUN
     }
-    FinishedExportedIslandData(metadata.id, metadata.userRoundsToBeat, metadata.modifier, team, island.round)
+    val round = if (island.round == DEFAULT_ROUND) null else island.round
+    FinishedExportedIslandData(metadata.id, metadata.userRoundsToBeat, metadata.modifier, team, round)
   }
 }
 
