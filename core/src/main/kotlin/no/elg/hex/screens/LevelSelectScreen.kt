@@ -112,23 +112,23 @@ class LevelSelectScreen :
           }
           val font = Hex.assets.regularFontNotScaled
           val vertOffset = font.lineHeight
+          var line = 1
 
           val showIslandId = Hex.mapEditor || Hex.debug || Settings.showIslandId
           if (showIslandId) {
-            layout.setText(font, "Island ${metadata.id}", Color.WHITE, width, Align.left, true)
-            font.draw(batch, layout, x, y + vertOffset)
+            layout.setText(font, "Island ${metadata.id}", Color.WHITE, width, Align.left, false)
+            font.draw(batch, layout, x, y + vertOffset * line++)
           }
 
           if (metadata.userRoundsToBeat != Island.NEVER_PLAYED) {
             val color = if (metadata.isUserBetterThanAuthor()) Color.GOLD else Color.WHITE
-            val align = if (showIslandId) Align.right else Align.center
-            layout.setText(font, "Best: ${metadata.userRoundsToBeat} rounds", color, width, align, true)
-            font.draw(batch, layout, x, y + vertOffset)
+            layout.setText(font, "Best ${metadata.userRoundsToBeat}", color, width, Align.left, true)
+            font.draw(batch, layout, x, y + vertOffset * line++)
           }
 
           if (Hex.mapEditor || Hex.debug) {
             layout.setText(font, "ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.left, true)
-            font.draw(batch, layout, x, y + vertOffset * 2)
+            font.draw(batch, layout, x, y + vertOffset * line++)
           }
         }
       }
