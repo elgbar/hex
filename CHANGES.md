@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+[//]: # (Remember to update the version in the `gradle.properties` file when releasing a new version)
+
 ## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+# v2.5.0 - 2025-05-23
 
 ### Added
 
@@ -17,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * When the AI surrenders exit to the level select screen after accepting it
-* Add ARtB to the islands 66 to 117, and 34
+* Add ARtB to the islands 66 to 117, and update 34 to 6
 
 ### Fixed
 
@@ -26,8 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix island not being saved correctly when game ends
 * Save a few bytes when saving won islands
 * Fix overlapping text in level select screens when the resolution is low
-
-### Removed
 
 ---
 
