@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * When the AI surrenders exit to the level select screen after accepting it
+* Add ARtB to the islands 66 to 117, and 34
 
 ### Fixed
 
