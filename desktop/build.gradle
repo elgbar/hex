@@ -1,4 +1,4 @@
-project.ext.mainClassName = "no.elg.hex.desktop.DesktopLauncherKt"
+project.ext.mainClassName = "no.elg.hex.platform.desktop.DesktopLauncherKt"
 project.ext.assetsDir = new File("../core/src/main/resources")
 
 tasks.register('run', JavaExec) {
@@ -24,7 +24,7 @@ tasks.register('dist', Jar) {
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  duplicatesStrategy = DuplicatesStrategy.INCLUDE
   dependsOn configurations.runtimeClasspath
   from {
     configurations.runtimeClasspath.collect {

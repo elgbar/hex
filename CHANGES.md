@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+
 ### Removed
 
 ---
@@ -40,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix island not being saved correctly when game ends
 * Save a few bytes when saving won islands
 * Fix overlapping text in level select screens when the resolution is low
+* Fix desktop distribution
 
 ---
 
