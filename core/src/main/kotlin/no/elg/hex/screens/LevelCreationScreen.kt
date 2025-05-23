@@ -43,10 +43,6 @@ import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandGeneration
-import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_GAIN
-import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_LACUNARITY
-import no.elg.hex.island.IslandGeneration.INITIAL_FRACTAL_OCTAVES
-import no.elg.hex.island.IslandGeneration.INITIAL_FREQUENCY
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
 import no.elg.hex.util.fixWrongTreeTypes
@@ -74,8 +70,9 @@ class LevelCreationScreen :
   private val newIslandpreviewSize get() = (((Gdx.graphics.width - 3 * (Gdx.graphics.width * 0.025f)) / 2).toInt() * 2).coerceAtLeast(1024)
 
   private val layoutSpinner = ArraySpinnerModel(GdxArray(HexagonalGridLayout.entries.toTypedArray()))
-  private val widthSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
-  private val heightSpinner = IntSpinnerModel(31, 1, Int.MAX_VALUE)
+  val widthSpinner = IntSpinnerModel(IslandGeneration.lastWidth, 1, Int.MAX_VALUE)
+  val heightSpinner = IntSpinnerModel(IslandGeneration.lastHeight, 1, Int.MAX_VALUE)
+
   private val seedField = VisTextField(Random.nextLong().toString())
 
   private val previewImage: VisImage
@@ -146,6 +143,7 @@ class LevelCreationScreen :
           name = WIDTH_SPINNER_NAME
           textField.addValidator(validator)
           onChange {
+            IslandGeneration.lastWidth = widthSpinner.value
             syncValue(widthSpinner, heightSpinner, oldWidth)
             renderPreview()
           }
@@ -153,6 +151,7 @@ class LevelCreationScreen :
         spinner("Height", heightSpinner) {
           textField.addValidator(validator)
           onChange {
+            IslandGeneration.lastHeight = heightSpinner.value
             syncValue(heightSpinner, widthSpinner, oldHeight)
             renderPreview()
           }
@@ -163,8 +162,14 @@ class LevelCreationScreen :
               HexagonalGridLayout.entries.toTypedArray().maxOf { layout -> layout.name.length / 2f + 1 }
           cells.get(1)?.minWidth(minWidth)
           textField.addValidator(validator)
-          onChange { renderPreview() }
+          onChange {
+            IslandGeneration.lastLayout = layoutSpinner.value
+            renderPreview()
+          }
         }
+
+        // Note: must be set after the spinner is created (fml)
+        layoutSpinner.setCurrent(IslandGeneration.lastLayout, false)
       }
 
       row()
@@ -172,7 +177,7 @@ class LevelCreationScreen :
         space(20f)
         spinner(
           "Frequency",
-          SimpleFloatSpinnerModel(INITIAL_FREQUENCY, 0f, 10f, 0.01f, 3).also {
+          SimpleFloatSpinnerModel(IslandGeneration.noise.frequency, 0f, 10f, 0.01f, 3).also {
             onChange {
               IslandGeneration.noise.setFrequency(it.value)
               renderPreview()
@@ -212,7 +217,7 @@ class LevelCreationScreen :
         space(20f)
         spinner(
           "Fractal Octaves",
-          IntSpinnerModel(INITIAL_FRACTAL_OCTAVES, 1, 9, 1).also {
+          IntSpinnerModel(IslandGeneration.noise.octaves, 1, 9, 1).also {
             onChange {
               IslandGeneration.noise.setFractalOctaves(it.value)
               renderPreview()
@@ -221,7 +226,7 @@ class LevelCreationScreen :
         )
         spinner(
           "Fractal Lacunarity",
-          SimpleFloatSpinnerModel(INITIAL_FRACTAL_LACUNARITY, 0f, 10f, 0.1f).also {
+          SimpleFloatSpinnerModel(IslandGeneration.noise.lacunarity, 0f, 10f, 0.1f).also {
             onChange {
               IslandGeneration.noise.setFractalLacunarity(it.value)
               renderPreview()
@@ -230,7 +235,7 @@ class LevelCreationScreen :
         )
         spinner(
           "Fractal Gain",
-          SimpleFloatSpinnerModel(INITIAL_FRACTAL_GAIN, 0f, 1f, 0.05f).also {
+          SimpleFloatSpinnerModel(IslandGeneration.noise.gain, 0f, 1f, 0.05f).also {
             onChange {
               IslandGeneration.noise.setFractalGain(it.value)
               renderPreview()
@@ -427,6 +432,10 @@ class LevelCreationScreen :
     previewBufferNoise.disposeSafely()
     previewBuffer.disposeSafely()
     dummyMetadata.dispose()
+
+    IslandGeneration.lastWidth = widthSpinner.value
+    IslandGeneration.lastHeight = heightSpinner.value
+    IslandGeneration.lastLayout = layoutSpinner.current
   }
 
   override fun resize(width: Int, height: Int) {

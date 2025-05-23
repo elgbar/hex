@@ -83,24 +83,41 @@ import no.elg.hex.util.noise.TransformType3D.DEFAULT_OPEN_SIMPLEX_2
 
 @Suppress("DuplicatedCode")
 class FastNoiseLite {
-  private var seed = 1337
-  private var frequency = 0.01f
-  private var noiseType = OPEN_SIMPLEX_2
-  private var rotationType3D = NONE
+  var seed = 1337
+    private set
+  var frequency = 0.01f
+    private set
+  var noiseType = OPEN_SIMPLEX_2
+    private set
+  var rotationType3D = NONE
+    private set
+  var fractalType = FractalType.NONE
+    private set
+  var octaves = 3
+    private set
+  var lacunarity = 2.0f
+    private set
+  var gain = 0.5f
+    private set
+  var weightedStrength = 0f
+    private set
+  var pingPongStength = 2.0f
+    private set
+  var fractalBounding = 1 / 1.75f
+    private set
+  var cellularDistanceFunction = EUCLIDEAN_SQ
+    private set
+  var cellularReturnType = DISTANCE
+    private set
+  var cellularJitterModifier = 1.0f
+    private set
+  var domainWarpType = DomainWarpType.OPEN_SIMPLEX_2
+    private set
+  var domainWarpAmp = 1.0f
+    private set
+
   private var transformType3D = DEFAULT_OPEN_SIMPLEX_2
-  private var fractalType = FractalType.NONE
-  private var octaves = 3
-  private var lacunarity = 2.0f
-  private var gain = 0.5f
-  private var weightedStrength = 0f
-  private var pingPongStength = 2.0f
-  private var fractalBounding = 1 / 1.75f
-  private var cellularDistanceFunction = EUCLIDEAN_SQ
-  private var cellularReturnType = DISTANCE
-  private var cellularJitterModifier = 1.0f
-  private var domainWarpType = DomainWarpType.OPEN_SIMPLEX_2
   private var warpTransformType3D = DEFAULT_OPEN_SIMPLEX_2
-  private var domainWarpAmp = 1.0f
 
   /**
    * Create new FastNoise object with default seed

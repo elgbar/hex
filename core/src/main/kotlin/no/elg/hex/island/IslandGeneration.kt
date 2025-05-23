@@ -26,21 +26,32 @@ object IslandGeneration {
   const val INITIAL_FRACTAL_OCTAVES = 1
   const val INITIAL_FRACTAL_LACUNARITY = 2.1f
   const val INITIAL_FRACTAL_GAIN = 0.7f
+  const val INITIAL_AMPLITUDE = 0.07f
+  const val INITIAL_OFFSET = 0.4f
+  const val INITIAL_TREE_CHANCE = 0.05f
+
+  const val INITIAL_WIDTH = 31
+  const val INITIAL_HEIGHT = 31
+  val INITIAL_LAYOUT = HexagonalGridLayout.RECTANGULAR
 
   /**
    * `a` in a `ax + b` graph
    */
-  var amplitude = 0.07f
+  var amplitude = INITIAL_AMPLITUDE
 
   /**
    * `b` in a `ax + b` graph
    */
-  var offset = 0.4f
+  var offset = INITIAL_OFFSET
 
   /**
    * A value in the range 0 <= treeChance <= 1 of how likely there is to be a tree
    */
-  var treeChance = 0.05f
+  var treeChance = INITIAL_TREE_CHANCE
+
+  var lastWidth = INITIAL_WIDTH
+  var lastHeight = INITIAL_HEIGHT
+  var lastLayout = INITIAL_LAYOUT
 
   init {
     noise.setNoiseType(OPEN_SIMPLEX_2_S)
