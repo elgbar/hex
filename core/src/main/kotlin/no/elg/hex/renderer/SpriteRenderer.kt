@@ -4,12 +4,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.ai.NotAsRandomAI
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.LivingPiece
 import no.elg.hex.hexagon.Peasant
 import no.elg.hex.hexagon.Spearman
+import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.strengthToTypeOrNull
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
@@ -57,6 +59,9 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
             renderStrengthHint(island.selected)
           }
         }
+        if (Hex.debug && Settings.debugCastlePlacement) {
+          island.getAllTerritories().values.flatten().forEach(::renderBestCastlePlacement)
+        }
       }
     }
   }
@@ -87,6 +92,23 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
       val height = boundingBox.width.toFloat() / 3
       batch.draw(drawable, boundingBox.x.toFloat(), boundingBox.y.toFloat(), width, height)
     }
+  }
+
+  private val nari: Map<Team, NotAsRandomAI> by lazy {
+    @Suppress("UNCHECKED_CAST")
+    Team.entries.associateWith { NotAsRandomAI(it, 0, 1.0, 1.0) }
+  }
+
+  private fun renderBestCastlePlacement(territory: Territory) {
+    val ai: NotAsRandomAI = nari[territory.team] ?: return
+    val hexagon = ai.calculateBestCastlePlacement(territory) ?: return
+
+    val boundingBox = hexagon.internalBoundingBox
+
+    val width = boundingBox.height.toFloat() / 3
+    val height = boundingBox.width.toFloat() / 3
+
+    batch.draw(Hex.assets.castle, boundingBox.x.toFloat() + width, boundingBox.y.toFloat(), width, height)
   }
 
   override fun dispose() {
