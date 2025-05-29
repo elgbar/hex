@@ -612,7 +612,7 @@ class Island(
    * one island)
    * * No capital pieces in territories with size smaller than [MIN_HEX_IN_TERRITORY]
    * * There must be exactly one capital per territory
-   * * There must be at least two different teams with a capital
+   * * Each team must have at least one capital
    *
    * @return If this island is valid.
    */
@@ -652,10 +652,11 @@ class Island(
       totalCapitalCount[team] = totalCapitalCount.getOrDefault(team, 0) + capitalCount
     }
 
-    val teamsWithCapital = totalCapitalCount.filterValues { it >= 1 }.size
-    if (teamsWithCapital < 2) {
-      publishError("There are $teamsWithCapital teams with a capital, there must be at least 2 different teams with a capitals")
-      valid = false
+    for (team in Team.entries) {
+      val count = totalCapitalCount.getOrDefault(team, 0)
+      if (count < 1) {
+        registerViolation("There are no capitals for team $team, every team must have at least one capital")
+      }
     }
 
     // Check rules which apply to each visible hexagon

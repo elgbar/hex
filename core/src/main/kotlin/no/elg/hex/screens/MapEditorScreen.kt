@@ -298,6 +298,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
             |* Pine tree can not have an invisible hexagons next to them
             |* Palms trees can not only be surrendered by visible hexagons
             |* No pieces on invisible hexagons
+            |* Each team must have at least one capital
           """.trimMargin()
         ) {
           it.expand().fill()
