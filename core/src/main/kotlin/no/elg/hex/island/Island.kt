@@ -35,7 +35,7 @@ import no.elg.hex.hexagon.Team.STONE
 import no.elg.hex.hexagon.Team.SUN
 import no.elg.hex.hexagon.TreePiece
 import no.elg.hex.hexagon.replaceWithTree
-import no.elg.hex.hud.MessagesRenderer.publishError
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Hand.Companion.NoRestore
 import no.elg.hex.model.IslandDto
@@ -363,7 +363,7 @@ class Island(
             // Ignore cancel exceptions
           } catch (e: RuntimeException) {
             e.printStackTrace()
-            publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
+            MessagesRenderer.publishError("Exception thrown during AI turn: ${e::class.simpleName} ${e.message}", Float.MAX_VALUE, e)
           }
         }
         Gdx.app.debug("AI") { "${cai.team} AI's turn took $time ms" }
@@ -489,6 +489,11 @@ class Island(
   fun getTerritoryHexagons(hexagon: Hexagon<HexagonData>): Set<Hexagon<HexagonData>>? {
     val territoryHexes = connectedTerritoryHexagons(hexagon)
     if (territoryHexes.size < MIN_HEX_IN_TERRITORY) {
+      if (Hex.mapEditor) {
+        // When in map editor, we do not want to adhere to game logic. It will be validated before saving
+        return null
+      }
+
       // If given hexagon is a capital, but it is no longer a part of a territory (ie it's on its own)
       // then replace the capital with a tree
       val data = getData(hexagon)

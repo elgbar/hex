@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Do not automatically replace pieces when in map editor mode. It makes it harder and less predictable to edit islands
+
 
 ### Removed
 
