@@ -157,6 +157,7 @@ enum class HexType(private vararg val surfaces: Surface) {
 
   companion object {
     val points = FloatArray(2 * 7)
+    private val renderColor = Color()
   }
 
   private data class Surface(
@@ -183,7 +184,7 @@ enum class HexType(private vararg val surfaces: Surface) {
 
       vertices[4] = points[v3 * 2]
       vertices[5] = points[v3 * 2 + 1]
-      verticesRenderer.drawTriangle(color.cpy().dim(shade).toFloatBits(), vertices)
+      verticesRenderer.drawTriangle(renderColor.set(color).dim(shade).toFloatBits(), vertices)
     }
 
     companion object {

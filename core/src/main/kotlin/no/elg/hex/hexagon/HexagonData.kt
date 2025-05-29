@@ -83,12 +83,12 @@ class HexagonData(
   /**
    * @return If the piece was updated. If this returns `true` [piece] is guaranteed to be of type [T].
    */
-  inline fun <reified T : Piece> setPiece(crossinline init: (T) -> Unit = { }): Boolean {
+  inline fun <reified T : Piece> setPiece(noinline init: (T) -> Unit = { }): Boolean {
     contract { callsInPlace(init, InvocationKind.AT_MOST_ONCE) }
     return setPiece(T::class, init)
   }
 
-  inline fun <T : Piece> setPiece(pieceType: KClass<out T>, init: (T) -> Unit = { }): Boolean {
+  fun <T : Piece> setPiece(pieceType: KClass<out T>, init: (T) -> Unit = { }): Boolean {
     contract { callsInPlace(init, InvocationKind.AT_MOST_ONCE) }
     require(!pieceType.isAbstract) { "Cannot set the piece to an abstract piece" }
     val pieceToPlace = pieceType.createInstance(this)

@@ -80,7 +80,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   private val disableChecker: MutableMap<Disableable, (Territory?) -> Boolean> = mutableMapOf()
   private val labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit> = mutableMapOf()
 
-  private lateinit var toggleMusicButton: KVisImageButton
+  private var toggleMusicButton: KVisImageButton
 
   private val settingsChangeEventListener = SimpleEventListener.create<SettingsChangeEvent<Boolean>> { (delegate, _, _) ->
     if (delegate == Settings::musicPaused.safeGetDelegate()) {
