@@ -1,5 +1,7 @@
 package no.elg.hex.input.editor
 
+import no.elg.hex.hexagon.Capital
+import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Team
 import no.elg.hex.util.getData
@@ -18,7 +20,7 @@ sealed interface TeamEditor : Editor {
     override val order: Int = 0
 
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-      data.team = Team.entries.toTypedArray().random()
+      data.team = Team.entries.random()
     }
   }
 
@@ -26,8 +28,16 @@ sealed interface TeamEditor : Editor {
 
     override val order: Int = 1
 
-    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
-      metadata.island.allHexagons.forEach { RandomizeTeam.edit(it, metadata.island.getData(it), metadata) }
+    override fun edit(hexagon: Hexagon<HexagonData>, ignore: HexagonData, metadata: EditMetadata) {
+      val allData = metadata.island.allHexagons
+        .asSequence()
+        .map(metadata.island::getData)
+
+      allData
+        .filter { it.piece is Capital }
+        .forEach { it.setPiece<Empty>() }
+
+      allData.forEach { it.team = Team.entries.random() }
     }
   }
 }
