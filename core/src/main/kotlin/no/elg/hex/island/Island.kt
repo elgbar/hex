@@ -617,7 +617,11 @@ class Island(
    * @return If this island is valid.
    */
   fun validate(): Boolean {
-    var valid = true
+    val violations = mutableListOf<String>()
+
+    fun registerViolation(message: String) {
+      violations += message
+    }
 
     // Check rules which apply to whole territories
     val territoryHexagons = HashSet<Hexagon<HexagonData>>()
@@ -632,8 +636,7 @@ class Island(
       if (connectedHexes.size < MIN_HEX_IN_TERRITORY) {
         for (invalidTerrHex in connectedHexes) {
           if (getData(invalidTerrHex).piece is Capital) {
-            publishError("Hexagon ${invalidTerrHex.coordinates} is a capital, even though its territory has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
-            valid = false
+            registerViolation("Hexagon ${invalidTerrHex.coordinates} is a capital, even though its territory has fewer than $MIN_HEX_IN_TERRITORY hexagons in it.")
           }
         }
         continue
@@ -641,11 +644,9 @@ class Island(
 
       val capitalCount = connectedHexes.count { getData(it).piece is Capital }
       if (capitalCount < 1) {
-        publishError("There exists a territory with no capital. Hexagon ${hexagon.coordinates} is within it.")
-        valid = false
+        registerViolation("There exists a territory with no capital. Hexagon ${hexagon.coordinates} is within it.")
       } else if (capitalCount > 1) {
-        publishError("There exists a territory with more than one capital. Hexagon ${hexagon.coordinates} is within it.")
-        valid = false
+        registerViolation("There exists a territory with more than one capital. Hexagon ${hexagon.coordinates} is within it.")
       }
 
       totalCapitalCount[team] = totalCapitalCount.getOrDefault(team, 0) + capitalCount
@@ -661,10 +662,9 @@ class Island(
     for (hexagon in visibleHexagons) {
       val data = getData(hexagon)
       if (data.piece is TreePiece && data.piece::class != treeType(hexagon)) {
-        publishError(
+        registerViolation(
           "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${treeType(hexagon).simpleName}"
         )
-        valid = false
       }
     }
 
@@ -673,8 +673,7 @@ class Island(
     val toCheck = Queue<Hexagon<HexagonData>>(visibleHexagons.size * 2)
     val firstVisible = visibleHexagons.firstOrNull()
     if (firstVisible == null) {
-      publishError("There are no visible hexagons")
-      valid = false
+      registerViolation("There are no visible hexagons")
     } else {
       toCheck.addFirst(firstVisible)
     }
@@ -692,20 +691,25 @@ class Island(
     }
 
     if (!visibleHexagons.containsAll(visibleNeighbors) || !visibleNeighbors.containsAll(visibleHexagons)) {
-      publishError("The visible hexagon grid is not connected.")
-      valid = false
+      registerViolation("The visible hexagon grid is not connected.")
     }
 
     // Check rules which apply to each invisible hexagon
     for (hexagon in invisibleHexagons) {
       val data = getData(hexagon)
       if (data.piece !is Empty) {
-        publishError("Hexagon ${hexagon.coordinates} is invisible but has a piece on it! ${data.piece}")
-        valid = false
+        registerViolation("Hexagon ${hexagon.coordinates} is invisible but has a piece on it! ${data.piece}")
       }
     }
 
-    return valid
+    if (violations.isNotEmpty()) {
+      val durationSeconds = violations.size * 10f
+      MessagesRenderer.publishError("Island validation failed with ${violations.size} violations:", durationSeconds)
+      for (violation in violations) {
+        MessagesRenderer.publishError(violation, durationSeconds)
+      }
+    }
+    return violations.isEmpty()
   }
 
   companion object {
