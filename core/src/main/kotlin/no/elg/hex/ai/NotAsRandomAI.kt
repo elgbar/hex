@@ -5,6 +5,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.ai.NotAsRandomAI.Companion.PIECE_MAINTAIN_CONTRACT_LENGTH
+import no.elg.hex.ai.NotAsRandomAI.Companion.isEconomicalToCreatePiece
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -421,8 +423,13 @@ class NotAsRandomAI(
     return found
   }
 
-  private fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
+  fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
     val island = territory.island
+    fun findLeastProtectedHexagon(hex: Hexagon<HexagonData>, filter: (data: HexagonData) -> Boolean): Double {
+      val neighborStrength = island.getNeighbors(hex).map { neighbor -> island.calculateStrength(neighbor, territory.team, filter = filter) }
+      return island.calculateStrength(hex, filter = filter) + neighborStrength.sum().toDouble()
+    }
+
     val placeableHexes =
       territory.hexagons
         .filter {
@@ -430,22 +437,16 @@ class NotAsRandomAI(
           val piece = island.getData(it).piece
           piece is Empty || (piece is LivingPiece && !piece.moved)
         }
-        .associateWith {
-          val originData = island.getData(it)
-          // We should not consider the piece curr the hexagon itself, as it will not be there when we place the castle
-          val filter: (data: HexagonData) -> Boolean = { data ->
-            // Living pieces will no
-            data.piece !is LivingPiece || data.piece !is Capital || data == originData
-          }
-          val neighborStrength = island.getNeighbors(it).map { neighbor -> island.calculateStrength(neighbor, filter = filter) }
-          island.calculateStrength(it, filter = filter) + (neighborStrength.sum().toDouble() / neighborStrength.size)
+        .associateWith { hex ->
+          // calculates the long-term protection of the hexagon, by not factoring in transient pieces (living pieces) and by ignoring the capital hexagon to make it more protected
+          findLeastProtectedHexagon(hex) { data -> data.piece is Castle }
         }
 
-    // find any hexagon with that is protected the least
+    // find hexagon is the least protected
     val minStr = placeableHexes.values.minOrNull() ?: return null
-    think(territory) { "The least defended hexagon has a strength of $minStr, castle candidates are ${placeableHexes.mapKeys { it.key.coordinates }}" }
+    think(territory) { "The least defended hexagon in the territory has a strength of $minStr, castle candidates are ${placeableHexes.mapKeys { it.key.coordinates }}" }
 
-    val leastDefendedHexes =
+    val leastDefendedHexes: List<Hexagon<HexagonData>> =
       placeableHexes.filter { (hex, str) ->
         str <= minStr &&
           // Never place a castle next to another castle
@@ -454,19 +455,38 @@ class NotAsRandomAI(
             .map { island.getData(it) }
             .filter { it.team == team }
             .none { it.piece is Castle }
-      }.mapTo(ArrayList()) { it.key }
+      }
+        .mapTo(mutableListOf(), Map.Entry<Hexagon<HexagonData>, *>::key)
+        .apply {
+          shuffle() // shuffle the list to make the selection more uniform
+        }
 
-    // shuffle the list to make the selection more uniform
-    leastDefendedHexes.shuffle()
+    think(territory) { "The least defended hexagon has a strength of $minStr, castle candidates are ${leastDefendedHexes.map(Hexagon<*>::coordinates)}" }
 
     // there are multiple hexagons that are defended as badly, choose the hexagon that will protect
     // the most hexagons
-    return leastDefendedHexes.maxByOrNull {
-      // note that this will give a slight disadvantage to hexagons surrounded by sea, as we look at
-      // the absolute number of neighbors
-      val neighbors = island.getNeighbors(it)
-      neighbors.count { neighbor -> island.getData(neighbor).team == team } / neighbors.size
+    val hexesDefendingTheMostWithValues = leastDefendedHexes.associateWith {
+      // note that this will give a slight advantage to hexagons surrounded by sea, as they are counted as friendly
+      val neighbors = island.getNeighbors(it, onlyVisible = true)
+      val friendlyNeighbors = neighbors.count { neighbor ->
+        val data = island.getData(neighbor)
+        data.invisible || data.team == team
+      }
+      friendlyNeighbors
     }
+    val maxOf = hexesDefendingTheMostWithValues.maxOfOrNull { it.value } ?: return null
+    val hexesDefendingTheMost = hexesDefendingTheMostWithValues
+      .filter { it.value == maxOf }
+      .mapTo(mutableListOf()) { it.key }
+      .shuffled()
+
+    val minByOrNull = hexesDefendingTheMost.minByOrNull { hex ->
+      findLeastProtectedHexagon(hex) { data ->
+        val piece = data.piece
+        piece is Castle || piece is Capital || (piece is LivingPiece && !piece.moved)
+      }
+    }
+    return minByOrNull
   }
 
   private fun calculateBestLivingDefencePosition(territory: Territory): Hexagon<HexagonData>? {
@@ -569,11 +589,12 @@ class NotAsRandomAI(
     // only buy pieces we can maintain for at least PIECE_MAINTAIN_CONTRACT_LENGTH turns
     val newBalance = territory.capital.balance - piece.price
     val newIncome = territory.income + piece.income
-    return territory.capital.canBuy(piece) && isEconomicalToCreatePiece(
-      newBalance,
-      newIncome,
-      canPieceAttackOrCutDownTree(territory, piece)
-    )
+    return territory.capital.canBuy(piece) &&
+      isEconomicalToCreatePiece(
+        newBalance,
+        newIncome,
+        canPieceAttackOrCutDownTree(territory, piece)
+      )
   }
 
   companion object {
