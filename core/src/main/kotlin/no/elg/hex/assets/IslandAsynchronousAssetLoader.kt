@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.reportTiming
@@ -30,6 +31,14 @@ class IslandAsynchronousAssetLoader(resolver: FileHandleResolver) : Asynchronous
       reportTiming("deserialize island json") {
         Island.deserialize(json)
       }.also { island ->
+
+        if (Hex.args.`validate-island-on-load`) {
+          if (!island.validate()) {
+            MessagesRenderer.publishError("Island $fileName failed validation")
+            MessagesRenderer.publishError("---")
+          }
+        }
+
         if (Hex.args.`update-saved-islands`) {
           Gdx.files.local(file.path()).writeString(
             island.also {
