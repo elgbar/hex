@@ -211,7 +211,7 @@ object Hex : ApplicationAdapter() {
       renderFailures = 0
     } catch (e: Throwable) {
       e.printStackTrace()
-      MessagesRenderer.publishError("Threw exception when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName}", 600f)
+      MessagesRenderer.publishError("Threw exception when rending frame ${Gdx.graphics.frameId}: ${e::class.simpleName} : ${e.message}", 120f)
       if (++renderFailures > RENDER_FAILED_THRESHOLD) {
         Gdx.app.error("RENDER", "Too many render failures, exiting")
         Gdx.app.postRunnable {
