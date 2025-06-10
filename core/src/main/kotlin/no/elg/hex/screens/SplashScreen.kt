@@ -29,7 +29,7 @@ class SplashScreen(private var nextScreen: AbstractScreen?) :
   }
 
   override fun render(delta: Float) {
-    val assetsDone = Hex.assets.update() // Don't set a time here, we WANT one task per frame
+    val assetsDone = Hex.assets.update(30) // Ok to block for a bit, since this is the first screen. Improves loading time by ~ 500ms
     val previewRenderingDone = Hex.assets.islandPreviews.size
     if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.islandFiles.size == previewRenderingDone && assetsDone) {
       val realNextScreen = nextScreen
