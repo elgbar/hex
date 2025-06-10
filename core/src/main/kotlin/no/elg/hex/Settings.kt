@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
+import no.elg.hex.model.PreviewSortingOrder
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.resetAllIslandProgress
@@ -143,6 +144,24 @@ object Settings {
 
   var debugAIAction by PreferenceDelegate(false, priority = 200_100, shouldHide = { !Hex.debug })
   var debugAIActionDelayMillis by PreferenceDelegate(2000L, priority = 200_101, shouldHide = { !Hex.debug })
+
+  var levelSorter by PreferenceDelegate(
+    PreviewSortingOrder.BY_AUTHOR_ROUNDS,
+    priority = 91,
+    runAfterChangeOnInit = false,
+    afterChange = { _, _, _ ->
+      Hex.assets.islandPreviews.sortIslands()
+    }
+  )
+
+  var reverseLevelSorting by PreferenceDelegate(
+    false,
+    priority = 92,
+    runAfterChangeOnInit = false,
+    afterChange = { _, _, _ ->
+      Hex.assets.islandPreviews.sortIslands()
+    }
+  )
 
   val deleteAllProgress = ResetSetting("Are you sure you want to delete all your progress?") {
     resetAllIslandProgress()

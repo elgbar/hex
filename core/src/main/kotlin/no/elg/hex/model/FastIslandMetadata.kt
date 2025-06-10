@@ -8,15 +8,14 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import ktx.assets.disposeSafely
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.island.Island
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.textureFromBytes
-import java.util.Comparator.comparingInt
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import java.util.function.ToIntFunction
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -60,18 +59,7 @@ class FastIslandMetadata(
       return internalPreviewTexture
     }
 
-  override fun compareTo(other: FastIslandMetadata): Int =
-    comparingInt(
-      ToIntFunction<FastIslandMetadata> { metadata ->
-        if (Island.NEVER_PLAYED == metadata.authorRoundsToBeat) {
-          Int.MAX_VALUE / 2
-        } else {
-          metadata.authorRoundsToBeat
-        }
-      }
-    )
-      .thenComparing(comparingInt(FastIslandMetadata::id))
-      .compare(this, other)
+  override fun compareTo(other: FastIslandMetadata): Int = Settings.levelSorter.comparator().compare(this, other)
 
   /**
    * Must be called on main thread

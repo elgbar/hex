@@ -58,10 +58,8 @@ class IslandPreviewCollection : Disposable {
 
   fun sortIslands() {
     dirty = false
-    if (!Hex.mapEditor) {
-      synchronized(fastIslandPreviews) {
-        fastIslandPreviews.sort()
-      }
+    synchronized<Unit>(fastIslandPreviews) {
+      fastIslandPreviews.sort()
     }
   }
 
