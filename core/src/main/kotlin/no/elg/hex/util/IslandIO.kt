@@ -106,6 +106,7 @@ fun resetAllIslandProgress() {
   islandPreferences.clear()
   islandPreferences.flush()
   Hex.assets.islandPreviews.updateAllPreviewsFromMetadata()
+  Hex.assets.islandPreviews.sortIslands()
 }
 
 fun IslandDto.serialize(): String = Hex.mapper.writeValueAsString(this)
