@@ -9,7 +9,9 @@ import java.util.function.ToIntFunction
 enum class PreviewSortingOrder(private val rawComparator: Comparator<FastIslandMetadata>) {
   BY_ID(comparingInt(FastIslandMetadata::id)),
   BY_AUTHOR_ROUNDS(byRound(FastIslandMetadata::authorRoundsToBeat).thenComparing(BY_ID.rawComparator)),
-  BY_USER_ROUNDS(byRound(FastIslandMetadata::userRoundsToBeat).thenComparing(BY_ID.rawComparator));
+  BY_USER_ROUNDS(byRound(FastIslandMetadata::userRoundsToBeat).thenComparing(BY_ID.rawComparator)),
+  NOT_PLAYED(notPlayed().thenComparing(BY_AUTHOR_ROUNDS.rawComparator))
+  ;
 
   private val reversedComparator by lazy { rawComparator.reversed() }
 
@@ -31,6 +33,17 @@ private fun byRound(roundsToBeat: FastIslandMetadata.() -> Int): Comparator<Fast
         Int.MAX_VALUE / 2
       } else {
         roundsToBeat1
+      }
+    }
+  )
+
+private fun notPlayed(): Comparator<FastIslandMetadata> =
+  comparingInt(
+    ToIntFunction<FastIslandMetadata> { metadata ->
+      if (Island.NEVER_PLAYED == metadata.userRoundsToBeat) {
+        0
+      } else {
+        Int.MAX_VALUE
       }
     }
   )
