@@ -11,11 +11,11 @@ import com.badlogic.gdx.utils.Disposable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import ktx.assets.load
 import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
 import ktx.async.skipFrame
-import ktx.collections.GdxArray
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
@@ -25,42 +25,31 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.isLoaded
+import no.elg.hex.util.reportTiming
 import no.elg.hex.util.safeUse
 import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
-import kotlin.Float
-import kotlin.Int
-import kotlin.String
-import kotlin.Unit
-import kotlin.collections.IndexedValue
-import kotlin.collections.Iterable
-import kotlin.collections.indexOfFirst
-import kotlin.collections.map
-import kotlin.collections.withIndex
-import kotlin.let
-import kotlin.synchronized
+import java.util.concurrent.CopyOnWriteArrayList
 
 class IslandPreviewCollection : Disposable {
 
-  private val fastIslandPreviews = GdxArray<FastIslandMetadata>()
+  private val fastIslandPreviews = CopyOnWriteArrayList<FastIslandMetadata>()
   private var dirty = true
 
   val size get() = fastIslandPreviews.size
 
-  fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> {
-    synchronized(fastIslandPreviews) {
-      if (dirty) {
-        sortIslands()
-      }
-      return fastIslandPreviews.withIndex()
+  fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> = sortedIslands().withIndex()
+
+  fun sortedIslands(): Iterable<FastIslandMetadata> {
+    if (dirty) {
+      sortIslands()
     }
+    return fastIslandPreviews
   }
 
   fun sortIslands() {
     dirty = false
-    synchronized<Unit>(fastIslandPreviews) {
-      fastIslandPreviews.sort()
-    }
+    fastIslandPreviews.sort()
   }
 
   fun createPreviewFromIsland(island: Island, previewWidth: Int, previewHeight: Int, metadata: FastIslandMetadata): FrameBuffer {
@@ -165,14 +154,19 @@ class IslandPreviewCollection : Disposable {
           }
         } else {
           val metadata = FastIslandMetadata.load(id)
-          synchronized(fastIslandPreviews) {
-            metadata.clearPreviewTexture()
-            metadata.preview // Load the preview
-            fastIslandPreviews.add(metadata)
-            dirty = true
-          }
+          metadata.clearPreviewTexture()
+
+          fastIslandPreviews.add(metadata)
+          dirty = true
         }
-        skipFrame()
+      }
+
+      reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
+        // make a copy to avoid concurrent modification
+        sortedIslands().forEach { metadata ->
+          metadata.preview // Load the preview
+          skipFrame()
+        }
       }
     }
   }
@@ -191,7 +185,7 @@ class IslandPreviewCollection : Disposable {
         withContext(MainDispatcher) {
           Hex.assets.load<Island>(islandFileName)
           while (!Hex.assets.update()) {
-            Thread.yield()
+            yield()
           }
         }
       }
@@ -204,34 +198,29 @@ class IslandPreviewCollection : Disposable {
       val preview = createPreviewFromIsland(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata)
       metadata.previewPixmap = preview.toBytes()
       metadata.save()
-      synchronized(fastIslandPreviews) {
-        val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
-        if (existingIndex == NOT_IN_COLLECTION) {
-          fastIslandPreviews.add(metadata)
-        } else {
-          fastIslandPreviews.set(existingIndex, metadata)
-        }
-        dirty = true
+      val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
+      if (existingIndex == NOT_IN_COLLECTION) {
+        fastIslandPreviews.add(metadata)
+      } else {
+        fastIslandPreviews[existingIndex] = metadata
       }
+      dirty = true
     }
   }
 
   fun removeIsland(id: Int) {
-    synchronized(fastIslandPreviews) {
-      val index = fastIslandPreviews.indexOfFirst { it.id == id }
-      if (index != NOT_IN_COLLECTION) {
-        val removeIndex = fastIslandPreviews.removeIndex(index)
-        removeIndex.dispose()
-        dirty = true
-      }
+    val index = fastIslandPreviews.indexOfFirst { it.id == id }
+    if (index != NOT_IN_COLLECTION) {
+      val removeIndex = fastIslandPreviews.removeAt(index)
+      removeIndex.dispose()
+      dirty = true
     }
   }
 
   private fun disposePreviews() {
-    synchronized(fastIslandPreviews) {
-      fastIslandPreviews.map(Disposable::dispose)
-      fastIslandPreviews.clear()
-    }
+    val copy = fastIslandPreviews.toList()
+    fastIslandPreviews.clear()
+    copy.map(Disposable::dispose) // Make sure we dispose previews after they are removed from the collection
   }
 
   override fun dispose() {

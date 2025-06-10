@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix maps not having capitals for all teams
   * Relevant for islands 54, 63, 74, 132, 148, 157, 197
 * Fix crash when using the `--update-previews` flag
+* Improve startup time to the level select screen
 
 ### Removed
 
