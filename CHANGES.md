@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Randomizing all teams in map editor will now properly set the capitals
 * Fix maps not having capitals for all teams
   * Relevant for islands 54, 63, 74, 132, 148, 157, 197
+* Fix crash when using the `--update-previews` flag
 
 ### Removed
 

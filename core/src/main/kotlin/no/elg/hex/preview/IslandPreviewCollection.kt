@@ -20,6 +20,7 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.model.FastIslandMetadata.Companion.loadInitial
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFileName
@@ -27,6 +28,17 @@ import no.elg.hex.util.isLoaded
 import no.elg.hex.util.safeUse
 import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
+import kotlin.Float
+import kotlin.Int
+import kotlin.String
+import kotlin.Unit
+import kotlin.collections.IndexedValue
+import kotlin.collections.Iterable
+import kotlin.collections.indexOfFirst
+import kotlin.collections.map
+import kotlin.collections.withIndex
+import kotlin.let
+import kotlin.synchronized
 
 class IslandPreviewCollection : Disposable {
 
@@ -149,10 +161,12 @@ class IslandPreviewCollection : Disposable {
 
     KtxAsync.launch(MainDispatcher) {
       for (id in Hex.assets.islandFiles.islandIds) {
-        val metadata = FastIslandMetadata.load(id)
         if (Hex.args.`update-previews`) {
-          updatePreviewFromIsland(metadata)
+          loadInitial(id)?.let { initialMetadata ->
+            updatePreviewFromIsland(initialMetadata)
+          }
         } else {
+          val metadata = FastIslandMetadata.load(id)
           synchronized(fastIslandPreviews) {
             metadata.clearPreviewTexture()
             metadata.preview // Load the preview
@@ -176,9 +190,11 @@ class IslandPreviewCollection : Disposable {
       val islandFileName = getIslandFileName(metadata.id)
       if (!Hex.assets.isLoaded<Island>(islandFileName)) {
         Gdx.app.trace("Update preview") { "Island ${metadata.id} was not loaded, waiting for it to be loaded now..." }
-        Hex.assets.load<Island>(islandFileName)
-        while (!Hex.assets.update()) {
-          Thread.yield()
+        withContext(MainDispatcher) {
+          Hex.assets.load<Island>(islandFileName)
+          while (!Hex.assets.update()) {
+            Thread.yield()
+          }
         }
       }
       Hex.assets.fetch(islandFileName)
