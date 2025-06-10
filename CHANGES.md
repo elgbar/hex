@@ -22,16 +22,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improve castle placement
 * Island ARtB updated
   * island 6, from 15 to 13 rounds
+  * island 17, from 16 to 15 rounds
+  * island 32, from 14 to 11 rounds
+  * island 48, from 16 to 10 rounds (!)
+  * island 58, from 28 to 23 rounds
+  * island 59, from 21 to 14 rounds (!)
   * island 78, from 9 to 8 rounds
   * island 80, from 14 to 12 rounds
   * island 94, from 11 to 10 rounds
-  * island 106, from 12 to 11 rounds
   * island 103, from 14 to 13 rounds
-  * island 32, from 14 to 11 rounds
-  * island 17, from 16 to 15 rounds
-  * island 48, from 16 to 10 rounds (!)
-  * island 59, from 21 to 14 rounds (!)
-  * island 58, from 28 to 23 rounds
+  * island 106, from 12 to 11 rounds
+  * island 108, from 14 to 13 rounds
 
 ### Fixed
 
