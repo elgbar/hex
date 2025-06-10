@@ -10,7 +10,7 @@ enum class PreviewSortingOrder(private val rawComparator: Comparator<FastIslandM
   BY_ID(comparingInt(FastIslandMetadata::id)),
   BY_AUTHOR_ROUNDS(byRound(FastIslandMetadata::authorRoundsToBeat).thenComparing(BY_ID.rawComparator)),
   BY_USER_ROUNDS(byRound(FastIslandMetadata::userRoundsToBeat).thenComparing(BY_ID.rawComparator)),
-  NOT_PLAYED(notPlayed().thenComparing(BY_AUTHOR_ROUNDS.rawComparator))
+  NOT_WON(notWon().thenComparing(BY_AUTHOR_ROUNDS.rawComparator))
   ;
 
   private val reversedComparator by lazy { rawComparator.reversed() }
@@ -37,7 +37,7 @@ private fun byRound(roundsToBeat: FastIslandMetadata.() -> Int): Comparator<Fast
     }
   )
 
-private fun notPlayed(): Comparator<FastIslandMetadata> =
+private fun notWon(): Comparator<FastIslandMetadata> =
   comparingInt(
     ToIntFunction<FastIslandMetadata> { metadata ->
       if (Island.NEVER_PLAYED == metadata.userRoundsToBeat) {
