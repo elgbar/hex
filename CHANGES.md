@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Add debug rendering for castle placement
+* Add `--create-artb-improvement-rapport`
+  * Simplifies finding which islands have an improvement in ARtB
 * Allow level sorting to be customized in settings
   * The default sorting is by ARtB, then by id
   * The sorting also applies to the map editor

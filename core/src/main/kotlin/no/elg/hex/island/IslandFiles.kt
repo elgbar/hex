@@ -49,10 +49,23 @@ class IslandFiles {
           Gdx.app.trace(TAG) { "Found island $fileName" }
           nonExistentFilesInRow = 0
 
-          if (FastIslandMetadata.loadInitial(id)?.forTesting == true && (!Hex.debug && !Hex.mapEditor)) {
-            Gdx.app.info(TAG) { "Skipping island $id as it is for debugging purposes only" }
+          val initialMetadata = FastIslandMetadata.loadInitial(id)
+          if (initialMetadata?.forTesting == true && (!Hex.debug && !Hex.mapEditor)) {
+            Gdx.app.debug(TAG) { "Skipping island $id as it is for debugging purposes only" }
             FastIslandMetadata.clearInitialIslandMetadataCache(id)
             continue
+          }
+
+          if (initialMetadata != null && Hex.args.`create-artb-improvement-rapport`) {
+            val progress = FastIslandMetadata.loadProgress(id)
+            if (progress != null) {
+              progress.authorRoundsToBeat = initialMetadata.authorRoundsToBeat
+              if (progress.isUserBetterThanAuthor()) {
+                Gdx.app.info("ARtB") {
+                  "Island $id improved from ${progress.authorRoundsToBeat} to ${progress.userRoundsToBeat} rounds"
+                }
+              }
+            }
           }
 
           if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded<Island>(fileName)) {
