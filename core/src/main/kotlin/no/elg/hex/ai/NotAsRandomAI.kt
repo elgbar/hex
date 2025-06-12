@@ -29,11 +29,15 @@ import no.elg.hex.hexagon.strengthToType
 import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
+import no.elg.hex.util.calculateHexagonsWithinRadius
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.coordinates
 import no.elg.hex.util.createHandInstance
+import no.elg.hex.util.filter
 import no.elg.hex.util.filterIsPiece
+import no.elg.hex.util.filterIsPieceAndTeam
+import no.elg.hex.util.filterIsTeam
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.info
@@ -425,68 +429,125 @@ class NotAsRandomAI(
 
   fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
     val island = territory.island
-    fun findLeastProtectedHexagon(hex: Hexagon<HexagonData>, filter: (data: HexagonData) -> Boolean): Double {
-      val neighborStrength = island.getNeighbors(hex).map { neighbor -> island.calculateStrength(neighbor, territory.team, filter = filter) }
-      return island.calculateStrength(hex, filter = filter) + neighborStrength.sum().toDouble()
+    val team = territory.team
+
+    /**
+     * Calculates how well-protected a given hexagon is within the territory.
+     *
+     * A lower score means the hexagon is less protected.
+     */
+    fun calculateProtectionScore(hex: Hexagon<HexagonData>, filter: (data: HexagonData) -> Boolean): Double {
+      val neighbors = island.getNeighbors(hex)
+      val hexStrength = (sequenceOf(hex) + neighbors).filterIsTeam(island, team).map { neighbor -> island.calculateStrength(neighbor, filter = filter) }
+      // Give a slight disadvantage (i.e., a higher score) to hexagons which have invisible neighbors. We want the castle to protect as many visible hexagons as possible
+      val nonVisibleNeighbors = 0.0
+      return nonVisibleNeighbors + hexStrength.sum()
     }
 
-    val placeableHexes =
-      territory.hexagons
-        .filter {
-          // all legal hexagons we can place a castle at (which is all empty hexes)
-          val piece = island.getData(it).piece
-          piece is Empty || (piece is LivingPiece && !piece.moved)
-        }
+    //
+    // STEP 1: Find the long-term feasible hexagons for placing a castle.
+    //
+
+    val longTermFeasibleHexagons = territory.hexagons
+      .asSequence()
+      .filter {
+        // all legal hexagons we can place a castle at (which is all empty hexes)
+        val piece = island.getData(it).piece
+        piece is Empty || (piece is LivingPiece && !piece.moved)
+      }
+      .filter { candidateHex ->
+        // Never place a castle next to another castle, it just wastes resources
+        island.getNeighbors(candidateHex)
+          .asSequence()
+          .filterIsPieceAndTeam<Castle>(island, team)
+          .none()
+      }
+      .filter {
+        // If there are no enemy hexagons within a radius of 2, there is no point in placing a castle there
+        island.calculateHexagonsWithinRadius(it, 2)
+          .asSequence()
+          .filter(island) { _, data -> data.visible && data.team != team }
+          .any()
+      }
+    val longTermFeasibleHexagonsWithScore =
+      longTermFeasibleHexagons
         .associateWith { hex ->
-          // calculates the long-term protection of the hexagon, by not factoring in transient pieces (living pieces) and by ignoring the capital hexagon to make it more protected
-          findLeastProtectedHexagon(hex) { data -> data.piece is Castle }
+          calculateProtectionScore(hex) { data ->
+            val piece = data.piece
+            piece is Castle
+          }
         }
 
     // find hexagon is the least protected
-    val minStr = placeableHexes.values.minOrNull() ?: return null
-    think(territory) { "The least defended hexagon in the territory has a strength of $minStr, castle candidates are ${placeableHexes.mapKeys { it.key.coordinates }}" }
+    val minStrFeasibleHexagons = longTermFeasibleHexagonsWithScore.values.minOrNull() ?: return null
+    think(territory) {
+      "The least defended hexagon in the territory has a strength of $minStrFeasibleHexagons, castle candidates are ${
+        longTermFeasibleHexagonsWithScore.map {
+          "${it.key.coordinates} (${it.value})"
+        }
+      }"
+    }
 
     val leastDefendedHexes: List<Hexagon<HexagonData>> =
-      placeableHexes.filter { (hex, str) ->
-        str <= minStr &&
-          // Never place a castle next to another castle
-          island.getNeighbors(hex)
-            .asSequence()
-            .map { island.getData(it) }
-            .filter { it.team == team }
-            .none { it.piece is Castle }
-      }
+      longTermFeasibleHexagonsWithScore.filter { (_, str) -> str <= minStrFeasibleHexagons }
         .mapTo(mutableListOf(), Map.Entry<Hexagon<HexagonData>, *>::key)
         .apply {
           shuffle() // shuffle the list to make the selection more uniform
         }
 
-    think(territory) { "The least defended hexagon has a strength of $minStr, castle candidates are ${leastDefendedHexes.map(Hexagon<*>::coordinates)}" }
+    think(territory) { "The least defended hexagon has a strength of $minStrFeasibleHexagons, castle candidates are ${leastDefendedHexes.map(Hexagon<*>::coordinates)}" }
+
+    //
+    // STEP 2: Find the hexagon that will defend the most hexagons
+    //
 
     // there are multiple hexagons that are defended as badly, choose the hexagon that will protect
     // the most hexagons
-    val hexesDefendingTheMostWithValues = leastDefendedHexes.associateWith {
-      // note that this will give a slight advantage to hexagons surrounded by sea, as they are counted as friendly
-      val neighbors = island.getNeighbors(it, onlyVisible = true)
-      val friendlyNeighbors = neighbors.count { neighbor ->
-        val data = island.getData(neighbor)
-        data.invisible || data.team == team
-      }
-      friendlyNeighbors
+    val leastDefendedHexesWithNrOfFriendlyNeighbors = leastDefendedHexes.associateWith {
+      island.getNeighbors(it).asSequence().filterIsTeam(island, team).count()
     }
-    val maxOf = hexesDefendingTheMostWithValues.maxOfOrNull { it.value } ?: return null
-    val hexesDefendingTheMost = hexesDefendingTheMostWithValues
-      .filter { it.value == maxOf }
+
+    val maxNeighbors = leastDefendedHexesWithNrOfFriendlyNeighbors.maxOfOrNull { it.value } ?: return null
+    val hexesDefendingTheMost = leastDefendedHexesWithNrOfFriendlyNeighbors
+      .filter { it.value == maxNeighbors }
       .mapTo(mutableListOf()) { it.key }
       .shuffled()
 
-    val minByOrNull = hexesDefendingTheMost.minByOrNull { hex ->
-      findLeastProtectedHexagon(hex) { data ->
+    think(territory) { "The hexagon that will defend the most hexagons ($maxNeighbors), castle candidates are ${hexesDefendingTheMost.map(Hexagon<*>::coordinates)}" }
+
+    //
+    // STEP 3: Find the hexagons that also will protect the capital
+    //
+
+    // If we still have multiple alternatives, select the one that provided the best long-term protection
+    val mediumTermFeasibleHexagonsWithScore = hexesDefendingTheMost.associateWith { hex ->
+      calculateProtectionScore(hex) { data ->
+        // calculates the long-term protection of the hexagon, by not factoring in transient pieces (living pieces) and by ignoring the capital hexagon to make it more protected
         val piece = data.piece
-        piece is Castle || piece is Capital || (piece is LivingPiece && !piece.moved)
+        piece is Castle || piece is Capital // || (piece is LivingPiece && piece.moved)
       }
     }
-    return minByOrNull
+
+    val minStrMediumTermFeasibleHexagons = mediumTermFeasibleHexagonsWithScore.values.minOrNull() ?: return null
+    think(territory) {
+      "The least defended hexagon in the territory has a strength of $minStrMediumTermFeasibleHexagons, castle candidates are ${
+        mediumTermFeasibleHexagonsWithScore.map {
+          "${it.key.coordinates} (${it.value})"
+        }
+      }"
+    }
+    val hexesDefendingCapitals = mediumTermFeasibleHexagonsWithScore
+      .filter { it.value == minStrMediumTermFeasibleHexagons }
+      .mapTo(mutableListOf()) { it.key }
+      .shuffled()
+
+    //
+    // STEP 4: Find the hexagon that has the most visible neighbors
+    //
+
+    return hexesDefendingCapitals.maxByOrNull {
+      island.getNeighbors(it).size
+    }
   }
 
   private fun calculateBestLivingDefencePosition(territory: Territory): Hexagon<HexagonData>? {

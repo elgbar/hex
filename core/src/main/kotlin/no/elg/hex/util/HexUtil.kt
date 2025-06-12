@@ -203,6 +203,7 @@ fun Island.canAttack(hexagon: Hexagon<HexagonData>, with: Piece): Boolean = canA
 
 inline fun Island.filterByData(crossinline filter: (data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
   visibleHexagons.asSequence().filter { hexagon -> filter(getData(hexagon)) }
+
 inline fun Sequence<Hexagon<HexagonData>>.filterByData(island: Island, crossinline filter: (data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
   filter { hexagon -> filter(island.getData(hexagon)) }
 
@@ -220,18 +221,56 @@ inline fun <reified T : Piece> checkIsPieceAndTeam(island: Island, team: Team? =
 inline fun <reified T : Piece> Hexagon<HexagonData>.isPiece(island: Island, team: Team? = null): Boolean = checkIsPieceAndTeam<T>(island, team).invoke(this)
 inline fun <reified T : Piece> Island.filterIsPiece(team: Team? = null): Sequence<Hexagon<HexagonData>> = visibleHexagons.asSequence().filter(checkIsPieceAndTeam<T>(this, team))
 inline fun <reified T : Piece> Territory.filterIsPiece(team: Team? = null): Sequence<Hexagon<HexagonData>> = hexagons.asSequence().filter(checkIsPieceAndTeam<T>(island, team))
-inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsPiece(island: Island, team: Team? = null): Sequence<Hexagon<HexagonData>> =
+inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsPiece(island: Island): Sequence<Hexagon<HexagonData>> = filter(checkIsPieceAndTeam<T>(island, null))
+
+inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsPieceAndTeam(island: Island, team: Team): Sequence<Hexagon<HexagonData>> =
   filter(checkIsPieceAndTeam<T>(island, team))
+
 inline fun <reified T : Piece> Collection<Hexagon<HexagonData>>.filterIsPiece(island: Island, team: Team? = null): Collection<Hexagon<HexagonData>> =
   filter(checkIsPieceAndTeam<T>(island, team))
 
-inline fun <reified T : Piece> Sequence<Hexagon<HexagonData>>.filterIsTeam(island: Island): Sequence<Hexagon<HexagonData>> =
-  filter { hexagon -> island.getData(hexagon).piece is T }
+fun Sequence<Hexagon<HexagonData>>.filterIsTeam(island: Island, team: Team): Sequence<Hexagon<HexagonData>> = filter { hexagon -> island.getData(hexagon).team == team }
+fun Sequence<Hexagon<HexagonData>>.filterIsNotTeam(island: Island, team: Team): Sequence<Hexagon<HexagonData>> = filter { hexagon -> island.getData(hexagon).team != team }
+
+fun Sequence<Hexagon<HexagonData>>.filterVisible(island: Island): Sequence<Hexagon<HexagonData>> = filter { hexagon -> island.getData(hexagon).visible }
+fun Sequence<Hexagon<HexagonData>>.filterInvisible(island: Island): Sequence<Hexagon<HexagonData>> = filter { hexagon -> island.getData(hexagon).invisible }
+
+inline fun Sequence<Hexagon<HexagonData>>.filter(island: Island, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Boolean): Sequence<Hexagon<HexagonData>> =
+  filter { hexagon -> action(hexagon, island.getData(hexagon)) }
+
+inline fun Sequence<Hexagon<HexagonData>>.none(island: Island, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Boolean): Boolean {
+  contract { callsInPlace(action) }
+  return none { hexagon ->
+    action(hexagon, island.getData(hexagon))
+  }
+}
+
+inline fun Sequence<Hexagon<HexagonData>>.any(island: Island, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Boolean): Boolean {
+  contract { callsInPlace(action) }
+  return any { hexagon ->
+    action(hexagon, island.getData(hexagon))
+  }
+}
+
+inline fun Sequence<Hexagon<HexagonData>>.all(island: Island, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Boolean): Boolean {
+  contract { callsInPlace(action) }
+  return all { hexagon ->
+    action(hexagon, island.getData(hexagon))
+  }
+}
 
 inline fun <reified T : Piece> Island.forEachPieceType(action: (hex: Hexagon<HexagonData>, data: HexagonData, piece: T) -> Unit) {
   for (hexagon in visibleHexagons) {
     val data = getData(hexagon)
     if (data.piece is T) action(hexagon, data, data.piece as T)
+  }
+}
+
+inline fun Sequence<Hexagon<HexagonData>>.withData(island: Island, excludeInvisible: Boolean = true, crossinline action: (hex: Hexagon<HexagonData>, data: HexagonData) -> Unit) {
+  contract { callsInPlace(action) }
+  for ((hexagon, data) in this.map { it to island.getData(it) }) {
+    if (excludeInvisible && data.invisible) continue
+    action(hexagon, data)
   }
 }
 
@@ -289,6 +328,11 @@ val NEIGHBORS =
     intArrayOf(-1, +1),
     intArrayOf(0, +1)
   )
+
+/**
+ * How many hexagons normally surrounds a hexagon when all it's neighbors are visible
+ */
+const val NORMAL_NEIGHBOR_COUNT = 6
 
 fun getNeighborCoordinateByIndex(coordinate: CubeCoordinate, index: Int) =
   CubeCoordinate.fromCoordinates(
