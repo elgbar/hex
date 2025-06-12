@@ -30,6 +30,7 @@ import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Island
 import no.elg.hex.island.Territory
 import no.elg.hex.util.calculateHexagonsWithinRadius
+import no.elg.hex.util.calculateRing
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.coordinates
@@ -445,10 +446,10 @@ class NotAsRandomAI(
     }
 
     //
-    // STEP 1: Find the long-term feasible hexagons for placing a castle.
+    // STEP 0: Find the all feasible hexagons for placing a castle
     //
 
-    val longTermFeasibleHexagons = territory.hexagons
+    val allFeasibleHexagons = territory.hexagons
       .asSequence()
       .filter {
         // all legal hexagons we can place a castle at (which is all empty hexes)
@@ -469,8 +470,43 @@ class NotAsRandomAI(
           .filter(island) { _, data -> data.visible && data.team != team }
           .any()
       }
+
+    //
+    // Step 0.5: Find gaps in the defence, this should be prioritized when placing castles
+    //
+
+    val gapPlacements = allFeasibleHexagons.filter { feasableHex ->
+      val castleStrength = island.calculateStrength(feasableHex) { data -> data.piece is Castle }
+
+      val hasCastleAsNeighborsNeighbor by lazy {
+        // If there are no enemy hexagons within a radius of 2, there is no point in placing a castle there
+        val farawayCastles = island.calculateRing(feasableHex, 2)
+          .asSequence()
+          .filter(island) { _, data -> data.visible && data.team == team && data.piece is Castle }
+          .toSet()
+
+        farawayCastles.count() > 1 &&
+          farawayCastles.any { fac ->
+            // From each possible castles persepective, there should be a castle 4 hexagons away, and the feasible hexagon 2 hexagons away
+            island.calculateRing(fac, 2).any { it == feasableHex } && island.calculateRing(fac, 4).any { it in farawayCastles }
+          }
+      }
+      castleStrength == NO_STRENGTH && hasCastleAsNeighborsNeighbor
+    }
+
+    // short-circuit if we have any gaps in the defence, as we should prioritize those
+    if (gapPlacements.any()) {
+      val toSet = gapPlacements.toSet()
+      think(territory) { "Found a gap in the defence! ${toSet.map(Hexagon<*>::coordinates)}" }
+      return toSet.random()
+    }
+
+    //
+    // STEP 1: Find the long-term feasible hexagons for placing a castle.
+    //
+
     val longTermFeasibleHexagonsWithScore =
-      longTermFeasibleHexagons
+      allFeasibleHexagons
         .associateWith { hex ->
           calculateProtectionScore(hex) { data ->
             val piece = data.piece
