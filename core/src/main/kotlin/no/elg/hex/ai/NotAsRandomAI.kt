@@ -138,8 +138,8 @@ class NotAsRandomAI(
           break
         }
 
-        if (!territory.checkWeaklyValid()) {
-          think(territory) { "This territory is not longer weakly valid, skipping to next territory" }
+        if (!territory.checkStronglyValid()) {
+          think(territory) { "This territory is not longer valid, skipping to next territory" }
           break
         }
 
