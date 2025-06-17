@@ -12,11 +12,11 @@ buildscript {
     gdxVersion = '1.13.5'
     ktxVersion = "1.13.1-rc1"
     visVersion = '1.5.5'
-    jacksonVersion = "2.19.0"
-    junitVersion = "5.12.2"
+    jacksonVersion = "2.19.1"
+    junitVersion = "5.13.1"
     kotlinCoroutineVersion = "1.10.2"
     argparserVersion = "2.0.7"
-    spotlessVersion = "7.0.3"
+    spotlessVersion = "7.0.4"
     androidGradleToolsVersion = '8.10.1'
     ktlintVersion = "0.48.2"
     gradleVersions = "0.52.0"
