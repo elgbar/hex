@@ -52,6 +52,7 @@ object IslandGeneration {
   var lastWidth = INITIAL_WIDTH
   var lastHeight = INITIAL_HEIGHT
   var lastLayout = INITIAL_LAYOUT
+  var instantIslandPreview = true
 
   init {
     noise.setNoiseType(OPEN_SIMPLEX_2_S)

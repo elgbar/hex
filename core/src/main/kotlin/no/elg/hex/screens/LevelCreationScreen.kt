@@ -36,6 +36,7 @@ import ktx.async.MainDispatcher
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
+import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
@@ -138,6 +139,7 @@ class LevelCreationScreen :
       }
 
       val spinner: Spinner
+
       horizontalGroup {
         space(20f)
 
@@ -262,6 +264,14 @@ class LevelCreationScreen :
             renderPreview()
           }
         }
+
+        visCheckBox("Instant create preview") {
+          isChecked = IslandGeneration.instantIslandPreview
+          onChange {
+            IslandGeneration.instantIslandPreview = isChecked
+            renderPreview()
+          }
+        }
       }
       row()
 
@@ -285,13 +295,8 @@ class LevelCreationScreen :
         )
 
         val metadata = FastIslandMetadata(nextId)
-        val island = createIsland()
+        val island = createIsland(instantly)
         val showIslandCreationScreen = if (instantly) {
-          island.removeSmallerIslands()
-          island.fixWrongTreeTypes()
-          island.regenerateCapitals()
-          island.cleanPiecesOnInvisibleHexagons()
-
           if (!island.validate()) {
             (0 until 5).any { attempt ->
               Gdx.app.info("CREATOR") { "Island created not valid, reshuffling the teams. Attempt: $attempt" }
@@ -366,13 +371,22 @@ class LevelCreationScreen :
     }
   }
 
-  private fun createIsland(): Island =
-    IslandGeneration.generate(
+  private fun createIsland(instantly: Boolean): Island {
+    val island = IslandGeneration.generate(
       seedField.text.hashCode(),
       widthSpinner.value + 2,
       heightSpinner.value + 2,
       layoutSpinner.value
     )
+
+    if (instantly) {
+      island.removeSmallerIslands()
+      island.fixWrongTreeTypes()
+      island.regenerateCapitals()
+      island.cleanPiecesOnInvisibleHexagons()
+    }
+    return island
+  }
 
   private var lastRequestedReRender = 0L
 
@@ -390,7 +404,7 @@ class LevelCreationScreen :
     if (layoutSpinner.value.gridLayoutStrategy.checkParameters(widthSpinner.value, heightSpinner.value)) {
       KtxAsync.launch(MainDispatcher) {
         val preview = async {
-          Hex.assets.islandPreviews.createPreviewFromIsland(createIsland(), newIslandpreviewSize, newIslandpreviewSize, dummyMetadata)
+          Hex.assets.islandPreviews.createPreviewFromIsland(createIsland(IslandGeneration.instantIslandPreview), newIslandpreviewSize, newIslandpreviewSize, dummyMetadata)
         }.await()
 
         previewBuffer?.dispose()
