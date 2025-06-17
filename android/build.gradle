@@ -73,6 +73,10 @@ android {
     renderScript true
     aidl true
   }
+
+  clean {
+    delete("libs", "release")
+  }
 }
 
 // called every time gradle gets executed, takes the native dependencies of
