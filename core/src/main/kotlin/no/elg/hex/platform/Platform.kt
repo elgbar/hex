@@ -48,8 +48,8 @@ interface Platform {
   fun writeToClipboard(label: String, data: Any): Boolean
 
   /**
-   * Read the text from the clipboard
+   * Read a string from the clipboard
    * @return The text from the clipboard or `null` if there is no text in the clipboard
    */
-  fun readFromClipboard(): String?
+  fun readStringFromClipboard(): String?
 }

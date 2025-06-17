@@ -5,8 +5,7 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.platform.Platform
 import no.elg.hex.platform.PlatformType
-import no.elg.hex.util.compressB85
-import no.elg.hex.util.decompressB85
+import no.elg.hex.util.compressB85IfEnabled
 import no.elg.hex.util.loadProperties
 import java.awt.HeadlessException
 import java.awt.Toolkit
@@ -34,7 +33,7 @@ class DesktopPlatform : Platform {
 
   override fun writeToClipboard(label: String, data: Any): Boolean {
     try {
-      val writeValueAsString = compressB85(Hex.mapper.writeValueAsString(data))
+      val writeValueAsString = compressB85IfEnabled(Hex.mapper.writeValueAsString(data))
       Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(writeValueAsString), null)
       return true
     } catch (e: HeadlessException) {
@@ -46,12 +45,12 @@ class DesktopPlatform : Platform {
     return false
   }
 
-  override fun readFromClipboard(): String? =
+  override fun readStringFromClipboard(): String? =
     try {
       val systemClipboard = Toolkit.getDefaultToolkit().systemClipboard
-      (systemClipboard.getData(DataFlavor.stringFlavor) as? String)?.let(::decompressB85)
+      (systemClipboard.getData(DataFlavor.stringFlavor) as? String)
     } catch (e: Exception) {
-      Gdx.app.error("DesktopPlatform", "Failed to read from clipboard", e)
+      Gdx.app.error("DesktopPlatform", "Failed to read string from clipboard", e)
       null
     }
 }

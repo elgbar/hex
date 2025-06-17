@@ -40,6 +40,7 @@ import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.exportIsland
 import no.elg.hex.util.findEnumValues
 import no.elg.hex.util.importIslands
+import no.elg.hex.util.info
 import no.elg.hex.util.padAndSpace
 import no.elg.hex.util.platformButtonPadding
 import no.elg.hex.util.platformCheckBoxSize
@@ -50,12 +51,14 @@ import no.elg.hex.util.safeGetDelegate
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
+import no.elg.hex.util.tryDecompressB85
 import kotlin.math.max
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure
+import kotlin.system.measureTimeMillis
 
 class SettingsScreen : OverlayScreen() {
 
@@ -144,18 +147,21 @@ class SettingsScreen : OverlayScreen() {
             otherSettingsStyle(it)
             onClick {
               tryPlayClick()
-              val progress = Hex.assets.islandFiles.islandIds
-                .mapNotNull(FastIslandMetadata::loadProgress)
-                .map(::exportIsland)
-                .toTypedArray() // must be array to save type correctly
+              val exportMs = measureTimeMillis {
+                val progress = Hex.assets.islandFiles.islandIds
+                  .mapNotNull(FastIslandMetadata::loadProgress)
+                  .map(::exportIsland)
+                  .toTypedArray() // must be array to save type correctly
 
-              if (progress.isEmpty()) {
-                MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
-                return@onClick
+                if (progress.isEmpty()) {
+                  MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
+                  return@onClick
+                }
+                if (Hex.platform.writeToClipboard("Hex island export", progress)) {
+                  MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
+                }
               }
-              if (Hex.platform.writeToClipboard("Hex island export", progress)) {
-                MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
-              }
+              Gdx.app.info("EXPORT") { "Exported all islands in $exportMs ms" }
               playMoney()
             }
             pack()
@@ -166,7 +172,8 @@ class SettingsScreen : OverlayScreen() {
             otherSettingsStyle(it)
             onClick {
               tryPlayClick()
-              val clipboardText = Hex.platform.readFromClipboard()
+              val clipboardText = Hex.platform.readStringFromClipboard()?.let(::tryDecompressB85)
+
               if (clipboardText == null) {
                 MessagesRenderer.publishWarning("No valid text found in clipboard")
                 return@onClick

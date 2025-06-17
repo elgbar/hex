@@ -14,8 +14,7 @@ import no.elg.hex.Hex
 import no.elg.hex.R
 import no.elg.hex.platform.Platform
 import no.elg.hex.platform.PlatformType
-import no.elg.hex.util.compressB85
-import no.elg.hex.util.decompressB85
+import no.elg.hex.util.compressB85IfEnabled
 
 
 class AndroidPlatform(private val activity: Activity) : Platform {
@@ -52,16 +51,15 @@ class AndroidPlatform(private val activity: Activity) : Platform {
     val clipboard: ClipboardManager = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     val writeValueAsString = Hex.mapper.writeValueAsString(data)
-    clipboard.setPrimaryClip(ClipData.newPlainText(label, compressB85(writeValueAsString)))
+    clipboard.setPrimaryClip(ClipData.newPlainText(label, compressB85IfEnabled(writeValueAsString)))
     return VERSION.SDK_INT <= VERSION_CODES.S_V2
   }
 
-  override fun readFromClipboard(): String? {
+  override fun readStringFromClipboard(): String? {
     val clipboard: ClipboardManager = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     return clipboard.primaryClip?.let { clipData ->
       if(clipData.itemCount == 0) return null
-      val raw = clipData.getItemAt(0).coerceToText(null).toString()
-      decompressB85(raw)
+      clipData.getItemAt(0).coerceToText(null).toString()
     }
   }
 }
