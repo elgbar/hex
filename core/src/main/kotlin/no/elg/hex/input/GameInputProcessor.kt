@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Keys.ESCAPE
 import com.badlogic.gdx.Input.Keys.F10
 import com.badlogic.gdx.Input.Keys.F11
 import com.badlogic.gdx.Input.Keys.F12
+import com.badlogic.gdx.Input.Keys.F6
 import com.badlogic.gdx.Input.Keys.F9
 import com.badlogic.gdx.Input.Keys.SPACE
 import com.badlogic.gdx.Input.Keys.Y
@@ -66,6 +67,9 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           val data = island.getData(it)
           data.team = island.currentTeam
         }
+      }
+      F6 -> if (Hex.debug) {
+        gameInteraction.animate = !gameInteraction.animate
       }
 
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.undo()

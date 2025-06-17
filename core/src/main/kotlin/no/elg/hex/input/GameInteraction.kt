@@ -32,6 +32,10 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
 
   internal var cheating = Hex.args.cheating
 
+  /**
+   * Whether the animations are enabled.
+   */
+  internal var animate = true
   fun endGame() = endGame(island.isCurrentTeamHuman())
 
   /**

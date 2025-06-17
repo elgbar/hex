@@ -36,7 +36,12 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
       loop@ for (hexagon in island.visibleHexagons) {
         val data = island.getData(hexagon)
 
-        fun shouldAnimate(): Boolean = data.team == island.currentTeam && island.isCurrentTeamHuman() && !Hex.mapEditor && !islandScreen.isPreviewRenderer
+        fun shouldAnimate(): Boolean =
+          data.team == island.currentTeam &&
+            island.isCurrentTeamHuman() &&
+            !Hex.mapEditor &&
+            !islandScreen.isPreviewRenderer &&
+            islandScreen.island.gameInteraction.animate
 
         val drawable = Hex.assets.getTexture(data.piece, shouldAnimate()) ?: continue@loop
 
