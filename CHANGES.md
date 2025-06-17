@@ -60,8 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix crash when using the `--update-previews` flag
 * Improve startup time to the level select screen
 
-### Removed
-
 ---
 
 # v2.5.0 - 2025-05-23
