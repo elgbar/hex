@@ -30,6 +30,7 @@ import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
+import kotlin.sequences.forEach
 
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData =
@@ -63,7 +64,7 @@ fun Island.getHexagon(x: Double, y: Double): Hexagon<HexagonData>? {
  * @return All (visible) connected hexagons to the start hexagon of the same team.
  */
 fun Island.connectedTerritoryHexagons(hexagon: Hexagon<HexagonData>, team: Team? = this.getData(hexagon).team): Set<Hexagon<HexagonData>> {
-  fun connectedTerritoryHexagons(center: Hexagon<HexagonData>, team: Team?, visited: MutableSet<Hexagon<HexagonData>>, island: Island): Set<Hexagon<HexagonData>> {
+  fun connectedTerritoryHexagons(center: Hexagon<HexagonData>, visited: MutableSet<Hexagon<HexagonData>>, island: Island): Set<Hexagon<HexagonData>> {
     val data = island.getData(center)
     // only check a hexagon if they have the same color and haven't been visited
     if (center in visited || (team != null && data.team != team) || data.invisible) {
@@ -75,11 +76,11 @@ fun Island.connectedTerritoryHexagons(hexagon: Hexagon<HexagonData>, team: Team?
 
     // check each neighbor
     for (neighbor in island.grid.getNeighborsOf(center)) {
-      connectedTerritoryHexagons(neighbor, team, visited, island)
+      connectedTerritoryHexagons(neighbor, visited, island)
     }
     return visited
   }
-  return connectedTerritoryHexagons(hexagon, team, HashSet(), this)
+  return connectedTerritoryHexagons(hexagon, HashSet(), this)
 }
 
 /**
@@ -157,6 +158,19 @@ fun Island.cleanPiecesOnInvisibleHexagons() {
   invisibleHexagons.withData(this, false) { _, data ->
     data.setPiece<Empty>()
   }
+}
+
+fun Island.shuffleAllTeams() {
+  val allData = allHexagons
+    .asSequence()
+    .map(this::getData)
+
+  allData
+    .filter { it.piece is Capital }
+    .forEach { it.setPiece<Empty>() }
+
+  allData.forEach { it.team = Team.entries.random() }
+  regenerateCapitals()
 }
 
 fun Island.removeSmallerIslands() {

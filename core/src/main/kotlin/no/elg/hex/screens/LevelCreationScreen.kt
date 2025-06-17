@@ -46,12 +46,14 @@ import no.elg.hex.island.IslandGeneration
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
 import no.elg.hex.util.fixWrongTreeTypes
+import no.elg.hex.util.info
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.play
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.removeSmallerIslands
 import no.elg.hex.util.safeUse
 import no.elg.hex.util.saveInitialIsland
+import no.elg.hex.util.shuffleAllTeams
 import no.elg.hex.util.value
 import org.hexworks.mixite.core.api.HexagonalGridLayout
 import org.hexworks.mixite.core.api.HexagonalGridLayout.HEXAGONAL
@@ -290,7 +292,19 @@ class LevelCreationScreen :
           island.regenerateCapitals()
           island.cleanPiecesOnInvisibleHexagons()
 
-          !saveInitialIsland(metadata, island)
+          if (!island.validate()) {
+            (0 until 5).any { attempt ->
+              Gdx.app.info("CREATOR") { "Island created not valid, reshuffling the teams. Attempt: $attempt" }
+              island.shuffleAllTeams()
+              if (island.validate()) {
+                Gdx.app.info("CREATOR") { "Island created valid after reshuffle." }
+                return@any !saveInitialIsland(metadata, island)
+              }
+              false
+            }
+          } else {
+            !saveInitialIsland(metadata, island)
+          }
         } else {
           true
         }

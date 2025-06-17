@@ -1,10 +1,8 @@
 package no.elg.hex.input.editor
 
-import no.elg.hex.hexagon.Capital
-import no.elg.hex.hexagon.Empty
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.hexagon.Team
-import no.elg.hex.util.getData
+import no.elg.hex.util.shuffleAllTeams
 import org.hexworks.mixite.core.api.Hexagon
 
 sealed interface TeamEditor : Editor {
@@ -29,15 +27,7 @@ sealed interface TeamEditor : Editor {
     override val order: Int = 1
 
     override fun edit(hexagon: Hexagon<HexagonData>, ignore: HexagonData, metadata: EditMetadata) {
-      val allData = metadata.island.allHexagons
-        .asSequence()
-        .map(metadata.island::getData)
-
-      allData
-        .filter { it.piece is Capital }
-        .forEach { it.setPiece<Empty>() }
-
-      allData.forEach { it.team = Team.entries.random() }
+      metadata.island.shuffleAllTeams()
     }
   }
 }

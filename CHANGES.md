@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Allow level sorting to be customized in settings
   * The default sorting is by ARtB, then by id
   * The sorting also applies to the map editor
+* Simplify instantly creating islands by retrying to shuffle the teams until it is valid
 
 ### Changed
 
