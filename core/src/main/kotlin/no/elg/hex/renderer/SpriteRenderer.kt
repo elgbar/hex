@@ -14,6 +14,7 @@ import no.elg.hex.hexagon.Spearman
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hexagon.strengthToTypeOrNull
 import no.elg.hex.island.Island
+import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Territory
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
@@ -101,6 +102,7 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
 
   private fun renderBestCastlePlacement(territory: Territory) {
     val ai: NotAsRandomAI = nari[territory.team] ?: return
+    if (territory.hexagons.size == MIN_HEX_IN_TERRITORY) return // no point in rendering a castle placement when there is only one option (reduces visual clutter)
     val hexagon = ai.calculateBestCastlePlacement(territory) ?: return
 
     val boundingBox = hexagon.internalBoundingBox
