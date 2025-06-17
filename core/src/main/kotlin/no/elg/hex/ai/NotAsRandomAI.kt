@@ -495,10 +495,10 @@ class NotAsRandomAI(
     }
 
     // short-circuit if we have any gaps in the defence, as we should prioritize those
-    if (gapPlacements.any()) {
-      val toSet = gapPlacements.toSet()
-      think(territory) { "Found a gap in the defence! ${toSet.map(Hexagon<*>::coordinates)}" }
-      return toSet.random()
+    val gapPlacementsSet = gapPlacements.toSet()
+    if (gapPlacementsSet.any()) {
+      think(territory) { "Found a gap in the defence! ${gapPlacementsSet.map(Hexagon<*>::coordinates)}" }
+      return gapPlacementsSet.randomOrNull()
     }
 
     //
