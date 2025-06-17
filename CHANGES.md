@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add 150 new islands
 * Add debug rendering for castle placement
 * Add `--create-artb-improvement-rapport`
   * Simplifies finding which islands have an improvement in ARtB
