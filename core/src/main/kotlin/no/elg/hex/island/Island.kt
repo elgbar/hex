@@ -432,10 +432,12 @@ class Island(
    * @return The territory the hexagon is part of or `null` if no capital can be found
    */
   fun findTerritory(maybeHex: Hexagon<HexagonData>?): Territory? {
+    val startTurn = turn
     val hexagon = maybeHex ?: return null
     val territoryHexes = getTerritoryHexagons(hexagon) ?: return null
     val capitalHex = findOrCreateCapital(territoryHexes) ?: return null
     val capital = getData(capitalHex).piece as? Capital ?: return null
+    if (turn != startTurn) return null
     return Territory(this, capital, territoryHexes, capitalHex)
   }
 
