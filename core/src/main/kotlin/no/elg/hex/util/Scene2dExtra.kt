@@ -143,7 +143,7 @@ fun VisWindow.show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_
       centerWindow()
     }
   } else {
-    Gdx.app.log("WINDOWS") { "Tried to show '$titleLabel' but it is already shown" }
+    Gdx.app.debug("WINDOWS") { "Tried to show '$titleLabel' but it is already shown" }
   }
 }
 
