@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix IndexOutOfBounds exception when the AI's selecting a piece
 * Fix end game window not showing when loosing to the AI
+* Fix checking end game after ending turn, not before
 
 ### Removed
 

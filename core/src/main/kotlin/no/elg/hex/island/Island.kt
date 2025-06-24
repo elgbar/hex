@@ -38,6 +38,7 @@ import no.elg.hex.hexagon.replaceWithTree
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.GameInteraction
 import no.elg.hex.island.Hand.Companion.NoRestore
+import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.model.IslandDto
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateRing
@@ -295,8 +296,13 @@ class Island(
     aiJob = KtxAsync.launch(Hex.asyncThread) {
       select(null)
 
+      if (checkGameEnded()) {
+        gameInteraction.endGame()
+        return@launch
+      }
+
       val oldTeam = currentTeam
-      val newTeam = Team.entries.toTypedArray().next(oldTeam)
+      val newTeam = Team.entries.next(oldTeam)
       currentTeam = newTeam
       Gdx.app.debug("TURN") { "Starting turn of $newTeam" }
       Gdx.app.postRunnable { Events.fireEvent(TeamEndTurnEvent(oldTeam, newTeam)) }
@@ -331,11 +337,6 @@ class Island(
         data.piece.beginTurn(this@Island, capital, data, newTeam)
       }
       Gdx.graphics.requestRendering()
-
-      if (checkGameEnded()) {
-        gameInteraction.endGame()
-        return@launch
-      }
 
       if (capitals.isNotEmpty()) {
         beginTurn()
