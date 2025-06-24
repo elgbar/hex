@@ -67,7 +67,7 @@ fun Island.connectedTerritoryHexagons(hexagon: Hexagon<HexagonData>, team: Team?
   fun connectedTerritoryHexagons(center: Hexagon<HexagonData>, visited: MutableSet<Hexagon<HexagonData>>, island: Island): Set<Hexagon<HexagonData>> {
     val data = island.getData(center)
     // only check a hexagon if they have the same color and haven't been visited
-    if (center in visited || (team != null && data.team != team) || data.invisible) {
+    if (data.invisible || (team != null && data.team != team) || center in visited) {
       return visited
     }
 
