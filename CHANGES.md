@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Disable strength hints everywhere by default
+
 ### Fixed
 
 * Fix IndexOutOfBounds exception when the AI's selecting a piece
