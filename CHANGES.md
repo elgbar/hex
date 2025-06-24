@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+---
+
+# v2.6.1 - 2025-06-24
+
+### Changed
+
 * Disable strength hints everywhere by default
 
 ### Fixed
@@ -20,9 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix IndexOutOfBounds exception when the AI's selecting a piece
 * Fix end game window not showing when loosing to the AI
 * Fix checking end game after ending turn, not before
-* Reduce invalid territory creation when playing fast
-
-### Removed
+* Reduce invalid territory creation when playing fast (errors might still occur, but they are rare in normal play)
 
 ---
 
