@@ -313,7 +313,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
       }
     }
     windows.filter { it != window }.forEach(VisWindow::hide)
-    window.show(stage)
+    Gdx.app.postRunnable { window.show(stage) }
   }
 
   private fun onGameEnded(modifier: PreviewModifier) {
