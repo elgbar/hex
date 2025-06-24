@@ -171,7 +171,7 @@ class NotAsRandomAI(
     }
 
     if (hexPickupPritoryList.isNotEmpty()) {
-      val hex = hexPickupPritoryList.removeAt(hexPickupPritoryList.size) // cannot use removeLast() as it is not available in android 14
+      val hex = hexPickupPritoryList.removeAt(hexPickupPritoryList.lastIndex) // cannot use removeLast() as it is not available in android 14
       think(territory) {
         val data = island.getData(hex)
         "Picking up priority piece ${data.piece} at ${hex.coordinates}"

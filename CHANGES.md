@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix IndexOutOfBounds exception when the AI's selecting a piece
+
 ### Removed
 
 ---
@@ -163,11 +165,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Disallow hard AI to buy castles on the first round
   * Double the number of rounds before normal AI can buy castles
   * AI will try to attack enemy living pieces in the order of `baron`, `knight`, `spearman`, `peasant`
-  * AI will try to attack enemy trees 
-  * Add special case when there is only a single least defended hexagon, will try to place it adjacent to it if possible to protect the living piece 
+  * AI will try to attack enemy trees
+  * Add special case when there is only a single least defended hexagon, will try to place it adjacent to it if possible to protect the living piece
   * Only prioritize cutting down trees that will propagate into friendly territory
   * Improve castle placement to be allowed to place on movable living pieces
-  * Improve castle placement to ignore the capital and living pieces 
+  * Improve castle placement to ignore the capital and living pieces
     * to more fairly distribute them regardless of how living pieces are placed
     * to place castles near capitals to defend them
 
