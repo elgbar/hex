@@ -56,7 +56,7 @@ class Maybe<T> {
    * returned.
    */
   // TODO: make this easier to use
-  fun filter(predicate: Predicate<in T>): Maybe<T> {
+  fun filter(predicate: Predicate<T>): Maybe<T> {
     return if (!isPresent) {
       this
     } else if (predicate(get())) this else empty()

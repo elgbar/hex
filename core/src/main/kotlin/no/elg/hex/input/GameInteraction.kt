@@ -84,9 +84,14 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
   fun buyUnit(piece: Piece): Boolean {
     island.selected?.also { territory ->
       val hand = island.hand
-      if (hand != null && (
-          piece !is LivingPiece && hand.piece !is LivingPiece && piece::class == hand.piece::class ||
-            piece is LivingPiece && hand.piece is LivingPiece && piece.canNotMerge(hand.piece)
+      if (hand != null &&
+        (
+          piece !is LivingPiece &&
+            hand.piece !is LivingPiece &&
+            piece::class == hand.piece::class ||
+            piece is LivingPiece &&
+            hand.piece is LivingPiece &&
+            piece.canNotMerge(hand.piece)
           )
       ) {
         // If we cannot merge or the pieces are identical we should not be able to buy new pieces

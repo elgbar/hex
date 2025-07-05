@@ -1153,30 +1153,6 @@ class FastNoiseLite {
           xi++
         }
       }
-
-      else -> {
-        var xi = xr - 1
-        while (xi <= xr + 1) {
-          var yPrimed = yPrimedBase
-          var yi = yr - 1
-          while (yi <= yr + 1) {
-            val hash: Int = Hash(seed, xPrimed, yPrimed)
-            val idx = hash and (255 shl 1)
-            val vecX: Float = xi - x + RandVecs2D[idx] * cellularJitter
-            val vecY: Float = yi - y + RandVecs2D[idx or 1] * cellularJitter
-            val newDistance = vecX * vecX + vecY * vecY
-            distance1 = FastMax(FastMin(distance1, newDistance), distance0)
-            if (newDistance < distance0) {
-              distance0 = newDistance
-              closestHash = hash
-            }
-            yPrimed += PRIME_Y
-            yi++
-          }
-          xPrimed += PRIME_X
-          xi++
-        }
-      }
     }
     if (cellularDistanceFunction === EUCLIDEAN && cellularReturnType !== CELL_VALUE) {
       distance0 = FastSqrt(distance0)
@@ -2196,20 +2172,17 @@ class FastNoiseLite {
     i *= PRIME_X
     j *= PRIME_Y
     k *= PRIME_Z
-    var vx: Float
-    var vy: Float
-    var vz: Float
-    vz = 0f
-    vy = vz
-    vx = vy
+    var vz: Float = 0f
+    var vy: Float = vz
+    var vx: Float = vy
     var a = 0.6f - x0 * x0 - (y0 * y0 + z0 * z0)
     var l = 0
     while (true) {
       if (a > 0) {
         val aaaa = a * a * (a * a)
-        var xo: Float
-        var yo: Float
-        var zo: Float
+        val xo: Float
+        val yo: Float
+        val zo: Float
         if (outGradOnly) {
           val hash: Int = Hash(seed, i, j, k) and (255 shl 2)
           xo = RandVecs3D[hash]
@@ -2257,9 +2230,9 @@ class FastNoiseLite {
       if (b > 1) {
         b -= 1f
         val bbbb = b * b * (b * b)
-        var xo: Float
-        var yo: Float
-        var zo: Float
+        val xo: Float
+        val yo: Float
+        val zo: Float
         if (outGradOnly) {
           val hash: Int = Hash(seed, i1, j1, k1) and (255 shl 2)
           xo = RandVecs3D[hash]

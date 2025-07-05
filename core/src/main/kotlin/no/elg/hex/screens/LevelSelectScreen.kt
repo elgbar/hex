@@ -128,7 +128,7 @@ class LevelSelectScreen :
 
           if (Hex.mapEditor || Hex.debug) {
             layout.setText(font, "ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.left, true)
-            font.draw(batch, layout, x, y + vertOffset * line++)
+            font.draw(batch, layout, x, y + vertOffset * line)
           }
         }
       }

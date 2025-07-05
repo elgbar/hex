@@ -26,7 +26,7 @@ sealed interface TeamEditor : Editor {
 
     override val order: Int = 1
 
-    override fun edit(hexagon: Hexagon<HexagonData>, ignore: HexagonData, metadata: EditMetadata) {
+    override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
       metadata.island.shuffleAllTeams()
     }
   }
