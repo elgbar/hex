@@ -8,7 +8,7 @@ import java.nio.file.Paths
 buildscript {
   ext {
     appName = "Hex"
-    kotlinVersion = "2.1.21"
+    kotlinVersion = "2.2.0"
     gdxVersion = '1.13.5'
     ktxVersion = "1.13.1-rc1"
     visVersion = '1.5.5'
@@ -88,8 +88,11 @@ subprojects {
     compilerOptions {
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]
-      freeCompilerArgs.add("-Xwhen-guards") // https://github.com/Kotlin/KEEP/blob/guards/proposals/guards.md
-      freeCompilerArgs.add("-Xnon-local-break-continue") // https://github.com/Kotlin/KEEP/blob/guards/proposals/break-continue-in-inline-lambdas.md (beta in 2.1)
+      freeCompilerArgs.add("-Xcontext-sensitive-resolution") // https://kotlinlang.org/docs/whatsnew22.html#preview-of-context-sensitive-resolution (experimental in 2.2)
+      freeCompilerArgs.add("-Xannotation-target-all") // https://kotlinlang.org/docs/whatsnew22.html#all-meta-target-for-properties (experimental in 2.2)
+      freeCompilerArgs.add("-Xnested-type-aliases") // https://kotlinlang.org/docs/whatsnew22.html#support-for-nested-type-aliases (beta in 2.2)
+      freeCompilerArgs.add("-Wextra") // Enables all additional declaration, expression, and type compiler checks that emit warnings if true.
+      freeCompilerArgs.add("-jvm-default=no-compatibility") // https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions
 //      allWarningsAsErrors = true
     }
   }
