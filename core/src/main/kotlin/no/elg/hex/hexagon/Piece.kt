@@ -147,9 +147,13 @@ val PIECES: List<KClass<out Piece>> by lazy {
 val PIECES_ORGANIZED: List<List<KClass<out Piece>>> by lazy {
   val subclassesRow = mutableListOf<MutableList<KClass<out Piece>>>()
   var subclasses: MutableList<KClass<out Piece>> = mutableListOf()
-  forEachPieceSubClass({ subclasses = mutableListOf<KClass<out Piece>>().also { subclassesRow.add(it) } }) {
+  val sealed: (KClass<out Piece>) -> Unit = {
+    subclasses = mutableListOf<KClass<out Piece>>().also { subclassesRow.add(it) }
+  }
+  val instance: (KClass<out Piece>) -> Unit = {
     subclasses += it
   }
+  forEachPieceSubClass(sealed, instance)
   return@lazy subclassesRow
 }
 

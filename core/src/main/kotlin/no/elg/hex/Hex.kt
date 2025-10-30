@@ -12,6 +12,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglGraphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -64,7 +65,7 @@ object Hex : ApplicationAdapter() {
   @JvmStatic
   val mapper = jsonMapper {
     addModule(kotlinModule())
-    serializationInclusion(JsonInclude.Include.NON_DEFAULT)
+    defaultPropertyInclusion(JsonInclude.Value.construct(NON_DEFAULT, NON_DEFAULT))
     addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
     addModule(SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) })
     configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)

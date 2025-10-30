@@ -9,16 +9,16 @@ int javaCompileVersion = Integer.parseInt(javaVersion)
 android {
   compileSdk androidSdkVersion
 
-  namespace 'no.elg.hex'
+  namespace = 'no.elg.hex'
 
   compileOptions {
     sourceCompatibility = JavaVersion.toVersion(javaCompileVersion)
     targetCompatibility = JavaVersion.toVersion(javaCompileVersion)
   }
 
-  kotlinOptions {
-    jvmTarget = javaCompileVersion.toString()
-  }
+//  kotlinOptions {
+//    jvmTarget = javaCompileVersion.toString()
+//  }
 
   sourceSets {
     main {
@@ -57,7 +57,7 @@ android {
   buildTypes {
     release {
       minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
       resValue("string", "version", hexVersion)
       resValue("string", "args", "")
     }
@@ -70,8 +70,8 @@ android {
     }
   }
   buildFeatures {
-    renderScript true
-    aidl true
+    renderScript = true
+    aidl = true
   }
 
   clean {
