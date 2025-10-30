@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added two new levels
+
 ### Changed
 
 ### Fixed
+
+* Fix android 16 kB alignment
 
 ### Removed
 
