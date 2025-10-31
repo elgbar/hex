@@ -30,7 +30,7 @@ fun compressB85(text: String): String? {
  * @return The decompressed string if valid, otherwise the original string.
  */
 fun tryDecompressB85(b85Compressed: String): String? {
-  val data = b85Compressed.toByteArray(US_ASCII)
+  val data = b85Compressed.trim().toByteArray(US_ASCII)
   return if (Base85.getZ85Decoder().test(data)) {
     val decoded = Base85.getZ85Decoder().decode(data)
     val decompressed = decompress(decoded) ?: return null

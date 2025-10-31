@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* More lenient import, trimming away white spaces
+
 ### Fixed
 
 * Fix android 16 kB alignment
