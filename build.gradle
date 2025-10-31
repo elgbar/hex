@@ -149,6 +149,10 @@ project(":desktop") {
 
   apply plugin: "kotlin"
 
+  tasks.withType(JavaExec).configureEach {
+    jvmArgs "--enable-native-access=ALL-UNNAMED"
+  }
+
   dependencies {
     implementation project(":core")
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -215,7 +219,7 @@ project(":core") {
     api "com.kotcrab.vis:vis-ui:$visVersion"
     api platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$kotlinCoroutineVersion")
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
-    api "org.jetbrains:annotations:26.0.2"
+    api "org.jetbrains:annotations:26.0.2-1"
 
     api "io.github.libktx:ktx-app:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
@@ -227,7 +231,7 @@ project(":core") {
     implementation "io.github.libktx:ktx-async:$ktxVersion"
     implementation "io.github.libktx:ktx-assets:$ktxVersion"
 
-    api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    compileOnly "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
     api platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion")
     api "com.fasterxml.jackson.module:jackson-module-kotlin"
