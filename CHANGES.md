@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Island 190 unbeaten to 23 rounds
   * Island 248 unbeaten to 27 rounds
   * Island 292 unbeaten to 39 rounds
+  * Island 318 unbeaten to 16 rounds
+  * Island 325 unbeaten to 17 rounds
+  * Island 330 unbeaten to 18 rounds
 * Update too difficult islands
   * Island 190: Added a second territory for Leaf, Sun, and Earth and added more trees to nerf Forest
   * Island 235: Replace two Sun tiles with Leaf tiles to make Sun less dominant
@@ -33,6 +36,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Island 256: Nerfed Sun and Added second Leaf territory
   * Island 293: Added a singe new Leaf tile up north
   * Island 295: Add more Stone and Leaf territories
+  * Island 303: Nerf southern Forest territory and add a second Leaf territories
+  * Island 313: Nerf northern Forest territory, remove tree from leaf territory spawn, add third Leaf territory
+  * Island 314: Add second Leaf territory, tweak tree spawns
+  * Island 318: Enlarge eastern Leaf territory 
+  * Island 325: Nerf eastern Forest territory, add second Leaf territory
+  * Island 330: Rework map to be north leaf vs south Stone with loads of small territories in the middle
+  * Island 331: Make it easier to connect the two middle leaf territories
+  * Island 340: Add second Leaf territory
 
 ### Fixed
 
