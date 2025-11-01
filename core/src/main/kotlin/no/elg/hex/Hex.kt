@@ -128,7 +128,7 @@ object Hex : ApplicationAdapter() {
         Gdx.graphics.isContinuousRendering = false
         Events.clear(true)
 
-        Gdx.app.debug("SCREEN", "Loading new screen ${value::class.simpleName}")
+        Gdx.app.debug("SCREEN") { "Loading new screen ${value::class.simpleName}" }
         value.show()
         value.resize(Gdx.graphics.width, Gdx.graphics.height)
         // Keep this last

@@ -27,7 +27,6 @@ fun Application.debug(tag: String, message: () -> String) {
   if (logLevel >= LOG_DEBUG) applicationLogger.debug(tag, message())
 }
 
-fun Application.log(tag: String, message: () -> String) = info(tag, message)
 fun Application.info(tag: String, message: () -> String) {
   if (logLevel >= LOG_INFO) applicationLogger.log(tag, message())
 }
