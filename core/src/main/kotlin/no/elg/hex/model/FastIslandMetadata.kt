@@ -37,6 +37,7 @@ class FastIslandMetadata(
   Disposable {
 
   fun isUserBetterThanAuthor(): Boolean = userRoundsToBeat != Island.NEVER_PLAYED && userRoundsToBeat < authorRoundsToBeat
+  fun wasNeverBeatenByAuthorButBeatenByUser(): Boolean = authorRoundsToBeat == Island.NEVER_PLAYED && userRoundsToBeat != Island.NEVER_PLAYED
 
   var previewPixmap: ByteArray? = previewPixmap
     set(value) {

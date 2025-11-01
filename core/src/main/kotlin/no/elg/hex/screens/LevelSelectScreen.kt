@@ -145,7 +145,11 @@ class LevelSelectScreen :
           }
 
           if (metadata.userRoundsToBeat != Island.NEVER_PLAYED) {
-            val color = if (metadata.isUserBetterThanAuthor()) Color.GOLD else Color.WHITE
+            val color = when {
+              metadata.isUserBetterThanAuthor() -> Color.GOLD
+              metadata.wasNeverBeatenByAuthorButBeatenByUser() -> Color.YELLOW
+              else -> Color.WHITE
+            }
             layout.setText(font, "Best ${metadata.userRoundsToBeat}", color, width, Align.left, true)
             font.draw(batch, layout, x, y + vertOffset * line++)
           }
