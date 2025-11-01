@@ -332,6 +332,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
   }
 
   private fun endGame(win: Boolean) {
+    Gdx.app.log("ISLAND", "Game ended on round ${island.round} (win? $win)")
     showWindow(
       when {
         island.onlyAIPlayers -> aiDone

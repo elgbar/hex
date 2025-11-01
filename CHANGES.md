@@ -16,7 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* More lenient import, trimming away white spaces
+* More lenient import, trimming away white spaces*
+* Island ARtB updated
+  * Island 11 improved from 11 to 9 rounds
+  * Island 22 improved from 14 to 13 rounds
+  * Island 109 improved from 29 to 23 rounds
+  * Island 148 unbeaten to 20 rounds
+  * Island 109 unbeaten to 31 rounds
+  * Island 190 unbeaten to 23 rounds
+  * Island 248 unbeaten to 27 rounds
+  * Island 292 unbeaten to 39 rounds
+* Update too difficult islands
+  * Island 190: Added a second territory for Leaf, Sun, and Earth and added more trees to nerf Forest
+  * Island 235: Replace two Sun tiles with Leaf tiles to make Sun less dominant
+  * Island 248: Added a second Leaf territory and nerf Forest up north
+  * Island 256: Nerfed Sun and Added second Leaf territory
+  * Island 293: Added a singe new Leaf tile up north
+  * Island 295: Add more Stone and Leaf territories
 
 ### Fixed
 
