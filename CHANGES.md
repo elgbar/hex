@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added three new levels
+* Added 99 new islands
 * Added pressing `F1` on the level select screen to open a level select dialog
 
 ### Changed
