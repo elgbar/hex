@@ -31,61 +31,69 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 
 ## Help page
 
-*Accurate as of version 2.6.2-snapshot*
+*Accurate as of version 2.7.0*
 
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
        [--draw-edges] [--stage-debug] [--update-previews]
        [--update-saved-islands] [--load-all-islands] [--reset-all] [--ai-debug]
-       [--create-artb-improvement-rapport] [--validate-island-on-load]
+       [--list-artb-improvements UPDATE_ARTB] [--validate-island-on-load]
        [--scale SCALE] [--profile]
 
 optional arguments:
-  -h, --help                          show this help message and exit
+  -h, --help                             show this help message and exit
 
-  -d, --debug                         Enable debug logging
+  -d, --debug                            Enable debug logging
 
-  -t, --trace                         Enable even more logging
+  -t, --trace                            Enable even more logging
 
-  -s, --silent                        Do not print anything to stdout or
-                                      stderr
+  -s, --silent                           Do not print anything to stdout or
+                                         stderr
 
-  -e, --map-editor                    Start the program in map editor mode
+  -e, --map-editor                       Start the program in map editor mode
 
-  --i-am-a-cheater                    Enable cheating
+  --i-am-a-cheater                       Enable cheating
 
-  --disable-island-loading            Don't load islands
+  --disable-island-loading               Don't load islands
 
-  --draw-edges                        Draw the edge hexagons to assists with
-                                      debugging
+  --draw-edges                           Draw the edge hexagons to assists
+                                         with debugging
 
-  --stage-debug                       Enable debug overlay for UI
+  --stage-debug                          Enable debug overlay for UI
 
-  --update-previews                   Update pre-rendered previews of islands
-                                      from the initial island metadata
+  --update-previews                      Update pre-rendered previews of
+                                         islands from the initial island
+                                         metadata
 
-  --update-saved-islands              Update the saved islands by saving them
-                                      again after loading them. Only really
-                                      useful when changing the save format
+  --update-saved-islands                 Update the saved islands by saving
+                                         them again after loading them. Only
+                                         really useful when changing the save
+                                         format
 
-  --load-all-islands                  Load all islands at startup instead of
-                                      when first played
+  --load-all-islands                     Load all islands at startup instead
+                                         of when first played
 
-  --reset-all                         Resetting settings and progress
+  --reset-all                            Resetting settings and progress
 
-  --ai-debug                          Listen to the AI thinking
+  --ai-debug                             Listen to the AI thinking
 
-  --create-artb-improvement-rapport   List all islands where the Author Round
-                                      to Beat (ARtB) was beaten or there was
-                                      no ARtB set and it has now been beaten
-                                      by the user
+  --list-artb-improvements UPDATE_ARTB   List all islands where the Author
+                                         Round to Beat (ARtB) was beaten or
+                                         there was no ARtB set and it has now
+                                         been beaten by the user. Argument
+                                         UPDATE_ARTB (boolean) is used to
+                                         specify if the islands' progress
+                                         should be updated to reflect the new
+                                         ARtB values.App will exit after
+                                         listing the islands.
 
-  --validate-island-on-load           Validate island when loading it, useful
-                                      with `--load-all-islands`
+  --validate-island-on-load              Validate island when loading it,
+                                         useful with `--load-all-islands`
 
-  --scale SCALE                       Scale of UI, if <= 0 default scale apply
+  --scale SCALE                          Scale of UI, if <= 0 default scale
+                                         apply
 
-  --profile                           Enable GL profiling
+  --profile                              Enable GL profiling
 ```
 
 ## Hints
