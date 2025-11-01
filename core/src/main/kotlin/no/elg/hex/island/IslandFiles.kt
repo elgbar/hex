@@ -30,6 +30,12 @@ class IslandFiles {
       return firstExisting + 1
     }
 
+  fun exists(islandId: Int): Boolean {
+    val fileName = getIslandFileName(islandId)
+    val file = getIslandFile(fileName, allowInternal = !Hex.mapEditor)
+    return file.exists() && !file.isDirectory
+  }
+
   fun fullFilesSearch() {
     reportTiming("do a full files search") {
       if (Hex.args.`disable-island-loading`) return
@@ -37,16 +43,13 @@ class IslandFiles {
 
       var nonExistentFilesInRow = 0
       for (id in 0..Int.MAX_VALUE) {
-        val fileName = getIslandFileName(id)
-        val file = getIslandFile(fileName, allowInternal = !Hex.mapEditor)
-        if (file.exists()) {
-          if (file.isDirectory) continue
+        if (exists(id)) {
           if (nonExistentFilesInRow > 0) {
             Gdx.app.debug(TAG) {
               "Missing the islands ${(id - nonExistentFilesInRow until id).map { getIslandFileName(it) }}"
             }
           }
-          Gdx.app.trace(TAG) { "Found island $fileName" }
+          Gdx.app.trace(TAG) { "Found island ${getIslandFileName(id)}" }
           nonExistentFilesInRow = 0
 
           val initialMetadata = FastIslandMetadata.loadInitial(id)
@@ -55,6 +58,8 @@ class IslandFiles {
             FastIslandMetadata.clearInitialIslandMetadataCache(id)
             continue
           }
+
+          islandIds += id
 
           if (initialMetadata != null && Hex.args.`create-artb-improvement-rapport`) {
             val progress = FastIslandMetadata.loadProgress(id)
@@ -67,11 +72,12 @@ class IslandFiles {
               }
             }
           }
-
-          if (Hex.args.`load-all-islands` && !Hex.assets.isLoaded<Island>(fileName)) {
-            Hex.assets.load<Island>(fileName)
+          if (Hex.args.`load-all-islands`) {
+            val fileName = getIslandFileName(id)
+            if (!Hex.assets.isLoaded<Island>(fileName)) {
+              Hex.assets.load<Island>(fileName)
+            }
           }
-          islandIds += id
         } else {
           nonExistentFilesInRow++
           if (nonExistentFilesInRow >= FILE_NOT_FOUND_IN_ROW_TO_STOP_SEARCH) {

@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added two new levels
+* Added three new levels
+* Added pressing `F1` on the level select screen to open a level select dialog
 
 ### Changed
 

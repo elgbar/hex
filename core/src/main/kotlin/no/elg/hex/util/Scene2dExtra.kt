@@ -2,6 +2,7 @@ package no.elg.hex.util
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.EventListener
@@ -9,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener
+import com.kotcrab.vis.ui.util.InputValidator
 import com.kotcrab.vis.ui.widget.MenuItem
 import com.kotcrab.vis.ui.widget.PopupMenu
 import com.kotcrab.vis.ui.widget.Separator
@@ -26,6 +29,7 @@ import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
+import ktx.scene2d.vis.visValidatableTextField
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
 import no.elg.hex.platform.PlatformType.DESKTOP
@@ -257,6 +261,7 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindo
     }
     centerWindow()
     onAnyKeysDownEvent(Input.Keys.ESCAPE, Input.Keys.BACK, catchEvent = true) {
+      this@visWindow.whenDenied()
       this@visWindow.fadeOut()
     }
     pack()
@@ -294,4 +299,71 @@ fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVi
     pack()
     centerWindow()
     hide()
+  }
+
+@Scene2dDsl
+fun StageWidget.inputWindow(
+  title: String,
+  prompt: String,
+  buttonText: String = "Load",
+  inputValidator: InputValidator,
+  whenConfirmed: KVisWindow.(String) -> Unit
+): KVisWindow =
+  this.visWindow(title) {
+    isMovable = false
+    isModal = true
+    hide()
+
+    visLabel(prompt)
+    row()
+
+    table { cell ->
+
+      cell.fillX()
+      cell.expandX()
+      cell.space(10f)
+      cell.pad(platformSpacing)
+
+      row()
+
+      val textInputField = visValidatableTextField("") {
+        it.expandX()
+        it.center()
+        addValidator(inputValidator)
+      }
+
+      visTextButton(buttonText) {
+        pad(platformButtonPadding)
+        it.expandX()
+        it.center()
+        this@visTextButton.isDisabled = true
+        textInputField.onChange {
+          this@visTextButton.isDisabled = !textInputField.isInputValid
+        }
+        onInteract(stage, Keys.ENTER) {
+          if (textInputField.isInputValid) {
+            this@visWindow.whenConfirmed(textInputField.text)
+            this@visWindow.fadeOut()
+          }
+        }
+      }
+
+      stage.addListener { event ->
+        if (event is FocusListener.FocusEvent && event.target == this@visWindow) {
+          event.stop()
+          event.cancel()
+
+          Gdx.app.postRunnable {
+            textInputField.focusField()
+          }
+        }
+        false
+      }
+    }
+    centerWindow()
+    onAnyKeysDownEvent(Input.Keys.ESCAPE, Input.Keys.BACK, catchEvent = true) {
+      this@visWindow.fadeOut()
+    }
+    pack()
+    fadeOut(0f)
   }

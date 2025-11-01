@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Align
+import com.kotcrab.vis.ui.util.InputValidator
 import ktx.actors.isShown
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
@@ -22,6 +23,7 @@ import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
 import no.elg.hex.util.confirmWindow
+import no.elg.hex.util.inputWindow
 import no.elg.hex.util.play
 import no.elg.hex.util.safeUse
 import no.elg.hex.util.show
@@ -40,12 +42,17 @@ class LevelSelectScreen :
   private val mouseY get() = input.mouseY
 
   private lateinit var confirmWindow: KVisWindow
+  private lateinit var searchWindow: KVisWindow
   private var toPlay: FastIslandMetadata? = null
 
-  val confirmingRestartIsland get() = confirmWindow.isShown()
+  val ignoreInput get() = confirmWindow.isShown() || searchWindow.isShown()
   fun confirmRestartIsland(island: FastIslandMetadata) {
     toPlay = island
     confirmWindow.show(stage)
+  }
+
+  fun loadBySearch() {
+    searchWindow.show(stage)
   }
 
   private fun initStage() {
@@ -61,7 +68,24 @@ class LevelSelectScreen :
           } ?: MessagesRenderer.publishError("Failed to restart island, try disabling the 'Confirm Restart Island' setting")
         }
       )
-      confirmWindow.pack()
+      searchWindow = inputWindow(
+        "Load island by ID",
+        "Enter the island ID to load:",
+        inputValidator = object : InputValidator {
+          override fun validateInput(input: String?): Boolean {
+            val islandId = input?.toIntOrNull() ?: return false
+            return Hex.assets.islandFiles.exists(islandId)
+          }
+        },
+        whenConfirmed = { id ->
+          val idInt = id.toIntOrNull()
+          if (idInt != null) {
+            input.tryPlayIsland(idInt)
+          } else {
+            MessagesRenderer.publishError("Island ids must be numbers, got '$id'")
+          }
+        }
+      )
     }
   }
 

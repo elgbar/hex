@@ -141,13 +141,13 @@ class FastIslandMetadata(
       }
     }
 
-    fun load(id: Int): FastIslandMetadata {
-      val savedMetadata = if (Hex.mapEditor || getMetadataFileName(id) !in islandPreferences) {
+    fun loadOrNull(id: Int): FastIslandMetadata? =
+      if (Hex.mapEditor || getMetadataFileName(id) !in islandPreferences) {
         loadInitial(id)
       } else {
         loadProgress(id)
       }
-      return savedMetadata ?: FastIslandMetadata(id)
-    }
+
+    fun load(id: Int): FastIslandMetadata = loadOrNull(id) ?: FastIslandMetadata(id)
   }
 }

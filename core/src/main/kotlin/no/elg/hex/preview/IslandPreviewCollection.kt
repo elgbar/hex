@@ -153,7 +153,7 @@ class IslandPreviewCollection : Disposable {
             updatePreviewFromIsland(initialMetadata)
           }
         } else {
-          val metadata = FastIslandMetadata.load(id)
+          val metadata = FastIslandMetadata.loadOrNull(id) ?: continue
           metadata.clearPreviewTexture()
 
           fastIslandPreviews.add(metadata)

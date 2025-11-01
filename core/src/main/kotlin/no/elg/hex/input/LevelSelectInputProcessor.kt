@@ -34,7 +34,7 @@ import java.lang.Float.max
 /** @author Elg */
 class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : AbstractInput(true) {
 
-  val ignoreInput: Boolean get() = screen.confirmingRestartIsland
+  val ignoreInput: Boolean get() = screen.ignoreInput
 
   /**
    * @param scale in range 0..1
@@ -88,27 +88,31 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
 
       id == 2 - PREVIEWS_PER_ROW -> Settings.musicPaused = !Settings.musicPaused
       id == 3 - PREVIEWS_PER_ROW -> Hex.screen = TutorialScreen()
-      id != INVALID_ISLAND_INDEX -> {
-        val metadata = FastIslandMetadata.load(id)
-        if (Settings.loadAlreadyCompletedIslands) {
-          if (metadata.modifier != PreviewModifier.NOTHING && !Hex.mapEditor) {
-            publishMessage("Settings.loadAlreadyCompletedIslands: Previewing already completed island. metadata is not reset!", durationSeconds = 60f, Color.ORANGE)
-          }
-          play(metadata)
-        } else if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.mapEditor) {
-          if (metadata.modifier != PreviewModifier.NOTHING) {
-            clearIslandProgress(metadata)
-          }
-          play(metadata)
-        } else {
-          screen.confirmRestartIsland(metadata)
-        }
-      }
+      id != INVALID_ISLAND_INDEX -> tryPlayIsland(id)
 
       else -> return false
     }
     playClick()
     return true
+  }
+
+  fun tryPlayIsland(id: Int) {
+    val metadata = FastIslandMetadata.loadOrNull(id)
+    if (metadata == null) {
+      publishWarning("Unknown island with id '$id'")
+    } else if (Settings.loadAlreadyCompletedIslands) {
+      if (metadata.modifier != PreviewModifier.NOTHING && !Hex.mapEditor) {
+        publishMessage("Settings.loadAlreadyCompletedIslands: Previewing already completed island. metadata is not reset!", durationSeconds = 60f, Color.ORANGE)
+      }
+      play(metadata)
+    } else if (metadata.modifier == PreviewModifier.NOTHING || !Settings.confirmRestartIsland || Hex.mapEditor) {
+      if (metadata.modifier != PreviewModifier.NOTHING) {
+        clearIslandProgress(metadata)
+      }
+      play(metadata)
+    } else {
+      screen.confirmRestartIsland(metadata)
+    }
   }
 
   private fun scroll(delta: Float) {
@@ -179,6 +183,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       Keys.N -> if (Hex.mapEditor && (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT))) {
         Hex.screen = LevelCreationScreen()
       }
+      Keys.F1 -> screen.loadBySearch()
 
       else -> return false
     }
