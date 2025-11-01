@@ -61,14 +61,23 @@ class IslandFiles {
 
           islandIds += id
 
-          if (initialMetadata != null && Hex.args.`create-artb-improvement-rapport`) {
+          if (initialMetadata != null && Hex.args.listARtBImprovements) {
             val progress = FastIslandMetadata.loadProgress(id)
             if (progress != null) {
               progress.authorRoundsToBeat = initialMetadata.authorRoundsToBeat
-              if (progress.isUserBetterThanAuthor()) {
+              val tryUpdate = if (progress.isUserBetterThanAuthor()) {
                 Gdx.app.info("ARtB") { "Island $id improved from ${progress.authorRoundsToBeat} to ${progress.userRoundsToBeat} rounds" }
+                true
               } else if (progress.wasNeverBeatenByAuthorButBeatenByUser()) {
                 Gdx.app.info("ARtB") { "Island $id unbeaten to ${progress.userRoundsToBeat} rounds" }
+                true
+              } else {
+                false
+              }
+              if (tryUpdate && Hex.args.writeARtBImprovements) {
+                initialMetadata.authorRoundsToBeat = progress.userRoundsToBeat
+                Gdx.app.debug("ARtB") { "Updating island $id's ARtB to ${initialMetadata.authorRoundsToBeat} rounds" }
+                initialMetadata.save()
               }
             }
           }
@@ -89,6 +98,10 @@ class IslandFiles {
         }
       }
       Gdx.app.debug(TAG, "Next island created will be $nextIslandId")
+      if (Hex.args.listARtBImprovements) {
+        Gdx.app.info(TAG) { "Done creating ARtB improvements list, exiting" }
+        Gdx.app.exit()
+      }
     }
   }
 

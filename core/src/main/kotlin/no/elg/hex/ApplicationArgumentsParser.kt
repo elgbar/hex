@@ -6,6 +6,7 @@ import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 
 /** @author Elg */
+@Suppress("PrivatePropertyName")
 class ApplicationArgumentsParser(parser: ArgParser) {
   val debug by parser.flagging("-d", "--debug", help = "Enable debug logging")
   val trace by parser.flagging("-t", "--trace", help = "Enable even more logging")
@@ -28,11 +29,17 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val `load-all-islands` by parser.flagging("Load all islands at startup instead of when first played")
   val `reset-all` by parser.flagging("Resetting settings and progress")
   val `ai-debug` by parser.flagging("Listen to the AI thinking")
-  val `create-artb-improvement-rapport` by parser.flagging(
-    "List all islands where the Author Round to Beat (ARtB) was beaten or there was no ARtB set and it has now been beaten by the user"
-  )
+  private val `list-artb-improvements` by parser.storing<Boolean?>(
+    "List all islands where the Author Round to Beat (ARtB) was beaten or there was no ARtB set and it has now been beaten by the user. " +
+      "Argument UPDATE_ARTB (boolean) is used to specify if the islands' progress should be updated to reflect the new ARtB values." +
+      "App will exit after listing the islands.",
+    "UPDATE_ARTB"
+  ) { toBoolean() }.default { null }
   val `validate-island-on-load` by parser.flagging("Validate island when loading it, useful with `--load-all-islands`")
 
   val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toInt() }.default { 0 }
   val profile by parser.flagging("Enable GL profiling")
+
+  val writeARtBImprovements get() = Hex.args.`list-artb-improvements` == true
+  val listARtBImprovements get() = Hex.args.`list-artb-improvements` != null
 }

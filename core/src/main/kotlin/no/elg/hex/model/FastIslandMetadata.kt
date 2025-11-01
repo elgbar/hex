@@ -70,7 +70,8 @@ class FastIslandMetadata(
     require(id >= 0) { "Island id must be positive, is $id" }
     requireNotNull(previewPixmap) { "A preview have not been generated" }
     requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
-    if (Hex.mapEditor) {
+    // ok to write to file when Hex.args.writeARtBImprovements is true as the app will exit afterwards
+    if (Hex.mapEditor || Hex.args.writeARtBImprovements) {
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
       require(userRoundsToBeat == Island.NEVER_PLAYED) { "userRoundsToBeat must be ${Island.NEVER_PLAYED} when saving initial island, is $userRoundsToBeat" }
 
