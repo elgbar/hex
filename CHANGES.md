@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * More lenient import, trimming away white spaces*
 * Color best user score yellow when the level does not have an ARtB
+* Update `--create-artb-improvement-rapport` to also list unbeaten islands
 * Island ARtB updated
   * Island 11 improved from 11 to 9 rounds
   * Island 22 improved from 14 to 13 rounds

@@ -66,9 +66,9 @@ class IslandFiles {
             if (progress != null) {
               progress.authorRoundsToBeat = initialMetadata.authorRoundsToBeat
               if (progress.isUserBetterThanAuthor()) {
-                Gdx.app.info("ARtB") {
-                  "Island $id improved from ${progress.authorRoundsToBeat} to ${progress.userRoundsToBeat} rounds"
-                }
+                Gdx.app.info("ARtB") { "Island $id improved from ${progress.authorRoundsToBeat} to ${progress.userRoundsToBeat} rounds" }
+              } else if (progress.wasNeverBeatenByAuthorButBeatenByUser()) {
+                Gdx.app.info("ARtB") { "Island $id unbeaten to ${progress.userRoundsToBeat} rounds" }
               }
             }
           }
