@@ -28,7 +28,9 @@ class ApplicationArgumentsParser(parser: ArgParser) {
   val `load-all-islands` by parser.flagging("Load all islands at startup instead of when first played")
   val `reset-all` by parser.flagging("Resetting settings and progress")
   val `ai-debug` by parser.flagging("Listen to the AI thinking")
-  val `create-artb-improvement-rapport` by parser.flagging("List all islands where the Author Round to Beat (ARtB) was beaten")
+  val `create-artb-improvement-rapport` by parser.flagging(
+    "List all islands where the Author Round to Beat (ARtB) was beaten or there was no ARtB set and it has now been beaten by the user"
+  )
   val `validate-island-on-load` by parser.flagging("Validate island when loading it, useful with `--load-all-islands`")
 
   val scale by parser.storing("Scale of UI, if <= 0 default scale apply") { toInt() }.default { 0 }

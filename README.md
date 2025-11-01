@@ -31,7 +31,7 @@ A simple turn based strategy game aiming to clone the gameplay of Slay.
 
 ## Help page
 
-*Accurate as of version 2.6.0*
+*Accurate as of version 2.6.2-snapshot*
 
 ```
 usage: [-h] [-d] [-t] [-s] [-e] [--i-am-a-cheater] [--disable-island-loading]
@@ -76,7 +76,9 @@ optional arguments:
   --ai-debug                          Listen to the AI thinking
 
   --create-artb-improvement-rapport   List all islands where the Author Round
-                                      to Beat (ARtB) was beaten
+                                      to Beat (ARtB) was beaten or there was
+                                      no ARtB set and it has now been beaten
+                                      by the user
 
   --validate-island-on-load           Validate island when loading it, useful
                                       with `--load-all-islands`
