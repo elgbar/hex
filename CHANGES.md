@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+# v2.7.0 - 2025-11-01
+
+### Added
+
 * Added 99 new islands
 * Added pressing `F1` on the level select screen to open a level select dialog
 
