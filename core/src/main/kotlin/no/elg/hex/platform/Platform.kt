@@ -22,6 +22,13 @@ interface Platform {
 
   val canControlAudio: Boolean
 
+  /**
+   * Whether vsync is currently enabled
+   *
+   * @return `true` if vsync is enabled, `false` if disabled, `null` if unknown
+   */
+  val vsync: Boolean?
+
   fun platformInit() = Unit
 
   /**

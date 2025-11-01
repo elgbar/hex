@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
   Hex.args = mainBody { ArgParser(args).parseInto(::ApplicationArgumentsParser) }
   Hex.launchPreference = Lwjgl3Preferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
-  Hex.platform = DesktopPlatform()
+  Hex.platform = DesktopPlatform(config)
   Hex.audioDisabled = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
 
   config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)

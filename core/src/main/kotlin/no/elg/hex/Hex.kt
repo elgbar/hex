@@ -8,7 +8,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Preferences
-import com.badlogic.gdx.backends.lwjgl.LwjglGraphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -171,17 +170,9 @@ object Hex : ApplicationAdapter() {
         Gdx.app.debug("SYS") { "GL version: ${Gdx.graphics.glVersion.debugVersionString}" }
         Gdx.app.debug("SYS") { "MSAA: ${launchPreference.getInteger(MSAA_SAMPLES_PATH, -1)}" }
         Gdx.app.debug("SYS") {
-          "VSYNC: ${
-            Gdx.app.graphics.let {
-              if (it is LwjglGraphics) {
-                "${
-                  it::class.java.getDeclaredField("vsync").also { field -> field.isAccessible = true }.get(it)
-                } (by field)"
-              } else {
-                "${launchPreference.getBoolean(Settings.VSYNC_PATH)} (by settings)"
-              }
-            }
-          }"
+          val bySettings = "${launchPreference.getBoolean(Settings.VSYNC_PATH)} (by settings)"
+          val byPlatform = "${platform.vsync} (by platform)"
+          "VSYNC: $bySettings / $byPlatform"
         }
 
         Gdx.input.inputProcessor = inputMultiplexer

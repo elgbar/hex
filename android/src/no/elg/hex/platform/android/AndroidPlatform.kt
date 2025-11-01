@@ -45,6 +45,9 @@ class AndroidPlatform(private val activity: Activity) : Platform {
     Log.v(tag, message, exception)
   }
 
+  override val vsync: Boolean?
+    get() = null
+
   override val type: PlatformType = PlatformType.MOBILE
 
   override fun writeToClipboard(label: String, data: Any): Boolean {

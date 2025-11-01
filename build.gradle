@@ -231,8 +231,6 @@ project(":core") {
     implementation "io.github.libktx:ktx-async:$ktxVersion"
     implementation "io.github.libktx:ktx-assets:$ktxVersion"
 
-    compileOnly "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-
     api platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion")
     api "com.fasterxml.jackson.module:jackson-module-kotlin"
     api "com.fasterxml.jackson.dataformat:jackson-dataformat-smile"

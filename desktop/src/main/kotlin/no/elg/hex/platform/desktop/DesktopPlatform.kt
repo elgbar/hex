@@ -1,6 +1,7 @@
 package no.elg.hex.platform.desktop
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.backends.lwjgl3.ReadableLwjgl3ApplicationConfiguration
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.platform.Platform
@@ -12,7 +13,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 
-class DesktopPlatform : Platform {
+class DesktopPlatform(val config: ReadableLwjgl3ApplicationConfiguration) : Platform {
 
   override val version: String? by lazy { loadProperties("version.properties").getProperty("version", null) }
 
@@ -26,6 +27,8 @@ class DesktopPlatform : Platform {
   override val canControlAudio: Boolean = true
 
   override val type: PlatformType = PlatformType.DESKTOP
+
+  override val vsync: Boolean get() = config.isVSync
 
   override fun trace(tag: String, exception: Throwable?, message: String) {
     Gdx.app.debug("TRACE | $tag", message + (exception?.let { "\n${it.stackTraceToString()}" } ?: ""))
