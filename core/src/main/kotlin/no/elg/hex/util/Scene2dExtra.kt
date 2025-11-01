@@ -340,7 +340,7 @@ fun StageWidget.inputWindow(
         textInputField.onChange {
           this@visTextButton.isDisabled = !textInputField.isInputValid
         }
-        onInteract(stage, Keys.ENTER) {
+        onInteract(stage, intArrayOf(Keys.ENTER), intArrayOf(Keys.NUMPAD_ENTER)) {
           if (textInputField.isInputValid) {
             this@visWindow.whenConfirmed(textInputField.text)
             this@visWindow.fadeOut()
