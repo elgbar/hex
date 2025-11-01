@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Island 330: Rework map to be north leaf vs south Stone with loads of small territories in the middle
   * Island 331: Make it easier to connect the two middle leaf territories
   * Island 340: Add second Leaf territory
+* Add ARtB to 208 islands
 
 ### Fixed
 
