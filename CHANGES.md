@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix android 16 kB alignment
 * Fix icon on android
+* Make sure the cursor is always arrow after screen change
 
 ### Removed
 

@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.graphics.GL20
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
@@ -126,6 +127,7 @@ object Hex : ApplicationAdapter() {
         inputMultiplexer.addProcessor(GlobalInputProcessor)
         Gdx.input.setOnscreenKeyboardVisible(false)
         Gdx.graphics.isContinuousRendering = false
+        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
         Events.clear(true)
 
         Gdx.app.debug("SCREEN") { "Loading new screen ${value::class.simpleName}" }
