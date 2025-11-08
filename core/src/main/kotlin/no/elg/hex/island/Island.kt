@@ -86,6 +86,10 @@ class Island(
   private val startTeam: Team = Settings.startTeam
 ) {
 
+  /**
+   * Each time a player have had a turn, the turn increases by one. In one round there are `Team.entries.size` turns.
+   * @return The current turn
+   */
   val turn get() = (round - 1) * Team.entries.size + (currentTeam.ordinal - startTeam.ordinal)
 
   lateinit var grid: HexagonalGrid<HexagonData>
