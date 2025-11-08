@@ -26,12 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added 99 new islands
-* Added pressing `F1` on the level select screen to open a level select dialog
+* Added pressing `F1` on the level select screen to open a level select dialogue
 
 ### Changed
 
 * More lenient import, trimming away white spaces*
-* Color best user score yellow when the level does not have an ARtB
+* Color the best user score yellow when the level does not have an ARtB
 * Rename `--create-artb-improvement-rapport` to `--list-artb-improvements`
   * Update it to also list unbeaten islands
   * Add argument to write the report to initial island metadata
@@ -69,9 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix android 16 kB alignment
 * Fix icon on android
-* Make sure the cursor is always arrow after screen change
-
-### Removed
+* Make sure the cursor is always `arrow` after screen change
 
 ---
 
