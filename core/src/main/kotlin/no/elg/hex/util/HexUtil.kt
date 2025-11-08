@@ -94,10 +94,14 @@ fun Hexagon<HexagonData>.isNotPartOfATerritory(island: Island): Boolean = !isPar
  * That is, the given hexagon have a neighbor hexagon which is in on the same team as the given hexagon
  */
 fun Hexagon<HexagonData>.isPartOfATerritory(island: Island): Boolean {
-  val team = island.getData(this).team
-  for (neighbor in island.getNeighbors(this)) {
-    val data = island.getData(neighbor)
-    if (data.team == team) {
+  val data = island.getData(this)
+  if (data.invisible) {
+    return false
+  }
+  val team = data.team
+  for (neighbor in island.getNeighbors(this, onlyVisible = true)) {
+    val neighborData = island.getData(neighbor)
+    if (neighborData.team == team) {
       return true
     }
   }
