@@ -50,12 +50,12 @@ import no.elg.hex.util.forEachPieceType
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.idealTreeType
 import no.elg.hex.util.isLazyInitialized
 import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.next
 import no.elg.hex.util.toEnumValue
 import no.elg.hex.util.trace
-import no.elg.hex.util.treeType
 import no.elg.hex.util.withData
 import org.hexworks.mixite.core.api.CubeCoordinate
 import org.hexworks.mixite.core.api.Hexagon
@@ -674,9 +674,9 @@ class Island(
     // Check rules which apply to each visible hexagon
     for (hexagon in visibleHexagons) {
       val data = getData(hexagon)
-      if (data.piece is TreePiece && data.piece::class != treeType(hexagon)) {
+      if (data.piece is TreePiece && data.piece::class != idealTreeType(hexagon)) {
         registerViolation(
-          "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${treeType(hexagon).simpleName}"
+          "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${idealTreeType(hexagon).simpleName}"
         )
       }
     }

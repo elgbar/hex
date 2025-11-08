@@ -12,9 +12,10 @@ import no.elg.hex.util.debug
 import no.elg.hex.util.error
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
+import no.elg.hex.util.idealTreeType
+import no.elg.hex.util.isIdealTreeType
 import no.elg.hex.util.isNotPartOfATerritory
 import no.elg.hex.util.trace
-import no.elg.hex.util.treeType
 import org.hexworks.mixite.core.api.Hexagon
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
@@ -48,9 +49,9 @@ fun strengthToTypeOrNull(str: Int): KClass<out LivingPiece>? {
 
 fun mergedType(piece1: LivingPiece, piece2: LivingPiece) = strengthToType(piece1.strength + piece2.strength)
 
-fun replaceWithTree(island: Island, hex: Hexagon<HexagonData>) {
+fun replaceWithTree(island: Island, hex: Hexagon<HexagonData>): Boolean {
   val data = island.getData(hex)
-  val pieceType = island.treeType(hex)
+  val pieceType = island.idealTreeType(hex)
   Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.coordinates}) with tree $pieceType" }
   data.setPiece(pieceType)
 }
@@ -372,7 +373,7 @@ class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 
     island.getNeighbors(pieceHex)
       .asSequence()
       .filter {
-        island.getData(it).piece is Empty && island.treeType(it) == PineTree::class
+        island.getData(it).piece is Empty && island.isIdealTreeType<PineTree>(it)
       }.flatMap { hexagon ->
         // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
         island.getNeighbors(hexagon)
@@ -405,7 +406,7 @@ class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 
 
   // Find all empty neighbor hexes that are empty along the cost
   override fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>> =
-    island.getNeighbors(pieceHex).asSequence().filter { island.getData(it).piece is Empty && island.treeType(it) == PalmTree::class }
+    island.getNeighbors(pieceHex).asSequence().filter { island.getData(it).piece is Empty && island.isIdealTreeType<PalmTree>(it) }
 
   override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
     require(!hasGrown) { "Palm tree has not grown this round" }

@@ -105,7 +105,7 @@ fun Hexagon<HexagonData>.isPartOfATerritory(island: Island): Boolean {
 }
 
 /** Get all neighbors of the given [hexagon], not including [hexagon] */
-fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = true) =
+fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = true): Collection<Hexagon<HexagonData>> =
   grid.getNeighborsOf(hexagon).let {
     if (onlyVisible) {
       it.filter { hex -> getData(hex).visible }
@@ -114,10 +114,19 @@ fun Island.getNeighbors(hexagon: Hexagon<HexagonData>, onlyVisible: Boolean = tr
     }
   }
 
-fun Island.treeType(hexagon: Hexagon<HexagonData>): KClass<out TreePiece> {
+/**
+ * What kind of tree should be on the given hexagon
+ */
+fun Island.idealTreeType(hexagon: Hexagon<HexagonData>): KClass<out TreePiece> {
   val neighbors: Collection<Hexagon<HexagonData>> = getNeighbors(hexagon, false)
   return if (neighbors.any { getData(it).invisible }) PalmTree::class else PineTree::class
 }
+
+/**
+ * @param T The tree type to check for
+ * @return Whether the given [hexagon] should be of given tree type [T]. NOT if the piece on the hexagon is of type [T]
+ */
+inline fun <reified T : TreePiece> Island.isIdealTreeType(hexagon: Hexagon<HexagonData>): Boolean = idealTreeType(hexagon) == T::class
 
 /**
  * The strength of a hexagon is how much [Piece.strength] is needed to take a given hexagon. A hexagon defends its surrounding hexes.
