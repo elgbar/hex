@@ -39,6 +39,9 @@ tasks.register('dist', Jar) {
     }
   }
   with jar
+  doLast {
+    println("Distribution jar created at: ${archiveFile.get().asFile.getParentFile().absolutePath} with name ${archiveFile.get().asFile.name}")
+  }
 }
 
 
