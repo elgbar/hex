@@ -49,7 +49,6 @@ import no.elg.hex.util.actionableHexagons
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
 import no.elg.hex.util.fill
-import no.elg.hex.util.hide
 import no.elg.hex.util.okWindow
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.safeGetDelegate
@@ -312,7 +311,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
         action.invoke(window)
       }
     }
-    windows.filter { it != window }.forEach(VisWindow::hide)
+    windows.filter { it !== window }.forEach(VisWindow::remove)
     Gdx.app.postRunnable { window.show(stage) }
   }
 
