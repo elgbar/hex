@@ -13,10 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Capitals will more strongly prefer being placed next to a friendly castle
+  * This should help with defending capitals better later in the game
+* Capitals will slightly prefer being placed next to non-territory hexagons
+  * This should make capitals be placed more optimally at the beginning of the game
+* The distance to enemy territories is not weighted during initial placement
+
 ### Fixed
 
 * Fix in-game info windows not showing if another window was opened some time beforehand
 * Fix ARtB not being reset when using edit tools
+* Fix capital placement considering the team of invisible hexagons
 
 ### Removed
 

@@ -551,9 +551,15 @@ class Island(
       return NO_ENEMY_HEXAGONS
     }
 
-    val contenders: List<Hexagon<HexagonData>> = feasibleHexagons.associateWith { findDistanceToClosestEnemyHex(it) }.let { allContenders ->
-      val maxDistance: Int = allContenders.values.max()
-      allContenders.filterValues { distance -> distance == maxDistance }.map { it.key }
+    val contenders: List<Hexagon<HexagonData>> = if (Hex.mapEditor) {
+      // During initial capital placement, it's more important to place capitals to cover maximum friendly area
+      // As there are few situations where a capital far away from enemies is better than one close to friendly hexagons
+      feasibleHexagons
+    } else {
+      feasibleHexagons.associateWith { findDistanceToClosestEnemyHex(it) }.let { allContenders ->
+        val maxDistance: Int = allContenders.values.max()
+        allContenders.filterValues { distance -> distance == maxDistance }.map { it.key }
+      }
     }
 
     require(contenders.isNotEmpty()) {
@@ -561,11 +567,9 @@ class Island(
     }
 
     Gdx.app.trace("ISLAND") {
-      "Contenders are ${
-        contenders.joinToString(prefix = "\n", separator = "\n") {
-          "${getData(it)}@${it.coordinates} dist of ${findDistanceToClosestEnemyHex(it)}"
-        }
-      }"
+      contenders.joinToString(prefix = "Contenders are \n\t", separator = "\n\t") {
+        "${getData(it)}@${it.coordinates} dist of ${findDistanceToClosestEnemyHex(it)}"
+      }
     }
 
     if (contenders.size == 1) return contenders.first()
@@ -578,13 +582,37 @@ class Island(
 
     for (origin in contenders) {
       val ring = getNeighbors(origin, onlyVisible = false)
-      val calcScore = ring.sumOf {
+      val calcScore: Double = ring.sumOf {
         val data = getData(it)
-        when {
-          data.team == hexTeam && data.piece is Castle -> 2.0
-          data.team == hexTeam -> 1.0
-          data.invisible -> 1.1
+        val score = when {
+          data.visible && data.team == hexTeam ->
+            when {
+              // Prefer to place capitals next to castles, as they provide more defense
+              // This will almost always happen during gameplay, and a placed castle hints at a good location for a capital
+              data.piece is Castle -> 3.0
+              // Normal defended friendly hexagons
+              // Note: We do not consider living pieces as they can and will be moved around
+              else -> return@sumOf 1.0
+            }
+          // An invisible hexagon cannot become enemy territories, and are thus always safe
+          // Note: a visible friendly hexagon is better than an invisible hexagon,
+          //       so the boost should be so small it only matters when there is a tie
+          data.invisible -> 0.5
+          // A small boost for hexagons which are not part of a territory
+          // Note: a visible friendly hexagon is better than an invisible hexagon,
+          //       so the boost should be so small it only matters when there is a tie
+          data.visible && data.team != hexTeam && !it.isPartOfATerritory(this) -> 0.1
           else -> 0.0
+        }
+        Gdx.app.trace("ISLAND") { "\t${origin.coordinates}: +$score from ${it.coordinates}" }
+        score
+      }
+      Gdx.app.trace("ISLAND") {
+        val candidateInfo = "capital candidate found at ${origin.coordinates} (${getData(origin)}) with score $calcScore"
+        if (calcScore > currBestScore) {
+          "New best $candidateInfo"
+        } else {
+          "         $candidateInfo"
         }
       }
       if (calcScore > currBestScore) {
