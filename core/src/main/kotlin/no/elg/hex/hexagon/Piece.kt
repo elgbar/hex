@@ -29,6 +29,8 @@ const val BARON_STRENGTH = 4
 const val CASTLE_PRICE = 15
 const val PEASANT_PRICE = 10
 
+const val PEASANT_UPKEEP_COST = -2
+
 const val DESER_TAG = "PIECE DESER"
 
 fun strengthToType(str: Int): KClass<out LivingPiece> =
@@ -530,7 +532,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
 
 class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = PEASANT_STRENGTH
-  override val income: Int = -1
+  override val income: Int = PEASANT_UPKEEP_COST + 1  // -1
   override val capitalReplacementResistance: Int = 4
   override val price: Int = PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Peasant = Peasant(newData, moved)
@@ -538,24 +540,24 @@ class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, move
 
 class Spearman(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = SPEARMAN_STRENGTH
-  override val income: Int = -5
+  override val income: Int = (PEASANT_UPKEEP_COST * 3) + 1  // -5
   override val capitalReplacementResistance: Int = 3
-  override val price: Int = 20
+  override val price: Int = 2 * PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Spearman = Spearman(newData, moved)
 }
 
 class Knight(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = KNIGHT_STRENGTH
-  override val income: Int = -17
+  override val income: Int = (PEASANT_UPKEEP_COST * 3 * 3) + 1  // -17
   override val capitalReplacementResistance: Int = 2
-  override val price: Int = 30
+  override val price: Int = 3 * PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Knight = Knight(newData, moved)
 }
 
 class Baron(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = BARON_STRENGTH
-  override val income: Int = -53
+  override val income: Int = (PEASANT_UPKEEP_COST * 3 * 3 * 3) + 1 // -53
   override val capitalReplacementResistance: Int = 1
-  override val price: Int = 40
+  override val price: Int = 4 * PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Baron = Baron(newData, moved)
 }
