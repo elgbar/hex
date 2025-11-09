@@ -11,6 +11,7 @@ import no.elg.hex.hexagon.HexagonData.Companion.EDGE_DATA
 import no.elg.hex.hexagon.HexagonData.Companion.isEdgeHexagon
 import no.elg.hex.hexagon.KNIGHT_STRENGTH
 import no.elg.hex.hexagon.LivingPiece
+import no.elg.hex.hexagon.NO_STRENGTH
 import no.elg.hex.hexagon.PEASANT_STRENGTH
 import no.elg.hex.hexagon.PalmTree
 import no.elg.hex.hexagon.Piece
@@ -149,7 +150,7 @@ fun Island.calculateStrength(hexagon: Hexagon<HexagonData>, pretendedTeam: Team?
       .filter { it.team == team }
       .filter { filter == null || filter(it) }
       .maxOfOrNull { it.piece.strength }
-      ?: Empty.strength
+      ?: NO_STRENGTH
   return if (filter?.invoke(data) == false) {
     neighborStrength
   } else {
