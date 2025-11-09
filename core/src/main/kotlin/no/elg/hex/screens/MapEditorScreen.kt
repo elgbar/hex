@@ -349,22 +349,26 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
             menuItem("Regenerate Capitals") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.C) {
                 island.regenerateCapitals()
+                resetARtBOnEdit()
               }
             }
             menuItem("Remove Smaller Islands") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.K) {
                 island.removeSmallerIslands()
+                resetARtBOnEdit()
               }
             }
 
             menuItem("Fix wrong tree types") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.T) {
                 island.fixWrongTreeTypes()
+                resetARtBOnEdit()
               }
             }
             menuItem("Remove pieces on invisible hexagons") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.I) {
                 island.cleanPiecesOnInvisibleHexagons()
+                resetARtBOnEdit()
               }
             }
 
@@ -390,7 +394,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
           }
 
           menu("Help") {
-            menuItem("Information") { onClick { infoWindow.show(this@MapEditorScreen.stageScreen.stage) } }
+            menuItem("Validation Rules") { onClick { infoWindow.show(this@MapEditorScreen.stageScreen.stage) } }
           }
         }
         setFillParent(true)
@@ -404,6 +408,13 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
 
   private fun quickload() {
     island.restoreState(quickSavedIsland)
+  }
+
+  fun resetARtBOnEdit() {
+    if (artbSpinner.value != NEVER_PLAYED) {
+      MessagesRenderer.publishWarning("Resetting rounds to beat to unknown as the map has been edited")
+      artbSpinner.setValue(NEVER_PLAYED, true)
+    }
   }
 
   override fun render(delta: Float) {

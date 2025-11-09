@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fix in-game info windows not showing if another window was opened some time beforehand
+* Fix ARtB not being reset when using edit tools
 
 ### Removed
 
