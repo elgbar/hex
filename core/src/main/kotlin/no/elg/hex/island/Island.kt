@@ -314,21 +314,18 @@ class Island(
       if (newTeam == Settings.startTeam) {
         Gdx.app.debug("TURN", "New round!")
         round++
-        for (hexagon in visibleHexagons) {
-          val data = this@Island.getData(hexagon)
-          Gdx.app.trace("TURN") { "Handling new round of hex (${hexagon.gridX},${hexagon.gridZ})" }
-          data.piece.newRound(this@Island, hexagon)
-        }
       }
 
       val capitals = mutableSetOf<Hexagon<HexagonData>>()
       visibleHexagons.withData(this@Island) { hexagon, data ->
+        Gdx.app.trace("TURN") { "Handling new turn of ${data.piece::class.simpleName} (${hexagon.gridX},${hexagon.gridZ})" }
+        data.piece.newTurn(this@Island, hexagon, data)
         if (data.team == newTeam) {
           if (data.piece is Capital) {
             capitals.add(hexagon)
           } else {
             Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName} (${hexagon.gridX},${hexagon.gridZ})" }
-            data.piece.beginTurn(this@Island, hexagon, data, newTeam)
+            data.piece.beginTeamTurn(this@Island, hexagon, data, newTeam)
           }
         }
       }
@@ -338,7 +335,7 @@ class Island(
       for (capital in capitals) {
         val data = this@Island.getData(capital)
         Gdx.app.trace("TURN") { "Handling begin turn of ${data.piece::class.simpleName} (${capital.gridX},${capital.gridZ})" }
-        data.piece.beginTurn(this@Island, capital, data, newTeam)
+        data.piece.beginTeamTurn(this@Island, capital, data, newTeam)
       }
       Gdx.graphics.requestRendering()
 
@@ -700,12 +697,23 @@ class Island(
     }
 
     // Check rules which apply to each visible hexagon
+    // Done because hexagons are skipped in the territory check above
     for (hexagon in visibleHexagons) {
-      val data = getData(hexagon)
-      if (data.piece is TreePiece && data.piece::class != idealTreeType(hexagon)) {
-        registerViolation(
-          "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${data.piece::class.simpleName} but should be a ${idealTreeType(hexagon).simpleName}"
-        )
+      val data = this.getData(hexagon)
+      val team = data.team
+      val piece = data.piece
+      // Check rules which apply to each visible hexagon
+      if (piece is TreePiece) {
+        if (piece::class != idealTreeType(hexagon)) {
+          registerViolation(
+            "Hexagon ${hexagon.coordinates} is the wrong tree type, it is a ${piece::class.simpleName} but should be a ${idealTreeType(hexagon).simpleName}"
+          )
+        }
+        if (piece.lastGrownTurn != team.ordinal) {
+          registerViolation(
+            "Hexagon ${hexagon.coordinates} has a tree that was last grown on turn ${piece.lastGrownTurn}, but it should be ${team.ordinal} (the team's ordinal)"
+          )
+        }
       }
     }
 
@@ -721,11 +729,11 @@ class Island(
 
     while (!toCheck.isEmpty) {
       val curr: Hexagon<HexagonData> = toCheck.removeFirst()
-      if (visibleNeighbors.contains(curr)) continue
+      if (curr in visibleNeighbors) continue
       val neighbors = getNeighbors(curr)
 
       for (neighbor in neighbors) {
-        if (visibleNeighbors.contains(neighbor)) continue
+        if (neighbor in visibleNeighbors) continue
         toCheck.addLast(neighbor)
       }
       visibleNeighbors += curr

@@ -165,7 +165,19 @@ fun Island.regenerateCapitals() {
 }
 
 fun Island.fixWrongTreeTypes() {
-  forEachPieceType<TreePiece> { hex, _, _ -> replaceWithTree(this, hex) }
+  forEachPieceType<TreePiece> { hex, _, _ ->
+    replaceWithTree(this, hex)
+  }
+}
+
+/**
+ * Ensure that all trees have their [TreePiece.lastGrownTurn] set to the current team turn
+ * Not something that map creators need to worry about, and will be automatically handled by the game if all trees have 0 as their last grown turn
+ */
+fun Island.ensureTreesGrownOnTeamTurn() {
+  forEachPieceType<TreePiece> { _, data, piece ->
+    piece.lastGrownTurn = data.team.ordinal
+  }
 }
 
 fun Island.cleanPiecesOnInvisibleHexagons() {

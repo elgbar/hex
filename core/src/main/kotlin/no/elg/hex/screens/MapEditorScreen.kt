@@ -39,6 +39,7 @@ import no.elg.hex.hexagon.Piece
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.DebugInfoRenderer
 import no.elg.hex.hud.MapEditorRenderer
+import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.hud.MessagesRenderer.publishError
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.input.MapEditorInputProcessor
@@ -295,10 +296,13 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
             |  (i.e., there can only be one island)
             |* No capital pieces in territories with size smaller than $MIN_HEX_IN_TERRITORY
             |* There must be exactly one capital per territory
-            |* Pine tree can not have an invisible hexagons next to them
-            |* Palms trees can not only be surrendered by visible hexagons
             |* No pieces on invisible hexagons
             |* Each team must have at least one capital
+            |
+            |Trees specific rules:
+            |* Pine tree can not have an invisible hexagons next to them
+            |* Palms trees can not only be surrendered by visible hexagons
+            |* The lastGrown property of trees must be equal to the hex's current team ordinal
           """.trimMargin()
         ) {
           it.expand().fill()

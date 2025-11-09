@@ -52,6 +52,7 @@ fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
     return false
   }
   island.ensureCapitalStartFunds()
+  island.ensureTreesGrownOnTeamTurn()
 
   val file = getIslandFile(metadata.id, allowInternal = false)
 

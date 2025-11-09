@@ -53,7 +53,11 @@ fun replaceWithTree(island: Island, hex: Hexagon<HexagonData>): Boolean {
   val data = island.getData(hex)
   val pieceType = island.idealTreeType(hex)
   Gdx.app.trace("Piece") { "Replacing piece ${data.piece} (${hex.coordinates}) with tree $pieceType" }
-  data.setPiece(pieceType)
+  return data.setPiece(pieceType) {
+    require(!it.canGrowThisTurn) {
+      "Tree being placed by another tree should already be marked as grown"
+    }
+  }
 }
 
 /** @author Elg */
@@ -79,6 +83,9 @@ sealed class Piece {
    */
   abstract val capitalReplacementResistance: Int
 
+  /**
+   * Which types of pieces can this be placed on top of in normal gameplay. The [Empty] piece is always allowed, and should be omitted
+   */
   open val canBePlacedOn: Array<KClass<out Piece>> = emptyArray()
 
   /**
@@ -109,13 +116,17 @@ sealed class Piece {
   var elapsedAnimationTime = 0f
 
   /**
-   * Called when each team ends it's turn. The [pieceHex], [data], and [team] are guaranteed to be
-   * synced. Only hexagons who's turn it is will be called.
+   * Called for each visible hexagon at the beginning of every turn. Will be called just before [beginTeamTurn]
+   *
+   * Difference between [newTurn] and [beginTeamTurn] is that [newTurn] is called for all visible hexagons regardless of what team's turn it is.
    */
-  open fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) = Unit
+  open fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData) = Unit
 
-  /** Called when all visible hexagons' [beginTurn] has been called */
-  open fun newRound(island: Island, pieceHex: Hexagon<HexagonData>) = Unit
+  /**
+   * Called when each team ends it's turn. The [pieceHex], [data], and [team] are guaranteed to be
+   * synced. Only hexagons whose turn it is will be called.
+   */
+  open fun beginTeamTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) = Unit
 
   open val serializationData: Any? = null
 
@@ -241,7 +252,7 @@ class Capital(data: HexagonData, placed: Boolean = false, balance: Int = 0) : St
     }
   }
 
-  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
+  override fun beginTeamTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     val hexagons = island.getTerritoryHexagons(pieceHex)
     if (hexagons == null) {
       replaceWithTree(island, pieceHex)
@@ -306,7 +317,7 @@ class Grave(data: HexagonData, placed: Boolean = false) : StationaryPiece(data, 
 
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(LivingPiece::class)
 
-  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
+  override fun beginTeamTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     replaceWithTree(island, pieceHex)
   }
 
@@ -325,96 +336,130 @@ sealed class TreePiece(data: HexagonData, placed: Boolean, var lastGrownTurn: In
   override val canBePlacedOn: Array<KClass<out Piece>> = arrayOf(Capital::class, Grave::class)
 
   /**
-   * Create a new tree according to the tree types rules
+   * Create a new tree according to the tree types rules.
+   *
+   * @return if the tree successfully propagated
+   *
    */
-  protected abstract fun propagate(island: Island, pieceHex: Hexagon<HexagonData>)
+  protected abstract fun propagate(island: Island, pieceHex: Hexagon<HexagonData>): Boolean
 
   /**
    * What hexagons the tree can propagate to
    */
   abstract fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>>
 
-  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
-    if (hasGrown) {
-      Gdx.app.trace("Tree") { "Tree has already grown this round, skipping it, last grown $lastGrownTurn (current turn: ${Hex.island?.turn})" }
-      return
+  override fun newTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData) {
+    if (canGrowThisTurn) {
+      Gdx.app.trace("Tree") { "Tree can propagate this round! last grown $lastGrownTurn (current turn: ${currentTurn()})" }
+      if (propagate(island, pieceHex)) {
+        markAsGrown()
+      }
+    } else {
+      Gdx.app.trace("Tree") {
+        "Tree has already grown this round, skipping it, last grown $lastGrownTurn. current turn is ${currentTurn()}. scheduled to grow on turn ${lastGrownTurn + Team.entries.size}"
+      }
     }
-    Gdx.app.trace("Tree") { "Tree has not yet grown this round, last grown $lastGrownTurn (current turn: ${Hex.island?.turn})" }
-    propagate(island, pieceHex)
-    markAsGrown()
   }
 
   fun markAsGrown() {
-    lastGrownTurn = Hex.island?.round ?: 0
+    lastGrownTurn = currentTurn()
   }
 
-  val hasGrown: Boolean get() = Hex.island?.round == lastGrownTurn
+  /**
+   * @return whether this tree can grow this turn
+   */
+  val canGrowThisTurn: Boolean get() = lastGrownTurn + Team.entries.size <= currentTurn()
 
-  override fun toString() = "${this::class.simpleName}(placed? $placed, lastGrownRound: $lastGrownTurn)"
+  override fun toString() = "${this::class.simpleName}(placed? $placed, lastGrownTurn: $lastGrownTurn)"
 
   override val serializationData: Int
     get() = lastGrownTurn
 
   override fun handleDeserializationData(serializationData: Any?) {
     if (serializationData is Int) {
-      Gdx.app.trace(DESER_TAG) { "Updating moved of $this to $serializationData" }
-      lastGrownTurn = serializationData
+      if (serializationData == 0 && data.team.ordinal != 0) {
+        Gdx.app.trace(DESER_TAG) { "serializationData was 0. Updating to fix grow rate bug. Setting to the hex team's ordinal: ${data.team.ordinal}" }
+        lastGrownTurn = data.team.ordinal
+      } else {
+        Gdx.app.trace(DESER_TAG) { "Updating moved of $this to $serializationData" }
+        lastGrownTurn = serializationData
+      }
     } else if (serializationData != null) {
       Gdx.app.error(DESER_TAG, "The piece $this have the wrong type of serialization data. Expected a int or null, but got ${serializationData::class}")
     }
   }
+
+  companion object {
+
+    @JvmStatic
+    protected fun currentTurn(): Int = Hex.island?.turn ?: 0
+  }
 }
 
-class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 0) : TreePiece(data, placed, lastGrownTurn) {
+class PineTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = currentTurn()) : TreePiece(data, placed, lastGrownTurn) {
 
   override fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>> = propagateCandidates0(island, pieceHex).map { it.first }
 
+  /**
+   * @return A sequence of pairs where the first is the hexagon to grow into, and the second is the other pine tree that caused the growth
+   */
   private fun propagateCandidates0(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Pair<Hexagon<HexagonData>, Hexagon<HexagonData>>> =
     island.getNeighbors(pieceHex)
       .asSequence()
       .filter {
         island.getData(it).piece is Empty && island.isIdealTreeType<PineTree>(it)
-      }.flatMap { hexagon ->
+      }.flatMap { neighbor ->
         // Find all neighbor hexes (of our selected neighbor) has a pine next to it that has yet to grow
-        island.getNeighbors(hexagon)
+        island.getNeighbors(neighbor)
           .asSequence()
           .filter { it != pieceHex }
           .filter {
             val piece = island.getData(it).piece
-            piece is PineTree && !piece.hasGrown
+            piece is PineTree
           }
-          .map { otherPine -> hexagon to otherPine }
+          .map { otherPine -> neighbor to otherPine }
       }
 
-  override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
-    require(!hasGrown) { "Palm tree has not grown this round" }
+  override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>): Boolean {
+    require(canGrowThisTurn) { "Palm tree cannot grow this turn" }
     // Find all empty neighbor hexes that are empty
-    val (hexagon, otherPine) = propagateCandidates0(island, pieceHex).toSet().randomOrNull() ?: return
+    val candidates = propagateCandidates0(island, pieceHex).toSet()
+    Gdx.app.trace("PineTree") {
+      candidates.joinToString(prefix = "Pine tree at ${pieceHex.coordinates} can propagate to the following candidates:\n\t", separator = "\n\t") { (neighbor, otherPine) ->
+        val otherPinePiece = island.getData(otherPine).piece as PineTree
+        "Neighbor ${neighbor.coordinates} together with the other pine @ ${otherPine.coordinates} ($otherPinePiece)"
+      }
+    }
+    val (neighbor, otherPine) = candidates.randomOrNull() ?: return false
+    Gdx.app.trace("PineTree") {
+      val otherPinePiece = island.getData(otherPine).piece as PineTree
+      "Replacing ${neighbor.coordinates} with a pine. together with the other pine @ ${otherPine.coordinates} ($otherPinePiece)"
+    }
 
     // Grow a tree between this pine and another pine
-    val neighborPine = island.getData(otherPine).piece as TreePiece
-    val placed = island.getData(hexagon).setPiece<PineTree> { it.markAsGrown() }
+    val placed = replaceWithTree(island, neighbor)
     if (placed) {
-      neighborPine.markAsGrown()
+      val otherPinePiece = island.getData(otherPine).piece as PineTree
+      otherPinePiece.markAsGrown()
+      return true
     }
+    return false
   }
 
   override fun copyTo(newData: HexagonData): PineTree = PineTree(newData, placed, lastGrownTurn)
 }
 
-class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = 0) : TreePiece(data, placed, lastGrownTurn) {
+class PalmTree(data: HexagonData, placed: Boolean = false, lastGrownTurn: Int = currentTurn()) : TreePiece(data, placed, lastGrownTurn) {
 
   // Find all empty neighbor hexes that are empty along the cost
   override fun propagateCandidates(island: Island, pieceHex: Hexagon<HexagonData>): Sequence<Hexagon<HexagonData>> =
     island.getNeighbors(pieceHex).asSequence().filter { island.getData(it).piece is Empty && island.isIdealTreeType<PalmTree>(it) }
 
-  override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>) {
-    require(!hasGrown) { "Palm tree has not grown this round" }
-    val neighbour = propagateCandidates(island, pieceHex).toSet().randomOrNull() ?: return
-
-    island.getData(neighbour).setPiece<PalmTree> {
-      it.markAsGrown()
-    }
+  override fun propagate(island: Island, pieceHex: Hexagon<HexagonData>): Boolean {
+    require(canGrowThisTurn) { "Palm tree cannot grow this turn" }
+    val neighbour = propagateCandidates(island, pieceHex).toSet().randomOrNull() ?: return false
+    replaceWithTree(island, neighbour)
+    return true
   }
 
   override fun copyTo(newData: HexagonData): PalmTree = PalmTree(newData, placed, lastGrownTurn)
@@ -435,7 +480,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
     island.getData(hex).setPiece<Grave>()
   }
 
-  override fun beginTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
+  override fun beginTeamTurn(island: Island, pieceHex: Hexagon<HexagonData>, data: HexagonData, team: Team) {
     if (pieceHex.isNotPartOfATerritory(island)) {
       kill(island, pieceHex)
     } else {

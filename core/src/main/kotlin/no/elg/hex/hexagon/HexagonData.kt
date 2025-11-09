@@ -116,6 +116,9 @@ class HexagonData(
   val invisible: Boolean
     get() = edge || isDisabled
 
+  /**
+   * @return If the hexagon is visible to the player and can be played on
+   */
   @get:JsonIgnore
   val visible: Boolean
     get() = !invisible
