@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * A tree will now grow one round after it was created or propagated
   * Pine trees will now also allow to propagate with other pine tees which are not themselves not ready to propagate. This should make them be harder to contain.
   * This will also fix palm trees growing from one teams hex into another which then next turn propagates father.  
+* Allow test maps to be saved even when invalid
 
 ### Fixed
 

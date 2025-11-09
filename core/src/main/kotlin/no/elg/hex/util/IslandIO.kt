@@ -48,8 +48,12 @@ fun play(metadata: FastIslandMetadata, island: Island? = null): Boolean {
 
 fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
   if (!island.validate()) {
-    publishError("Island failed validation")
-    return false
+    if (metadata.forTesting) {
+      publishWarning("Island failed validation, but allowing save since forTesting is true")
+    } else {
+      publishError("Island failed validation")
+      return false
+    }
   }
   island.ensureCapitalStartFunds()
   island.ensureTreesGrownOnTeamTurn()
