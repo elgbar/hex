@@ -136,17 +136,20 @@ class Island(
     }
 
   internal fun restoreState(dto: IslandDto) {
-    restoreState(
-      width = dto.width,
-      height = dto.height,
-      layout = dto.layout,
-      territoryCoordinate = dto.territoryCoordinate,
-      handCoordinate = dto.handCoordinate,
-      handPiece = dto.handPiece,
-      handRestoreActionName = dto.handRestoreAction,
-      hexagonData = dto.hexagonData,
-      team = dto.team
-    )
+    // Use copy to avoid modifying the dto passed in
+    with(dto.copy()) {
+      restoreState(
+        width = width,
+        height = height,
+        layout = layout,
+        territoryCoordinate = territoryCoordinate,
+        handCoordinate = handCoordinate,
+        handPiece = handPiece,
+        handRestoreActionName = handRestoreAction,
+        hexagonData = hexagonData,
+        team = team
+      )
+    }
   }
 
   fun recalculateVisibleIslands() {

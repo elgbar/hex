@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix in-game info windows not showing if another window was opened some time beforehand
 * Fix ARtB not being reset when using edit tools
 * Fix capital placement considering the team of invisible hexagons
+* Fix quick loading not working more than once
 
 ### Removed
 

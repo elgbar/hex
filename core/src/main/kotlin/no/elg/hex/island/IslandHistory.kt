@@ -110,7 +110,7 @@ class IslandHistory(val island: Island) {
     val wasEnabled = enabled
     enabled = false
     historyPointer = pointer
-    island.restoreState(history[pointer].copy())
+    island.restoreState(history[pointer])
     enabled = wasEnabled
   }
 }
