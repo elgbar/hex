@@ -20,7 +20,7 @@ sealed interface OpaquenessEditor : Editor {
     override fun edit(hexagon: Hexagon<HexagonData>, data: HexagonData, metadata: EditMetadata) {
       data.isDisabled = true
       if (data.piece !is Empty) {
-        publishWarning("Hexagon ${hexagon.coordinates} is had ${data.piece} on it. It has been removed.")
+        publishWarning("Removed hexagon ${hexagon.coordinates} had ${data.piece} on it. Piece has been removed.")
         data.setPiece<Empty>()
       }
     }
