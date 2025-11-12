@@ -10,30 +10,45 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import kotlin.text.Charsets.US_ASCII
 
-fun compressB85(text: String): String? {
-  val compressed = compress(text.toByteArray(UTF_8)) ?: return null
-  val encoded = Base85.getZ85Encoder().encode(compressed)
+fun encodeB85(compressed: ByteArray): String {
+  val encoded = encodeB85ToBytes(compressed)
   return String(encoded, US_ASCII)
+}
+fun encodeB85ToBytes(compressed: ByteArray): ByteArray = Base85.getZ85Encoder().encode(compressed)
+
+fun compressXZAndEncodeB85(text: String): String? {
+  val compressed = compressXZ(text.toByteArray(UTF_8)) ?: return null
+  return encodeB85(compressed)
+}
+
+fun compressXZAndEncodeB85(text: ByteArray): String? {
+  val compressed = compressXZ(text) ?: return null
+  return encodeB85(compressed)
 }
 
 /**
  * Decompresses a Base85 encoded string if it is valid, otherwise returns the original string.
  *
- * @param b85Compressed The Base85 compressed string to decompress.
+ * @param maybeCompressed The Base85 compressed string to decompress.
  * @return The decompressed string if valid, otherwise the original string.
  */
-fun tryDecompressB85(b85Compressed: String): String? {
-  val data = b85Compressed.trim().toByteArray(US_ASCII)
-  return if (Base85.getZ85Decoder().test(data)) {
-    val decoded = Base85.getZ85Decoder().decode(data)
-    val decompressed = decompress(decoded) ?: return null
-    String(decompressed, UTF_8)
+fun tryDecompressB85AndDecompressXZ(maybeCompressed: String): String? {
+  val data = maybeCompressed.trim().toByteArray(US_ASCII)
+  val decompressed = tryDecompressB85AndDecompressXZ(data) ?: return null
+  return String(decompressed, UTF_8)
+}
+
+fun tryDecompressB85AndDecompressXZ(maybeCompressed: ByteArray): ByteArray? {
+  return if (Base85.getZ85Decoder().test(maybeCompressed)) {
+    val decoded = Base85.getZ85Decoder().decode(maybeCompressed)
+    val decompressed = decompressXZ(decoded) ?: return null
+    decompressed
   } else {
-    b85Compressed
+    maybeCompressed
   }
 }
 
-fun compress(bArray: ByteArray): ByteArray? =
+fun compressXZ(bArray: ByteArray): ByteArray? =
   try {
     ByteArrayOutputStream().apply {
       XZOutputStream(this, LZMA2Options(Settings.compressionPreset)).use { it.write(bArray) }
@@ -43,7 +58,7 @@ fun compress(bArray: ByteArray): ByteArray? =
     null
   }
 
-fun decompress(compressedTxt: ByteArray): ByteArray? =
+fun decompressXZ(compressedTxt: ByteArray): ByteArray? =
   try {
     SingleXZInputStream(compressedTxt.inputStream()).use { it.readBytes() }
   } catch (e: Exception) {

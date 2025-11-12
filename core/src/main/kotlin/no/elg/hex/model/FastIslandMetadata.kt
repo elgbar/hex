@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.module.kotlin.readValue
 import ktx.assets.disposeSafely
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
@@ -11,14 +12,20 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.island.Island
 import no.elg.hex.preview.PreviewModifier
+import no.elg.hex.util.compressXZ
+import no.elg.hex.util.decompressXZ
+import no.elg.hex.util.encodeB85
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.textureFromBytes
+import no.elg.hex.util.tryDecompressB85AndDecompressXZ
+import java.nio.charset.StandardCharsets.US_ASCII
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+@JsonPropertyOrder("id", "modifier", "forTesting", "authorRoundsToBeat", "userRoundsToBeat", "previewPixmap")
 class FastIslandMetadata(
   val id: Int,
   previewPixmap: ByteArray? = null,
@@ -71,16 +78,18 @@ class FastIslandMetadata(
     requireNotNull(previewPixmap) { "A preview have not been generated" }
     requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
     // ok to write to file when Hex.args.writeARtBImprovements is true as the app will exit afterwards
+    val serializedThis = Hex.mapper.writeValueAsBytes(this)
+    val compressed = compressXZ(serializedThis) ?: serializedThis
     if (Hex.mapEditor || Hex.args.writeARtBImprovements) {
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
       require(userRoundsToBeat == Island.NEVER_PLAYED) { "userRoundsToBeat must be ${Island.NEVER_PLAYED} when saving initial island, is $userRoundsToBeat" }
 
-      val fileHandle = getFileHandle(id, true)
+      val fileHandle = getFileHandle(id, isForWriting = true, useNewEnding = true)
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()
-      Hex.smileMapper.writeValue(file, this)
+      file.writeBytes(compressed)
     } else {
-      islandPreferences.putString(getMetadataFileName(id), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
+      islandPreferences.putString(getMetadataFileName(id, useNewEnding = true), encodeB85(compressed))
       islandPreferences.flush()
     }
   }
@@ -109,31 +118,52 @@ class FastIslandMetadata(
 
   companion object {
 
-    private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
+    private fun getMetadataFileName(id: Int, useNewEnding: Boolean) = "island-metadata-$id." + if (useNewEnding) "json.xz" else "smile"
 
-    fun getFileHandle(id: Int, isForWriting: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
+    fun getFileHandle(id: Int, isForWriting: Boolean, useNewEnding: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id, useNewEnding)}", !isForWriting)
 
     private val initialIslandMetadata: ConcurrentMap<Int, FastIslandMetadata> = ConcurrentHashMap()
 
     fun clearInitialIslandMetadataCache(id: Int) = initialIslandMetadata.remove(id)
 
+    private fun readIslandFromBytes(rawBytes: ByteArray, useNewEnding: Boolean, decode: Boolean): FastIslandMetadata =
+      if (useNewEnding) {
+        val serialized = if (decode) tryDecompressB85AndDecompressXZ(rawBytes) else decompressXZ(rawBytes)
+        Hex.mapper.readValue<FastIslandMetadata>(serialized ?: error("Failed to decode island"))
+      } else {
+        val serialized = if (decode) Base64.decode(rawBytes) else rawBytes
+        @Suppress("DEPRECATION") // Legacy support for old format
+        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+      }
+
     fun loadInitial(id: Int): FastIslandMetadata? =
       initialIslandMetadata.computeIfAbsent(id) {
         try {
-          val serialized = getFileHandle(id, false).readBytes() ?: return@computeIfAbsent null
-          Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+          var useNewEnding = true
+          val rawBytes = try {
+            val newFileHandle = getFileHandle(id, false, useNewEnding = useNewEnding)
+            newFileHandle.readBytes()
+          } catch (_: Exception) {
+            useNewEnding = false
+            getFileHandle(id, false, useNewEnding = useNewEnding).readBytes()
+          }
+
+          readIslandFromBytes(rawBytes, useNewEnding, decode = false)
         } catch (e: Exception) {
           Gdx.app.error("IslandMetadataDto", "Failed to load initial island metadata for island $id", e)
           null
         }
       }
 
-    @OptIn(ExperimentalEncodingApi::class)
     fun loadProgress(id: Int): FastIslandMetadata? {
-      val raw = islandPreferences.getString(getMetadataFileName(id), null) ?: return null
+      var useNewEnding = true
+      val rawString = islandPreferences.getString(getMetadataFileName(id, useNewEnding = true), null) ?: let {
+        useNewEnding = false
+        islandPreferences.getString(getMetadataFileName(id, useNewEnding = false), null)
+      } ?: return null
+      val rawBytes = rawString.toByteArray(US_ASCII)
       return try {
-        val serialized = Base64.decode(raw)
-        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+        readIslandFromBytes(rawBytes, useNewEnding, decode = true)
       } catch (e: Exception) {
         Gdx.app.error("IslandMetadataDto", "Failed to load island metadata progress for island $id", e)
         null
@@ -144,7 +174,7 @@ class FastIslandMetadata(
     }
 
     fun loadOrNull(id: Int): FastIslandMetadata? =
-      if (Hex.mapEditor || getMetadataFileName(id) !in islandPreferences) {
+      if (Hex.mapEditor || getMetadataFileName(id, useNewEnding = false) !in islandPreferences || getMetadataFileName(id, useNewEnding = true) !in islandPreferences) {
         loadInitial(id)
       } else {
         loadProgress(id)

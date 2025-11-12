@@ -34,7 +34,7 @@ import no.elg.hex.event.events.SettingsChangeEvent
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.ExportedIsland
-import no.elg.hex.util.compressB85
+import no.elg.hex.util.compressXZAndEncodeB85
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
@@ -52,7 +52,7 @@ import no.elg.hex.util.safeGetDelegate
 import no.elg.hex.util.separator
 import no.elg.hex.util.show
 import no.elg.hex.util.toTitleCase
-import no.elg.hex.util.tryDecompressB85
+import no.elg.hex.util.tryDecompressB85AndDecompressXZ
 import kotlin.math.max
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
@@ -159,7 +159,7 @@ class SettingsScreen : OverlayScreen() {
                   return@onClick
                 }
                 val data = Hex.mapper.writeValueAsString(progress)
-                val compressedData = if (Settings.compressExport) compressB85(data) ?: data else data
+                val compressedData = if (Settings.compressExport) compressXZAndEncodeB85(data) ?: data else data
                 if (Hex.platform.writeToClipboard("Hex island export", compressedData)) {
                   MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
                 }
@@ -175,7 +175,7 @@ class SettingsScreen : OverlayScreen() {
             otherSettingsStyle(it)
             onClick {
               tryPlayClick()
-              val clipboardText = Hex.platform.readStringFromClipboard()?.let(::tryDecompressB85)
+              val clipboardText = Hex.platform.readStringFromClipboard()?.let(::tryDecompressB85AndDecompressXZ)
 
               if (clipboardText == null) {
                 MessagesRenderer.publishWarning("No valid text found in clipboard")
