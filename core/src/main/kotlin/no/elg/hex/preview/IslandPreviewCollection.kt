@@ -20,6 +20,7 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.model.FastIslandMetadata.Companion.getFileHandle
 import no.elg.hex.model.FastIslandMetadata.Companion.loadInitial
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
@@ -151,7 +152,9 @@ class IslandPreviewCollection : Disposable {
         if (Hex.args.`update-previews`) {
           loadInitial(id)?.let { initialMetadata ->
             updatePreviewFromIsland(initialMetadata)
-          }
+          } ?: error("Require old metadata to re-render preview for island $id")
+          // Migrate
+          getFileHandle(id, true, useNewEnding = false).delete()
         } else {
           val metadata = FastIslandMetadata.loadOrNull(id) ?: continue
           metadata.clearPreviewTexture()
