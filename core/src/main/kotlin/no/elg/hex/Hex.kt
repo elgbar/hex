@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.dataformat.smile.databind.SmileMapper
 import com.fasterxml.jackson.module.kotlin.jsonMapper
@@ -70,6 +71,8 @@ object Hex : ApplicationAdapter() {
     addModule(SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) })
     configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true)
+    configure(SerializationFeature.WRITE_ENUMS_USING_INDEX, true)
   }
 
   private const val RENDER_FAILED_THRESHOLD = 3
