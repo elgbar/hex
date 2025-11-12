@@ -532,7 +532,7 @@ sealed class LivingPiece(final override val data: HexagonData, var moved: Boolea
 
 class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = PEASANT_STRENGTH
-  override val income: Int = PEASANT_UPKEEP_COST + 1  // -1
+  override val income: Int = PEASANT_UPKEEP_COST + 1 // -1
   override val capitalReplacementResistance: Int = 4
   override val price: Int = PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Peasant = Peasant(newData, moved)
@@ -540,7 +540,7 @@ class Peasant(data: HexagonData, moved: Boolean = true) : LivingPiece(data, move
 
 class Spearman(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = SPEARMAN_STRENGTH
-  override val income: Int = (PEASANT_UPKEEP_COST * 3) + 1  // -5
+  override val income: Int = (PEASANT_UPKEEP_COST * 3) + 1 // -5
   override val capitalReplacementResistance: Int = 3
   override val price: Int = 2 * PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Spearman = Spearman(newData, moved)
@@ -548,7 +548,7 @@ class Spearman(data: HexagonData, moved: Boolean = true) : LivingPiece(data, mov
 
 class Knight(data: HexagonData, moved: Boolean = true) : LivingPiece(data, moved) {
   override val strength = KNIGHT_STRENGTH
-  override val income: Int = (PEASANT_UPKEEP_COST * 3 * 3) + 1  // -17
+  override val income: Int = (PEASANT_UPKEEP_COST * 3 * 3) + 1 // -17
   override val capitalReplacementResistance: Int = 2
   override val price: Int = 3 * PEASANT_PRICE
   override fun copyTo(newData: HexagonData): Knight = Knight(newData, moved)
