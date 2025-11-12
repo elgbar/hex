@@ -10,11 +10,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.WindowManager
-import no.elg.hex.Hex
 import no.elg.hex.R
 import no.elg.hex.platform.Platform
 import no.elg.hex.platform.PlatformType
-import no.elg.hex.util.compressB85IfEnabled
 
 
 class AndroidPlatform(private val activity: Activity) : Platform {
@@ -50,11 +48,10 @@ class AndroidPlatform(private val activity: Activity) : Platform {
 
   override val type: PlatformType = PlatformType.MOBILE
 
-  override fun writeToClipboard(label: String, data: Any): Boolean {
+  override fun writeToClipboard(label: String, data: String): Boolean {
     val clipboard: ClipboardManager = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-    val writeValueAsString = Hex.mapper.writeValueAsString(data)
-    clipboard.setPrimaryClip(ClipData.newPlainText(label, compressB85IfEnabled(writeValueAsString)))
+    clipboard.setPrimaryClip(ClipData.newPlainText(label, data))
     return VERSION.SDK_INT <= VERSION_CODES.S_V2
   }
 

@@ -49,13 +49,13 @@ interface Platform {
    * Set the text to the clipboard
    *
    * @param label User-visible label for the clip data, might be ignored by some platforms
-   * @param data The actual data to be copied to the clipboard
+   * @param data The actual data to be copied to the clipboard, stringified, may be compressed
    * @return `true` if a notification should be shown that the text was copied to the clipboard
    */
-  fun writeToClipboard(label: String, data: Any): Boolean
+  fun writeToClipboard(label: String, data: String): Boolean
 
   /**
-   * Read a string from the clipboard
+   * Read a string from the clipboard. Not decompressed.
    * @return The text from the clipboard or `null` if there is no text in the clipboard
    */
   fun readStringFromClipboard(): String?

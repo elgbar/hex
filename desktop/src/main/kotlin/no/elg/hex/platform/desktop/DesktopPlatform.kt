@@ -2,11 +2,9 @@ package no.elg.hex.platform.desktop
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.ReadableLwjgl3ApplicationConfiguration
-import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.platform.Platform
 import no.elg.hex.platform.PlatformType
-import no.elg.hex.util.compressB85IfEnabled
 import no.elg.hex.util.loadProperties
 import java.awt.HeadlessException
 import java.awt.Toolkit
@@ -34,10 +32,9 @@ class DesktopPlatform(val config: ReadableLwjgl3ApplicationConfiguration) : Plat
     Gdx.app.debug("TRACE | $tag", message + (exception?.let { "\n${it.stackTraceToString()}" } ?: ""))
   }
 
-  override fun writeToClipboard(label: String, data: Any): Boolean {
+  override fun writeToClipboard(label: String, data: String): Boolean {
     try {
-      val writeValueAsString = compressB85IfEnabled(Hex.mapper.writeValueAsString(data))
-      Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(writeValueAsString), null)
+      Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(data), null)
       return true
     } catch (e: HeadlessException) {
       Gdx.app.error("DesktopPlatform", "No system clipboard exists", e)

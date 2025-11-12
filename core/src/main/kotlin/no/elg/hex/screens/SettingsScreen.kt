@@ -34,6 +34,7 @@ import no.elg.hex.event.events.SettingsChangeEvent
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.ExportedIsland
+import no.elg.hex.util.compressB85
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
@@ -157,7 +158,9 @@ class SettingsScreen : OverlayScreen() {
                   MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
                   return@onClick
                 }
-                if (Hex.platform.writeToClipboard("Hex island export", progress)) {
+                val data = Hex.mapper.writeValueAsString(progress)
+                val compressedData = if (Settings.compressExport) compressB85(data) ?: data else data
+                if (Hex.platform.writeToClipboard("Hex island export", compressedData)) {
                   MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
                 }
               }

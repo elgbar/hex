@@ -10,13 +10,6 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import kotlin.text.Charsets.US_ASCII
 
-fun compressB85IfEnabled(text: String): String? =
-  if (Settings.compressExport) {
-    compressB85(text)
-  } else {
-    text
-  }
-
 fun compressB85(text: String): String? {
   val compressed = compress(text.toByteArray(UTF_8)) ?: return null
   val encoded = Base85.getZ85Encoder().encode(compressed)
