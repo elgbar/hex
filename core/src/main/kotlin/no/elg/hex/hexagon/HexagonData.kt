@@ -4,10 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import no.elg.hex.Hex
 import no.elg.hex.event.Events
 import no.elg.hex.event.events.HexagonChangedPieceEvent
@@ -20,7 +18,6 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class)
 class HexagonData(
   /**
    * If this hexagon is disabled, meaning it will not be a part of the playable island
