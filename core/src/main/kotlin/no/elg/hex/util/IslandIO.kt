@@ -47,6 +47,8 @@ fun play(metadata: FastIslandMetadata, island: Island? = null): Boolean {
 }
 
 fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
+  island.ensureCapitalStartFunds()
+  island.ensureTreesGrownOnTeamTurn()
   if (!island.validate()) {
     if (metadata.forTesting) {
       publishWarning("Island failed validation, but allowing save since forTesting is true")
@@ -55,8 +57,6 @@ fun saveInitialIsland(metadata: FastIslandMetadata, island: Island): Boolean {
       return false
     }
   }
-  island.ensureCapitalStartFunds()
-  island.ensureTreesGrownOnTeamTurn()
 
   val file = getIslandFile(metadata.id, allowInternal = false)
 
