@@ -57,7 +57,7 @@ class OutlineRenderer(private val islandScreen: PreviewIslandScreen) :
         }
       }
 
-      val shouldDrawCurrentTeamHexagons = (island.isCurrentTeamHuman() && !Hex.mapEditor && allowedToDrawInvisible) || (Hex.debug && Settings.debugAITerritory)
+      val shouldDrawCurrentTeamHexagons = (island.isCurrentTeamHuman() && !Hex.mapEditor && allowedToDrawInvisible) || (Hex.debug && Settings.debugAIAction)
       if (shouldDrawCurrentTeamHexagons) {
         island.selected?.also {
           drawOutLines(it.hexagons) { _, target -> target.set(selectedColor) }

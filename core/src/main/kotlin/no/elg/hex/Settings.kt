@@ -139,8 +139,6 @@ object Settings {
   var enableDebugHUD by PreferenceDelegate(true, priority = 100_000, shouldHide = { !Hex.debug && !Hex.mapEditor })
   var enableDebugFPSGraph by PreferenceDelegate(false, priority = 100_000, shouldHide = { !Hex.debug })
 
-  var debugAITerritory by PreferenceDelegate(false, priority = 200_000, shouldHide = { !Hex.debug })
-
   var debugAIAction by PreferenceDelegate(false, priority = 200_100, shouldHide = { !Hex.debug })
   var debugAIActionDelayMillis by PreferenceDelegate(2000L, priority = 200_101, shouldHide = { !Hex.debug })
 

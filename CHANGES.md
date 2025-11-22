@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* Incorporate `debug AI Territory` into `debug AI Action`
+
 ---
 
 # v2.7.0 - 2025-11-01
