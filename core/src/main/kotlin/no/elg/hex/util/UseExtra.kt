@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.utils.Disposable
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -84,3 +85,10 @@ inline fun <SR : ShapeRenderer> SR.safeUse(type: ShapeRenderer.ShapeType, projec
     end()
   }
 }
+
+fun <D : Disposable, R> D.useDispose(block: (D) -> R): R =
+  try {
+    block(this)
+  } finally {
+    dispose()
+  }
