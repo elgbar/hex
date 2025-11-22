@@ -30,6 +30,14 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
 
   private val batch: SpriteBatch = SpriteBatch()
 
+  /**
+   * AI for each team. Used to debug best castle placement.
+   * Use NARI from island where possible (when the player is AI), otherwise a new instance for that team is created.
+   */
+  private val nari: Map<Team, NotAsRandomAI> by lazy {
+    Team.entries.associateWith { islandScreen.island.teamToPlayer[it] as? NotAsRandomAI ?: NotAsRandomAI(it, 0, 1.0, 1.0) }
+  }
+
   override fun frameUpdate() {
     val island = islandScreen.island
     batch.safeUse(islandScreen.camera) {
@@ -65,8 +73,12 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
             renderStrengthHint(island.selected)
           }
         }
-        if (Hex.debug && Settings.debugCastlePlacement) {
-          island.getAllTerritories().values.flatten().forEach(::renderBestCastlePlacement)
+        if (Hex.debug && Settings.debugAICastlePlacement) {
+          island.getAllTerritories().values.flatten().forEach { territory ->
+            val nari: NotAsRandomAI = nari.getValue(territory.team)
+            renderBestCastlePlacement(territory, nari)
+          }
+        }
         }
       }
     }
@@ -100,15 +112,9 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
     }
   }
 
-  private val nari: Map<Team, NotAsRandomAI> by lazy {
-    @Suppress("UNCHECKED_CAST")
-    Team.entries.associateWith { NotAsRandomAI(it, 0, 1.0, 1.0) }
-  }
-
-  private fun renderBestCastlePlacement(territory: Territory) {
-    val ai: NotAsRandomAI = nari[territory.team] ?: return
+  private fun renderBestCastlePlacement(territory: Territory, nari: NotAsRandomAI) {
     if (territory.hexagons.size == MIN_HEX_IN_TERRITORY) return // no point in rendering a castle placement when there is only one option (reduces visual clutter)
-    val hexagon = ai.calculateBestCastlePlacement(territory) ?: return
+    val hexagon = nari.calculateBestCastlePlacement(territory) ?: return
 
     val boundingBox = hexagon.internalBoundingBox
 

@@ -244,7 +244,7 @@ class Island(
   var currentTeam: Team = Settings.startTeam
     internal set
 
-  private val teamToPlayer =
+  val teamToPlayer =
     EnumMap<Team, AI?>(Team::class.java).apply {
       // if we create more teams this makes sure they are playing along
       putAll(Team.entries.map { it to Difficulty.HARD.aiConstructor(it) })

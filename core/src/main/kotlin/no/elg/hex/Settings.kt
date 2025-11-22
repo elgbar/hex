@@ -72,7 +72,6 @@ object Settings {
 
   var enableStrengthHintEverywhere by PreferenceDelegate(false, priority = 220, shouldHide = { !Hex.debug && !Hex.mapEditor })
   var enableStrengthHintInPlayerTerritories by PreferenceDelegate(false, priority = 221, shouldHide = { !Hex.debug })
-  var debugCastlePlacement by PreferenceDelegate(false, priority = 222, shouldHide = { !Hex.debug && !Hex.mapEditor })
 
   var showFps by PreferenceDelegate(false, priority = 109, shouldHide = { !Hex.debug })
 
@@ -141,6 +140,7 @@ object Settings {
 
   var debugAIAction by PreferenceDelegate(false, priority = 200_100, shouldHide = { !Hex.debug })
   var debugAIActionDelayMillis by PreferenceDelegate(2000L, priority = 200_101, shouldHide = { !Hex.debug })
+  var debugAICastlePlacement by PreferenceDelegate(false, priority = 200_102, shouldHide = { !Hex.debug && !Hex.mapEditor })
 
   var compressionPreset by PreferenceDelegate(6, priority = 100_000_000, shouldHide = { !Hex.debug }, invalidate = { it !in 0..9 })
   var compressExport by PreferenceDelegate(true, priority = 100_000_001, shouldHide = { !Hex.debug })
