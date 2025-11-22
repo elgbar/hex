@@ -10,7 +10,7 @@ buildscript {
     gdxVersion = '1.14.0'
     ktxVersion = "1.13.1-rc1"
     visVersion = '1.5.7'
-    jacksonVersion = "2.20.0"
+    jacksonVersion = "2.20.1"
     junitVersion = "5.13.3"
     kotlinCoroutineVersion = "1.10.2"
     argparserVersion = "2.0.7"
