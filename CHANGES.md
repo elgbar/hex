@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Allow test maps to be saved even when invalid
 * Optimize island sizes on disk both for progress and initial islands
 * Rewrite island metadata to use compressed json blob instead of smile. It makes it easier to debug and the size is smaller
+* Log what AI thinks when `debugAIAction` setting is enabled
 
 ### Fixed
 

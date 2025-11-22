@@ -91,7 +91,7 @@ class NotAsRandomAI(
   private val tag = "NARAI-$team"
 
   private fun think(territory: Territory?, words: () -> String) {
-    if (Hex.args.`ai-debug`) {
+    if (Hex.args.`ai-debug` || (Hex.debug && Settings.debugAIAction)) {
       Gdx.app.info(tag + territory?.capitalHexagon?.coordinates, message = words)
     } else if (Gdx.app.tracingEnabled) {
       Gdx.app.trace(tag + territory?.capitalHexagon?.coordinates, message = words)
