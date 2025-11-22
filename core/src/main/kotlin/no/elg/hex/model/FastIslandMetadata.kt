@@ -95,7 +95,7 @@ class FastIslandMetadata(
   }
 
   override fun dispose() {
-    internalPreviewTexture.disposeSafely()
+    clearPreviewTexture()
   }
 
   override fun equals(other: Any?): Boolean {
