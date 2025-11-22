@@ -7,6 +7,8 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.ai.NotAsRandomAI.Companion.PIECE_MAINTAIN_CONTRACT_LENGTH
 import no.elg.hex.ai.NotAsRandomAI.Companion.isEconomicalToCreatePiece
+import no.elg.hex.event.Events
+import no.elg.hex.event.events.AIClickedEvent
 import no.elg.hex.hexagon.BARON_STRENGTH
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
@@ -90,11 +92,11 @@ class NotAsRandomAI(
 
   private val tag = "NARAI-$team"
 
-  private fun think(territory: Territory?, words: () -> String) {
+  private fun think(territory: Territory?, thought: () -> String) {
     if (Hex.args.`ai-debug` || (Hex.debug && Settings.debugAIAction)) {
-      Gdx.app.info(tag + territory?.capitalHexagon?.coordinates, message = words)
+      Gdx.app.info(tag + territory?.capitalHexagon?.coordinates, message = thought)
     } else if (Gdx.app.tracingEnabled) {
-      Gdx.app.trace(tag + territory?.capitalHexagon?.coordinates, message = words)
+      Gdx.app.trace(tag + territory?.capitalHexagon?.coordinates, message = thought)
     }
   }
 
@@ -493,7 +495,7 @@ class NotAsRandomAI(
 
         farawayCastles.count() > 1 &&
           farawayCastles.any { fac ->
-            // From each possible castles persepective, there should be a castle 4 hexagons away, and the feasible hexagon 2 hexagons away
+            // From each possible castles perspective, there should be a castle 4 hexagons away, and the feasible hexagon 2 hexagons away
             island.calculateRing(fac, 2).any { it == feasableHex } && island.calculateRing(fac, 4).any { it in farawayCastles }
           }
       }

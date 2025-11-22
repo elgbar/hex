@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Improve AI debugging by visualising where the AI just clicked. 
+  * Enabled with the `debug AI Action` setting
+
 ### Changed
 
 * Capitals will more strongly prefer being placed next to a friendly castle

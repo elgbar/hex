@@ -501,4 +501,4 @@ fun Island.actionableHexagons(): Sequence<Hexagon<HexagonData>> {
   }
 }
 
-val Hexagon<*>.coordinates get() = cubeCoordinate.toAxialKey()
+val Hexagon<*>.coordinates: String get() = cubeCoordinate.toAxialKey()

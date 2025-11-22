@@ -1,11 +1,14 @@
 package no.elg.hex.renderer
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.ai.NotAsRandomAI
 import no.elg.hex.api.FrameUpdatable
+import no.elg.hex.event.SimpleEventListener
+import no.elg.hex.event.events.AIClickedEvent
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Knight
 import no.elg.hex.hexagon.LivingPiece
@@ -29,6 +32,9 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
   Disposable {
 
   private val batch: SpriteBatch = SpriteBatch()
+
+  private var lastAiClicked: AIClickedEvent? = null
+  private val aiClickedEvent: SimpleEventListener<AIClickedEvent> = SimpleEventListener.create<AIClickedEvent> { lastAiClicked = it }
 
   /**
    * AI for each team. Used to debug best castle placement.
@@ -79,6 +85,8 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
             renderBestCastlePlacement(territory, nari)
           }
         }
+        if (Hex.debug && Settings.debugAIAction) {
+          lastAiClicked?.also(::renderLastAiClicked)
         }
       }
     }
@@ -124,7 +132,21 @@ class SpriteRenderer(private val islandScreen: PreviewIslandScreen) :
     batch.draw(Hex.assets.castle, boundingBox.x.toFloat() + width, boundingBox.y.toFloat(), width, height)
   }
 
+  private fun renderLastAiClicked(aiClickedEvent: AIClickedEvent) {
+    val hexagon = aiClickedEvent.hexagon
+
+    val boundingBox = hexagon.internalBoundingBox
+
+    val width = boundingBox.height.toFloat() / 3
+    val height = boundingBox.width.toFloat() / 3
+
+    batch.color = aiClickedEvent.team.inverseColor
+    batch.draw(Hex.assets.hand, boundingBox.x.toFloat(), boundingBox.y.toFloat(), width, height)
+    batch.color = Color.WHITE
+  }
+
   override fun dispose() {
     batch.dispose()
+    aiClickedEvent.dispose()
   }
 }
