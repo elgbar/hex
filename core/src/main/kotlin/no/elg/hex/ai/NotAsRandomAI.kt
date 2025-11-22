@@ -133,7 +133,7 @@ class NotAsRandomAI(
 
         // Select the territory by selecting the capital
         // By selecting the capital we are use we don't pick up any piece in the territory
-        island.select(capitalHexagon)
+        gameInteraction.aiClick(capitalHexagon)
         val territory = island.selected
         if (territory == null) {
           think(null) { "Could not select territory for capital at ${capitalHexagon.coordinates}" }
@@ -149,13 +149,7 @@ class NotAsRandomAI(
           think(territory) { "No piece to buy or pick up, skipping to next territory" }
           break
         }
-        if (Hex.debug && Settings.debugAIAction) {
-          delay(Settings.debugAIActionDelayMillis)
-        }
         place(territory, gameInteraction)
-        if (Hex.debug && Settings.debugAIAction) {
-          delay(Settings.debugAIActionDelayMillis)
-        }
       } while (random.nextFloat() > endTurnChance)
     }
     think(null) { "Ending turn" }
@@ -163,7 +157,18 @@ class NotAsRandomAI(
     resetBlacklists()
   }
 
-  private fun pickUpOrBuy(territory: Territory, gameInteraction: GameInteraction): Boolean {
+  /**
+   * Handle an AI clicking on a hexagon. Might be delayed for debug purposes
+   */
+  private suspend fun GameInteraction.aiClick(hexagon: Hexagon<HexagonData>) {
+    click(hexagon)
+    if (Hex.debug && Settings.debugAIAction) {
+      Events.fireEvent(AIClickedEvent(team, hexagon))
+      delay(Settings.debugAIActionDelayMillis)
+    }
+  }
+
+  private suspend fun pickUpOrBuy(territory: Territory, gameInteraction: GameInteraction): Boolean {
     val island = territory.island
     think(territory) { "Picking up a piece" }
     if (island.hand?.piece != null) {
@@ -177,7 +182,7 @@ class NotAsRandomAI(
         val data = island.getData(hex)
         "Picking up priority piece ${data.piece} at ${hex.coordinates}"
       }
-      gameInteraction.click(hex)
+      gameInteraction.aiClick(hex)
       return true
     }
 
@@ -190,7 +195,7 @@ class NotAsRandomAI(
     // only buy if there are no more units to move
     val isHolding = if (pickUpHexes.isNotEmpty()) {
       think(territory) { "There is something to pick up in the current territory!" }
-      gameInteraction.click(pickUpHexes.random())
+      gameInteraction.aiClick(pickUpHexes.random())
       true
     } else {
       think(territory) { "No pieces to pick up. Buying a unit (balance ${territory.capital.balance})" }
@@ -228,7 +233,7 @@ class NotAsRandomAI(
     return true
   }
 
-  private fun place(territory: Territory, gameInteraction: GameInteraction) {
+  private suspend fun place(territory: Territory, gameInteraction: GameInteraction) {
     val island = territory.island
     val handPiece = island.hand?.piece
     think(territory) { "Placing held piece $handPiece" }
@@ -244,7 +249,7 @@ class NotAsRandomAI(
         return
       }
       think(territory) { "Best placement for this castle is ${hexagon.coordinates}" }
-      gameInteraction.click(hexagon)
+      gameInteraction.aiClick(hexagon)
     } else if (handPiece is LivingPiece) {
       val (mustAttackTrees, mehAttackTrees) = territory.filterIsPiece<TreePiece>().partition {
         val piece = island.getData(it).piece as TreePiece
@@ -349,7 +354,7 @@ class NotAsRandomAI(
         "Placing piece $handPiece at ${hexagon.coordinates} " +
           "(which is a ${island.getData(hexagon).piece} of team ${island.getData(hexagon).team})"
       }
-      gameInteraction.click(hexagon)
+      gameInteraction.aiClick(hexagon)
     }
   }
 
@@ -431,6 +436,7 @@ class NotAsRandomAI(
   fun calculateBestCastlePlacement(territory: Territory): Hexagon<HexagonData>? {
     val island = territory.island
     val team = territory.team
+    require(team == this.team) { "Can only calculate castle placement for own territory" }
 
     /**
      * Calculates how well-protected a given hexagon is within the territory.
