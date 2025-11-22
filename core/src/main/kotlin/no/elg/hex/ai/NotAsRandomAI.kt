@@ -45,6 +45,7 @@ import no.elg.hex.util.info
 import no.elg.hex.util.isPartOfATerritory
 import no.elg.hex.util.isPiece
 import no.elg.hex.util.trace
+import no.elg.hex.util.tracingEnabled
 import org.hexworks.mixite.core.api.Hexagon
 import java.util.Arrays
 import kotlin.random.Random
@@ -92,7 +93,7 @@ class NotAsRandomAI(
   private fun think(territory: Territory?, words: () -> String) {
     if (Hex.args.`ai-debug`) {
       Gdx.app.info(tag + territory?.capitalHexagon?.coordinates, message = words)
-    } else {
+    } else if (Gdx.app.tracingEnabled) {
       Gdx.app.trace(tag + territory?.capitalHexagon?.coordinates, message = words)
     }
   }

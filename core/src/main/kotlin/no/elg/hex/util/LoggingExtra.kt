@@ -19,18 +19,22 @@ fun logLevelToName(level: Int): String =
     else -> "Unknown (given: $level)"
   }
 
+val Application.tracingEnabled: Boolean get() = logLevel >= LOG_TRACE
 fun Application.trace(tag: String, exception: Throwable? = null, message: () -> String) {
-  if (logLevel >= LOG_TRACE) Hex.platform.trace(tag, exception, message())
+  if (tracingEnabled) Hex.platform.trace(tag, exception, message())
 }
 
+val Application.debugEnabled: Boolean get() = logLevel >= LOG_DEBUG
 fun Application.debug(tag: String, message: () -> String) {
-  if (logLevel >= LOG_DEBUG) applicationLogger.debug(tag, message())
+  if (debugEnabled) applicationLogger.debug(tag, message())
 }
 
+val Application.infoEnabled: Boolean get() = logLevel >= LOG_INFO
 fun Application.info(tag: String, message: () -> String) {
-  if (logLevel >= LOG_INFO) applicationLogger.log(tag, message())
+  if (infoEnabled) applicationLogger.log(tag, message())
 }
 
+val Application.errorEnabled: Boolean get() = logLevel >= LOG_ERROR
 fun Application.error(tag: String, message: () -> String) {
-  if (logLevel >= LOG_ERROR) applicationLogger.error(tag, message())
+  if (errorEnabled) applicationLogger.error(tag, message())
 }
