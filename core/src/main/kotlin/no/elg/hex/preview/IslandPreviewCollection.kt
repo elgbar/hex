@@ -30,6 +30,7 @@ import no.elg.hex.util.reportTiming
 import no.elg.hex.util.safeUse
 import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
+import no.elg.hex.util.useDispose
 import java.util.concurrent.CopyOnWriteArrayList
 
 class IslandPreviewCollection : Disposable {
@@ -202,9 +203,10 @@ class IslandPreviewCollection : Disposable {
     }
 
     withContext(MainDispatcher) {
-      val preview = createPreviewFromIsland(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata)
-      metadata.previewPixmap = preview.toBytes()
-      metadata.save()
+      createPreviewFromIsland(island, PREVIEW_SIZE, PREVIEW_SIZE, metadata).useDispose { preview ->
+        metadata.previewPixmap = preview.toBytes()
+        metadata.save()
+      }
       val existingIndex = fastIslandPreviews.indexOfFirst { it.id == metadata.id }
       if (existingIndex == NOT_IN_COLLECTION) {
         fastIslandPreviews.add(metadata)
