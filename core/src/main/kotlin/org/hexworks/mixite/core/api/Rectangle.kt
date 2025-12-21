@@ -23,15 +23,6 @@ class Rectangle {
     height = rect.height
   }
 
-  fun withRectangle(x: Double, y: Double, width: Double, height: Double) = also {
-    this.x = x
-    this.y = y
-    this.width = width
-    this.height = height
-
-    return this
-  }
-
   fun withX(x: Double) = also {
     this.x = x
   }
