@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Optimize island sizes on disk both for progress and initial islands
 * Rewrite island metadata to use compressed json blob instead of smile. It makes it easier to debug and the size is smaller
 * Log what AI thinks when `debugAIAction` setting is enabled
+* Bump minimum sdk to 27 as sdk 26 does not work on emulated devices
+  * Thus, it cannot be used verified to work 
 
 ### Fixed
 

@@ -50,7 +50,7 @@ android {
   }
   defaultConfig {
     applicationId "no.elg.hex"
-    minSdkVersion 26
+    minSdkVersion 27
     targetSdkVersion androidSdkVersion
     versionCode androidVersionCode
     versionName fullVersion
