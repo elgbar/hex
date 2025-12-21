@@ -167,7 +167,11 @@ class IslandPreviewCollection : Disposable {
       reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
         // make a copy to avoid concurrent modification
         sortedIslands().forEach { metadata ->
-          metadata.preview // Load the preview
+          if (metadata.preview == null) {
+            // abort to handle devices running out of memory
+            // this operation only makes the main menu screen lag less, so we can skip it
+            return@forEach
+          }
           skipFrame()
         }
       }
