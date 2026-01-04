@@ -99,12 +99,12 @@ class FastIslandMetadata(
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
       require(userRoundsToBeat == Island.NEVER_PLAYED) { "userRoundsToBeat must be ${Island.NEVER_PLAYED} when saving initial island, is $userRoundsToBeat" }
 
-      val fileHandle = getFileHandle(id, isForWriting = true, useNewEnding = true)
+      val fileHandle = getFileHandle(id, isForWriting = true, useNewEnding = false)
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()
       Hex.smileMapper.writeValue(file, this)
     } else {
-      islandPreferences.putString(getMetadataFileName(id, useNewEnding = true), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
+      islandPreferences.putString(getMetadataFileName(id, useNewEnding = false), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
       islandPreferences.flush()
     }
   }
