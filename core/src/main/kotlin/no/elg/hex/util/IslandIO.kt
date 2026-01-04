@@ -110,7 +110,7 @@ fun loadIslandSync(id: Int): Island {
 fun resetAllIslandProgress() {
   islandPreferences.clear()
   islandPreferences.flush()
-  Hex.assets.islandPreviews.updateAllPreviewsFromMetadata()
+  Hex.assets.islandPreviews.updateAllPreviewsFromIslandFiles()
   Hex.assets.islandPreviews.sortIslands()
 }
 

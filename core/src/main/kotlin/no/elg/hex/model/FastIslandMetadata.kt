@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.module.kotlin.readValue
 import ktx.assets.disposeSafely
+import ktx.async.skipFrame
 import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
 import no.elg.hex.Settings
@@ -71,6 +72,18 @@ class FastIslandMetadata(
       }
       return internalPreviewTexture
     }
+
+  /**
+   * Loads the preview and skips a from if the texture was loaded. This is to allow the splash screen to update
+   */
+  suspend fun loadPreview(): Texture? {
+    val skipFrame = internalPreviewTexture == null
+    val preview = this.preview
+    if (skipFrame) {
+      skipFrame()
+    }
+    return preview
+  }
 
   override fun compareTo(other: FastIslandMetadata): Int = Settings.levelSorter.comparator().compare(this, other)
 

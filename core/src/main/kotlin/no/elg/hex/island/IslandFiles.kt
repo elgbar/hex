@@ -6,6 +6,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ktx.assets.load
+import ktx.async.KtxAsync
+import ktx.async.MainDispatcher
 import no.elg.hex.Hex
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.debug
@@ -15,9 +17,8 @@ import no.elg.hex.util.info
 import no.elg.hex.util.isLoaded
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.trace
-import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 class IslandFiles {
 
@@ -26,11 +27,8 @@ class IslandFiles {
    */
   val islandIds = ArrayList<Int>()
 
-  private var updating: AtomicBoolean = AtomicBoolean(true)
-  val ready: Boolean get() = !updating.get()
-
-  private var _loadedIslands = AtomicInteger(0)
-  val loadedIslands: Int get() = _loadedIslands.get()
+  private var _ready: AtomicBoolean = AtomicBoolean(false)
+  val ready: Boolean get() = _ready.get()
 
   val size: Int get() = islandIds.size
 
@@ -54,13 +52,12 @@ class IslandFiles {
   }
 
   suspend fun fullFilesSearchSus() {
-    updating.set(true)
+    val previewToRender = ConcurrentHashMap<Int, FastIslandMetadata>()
+    _ready.set(false)
     try {
       reportTiming("do a full files search") {
         if (Hex.args.`disable-island-loading`) return
         islandIds.clear()
-        _loadedIslands.set(0)
-        val discoveredIslands = CopyOnWriteArrayList<Int>()
 
         var nonExistentFilesInRow = 0
         coroutineScope {
@@ -73,46 +70,21 @@ class IslandFiles {
               }
               Gdx.app.trace(TAG) { "Found island ${getIslandFileName(id)}" }
               nonExistentFilesInRow = 0
-              discoveredIslands += id
               // add to the sync list to make the loading screen number go up
               islandIds += id
 
               launch(Dispatchers.Default) {
                 // If there are any islands in progress, we need to load them anyway so no point in just loading initial
-                val initialMetadata = FastIslandMetadata.loadOrNull(id)
-                if (initialMetadata?.forTesting == true && (!Hex.debug && !Hex.mapEditor)) {
-                  Gdx.app.debug(TAG) { "Skipping island $id as it is for debugging purposes only" }
+                val metadata = FastIslandMetadata.loadOrNull(id)
+                if (metadata == null || metadata.forTesting && (!Hex.debug && !Hex.mapEditor)) {
+                  Gdx.app.debug(TAG) { "Skipping island $id as it is for null or for debugging purposes only" }
                   FastIslandMetadata.clearInitialIslandMetadataCache(id)
-                  discoveredIslands -= id
-                  return@launch
+                  islandIds -= id
+                } else {
+                  listARtBImprovements(id)
+                  loadIsland(id)
+                  previewToRender[id] = metadata
                 }
-                if (initialMetadata != null && Hex.args.listARtBImprovements) {
-                  val progress = FastIslandMetadata.loadProgress(id)
-                  if (progress != null) {
-                    progress.authorRoundsToBeat = initialMetadata.authorRoundsToBeat
-                    val tryUpdate = if (progress.isUserBetterThanAuthor()) {
-                      Gdx.app.info("ARtB") { "Island $id improved from ${progress.authorRoundsToBeat} to ${progress.userRoundsToBeat} rounds" }
-                      true
-                    } else if (progress.wasNeverBeatenByAuthorButBeatenByUser()) {
-                      Gdx.app.info("ARtB") { "Island $id unbeaten to ${progress.userRoundsToBeat} rounds" }
-                      true
-                    } else {
-                      false
-                    }
-                    if (tryUpdate && Hex.args.writeARtBImprovements) {
-                      initialMetadata.authorRoundsToBeat = progress.userRoundsToBeat
-                      Gdx.app.debug("ARtB") { "Updating island $id's ARtB to ${initialMetadata.authorRoundsToBeat} rounds" }
-                      initialMetadata.save()
-                    }
-                  }
-                }
-                if (Hex.args.`load-all-islands`) {
-                  val fileName = getIslandFileName(id)
-                  if (!Hex.assets.isLoaded<Island>(fileName)) {
-                    Hex.assets.load<Island>(fileName)
-                  }
-                }
-                _loadedIslands.incrementAndGet()
               }
             } else {
               nonExistentFilesInRow++
@@ -125,10 +97,6 @@ class IslandFiles {
             }
           }
         }
-        //
-        islandIds.clear()
-        islandIds.addAll(discoveredIslands)
-
         Gdx.app.debug(TAG, "Next island created will be $nextIslandId")
         if (Hex.args.listARtBImprovements) {
           Gdx.app.info(TAG) { "Done creating ARtB improvements list, exiting" }
@@ -136,8 +104,43 @@ class IslandFiles {
         }
       }
     } finally {
-      _loadedIslands.set(0)
-      updating.compareAndSet(true, false)
+      _ready.compareAndSet(false, true)
+    }
+    KtxAsync.launch(MainDispatcher) {
+      Hex.assets.islandPreviews.updateAllPreviewsFromMetadata(previewToRender)
+    }
+  }
+
+  private fun listARtBImprovements(id: Int) {
+    if (Hex.args.listARtBImprovements) {
+      val initialMetadata = FastIslandMetadata.loadInitial(id) ?: return
+      val progress = FastIslandMetadata.loadProgress(id)
+      if (progress != null) {
+        progress.authorRoundsToBeat = initialMetadata.authorRoundsToBeat
+        val tryUpdate = if (progress.isUserBetterThanAuthor()) {
+          Gdx.app.info("ARtB") { "Island $id improved from ${progress.authorRoundsToBeat} to ${progress.userRoundsToBeat} rounds" }
+          true
+        } else if (progress.wasNeverBeatenByAuthorButBeatenByUser()) {
+          Gdx.app.info("ARtB") { "Island $id unbeaten to ${progress.userRoundsToBeat} rounds" }
+          true
+        } else {
+          false
+        }
+        if (tryUpdate && Hex.args.writeARtBImprovements) {
+          initialMetadata.authorRoundsToBeat = progress.userRoundsToBeat
+          Gdx.app.debug("ARtB") { "Updating island $id's ARtB to ${initialMetadata.authorRoundsToBeat} rounds" }
+          initialMetadata.save()
+        }
+      }
+    }
+  }
+
+  private fun loadIsland(id: Int) {
+    if (Hex.args.`load-all-islands`) {
+      val fileName = getIslandFileName(id)
+      if (!Hex.assets.isLoaded<Island>(fileName)) {
+        Hex.assets.load<Island>(fileName)
+      }
     }
   }
 

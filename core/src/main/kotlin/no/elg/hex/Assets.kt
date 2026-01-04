@@ -400,10 +400,8 @@ class Assets : AssetManager() {
       loadingInfo = "islands"
 
       KtxAsync.launch(Hex.asyncThread) {
-        // do async to
-        islandFiles.fullFilesSearchSus() // find all island files
-        // previews require files to be searched
-        islandPreviews.updateAllPreviewsFromMetadata()
+        // do async to make the loading screen update properly
+        islandFiles.fullFilesSearchSus()
       }
     }
   }

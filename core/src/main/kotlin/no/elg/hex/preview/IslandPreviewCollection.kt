@@ -32,6 +32,7 @@ import no.elg.hex.util.toBytes
 import no.elg.hex.util.trace
 import no.elg.hex.util.useDispose
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 
 class IslandPreviewCollection : Disposable {
 
@@ -39,6 +40,10 @@ class IslandPreviewCollection : Disposable {
   private var dirty = true
 
   val size get() = fastIslandPreviews.size
+  val ready: Boolean get() = _ready.get()
+  private var _ready: AtomicBoolean = AtomicBoolean(false)
+
+//  private val previewToRender = ConcurrentHashMap<Int, () -> FastIslandMetadata>()
 
   fun islandWithIndex(): Iterable<IndexedValue<FastIslandMetadata>> = sortedIslands().withIndex()
 
@@ -134,7 +139,16 @@ class IslandPreviewCollection : Disposable {
     return buffer
   }
 
-  fun updateAllPreviewsFromMetadata() {
+  fun updateAllPreviewsFromIslandFiles() {
+    val previewToRender = mutableMapOf<Int, FastIslandMetadata?>()
+    for (islandId in Hex.assets.islandFiles.islandIds) {
+      previewToRender[islandId] = FastIslandMetadata.loadOrNull(islandId)
+    }
+    updateAllPreviewsFromMetadata(previewToRender)
+  }
+
+  fun updateAllPreviewsFromMetadata(previewToRender: Map<Int, FastIslandMetadata?>) {
+    _ready.set(false)
     if (Hex.assets.islandFiles.size == 0) {
       if (!Hex.args.`disable-island-loading`) {
         MessagesRenderer.publishError("Failed to find any islands to load")
@@ -146,31 +160,32 @@ class IslandPreviewCollection : Disposable {
       }
       return
     }
-    disposePreviews()
 
     KtxAsync.launch(MainDispatcher) {
+      disposePreviews()
+      skipFrame()
       val localMetadata = mutableListOf<FastIslandMetadata>()
-      for (id in Hex.assets.islandFiles.islandIds) {
-        if (Hex.args.`update-previews`) {
-          loadInitial(id)?.let { initialMetadata ->
-            updatePreviewFromIsland(initialMetadata)
-          } ?: error("Require old metadata to re-render preview for island $id")
-          // Migrate
+      for ((id, maybeMetadata) in previewToRender) {
+        val metadata: FastIslandMetadata = if (Hex.args.`update-previews`) {
+          // Migration of old previews
           getFileHandle(id, true, useNewEnding = false).delete()
-        } else {
-          val metadata = FastIslandMetadata.loadOrNull(id) ?: continue
-          metadata.clearPreviewTexture()
 
-          localMetadata.add(metadata)
-          dirty = true
+          val initialMetadata = loadInitial(id) ?: error("Require old metadata to re-render preview for island $id")
+          updatePreviewFromIsland(initialMetadata)
+          initialMetadata
+        } else {
+          maybeMetadata ?: continue
         }
+        localMetadata += metadata
       }
       fastIslandPreviews.addAll(localMetadata)
+      dirty = true
+      _ready.compareAndSet(false, true)
 
       reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
         // make a copy to avoid concurrent modification
         sortedIslands().forEach { metadata ->
-          if (metadata.preview == null) {
+          if (metadata.loadPreview() == null) {
             // abort to handle devices running out of memory
             // this operation only makes the main menu screen lag less, so we can skip it
             return@forEach

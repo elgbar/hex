@@ -31,7 +31,8 @@ class SplashScreen(private var nextScreen: AbstractScreen?) :
   override fun render(delta: Float) {
     val assetsDone = Hex.assets.update(30) // Ok to block for a bit, since this is the first screen. Improves loading time by ~ 500ms
     val previewRenderingDone = Hex.assets.islandPreviews.size
-    if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.islandFiles.ready && Hex.assets.islandFiles.size == previewRenderingDone && assetsDone) {
+    val islandFiles = Hex.assets.islandFiles.size
+    if (!Hex.paused && Hex.assets.mainFinishedLoading && Hex.assets.islandFiles.ready && Hex.assets.islandPreviews.ready && assetsDone) {
       val realNextScreen = nextScreen
       if (realNextScreen != null && realNextScreen !== this) {
         refreshAndSetScreen(realNextScreen)
@@ -42,12 +43,10 @@ class SplashScreen(private var nextScreen: AbstractScreen?) :
     } else {
       batch.safeUse {
         val txt = if (assetsDone) {
-          val totalIslands = Hex.assets.islandFiles.size
-          val loadedIslands = Hex.assets.islandFiles.loadedIslands
           """
           |Discovering islands...
           |
-          |$loadedIslands / $totalIslands
+          |$previewRenderingDone / $islandFiles
           |
           |${System.currentTimeMillis() - startTime} ms
           """.trimMargin()
