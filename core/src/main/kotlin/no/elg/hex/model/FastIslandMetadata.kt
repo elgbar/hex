@@ -167,13 +167,13 @@ class FastIslandMetadata(
         Gdx.app.error("IslandMetadataDto", "Failed to load island metadata progress for island $id", e)
         null
       }?.also {
-        // Clear up some memory by unloading
-        initialIslandMetadata.remove(id)
+        // Clear up some memory by unloading initial metadata as we now have progress loaded
+        clearInitialIslandMetadataCache(id)
       }
     }
 
     fun loadOrNull(id: Int): FastIslandMetadata? =
-      if (Hex.mapEditor || getMetadataFileName(id, useNewEnding = false) !in islandPreferences || getMetadataFileName(id, useNewEnding = true) !in islandPreferences) {
+      if (Hex.mapEditor || getMetadataFileName(id, useNewEnding = true) !in islandPreferences || getMetadataFileName(id, useNewEnding = false) !in islandPreferences) {
         loadInitial(id)
       } else {
         loadProgress(id)
