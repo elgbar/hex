@@ -180,7 +180,11 @@ class IslandPreviewCollection : Disposable {
       }
       fastIslandPreviews.addAll(localMetadata)
       dirty = true
-      _ready.compareAndSet(false, true)
+
+      if (!Hex.args.`update-previews`) {
+        // When not updating previews, we can mark as ready here (before actually loading all previews)
+        _ready.compareAndSet(false, true)
+      }
 
       reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
         // make a copy to avoid concurrent modification
@@ -192,6 +196,11 @@ class IslandPreviewCollection : Disposable {
           }
           skipFrame()
         }
+      }
+
+      if (Hex.args.`update-previews`) {
+        // If we're updating the previews it is nice to know how far we have come and when it is done
+        _ready.compareAndSet(false, true)
       }
     }
   }
