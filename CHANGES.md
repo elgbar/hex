@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+# v2.8.0 - 2026-01-04
+
+### Added
+
 * Improve AI debugging by visualising where the AI just clicked. 
   * Enabled with the `debug AI Action` setting
 * Added `Smooth Scrolling` setting to enable prefetching of island metatadata islands.
