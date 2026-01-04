@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Write list-artb-improvements" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="no.elg.hex.platform.desktop.DesktopLauncherKt" />
+    <module name="hex.desktop.main" />
+    <option name="PROGRAM_PARAMETERS" value="--list-artb-improvements=true" />
+    <shortenClasspath name="NONE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
