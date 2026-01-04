@@ -46,7 +46,7 @@ object Settings {
       Hex.music.updateMusicVolume()
     },
     shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
-  ) { it < 0f || it > 1f }
+  ) { it !in 0f..1f }
 
   var musicVolume by PreferenceDelegate(
     .5f,
@@ -55,7 +55,7 @@ object Settings {
       Hex.music.updateMusicVolume()
     },
     shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
-  ) { it < 0f || it > 1f }
+  ) { it !in 0f..1f }
   var musicPaused by PreferenceDelegate(false, priority = 211, afterChange = { _, _, _ -> Hex.music.toggleMute() })
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
