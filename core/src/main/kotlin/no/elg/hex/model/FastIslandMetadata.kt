@@ -76,12 +76,15 @@ class FastIslandMetadata(
    * Loads the preview and skips a from if the texture was loaded. This is to allow the splash screen to update
    */
   suspend fun loadPreview(): Texture? {
-    val skipFrame = internalPreviewTexture == null
-    val preview = this.preview
-    if (skipFrame) {
-      skipFrame()
+    if (Settings.smoothScrolling) {
+      val skipFrame = internalPreviewTexture == null
+      val preview = this.preview
+      if (skipFrame) {
+        skipFrame()
+      }
+      return preview
     }
-    return preview
+    return null
   }
 
   override fun compareTo(other: FastIslandMetadata): Int = Settings.levelSorter.comparator().compare(this, other)

@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Improve AI debugging by visualising where the AI just clicked. 
   * Enabled with the `debug AI Action` setting
+* Added `Smooth Scrolling` setting to enable prefetching of island metatadata islands.
+  * Defaults to enabled on desktop and disabled on mobile
+  * With this disabled the level select screen will load each island preview on demand, saving memory, but causing stutter when scrolling
 
 ### Changed
 

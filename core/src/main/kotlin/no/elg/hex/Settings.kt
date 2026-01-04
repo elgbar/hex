@@ -5,6 +5,7 @@ import no.elg.hex.ai.Difficulty
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.model.PreviewSortingOrder
+import no.elg.hex.platform.PlatformType
 import no.elg.hex.util.delegate.PreferenceDelegate
 import no.elg.hex.util.delegate.ResetSetting
 import no.elg.hex.util.resetAllIslandProgress
@@ -161,6 +162,15 @@ object Settings {
     afterChange = { _, _, _ ->
       Hex.assets.islandPreviews.sortIslands()
     }
+  )
+
+  var smoothScrolling by PreferenceDelegate(
+    when (Hex.platform.type) {
+      PlatformType.DESKTOP -> true
+      PlatformType.MOBILE -> false
+    },
+    priority = 100,
+    requireRestart = true
   )
 
   val deleteAllProgress = ResetSetting("Are you sure you want to delete all your progress?") {
