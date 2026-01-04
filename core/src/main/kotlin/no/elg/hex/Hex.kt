@@ -57,7 +57,6 @@ object Hex : ApplicationAdapter() {
   const val LAUNCH_PREF = "launchPref"
 
   @JvmStatic
-  @Deprecated("Use mapper, and compress the output")
   val smileMapper: SmileMapper =
     SmileMapper.builder().apply {
       addModule(kotlinModule())

@@ -14,9 +14,7 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.island.Island
 import no.elg.hex.preview.PreviewModifier
-import no.elg.hex.util.compressXZ
 import no.elg.hex.util.decompressXZ
-import no.elg.hex.util.encodeB85
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.textureFromBytes
@@ -95,8 +93,6 @@ class FastIslandMetadata(
     require(id >= 0) { "Island id must be positive, is $id" }
     requireNotNull(previewPixmap) { "A preview have not been generated" }
     // ok to write to file when Hex.args.writeARtBImprovements is true as the app will exit afterwards
-    val serializedThis = Hex.mapper.writeValueAsBytes(this)
-    val compressed = compressXZ(serializedThis) ?: serializedThis
     if (Hex.mapEditor || Hex.args.writeARtBImprovements) {
       // preview check only happens when we save it. For local saving we dont really care (user might have ran out of memory)
       requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
@@ -106,9 +102,9 @@ class FastIslandMetadata(
       val fileHandle = getFileHandle(id, isForWriting = true, useNewEnding = true)
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()
-      file.writeBytes(compressed)
+      Hex.smileMapper.writeValue(file, this)
     } else {
-      islandPreferences.putString(getMetadataFileName(id, useNewEnding = true), encodeB85(compressed))
+      islandPreferences.putString(getMetadataFileName(id, useNewEnding = true), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
       islandPreferences.flush()
     }
   }
