@@ -150,8 +150,9 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
 
           it.fillX()
           it.expandX()
-          it.spaceBottom(it.spaceBottomValue.get() * 2f)
-          it.pad(20f)
+          it.padBottom(Gdx.graphics.safeInsetBottom.toFloat().coerceAtLeast(20f))
+          it.padLeft(Gdx.graphics.safeInsetLeft.toFloat().coerceAtLeast(20f))
+          it.padRight(Gdx.graphics.safeInsetRight.toFloat().coerceAtLeast(20f))
 
           val size = Value.percentWidth(0.08f, this@table)
 

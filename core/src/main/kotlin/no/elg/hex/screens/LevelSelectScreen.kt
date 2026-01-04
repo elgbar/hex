@@ -255,9 +255,9 @@ class LevelSelectScreen :
     private const val PREVIEW_PADDING_PERCENT = 0.025f
 
     val paddingX: Float
-      get() = Gdx.graphics.width * PREVIEW_PADDING_PERCENT
+      get() = (Gdx.graphics.width - Gdx.graphics.safeInsetLeft - Gdx.graphics.safeInsetRight) * PREVIEW_PADDING_PERCENT
     val paddingY: Float get() = paddingX * 1.5f
     val shownPreviewSize
-      get() = (Gdx.graphics.width - (1 + PREVIEWS_PER_ROW) * paddingX) / PREVIEWS_PER_ROW
+      get() = ((Gdx.graphics.width - Gdx.graphics.safeInsetLeft - Gdx.graphics.safeInsetRight) - (1 + PREVIEWS_PER_ROW) * paddingX) / PREVIEWS_PER_ROW
   }
 }

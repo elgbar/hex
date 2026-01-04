@@ -48,8 +48,8 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     val paddedSize = paddingX + size
 
     return Rectangle(
-      paddingX + paddedSize * gridX + size * horzOffset * (1f - scale),
-      paddingY + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale),
+      paddingX + paddedSize * gridX + size * horzOffset * (1f - scale) + Gdx.graphics.safeInsetLeft,
+      paddingY + paddedSize * (gridY - (1f - NON_ISLAND_SCALE)) + size * (1f - scale) + Gdx.graphics.safeInsetTop,
       size * scale,
       size * scale
     )
@@ -183,6 +183,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       Keys.N -> if (Hex.mapEditor && (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT))) {
         Hex.screen = LevelCreationScreen()
       }
+
       Keys.F1 -> screen.loadBySearch()
 
       else -> return false

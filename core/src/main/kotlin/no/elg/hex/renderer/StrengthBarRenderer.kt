@@ -3,7 +3,6 @@ package no.elg.hex.renderer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import ktx.graphics.use
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.event.SimpleEventListener
@@ -23,7 +22,7 @@ class StrengthBarRenderer(val island: Island) : ScissorRenderer() {
   private val visibilityChangedListener: SimpleEventListener<HexagonVisibilityChanged>?
 
   override fun frameUpdate() {
-    drawFbo((Gdx.graphics.width) / 2f - (fboWidth / 2f), (Gdx.graphics.height) - fboHeight * 2f)
+    drawFbo((Gdx.graphics.width) / 2f - (fboWidth / 2f), (Gdx.graphics.height) - fboHeight * 2f - Gdx.graphics.safeInsetTop)
   }
 
   private fun redrawBar() {
