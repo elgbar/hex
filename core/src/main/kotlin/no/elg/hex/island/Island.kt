@@ -784,6 +784,11 @@ class Island(
      */
     const val NEVER_BEATEN = 999
 
+    /**
+     * A special map, not really meant to have a ARtB
+     */
+    const val SPECIAL_MAP = Int.MAX_VALUE
+
     fun Hand.createDtoPieceCopy(): Piece = piece.let { it.copyTo(if (restore != NoRestore) it.data.copy() else EDGE_DATA) }
 
     fun deserialize(json: String): Island = Hex.mapper.readValue(json)

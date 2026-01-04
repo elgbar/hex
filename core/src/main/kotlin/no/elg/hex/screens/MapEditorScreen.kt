@@ -52,6 +52,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.Island.Companion.MIN_HEX_IN_TERRITORY
 import no.elg.hex.island.Island.Companion.NEVER_BEATEN
 import no.elg.hex.island.Island.Companion.NEVER_PLAYED
+import no.elg.hex.island.Island.Companion.SPECIAL_MAP
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.IslandDto
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
@@ -164,7 +165,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
               textFieldEventPolicy = Spinner.TextFieldEventPolicy.ON_KEY_TYPED
               onChange {
                 val parsedInt = textField.text?.toIntOrNull() ?: NEVER_PLAYED
-                metadata.authorRoundsToBeat = if (parsedInt == NEVER_PLAYED - 1) Int.MAX_VALUE else parsedInt
+                metadata.authorRoundsToBeat = if (parsedInt == NEVER_PLAYED - 1) SPECIAL_MAP else parsedInt
               }
               it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
               it.prefWidth(Value.percentHeight(0.5f, this@visWindow))
