@@ -145,16 +145,9 @@ class FastIslandMetadata(
     fun loadInitial(id: Int): FastIslandMetadata? =
       initialIslandMetadata.computeIfAbsent(id) {
         try {
-          var useNewEnding = true
-          val rawBytes = try {
-            val newFileHandle = getFileHandle(id, false, useNewEnding = useNewEnding)
-            newFileHandle.readBytes()
-          } catch (_: Exception) {
-            useNewEnding = false
-            getFileHandle(id, false, useNewEnding = useNewEnding).readBytes()
-          }
-
-          readIslandFromBytes(rawBytes, useNewEnding, decode = false)
+          val fileHandle = getFileHandle(id, false, useNewEnding = true)
+          val rawBytes = fileHandle.readBytes()
+          readIslandFromBytes(rawBytes, true, decode = false)
         } catch (e: Exception) {
           Gdx.app.error("IslandMetadataDto", "Failed to load initial island metadata for island $id", e)
           null
