@@ -149,6 +149,7 @@ class IslandPreviewCollection : Disposable {
     disposePreviews()
 
     KtxAsync.launch(MainDispatcher) {
+      val localMetadata = mutableListOf<FastIslandMetadata>()
       for (id in Hex.assets.islandFiles.islandIds) {
         if (Hex.args.`update-previews`) {
           loadInitial(id)?.let { initialMetadata ->
@@ -160,10 +161,11 @@ class IslandPreviewCollection : Disposable {
           val metadata = FastIslandMetadata.loadOrNull(id) ?: continue
           metadata.clearPreviewTexture()
 
-          fastIslandPreviews.add(metadata)
+          localMetadata.add(metadata)
           dirty = true
         }
       }
+      fastIslandPreviews.addAll(localMetadata)
 
       reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
         // make a copy to avoid concurrent modification
@@ -229,7 +231,7 @@ class IslandPreviewCollection : Disposable {
   private fun disposePreviews() {
     val copy = fastIslandPreviews.toList()
     fastIslandPreviews.clear()
-    copy.map(Disposable::dispose) // Make sure we dispose previews after they are removed from the collection
+    copy.forEach(Disposable::dispose) // Make sure we dispose previews after they are removed from the collection
   }
 
   override fun dispose() {

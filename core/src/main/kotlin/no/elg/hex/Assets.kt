@@ -306,7 +306,7 @@ class Assets : AssetManager() {
       val boldNotFlippedFontAsset = loadFont(bold = true, italic = false, flip = false)
       val largeRegularFontAsset = loadFont(bold = false, italic = false, flip = false, fontSize = fontSize * 2)
 
-      loadingInfo = "VisUI"
+      loadingInfo = "UI"
 
       if (!VisUI.isLoaded()) {
         if (scale > 1) VisUI.load(X2) else VisUI.load(X1)
@@ -388,17 +388,23 @@ class Assets : AssetManager() {
       }
       Scene2DSkin.defaultSkin = VisUI.getSkin()
 
-      loadingInfo = "sprites"
+      loadingInfo = "textures"
 
       load<TextureAtlas>(SPRITE_ATLAS)
       load<TextureAtlas>(TUTORIAL_ATLAS)
+
+      loadingInfo = "audio"
 
       audioLoaded(true)
 
       loadingInfo = "islands"
 
-      islandFiles.fullFilesSearch() // find all island files
-      islandPreviews.updateAllPreviewsFromMetadata()
+      KtxAsync.launch(Hex.asyncThread) {
+        // do async to
+        islandFiles.fullFilesSearchSus() // find all island files
+        // previews require files to be searched
+        islandPreviews.updateAllPreviewsFromMetadata()
+      }
     }
   }
 

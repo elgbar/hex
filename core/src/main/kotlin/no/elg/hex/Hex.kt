@@ -229,7 +229,9 @@ object Hex : ApplicationAdapter() {
 
     if (assets0 == null) {
       assets0 = Assets()
-      assets.loadAssets()
+      Gdx.app.postRunnable {
+        assets.loadAssets()
+      }
     }
     Gdx.app.postRunnable {
       // must be last
