@@ -301,8 +301,8 @@ object ScreenRenderer : Disposable, Resizable {
     if (text.isNotEmpty()) {
       val y =
         when (position.vertical) {
-          TOP -> spacing * line * 2f + spacing
-          BOTTOM -> Gdx.graphics.height - spacing * line * 2f
+          TOP -> spacing * line * 2f + spacing + Gdx.graphics.safeInsetTop
+          BOTTOM -> Gdx.graphics.height - spacing * line * 2f - Gdx.graphics.safeInsetBottom
           VERTICAL_CENTER -> Gdx.graphics.height / 2 - spacing * (line - lines / 2) * 2f
         }
 
