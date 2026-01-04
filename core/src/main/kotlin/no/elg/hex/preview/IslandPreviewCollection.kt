@@ -22,7 +22,6 @@ import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.FastIslandMetadata.Companion.getFileHandle
 import no.elg.hex.model.FastIslandMetadata.Companion.loadInitial
-import no.elg.hex.platform.PlatformType
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
 import no.elg.hex.util.getIslandFileName
@@ -168,17 +167,15 @@ class IslandPreviewCollection : Disposable {
       }
       fastIslandPreviews.addAll(localMetadata)
 
-      if (Hex.platform.type == PlatformType.DESKTOP) {
-        reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
-          // make a copy to avoid concurrent modification
-          sortedIslands().forEach { metadata ->
-            if (metadata.preview == null) {
-              // abort to handle devices running out of memory
-              // this operation only makes the main menu screen lag less, so we can skip it
-              return@forEach
-            }
-            skipFrame()
+      reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
+        // make a copy to avoid concurrent modification
+        sortedIslands().forEach { metadata ->
+          if (metadata.preview == null) {
+            // abort to handle devices running out of memory
+            // this operation only makes the main menu screen lag less, so we can skip it
+            return@forEach
           }
+          skipFrame()
         }
       }
     }
