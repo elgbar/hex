@@ -143,14 +143,16 @@ class GameInfoRenderer(private val screen: PlayableIslandScreen) :
           val (width, height) = calcSize(region)
           val handWidth = height * (Hex.assets.hand.originalWidth / Hex.assets.hand.originalHeight.toFloat())
 
+          val x = (Gdx.graphics.width - width) / 2f
+          val y = height / 2f + Gdx.graphics.safeInsetTop
           batch.draw(
             Hex.assets.hand,
-            (Gdx.graphics.width - handWidth / 4f) / 2f,
-            (height + height / 2) / 2f,
+            x,
+            y + height / 4f,
             handWidth,
             height
           )
-          batch.draw(region, Gdx.graphics.width / 2f, height / 2f, width, height)
+          batch.draw(region, x, y, width, height)
         }
       }
     }
