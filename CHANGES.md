@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Island 248 improved from 27 to 23 rounds
   * Island 330 improved from 18 to 17 rounds
   * Update initial ARtB for islands for 104 islands
+  * Randomize teams on islands 63, 247, 264, 272, 293, 295, 351, 376, 448 as they were impossible to win with leaf on
 
 ### Fixed
 
