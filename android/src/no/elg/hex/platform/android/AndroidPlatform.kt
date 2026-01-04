@@ -9,7 +9,10 @@ import android.os.Build.VERSION_CODES
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.WindowManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import no.elg.hex.R
 import no.elg.hex.platform.Platform
 import no.elg.hex.platform.PlatformType
@@ -27,8 +30,19 @@ class AndroidPlatform(private val activity: Activity) : Platform {
   override val canControlAudio: Boolean = false
 
   override fun platformInit() {
-    if (VERSION.SDK_INT >= VERSION_CODES.R) {
-      activity.window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+    val window = activity.window
+    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+    windowInsetsController.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    // Add a listener to update the behavior of the toggle fullscreen button when
+    // the system bars are hidden or revealed.
+    ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, windowInsets ->
+      // You can hide the caption bar even when the other system bars are visible.
+      // To account for this, explicitly check the visibility of navigationBars()
+      // and statusBars() rather than checking the visibility of systemBars().
+      if (windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) || windowInsets.isVisible(WindowInsetsCompat.Type.statusBars())) {
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+      }
+      ViewCompat.onApplyWindowInsets(view, windowInsets)
     }
   }
 
@@ -58,7 +72,7 @@ class AndroidPlatform(private val activity: Activity) : Platform {
   override fun readStringFromClipboard(): String? {
     val clipboard: ClipboardManager = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     return clipboard.primaryClip?.let { clipData ->
-      if(clipData.itemCount == 0) return null
+      if (clipData.itemCount == 0) return null
       clipData.getItemAt(0).coerceToText(null).toString()
     }
   }

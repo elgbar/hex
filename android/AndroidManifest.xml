@@ -21,6 +21,8 @@
       android:name="no.elg.hex.platform.android.AndroidLauncher"
       android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout"
       android:exported="true"
+      android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+      android:fitsSystemWindows="true"
       android:screenOrientation="fullUser">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
