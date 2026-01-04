@@ -43,10 +43,11 @@ class SplashScreen(private var nextScreen: AbstractScreen?) :
     } else {
       batch.safeUse {
         val txt = if (assetsDone) {
+          val previewRendered = if (Hex.args.`update-previews`) "${Hex.assets.islandPreviews.previewRendered} / " else ""
           """
           |Discovering islands...
           |
-          |$previewRenderingDone / $islandFiles
+          |$previewRendered$previewRenderingDone / $islandFiles
           |
           |${System.currentTimeMillis() - startTime} ms
           """.trimMargin()

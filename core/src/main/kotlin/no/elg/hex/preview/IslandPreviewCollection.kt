@@ -40,6 +40,9 @@ class IslandPreviewCollection : Disposable {
   private var dirty = true
 
   val size get() = fastIslandPreviews.size
+  var previewRendered = 0
+    private set
+
   val ready: Boolean get() = _ready.get()
   private var _ready: AtomicBoolean = AtomicBoolean(false)
 
@@ -187,6 +190,7 @@ class IslandPreviewCollection : Disposable {
       }
 
       reportTiming("render all island previews", minSignificantTimeMs = 2000L) {
+        previewRendered = 0
         // make a copy to avoid concurrent modification
         sortedIslands().forEach { metadata ->
           if (metadata.loadPreview() == null) {
@@ -194,6 +198,7 @@ class IslandPreviewCollection : Disposable {
             // this operation only makes the main menu screen lag less, so we can skip it
             return@forEach
           }
+          previewRendered++
           skipFrame()
         }
       }
