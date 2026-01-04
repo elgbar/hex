@@ -29,9 +29,10 @@ class IslandFiles {
   private var updating: AtomicBoolean = AtomicBoolean(true)
   val ready: Boolean get() = !updating.get()
 
-  val size: Int get() = islandIds.size
   private var _loadedIslands = AtomicInteger(0)
   val loadedIslands: Int get() = _loadedIslands.get()
+
+  val size: Int get() = islandIds.size
 
   val nextIslandId: Int
     get() {
@@ -77,7 +78,8 @@ class IslandFiles {
               islandIds += id
 
               launch(Dispatchers.Default) {
-                val initialMetadata = FastIslandMetadata.loadInitial(id)
+                // If there are any islands in progress, we need to load them anyway so no point in just loading initial
+                val initialMetadata = FastIslandMetadata.loadOrNull(id)
                 if (initialMetadata?.forTesting == true && (!Hex.debug && !Hex.mapEditor)) {
                   Gdx.app.debug(TAG) { "Skipping island $id as it is for debugging purposes only" }
                   FastIslandMetadata.clearInitialIslandMetadataCache(id)
