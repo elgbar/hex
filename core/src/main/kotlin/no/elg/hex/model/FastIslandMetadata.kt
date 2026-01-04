@@ -14,11 +14,9 @@ import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.island.Island
 import no.elg.hex.preview.PreviewModifier
-import no.elg.hex.util.decompressXZ
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.textureFromBytes
-import no.elg.hex.util.tryDecompressB85AndDecompressXZ
 import java.nio.charset.StandardCharsets.US_ASCII
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -99,12 +97,12 @@ class FastIslandMetadata(
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
       require(userRoundsToBeat == Island.NEVER_PLAYED) { "userRoundsToBeat must be ${Island.NEVER_PLAYED} when saving initial island, is $userRoundsToBeat" }
 
-      val fileHandle = getFileHandle(id, isForWriting = true, useNewEnding = false)
+      val fileHandle = getFileHandle(id, isForWriting = true)
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()
       Hex.smileMapper.writeValue(file, this)
     } else {
-      islandPreferences.putString(getMetadataFileName(id, useNewEnding = false), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
+      islandPreferences.putString(getMetadataFileName(id), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
       islandPreferences.flush()
     }
   }
@@ -133,30 +131,25 @@ class FastIslandMetadata(
 
   companion object {
 
-    private fun getMetadataFileName(id: Int, useNewEnding: Boolean) = "island-metadata-$id." + if (useNewEnding) "json.xz" else "smile"
+    private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
 
-    fun getFileHandle(id: Int, isForWriting: Boolean, useNewEnding: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id, useNewEnding)}", !isForWriting)
+    fun getFileHandle(id: Int, isForWriting: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
 
     private val initialIslandMetadata: ConcurrentMap<Int, FastIslandMetadata> = ConcurrentHashMap()
 
     fun clearInitialIslandMetadataCache(id: Int) = initialIslandMetadata.remove(id)
 
-    private fun readIslandFromBytes(rawBytes: ByteArray, useNewEnding: Boolean, decode: Boolean): FastIslandMetadata =
-      if (useNewEnding) {
-        val serialized = if (decode) tryDecompressB85AndDecompressXZ(rawBytes) else decompressXZ(rawBytes)
-        Hex.mapper.readValue<FastIslandMetadata>(serialized ?: error("Failed to decode island"))
-      } else {
-        val serialized = if (decode) Base64.decode(rawBytes) else rawBytes
-        @Suppress("DEPRECATION") // Legacy support for old format
-        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
-      }
+    private fun readIslandFromBytes(rawBytes: ByteArray, decode: Boolean): FastIslandMetadata {
+      val serialized = if (decode) Base64.decode(rawBytes) else rawBytes
+      return Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+    }
 
     fun loadInitial(id: Int): FastIslandMetadata? =
       initialIslandMetadata.computeIfAbsent(id) {
         try {
-          val fileHandle = getFileHandle(id, false, useNewEnding = true)
+          val fileHandle = getFileHandle(id, false)
           val rawBytes = fileHandle.readBytes()
-          readIslandFromBytes(rawBytes, true, decode = false)
+          readIslandFromBytes(rawBytes, decode = false)
         } catch (e: Exception) {
           Gdx.app.error("IslandMetadataDto", "Failed to load initial island metadata for island $id", e)
           null
@@ -164,14 +157,10 @@ class FastIslandMetadata(
       }
 
     fun loadProgress(id: Int): FastIslandMetadata? {
-      var useNewEnding = true
-      val rawString = islandPreferences.getString(getMetadataFileName(id, useNewEnding = true), null) ?: let {
-        useNewEnding = false
-        islandPreferences.getString(getMetadataFileName(id, useNewEnding = false), null)
-      } ?: return null
+      val rawString = islandPreferences.getString(getMetadataFileName(id), null) ?: return null
       val rawBytes = rawString.toByteArray(US_ASCII)
       return try {
-        readIslandFromBytes(rawBytes, useNewEnding, decode = true)
+        readIslandFromBytes(rawBytes, decode = true)
       } catch (e: Exception) {
         Gdx.app.error("IslandMetadataDto", "Failed to load island metadata progress for island $id", e)
         null
@@ -182,7 +171,7 @@ class FastIslandMetadata(
     }
 
     fun loadOrNull(id: Int): FastIslandMetadata? =
-      if (Hex.mapEditor || getMetadataFileName(id, useNewEnding = true) !in islandPreferences || getMetadataFileName(id, useNewEnding = false) !in islandPreferences) {
+      if (Hex.mapEditor || getMetadataFileName(id) !in islandPreferences || getMetadataFileName(id) !in islandPreferences) {
         loadInitial(id)
       } else {
         loadProgress(id)

@@ -20,7 +20,6 @@ import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
-import no.elg.hex.model.FastIslandMetadata.Companion.getFileHandle
 import no.elg.hex.model.FastIslandMetadata.Companion.loadInitial
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.fetch
@@ -170,9 +169,6 @@ class IslandPreviewCollection : Disposable {
       val localMetadata = mutableListOf<FastIslandMetadata>()
       for ((id, maybeMetadata) in previewToRender) {
         val metadata: FastIslandMetadata = if (Hex.args.`update-previews`) {
-          // Migration of old previews
-          getFileHandle(id, true, useNewEnding = false).delete()
-
           val initialMetadata = loadInitial(id) ?: error("Require old metadata to re-render preview for island $id")
           updatePreviewFromIsland(initialMetadata)
           initialMetadata
