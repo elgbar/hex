@@ -40,7 +40,7 @@ class AndroidLauncher : AndroidApplication() {
     if (glVersion >= 3) {
       config.useGL30 = true
     }
-    config.useImmersiveMode = false
+    config.useImmersiveMode = true
     config.useCompass = false
     config.useAccelerometer = false
     config.useGyroscope = false
