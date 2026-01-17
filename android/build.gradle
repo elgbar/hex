@@ -15,6 +15,11 @@ android {
     targetCompatibility = JavaVersion.toVersion(javaCompileVersion)
   }
 
+  kotlinOptions {
+    //noinspection GrDeprecatedAPIUsage // android studio generates same code
+    jvmTarget = javaCompileVersion.toString()
+  }
+
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
