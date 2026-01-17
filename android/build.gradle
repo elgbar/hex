@@ -75,6 +75,7 @@ android {
   buildFeatures {
     renderScript = true
     aidl = true
+    resValues = true
   }
 
   clean {
