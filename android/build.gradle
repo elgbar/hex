@@ -36,6 +36,9 @@ android {
   }
   var fullVersion = "$hexVersion-avc$androidVersionCode"
   packagingOptions {
+    jniLibs {
+      useLegacyPackaging = true
+    }
     resources {
       excludes += ['META-INF/robovm/ios/robovm.xml']
       excludes += ['islands/**']
