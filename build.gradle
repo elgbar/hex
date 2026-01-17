@@ -220,12 +220,6 @@ project(":core") {
 
     implementation 'org.tukaani:xz:1.11'
 
-    testApi "org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion"
-    testApi("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testApi "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testApi "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-
     constraints {
       implementation("net.java.jinput:jinput:2.0.10")
     }
