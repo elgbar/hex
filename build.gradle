@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import java.nio.file.Files
@@ -30,7 +31,6 @@ buildscript {
   }
 
   dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
     classpath "com.android.tools.build:gradle:$androidGradleToolsVersion"
     classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersions"
@@ -84,6 +84,7 @@ subprojects {
 
   tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
+      jvmTarget = JvmTarget.fromTarget(javaVersion)
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]
 
@@ -123,7 +124,6 @@ tasks.named('wrapper') {
 
 project(":android") {
   apply plugin: "com.android.application"
-  apply plugin: 'kotlin-android'
 
   configurations { natives }
 
@@ -179,7 +179,7 @@ project(":desktop") {
     }
   }
 
-  tasks.register("createIslandSymlink"){
+  tasks.register("createIslandSymlink") {
     it.notCompatibleWithConfigurationCache("Uses file system operations")
 
     // Automatically create a soft link to the island folder to allow map-editor to work
