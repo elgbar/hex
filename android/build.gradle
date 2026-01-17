@@ -15,18 +15,8 @@ android {
     targetCompatibility = JavaVersion.toVersion(javaCompileVersion)
   }
 
-  kotlinOptions {
-    //noinspection GrDeprecatedAPIUsage // android studio generates same code
-    jvmTarget = javaCompileVersion.toString()
-  }
-
   sourceSets {
     main {
-      manifest.srcFile 'AndroidManifest.xml'
-      java.srcDirs = ['src']
-      aidl.srcDirs = ['src']
-      renderscript.srcDirs = ['src']
-      res.srcDirs = ['res']
       assets.srcDirs = [
         'assets',
         '../core/src/main/resources'
@@ -36,9 +26,6 @@ android {
   }
   var fullVersion = "$hexVersion-avc$androidVersionCode"
   packagingOptions {
-    jniLibs {
-      useLegacyPackaging = true
-    }
     resources {
       excludes += ['META-INF/robovm/ios/robovm.xml']
       excludes += ['islands/**']
@@ -88,10 +75,6 @@ android {
 // so they get packed with the APK.
 tasks.register('copyAndroidNatives') {
   doFirst {
-    file("libs/armeabi-v7a/").mkdirs()
-    file("libs/arm64-v8a/").mkdirs()
-    file("libs/x86_64/").mkdirs()
-    file("libs/x86/").mkdirs()
 
     configurations.natives.copy().files.each { jar ->
       def outputDir = null
@@ -100,6 +83,7 @@ tasks.register('copyAndroidNatives') {
       if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
       if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
       if (outputDir != null) {
+        outputDir.mkdirs()
         copy {
           from zipTree(jar)
           into outputDir
@@ -114,26 +98,4 @@ tasks.configureEach { packageTask ->
   if (packageTask.name.contains("package")) {
     packageTask.dependsOn 'copyAndroidNatives'
   }
-}
-
-tasks.register('run', Exec) {
-  def path
-  def localProperties = project.file("../local.properties")
-  if (localProperties.exists()) {
-    Properties properties = new Properties()
-    localProperties.withInputStream { instr ->
-      properties.load(instr)
-    }
-    def sdkDir = properties.getProperty('sdk.dir')
-    if (sdkDir) {
-      path = sdkDir
-    } else {
-      path = "$System.env.ANDROID_HOME"
-    }
-  } else {
-    path = "$System.env.ANDROID_HOME"
-  }
-
-  def adb = path + "/platform-tools/adb"
-  commandLine "$adb", 'shell', 'am', 'start', '-n', 'no.elg.hex/no.elg.hex.AndroidLauncher'
 }

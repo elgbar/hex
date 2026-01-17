@@ -380,8 +380,7 @@ class Island(
         history.enable()
 
         // Loose when no player have any capitals left
-        if (visibleHexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }
-        ) {
+        if (visibleHexagons.none { getData(it).let { data -> teamToPlayer[data.team] == null && data.piece is Capital } }) {
           gameInteraction.endGame(false)
         }
       }
