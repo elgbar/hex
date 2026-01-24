@@ -150,13 +150,17 @@ class LevelSelectScreen :
               Island.NEVER_PLAYED -> "Author never played"
               Island.NEVER_BEATEN -> "Author never beaten"
               Island.SPECIAL_MAP -> "Special map"
-              else -> "World record ${min(metadata.userRoundsToBeat, metadata.authorRoundsToBeat)}"
+              else -> if (Hex.mapEditor) {
+                "ARtB ${metadata.authorRoundsToBeat}"
+              } else {
+                "World record ${min(metadata.userRoundsToBeat, metadata.authorRoundsToBeat)}"
+              }
             }
             layout.setText(font, txt, Color.WHITE, width, Align.left, true)
             font.draw(batch, layout, x, y + vertOffset * line++)
           }
 
-          if (metadata.userRoundsToBeat != Island.NEVER_PLAYED) {
+          if (!Hex.mapEditor && metadata.userRoundsToBeat != Island.NEVER_PLAYED) {
             val color = when {
               metadata.isUserBetterThanAuthor() -> Color.GOLD
               metadata.wasNeverBeatenByAuthorButBeatenByUser() -> Color.YELLOW
