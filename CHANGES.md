@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added 150 new islands
 * Allow players to see the best author rounds to beat on the level select screen
 * Each island has a revision number which is incremented each time the island is edited in the map editor
   * It is used to force clear outdated islands, making updates to islands more obvious to Willy
