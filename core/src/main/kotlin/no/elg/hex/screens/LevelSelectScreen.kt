@@ -150,12 +150,12 @@ class LevelSelectScreen :
               metadata.wasNeverBeatenByAuthorButBeatenByUser() -> Color.YELLOW
               else -> Color.WHITE
             }
-            layout.setText(font, "Best ${metadata.userRoundsToBeat}", color, width, Align.left, true)
+            layout.setText(font, "Your best ${metadata.userRoundsToBeat}", color, width, Align.left, true)
             font.draw(batch, layout, x, y + vertOffset * line++)
           }
 
-          if (Hex.mapEditor || Hex.debug) {
-            layout.setText(font, "ARtB ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.left, true)
+          if (Hex.mapEditor || Hex.debug || Settings.showArtbId) {
+            layout.setText(font, "Known best ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.left, true)
             font.draw(batch, layout, x, y + vertOffset * line)
           }
         }

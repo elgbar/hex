@@ -11,7 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Allow players to see the best author rounds to beat on the level select screen
+
 ### Changed
+
+* Changed text on user rounds to beat to "Your Best <rounds>"
 
 ### Fixed
 
