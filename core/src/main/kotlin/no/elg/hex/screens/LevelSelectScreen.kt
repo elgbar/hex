@@ -27,6 +27,7 @@ import no.elg.hex.util.inputWindow
 import no.elg.hex.util.play
 import no.elg.hex.util.safeUse
 import no.elg.hex.util.show
+import kotlin.math.min
 
 /** @author Elg */
 class LevelSelectScreen :
@@ -144,18 +145,24 @@ class LevelSelectScreen :
             font.draw(batch, layout, x, y + vertOffset * line++)
           }
 
+          if (Hex.mapEditor || Hex.debug || Settings.showWorldRecord) {
+            val txt = when (metadata.authorRoundsToBeat) {
+              Island.NEVER_PLAYED -> "Author never played"
+              Island.NEVER_BEATEN -> "Author never beaten"
+              Island.SPECIAL_MAP -> "Special map"
+              else -> "World record ${min(metadata.userRoundsToBeat, metadata.authorRoundsToBeat)}"
+            }
+            layout.setText(font, txt, Color.WHITE, width, Align.left, true)
+            font.draw(batch, layout, x, y + vertOffset * line++)
+          }
+
           if (metadata.userRoundsToBeat != Island.NEVER_PLAYED) {
             val color = when {
               metadata.isUserBetterThanAuthor() -> Color.GOLD
               metadata.wasNeverBeatenByAuthorButBeatenByUser() -> Color.YELLOW
               else -> Color.WHITE
             }
-            layout.setText(font, "Your best ${metadata.userRoundsToBeat}", color, width, Align.left, true)
-            font.draw(batch, layout, x, y + vertOffset * line++)
-          }
-
-          if (Hex.mapEditor || Hex.debug || Settings.showArtbId) {
-            layout.setText(font, "Known best ${metadata.authorRoundsToBeat}", Color.WHITE, width, Align.left, true)
+            layout.setText(font, "Personal best ${metadata.userRoundsToBeat}", color, width, Align.left, true)
             font.draw(batch, layout, x, y + vertOffset * line)
           }
         }

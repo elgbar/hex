@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Changed text on user rounds to beat to "Your Best <rounds>"
+* Changed text on user rounds to beat to "Personal best <rounds>"
 * Improve import screen visually
 * Imported islands which are surrendered will not be filled with "winning" team anymore
 
