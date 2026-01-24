@@ -95,7 +95,9 @@ data class FinishedExportedIslandData(override val id: Int, override val best: I
     return try {
       loadInitialIsland(id).also { island ->
         island.round = round ?: DEFAULT_ROUND
-        island.fill(winningTeam)
+        if (modifier != PreviewModifier.SURRENDER) {
+          island.fill(winningTeam)
+        }
       }
     } catch (e: Exception) {
       MessagesRenderer.publishError("Failed to import finished island $id: ${e.message}")
