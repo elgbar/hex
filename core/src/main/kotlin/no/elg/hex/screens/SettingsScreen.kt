@@ -144,62 +144,63 @@ class SettingsScreen : OverlayScreen() {
           }
 
           row()
-          visTextButton("Export islands", "export") {
-            otherSettingsStyle(it)
-            onClick {
-              tryPlayClick()
-              val exportMs = measureTimeMillis {
-                val progress = Hex.assets.islandFiles.islandIds
-                  .mapNotNull(FastIslandMetadata::loadProgress)
-                  .map(::exportIsland)
-                  .toTypedArray() // must be array to save type correctly
+          if (!Hex.mapEditor) {
+            visTextButton("Export islands", "export") {
+              otherSettingsStyle(it)
+              onClick {
+                tryPlayClick()
+                val exportMs = measureTimeMillis {
+                  val progress = Hex.assets.islandFiles.islandIds
+                    .mapNotNull { id -> FastIslandMetadata.loadProgress(id, allowProgressInMapEditor = false) }
+                    .map(::exportIsland)
+                    .toTypedArray() // must be array to save type correctly
 
-                if (progress.isEmpty()) {
-                  MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
+                  if (progress.isEmpty()) {
+                    MessagesRenderer.publishWarning("No island progress found to export, try playing some islands first")
+                    return@onClick
+                  }
+                  val data = Hex.mapper.writeValueAsString(progress)
+                  val compressedData = if (Settings.compressExport) compressXZAndEncodeB85(data) ?: data else data
+                  if (Hex.platform.writeToClipboard("Hex island export", compressedData)) {
+                    MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
+                  }
+                }
+                Gdx.app.info("EXPORT") { "Exported all islands in $exportMs ms" }
+                playMoney()
+              }
+              pack()
+            }
+
+            row()
+            visTextButton("Import islands", "export") {
+              otherSettingsStyle(it)
+              onClick {
+                tryPlayClick()
+                val clipboardText = Hex.platform.readStringFromClipboard()?.let(::tryDecompressB85AndDecompressXZ)
+
+                if (clipboardText == null) {
+                  MessagesRenderer.publishWarning("No valid text found in clipboard")
                   return@onClick
                 }
-                val data = Hex.mapper.writeValueAsString(progress)
-                val compressedData = if (Settings.compressExport) compressXZAndEncodeB85(data) ?: data else data
-                if (Hex.platform.writeToClipboard("Hex island export", compressedData)) {
-                  MessagesRenderer.publishMessage("Copied the progress of ${progress.size} islands to clipboard")
+
+                val progress = try {
+                  Hex.mapper.readValue(clipboardText, islandsExportType)
+                } catch (e: Exception) {
+                  MessagesRenderer.publishError("Invalid island data found in clipboard")
+                  Gdx.app.error("SettingsScreen", "Failed to parse islands from clipboard", e)
+                  return@onClick
                 }
+                if (progress.isEmpty()) {
+                  MessagesRenderer.publishWarning("No islands found in clipboard")
+                  return@onClick
+                }
+
+                importIslands(progress.toList())
               }
-              Gdx.app.info("EXPORT") { "Exported all islands in $exportMs ms" }
-              playMoney()
+              pack()
             }
-            pack()
+            row()
           }
-
-          row()
-          visTextButton("Import islands", "export") {
-            otherSettingsStyle(it)
-            onClick {
-              tryPlayClick()
-              val clipboardText = Hex.platform.readStringFromClipboard()?.let(::tryDecompressB85AndDecompressXZ)
-
-              if (clipboardText == null) {
-                MessagesRenderer.publishWarning("No valid text found in clipboard")
-                return@onClick
-              }
-
-              val progress = try {
-                Hex.mapper.readValue(clipboardText, islandsExportType)
-              } catch (e: Exception) {
-                MessagesRenderer.publishError("Invalid island data found in clipboard")
-                Gdx.app.error("SettingsScreen", "Failed to parse islands from clipboard", e)
-                return@onClick
-              }
-              if (progress.isEmpty()) {
-                MessagesRenderer.publishWarning("No islands found in clipboard")
-                return@onClick
-              }
-
-              importIslands(progress.toList())
-            }
-            pack()
-          }
-          row()
-
           separator()
 
           for (property in otherProperties) {
