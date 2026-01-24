@@ -98,7 +98,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   }
 
   fun tryPlayIsland(id: Int) {
-    val metadata = FastIslandMetadata.loadOrNull(id)
+    val metadata = FastIslandMetadata.loadOrNull(id, false)
     if (metadata == null) {
       publishWarning("Unknown island with id '$id'")
     } else if (Settings.loadAlreadyCompletedIslands) {

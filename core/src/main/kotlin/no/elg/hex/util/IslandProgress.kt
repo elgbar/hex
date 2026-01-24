@@ -38,12 +38,12 @@ fun saveIslandMetadataProgress(metadata: FastIslandMetadata) {
   islandPreferences.flush()
 }
 
-fun readIslandProgressOrNull(id: Int): String? = readFromIslandPreferences(islandProgressKey(id))
+fun readIslandProgressOrNull(id: Int, allowProgressInMapEditor: Boolean): String? = readFromIslandPreferences(islandProgressKey(id), allowProgressInMapEditor)
 
-fun readIslandMetadataProgressOrNull(id: Int): String? = readFromIslandPreferences(islandMetadataFileName(id))
+fun readIslandMetadataProgressOrNull(id: Int, allowProgressInMapEditor: Boolean): String? = readFromIslandPreferences(islandMetadataFileName(id), allowProgressInMapEditor)
 
-private fun readFromIslandPreferences(key: String): String? {
-  if (Hex.mapEditor) {
+private fun readFromIslandPreferences(key: String, allowProgressInMapEditor: Boolean): String? {
+  if (Hex.mapEditor && !allowProgressInMapEditor) {
     return null
   }
   return islandPreferences.getString(key, null)

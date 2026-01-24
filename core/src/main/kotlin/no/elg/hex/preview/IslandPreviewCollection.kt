@@ -144,7 +144,7 @@ class IslandPreviewCollection : Disposable {
   fun updateAllPreviewsFromIslandFiles() {
     val previewToRender = mutableMapOf<Int, FastIslandMetadata?>()
     for (islandId in Hex.assets.islandFiles.islandIds) {
-      previewToRender[islandId] = FastIslandMetadata.loadOrNull(islandId)
+      previewToRender[islandId] = FastIslandMetadata.loadOrNull(islandId, false)
     }
     updateAllPreviewsFromMetadata(previewToRender)
   }

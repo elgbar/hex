@@ -163,8 +163,8 @@ class FastIslandMetadata(
         }
       }
 
-    fun loadProgress(id: Int): FastIslandMetadata? {
-      val rawString = readIslandMetadataProgressOrNull(id) ?: return null
+    fun loadProgress(id: Int, allowProgressInMapEditor: Boolean): FastIslandMetadata? {
+      val rawString = readIslandMetadataProgressOrNull(id, allowProgressInMapEditor) ?: return null
       val rawBytes = rawString.toByteArray(US_ASCII)
       return try {
         readIslandFromBytes(rawBytes, decode = true)
@@ -177,8 +177,6 @@ class FastIslandMetadata(
       }
     }
 
-    fun loadOrNull(id: Int): FastIslandMetadata? = loadProgress(id) ?: loadInitial(id)
-
-    fun load(id: Int): FastIslandMetadata = loadOrNull(id) ?: FastIslandMetadata(id)
+    fun loadOrNull(id: Int, allowProgressInMapEditor: Boolean): FastIslandMetadata? = loadProgress(id, allowProgressInMapEditor) ?: loadInitial(id)
   }
 }
