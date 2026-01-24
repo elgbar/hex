@@ -13,6 +13,7 @@ import no.elg.hex.input.AbstractInput
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.getIslandFile
+import no.elg.hex.util.info
 import no.elg.hex.util.loadIslandSync
 import no.elg.hex.util.playClick
 import no.elg.hex.util.safeUse
@@ -54,7 +55,7 @@ class SplashIslandScreen(val metadata: FastIslandMetadata, var island: Island? =
     if (currIsland != null) {
       loading = false
       Hex.screen = createIslandScreen(metadata, currIsland)
-      Gdx.app.log("IS SPLASH", "Loaded island ${metadata.id} in ${System.currentTimeMillis() - startTime} ms")
+      Gdx.app.info("IS SPLASH") { "Loaded island ${metadata.id} in ${System.currentTimeMillis() - startTime} ms" }
     } else {
       batch.safeUse {
         val txt =

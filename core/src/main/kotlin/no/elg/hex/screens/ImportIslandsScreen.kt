@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.async.skipFrame
 import no.elg.hex.Hex
+import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.island.Island
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.playMoney
@@ -50,7 +51,7 @@ class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadat
     Hex.assets.islandPreviews.sortIslands()
     Hex.screen = LevelSelectScreen()
     playMoney()
-    Gdx.app.log("IS SPLASH", "Imported ${jobs.size} islands in ${System.currentTimeMillis() - startTime} ms")
+    publishMessage("Imported ${jobs.size} islands in ${(System.currentTimeMillis() - startTime) / 1000.0} s")
   }
 
   private fun onWaiting() {

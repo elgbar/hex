@@ -46,6 +46,7 @@ import no.elg.hex.util.connectedTerritoryHexagons
 import no.elg.hex.util.coordinates
 import no.elg.hex.util.createInstance
 import no.elg.hex.util.debug
+import no.elg.hex.util.error
 import no.elg.hex.util.forEachPieceType
 import no.elg.hex.util.getByCubeCoordinate
 import no.elg.hex.util.getData
@@ -129,7 +130,7 @@ class Island(
     }
     get() {
       if (field?.currentHand == false) {
-        Gdx.app.log("HAND", "Current hand field has been disposed, but not removed!")
+        Gdx.app.error("HAND") { "Current hand field has been disposed, but not removed!" }
         field = null
       }
       return field
