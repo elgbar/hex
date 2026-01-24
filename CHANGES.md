@@ -14,12 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Allow players to see the best author rounds to beat on the level select screen
 * Each island has a revision number which is incremented each time the island is edited in the map editor
   * It is used to force clear outdated islands, making updates to islands more obvious to Willy
+* Tooltip on keyboard shortcuts
 
 ### Changed
 
 * Changed text on user rounds to beat to "Personal best <rounds>"
 * Improve import screen visually
 * Imported islands which are surrendered will not be filled with "winning" team anymore
+* Add keyboard shortcuts in map create screen
 
 ### Fixed
 

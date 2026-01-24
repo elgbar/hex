@@ -29,6 +29,7 @@ import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
+import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visValidatableTextField
 import ktx.scene2d.vis.visWindow
 import no.elg.hex.Hex
@@ -77,31 +78,38 @@ fun PopupMenu.separator() {
   add(Separator("menu")).fill().expand().row()
 }
 
+/**
+ * Call [interaction] when either the user clicks on the menu item or when pressing **all** the given
+ * keys.
+ */
 fun Button.onInteract(
   stage: Stage,
-  vararg keyShortcut: Int,
+  vararg allPressedKeyShortcuts: Int,
   playClick: Boolean = true,
   catchEvent: Boolean = false,
+  createTooltip: Boolean = true,
   interaction: Button.() -> Unit
 ) {
   this.onInteract(
     stage = stage,
-    keyShortcuts = arrayOf(keyShortcut),
+    allPressedKeyShortcuts = arrayOf(allPressedKeyShortcuts),
     playClick = playClick,
     catchEvent = catchEvent,
+    createTooltip = createTooltip,
     interaction = interaction
   )
 }
 
 /**
- * Call [interaction] when either the user clicks on the menu item or when pressing all the given
+ * Call [interaction] when either the user clicks on the menu item or when pressing **all** the given
  * keys.
  */
 fun Button.onInteract(
   stage: Stage,
-  vararg keyShortcuts: IntArray,
+  vararg allPressedKeyShortcuts: IntArray,
   catchEvent: Boolean = false,
   playClick: Boolean = true,
+  createTooltip: Boolean = true,
   interaction: Button.() -> Unit
 ) {
   val interactionWithSound: Button.() -> Unit = {
@@ -111,13 +119,16 @@ fun Button.onInteract(
     interaction()
   }
   onChange(interactionWithSound)
+  if (createTooltip) {
+    visTextTooltip("Shortcut: ${allPressedKeyShortcuts.filter { it.isNotEmpty() }.joinToString(" / ") { it.joinToString("+") { Input.Keys.toString(it) } }}")
+  }
 
-  if (keyShortcuts.isNotEmpty()) {
+  if (allPressedKeyShortcuts.isNotEmpty()) {
     if (this is MenuItem) {
-      val first = keyShortcuts.firstOrNull { it.isNotEmpty() } ?: return
+      val first = allPressedKeyShortcuts.firstOrNull { it.isNotEmpty() } ?: return
       setShortcut(*first)
     }
-    for (keyShortcut in keyShortcuts) {
+    for (keyShortcut in allPressedKeyShortcuts) {
       if (keyShortcut.isEmpty()) continue
       stage += onAllKeysDownEvent(
         *keyShortcut,
