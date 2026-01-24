@@ -25,6 +25,7 @@ import no.elg.hex.util.component1
 import no.elg.hex.util.component2
 import no.elg.hex.util.component3
 import no.elg.hex.util.component4
+import no.elg.hex.util.debug
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
 import no.elg.hex.util.play
@@ -75,7 +76,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
   override fun tap(x: Float, y: Float, count: Int, button: Int): Boolean {
     if (ignoreInput) return false
     val id = getHoveringIslandId()
-    Gdx.app.debug("SELECT", "Clicked on id $id")
+    Gdx.app.debug("SELECT") { "Clicked on id $id" }
     when {
       id == 0 - PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
       id == 1 - PREVIEWS_PER_ROW -> {
@@ -146,7 +147,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
         if (Hex.mapEditor) {
           val id = getHoveringIslandId()
           if (id == INVALID_ISLAND_INDEX) return false
-          Gdx.app.debug("SELECT", "Deleting island $id")
+          Gdx.app.debug("SELECT") { "Deleting island $id" }
           val file = getIslandFile(id, preview = false, allowInternal = false)
           val filePreview = getIslandFile(id, preview = true, allowInternal = false)
 

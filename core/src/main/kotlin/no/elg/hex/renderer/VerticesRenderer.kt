@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import no.elg.hex.api.FrameUpdatable
 import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.PreviewIslandScreen
+import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 
 class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
@@ -32,12 +33,10 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
       val vertShader: String = Gdx.files.internal(VERT_SHADER_PATH).readString()
       ShaderProgram.pedantic = false
       val shader = ShaderProgram(vertShader, fragShader)
-      val log = shader.log
-      if (!shader.isCompiled) {
-        throw GdxRuntimeException(log)
-      }
-      if (log != null && log.isNotEmpty()) {
-        Gdx.app.log("Shader Log", log)
+      if (shader.isCompiled) {
+        Gdx.app.debug("Shader Log") { shader.log }
+      } else {
+        throw GdxRuntimeException(shader.log)
       }
       return@run shader
     }

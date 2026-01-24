@@ -13,7 +13,6 @@ import no.elg.hex.Assets.Companion.ISLAND_METADATA_DIR
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.island.Island
-import no.elg.hex.island.Island.Companion.SPECIAL_MAP
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.islandPreferences
@@ -41,7 +40,7 @@ class FastIslandMetadata(
 ) : Comparable<FastIslandMetadata>,
   Disposable {
 
-  fun isSpecialMap(): Boolean = authorRoundsToBeat == SPECIAL_MAP
+  fun isSpecialMap(): Boolean = authorRoundsToBeat == Island.SPECIAL_MAP
   fun playerPlayed(): Boolean = !isSpecialMap() && userRoundsToBeat != Island.NEVER_PLAYED
   fun isUserBetterThanAuthor(): Boolean = playerPlayed() && userRoundsToBeat < authorRoundsToBeat
   fun wasNeverBeatenByAuthorButBeatenByUser(): Boolean = playerPlayed() && authorRoundsToBeat == Island.NEVER_PLAYED

@@ -9,6 +9,7 @@ import ktx.scene2d.vis.KVisTextButton
 import ktx.scene2d.vis.visTextButton
 import no.elg.hex.Hex
 import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.util.debug
 import no.elg.hex.util.onInteract
 import no.elg.hex.util.padAndSpace
 
@@ -39,7 +40,7 @@ abstract class OverlayScreen(useRootTable: Boolean = true) : StageScreen(useRoot
   override fun show() {
     super.show()
     previousScreen = Hex.screen
-    Gdx.app.debug("SETTINGS", "Previous screen is ${previousScreen::class.simpleName}")
+    Gdx.app.debug("SETTINGS") { "Previous screen is ${previousScreen::class.simpleName}" }
     if (previousScreen is OverlayScreen) {
       previousScreen = LevelSelectScreen()
       MessagesRenderer.publishError("Previous screen cannot be an Overlay screen")

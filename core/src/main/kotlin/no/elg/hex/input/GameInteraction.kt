@@ -16,6 +16,7 @@ import no.elg.hex.island.Territory
 import no.elg.hex.util.calculateRing
 import no.elg.hex.util.canAttack
 import no.elg.hex.util.createInstance
+import no.elg.hex.util.debug
 import no.elg.hex.util.getData
 import no.elg.hex.util.getNeighbors
 import no.elg.hex.util.isPartOfATerritory
@@ -58,7 +59,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     val territory = island.selected
     if (territory == null) {
       playBadClick()
-      Gdx.app.debug("PLACE", "Territory is still null after selecting it")
+      Gdx.app.debug("PLACE") { "Territory is still null after selecting it" }
       return false
     }
 
@@ -160,7 +161,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     val hexData = island.getData(placeOn)
     val isBorderHexagon = territory.enemyBorderHexes.contains(placeOn)
     if (hexData.team != island.currentTeam && !isBorderHexagon) {
-      Gdx.app.debug("PLACE", "Tried to place piece on enemy hex outside border hexes")
+      Gdx.app.debug("PLACE") { "Tried to place piece on enemy hex outside border hexes" }
       return false
     }
 
@@ -181,7 +182,7 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
     val (newPieceType, moved) = if (oldPiece is LivingPiece && newPiece is LivingPiece && hexData.team == territory.team) {
       // merge cursor piece with held piece
       if (newPiece.canNotMerge(oldPiece)) {
-        Gdx.app.debug("PLACE", "Cannot merge ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
+        Gdx.app.debug("PLACE") { "Cannot merge ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}" }
         return false
       }
       // The piece can only move when both the piece in hand and the hex pointed at has not moved
@@ -192,15 +193,15 @@ class GameInteraction(val island: Island, val endGame: (won: Boolean) -> Unit) {
 
     if (newPieceType.isSubclassOf(LivingPiece::class)) {
       if (hexData.team == territory.team && (oldPiece is Capital || oldPiece is Castle)) {
-        Gdx.app.debug("PLACE", "Cannot place a living entity of the same team onto a capital or castle piece")
+        Gdx.app.debug("PLACE") { "Cannot place a living entity of the same team onto a capital or castle piece" }
         return false
       } else if (hexData.team != territory.team && !island.canAttack(placeOn, newPiece)) {
-        Gdx.app.debug("PLACE", "Cannot place castle on an enemy hex")
+        Gdx.app.debug("PLACE") { "Cannot place castle on an enemy hex" }
         return false
       }
     } else if (Castle::class == newPieceType) {
       if (hexData.team != territory.team) {
-        Gdx.app.debug("PLACE", "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}")
+        Gdx.app.debug("PLACE") { "Cannot attack ${oldPiece::class.simpleName} with a ${newPiece::class.simpleName}" }
         return false
       }
     } else {

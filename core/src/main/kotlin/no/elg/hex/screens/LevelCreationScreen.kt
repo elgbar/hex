@@ -46,6 +46,7 @@ import no.elg.hex.island.Island
 import no.elg.hex.island.IslandGeneration
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
+import no.elg.hex.util.debug
 import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.info
 import no.elg.hex.util.onInteract
@@ -289,10 +290,9 @@ class LevelCreationScreen :
 
       fun createNewIsland(instantly: Boolean) {
         val nextId = Hex.assets.islandFiles.nextIslandId
-        Gdx.app.debug(
-          "CREATOR",
+        Gdx.app.debug("CREATOR") {
           "Creating island $nextId with a dimension of ${widthSpinner.value} x ${heightSpinner.value} and layout ${layoutSpinner.value} (seed: ${seedField.text})"
-        )
+        }
 
         val metadata = FastIslandMetadata(nextId)
         val island = createIsland(instantly)

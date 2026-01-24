@@ -315,7 +315,7 @@ class Island(
       Gdx.app.postRunnable { Events.fireEvent(TeamEndTurnEvent(oldTeam, newTeam)) }
 
       if (newTeam == Settings.startTeam) {
-        Gdx.app.debug("TURN", "New round!")
+        Gdx.app.debug("TURN") { "New round!" }
         round++
       }
 
@@ -348,7 +348,7 @@ class Island(
         if (isTeamHuman(newTeam) && singleAliveRealPlayer) {
           gameInteraction.endGame(false)
         } else {
-          Gdx.app.debug("TURN", "Team $newTeam have no territories, skipping their turn")
+          Gdx.app.debug("TURN") { "Team $newTeam have no territories, skipping their turn" }
           endTurn()
         }
       }

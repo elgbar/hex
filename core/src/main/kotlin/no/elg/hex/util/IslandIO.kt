@@ -89,10 +89,10 @@ fun loadIslandSync(id: Int): Island {
     val progress = getIslandProgress(id)
     Gdx.app.trace("IS SPLASH") { "progress: $progress" }
     return if (!Hex.mapEditor && !progress.isNullOrBlank()) {
-      Gdx.app.debug("IS SPLASH", "Found progress for island $id")
+      Gdx.app.debug("IS SPLASH") { "Found progress for island $id" }
       Island.deserialize(progress)
     } else {
-      Gdx.app.debug("IS SPLASH", "No progress found for island $id")
+      Gdx.app.debug("IS SPLASH") { "No progress found for island $id" }
       loadInitialIsland(id)
     }
   } catch (e: Exception) {

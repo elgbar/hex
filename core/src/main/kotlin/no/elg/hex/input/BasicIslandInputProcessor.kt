@@ -11,6 +11,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.platform.PlatformType
 import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
+import no.elg.hex.util.debug
 import no.elg.hex.util.getHexagon
 import no.elg.hex.util.playClick
 import no.elg.hex.util.trace
@@ -100,7 +101,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
   override fun pinch(initialPointer1: Vector2, initialPointer2: Vector2, pointer1: Vector2, pointer2: Vector2): Boolean {
     if (!pinching) {
-      Gdx.app.debug("pinch zoom", "Pinch start")
+      Gdx.app.debug("pinch zoom") { "Pinch start" }
       unprojectVector(initialPointer1, lastPointer1)
       unprojectVector(initialPointer2, lastPointer2)
     }
@@ -136,7 +137,7 @@ class BasicIslandInputProcessor(private val screen: PreviewIslandScreen) : Abstr
 
   override fun pinchStop() {
     pinching = false
-    Gdx.app.debug("pinch zoom", "Pinch end")
+    Gdx.app.debug("pinch zoom") { "Pinch end" }
     lastPointer1.set(0f, 0f)
     lastPointer2.set(0f, 0f)
   }

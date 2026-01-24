@@ -18,7 +18,7 @@ fun getIslandProgress(id: Int, preview: Boolean = false): String? {
 }
 
 fun PreviewIslandScreen.saveIslandProgress() {
-  Gdx.app.debug("IS PROGRESS", "Saving progress of island ${metadata.id}")
+  Gdx.app.debug("IS PROGRESS") { "Saving progress of island ${metadata.id}" }
   island.select(null)
   islandPreferences.putString(getPrefName(metadata.id), island.createDto().serialize())
   islandPreferences.flush()
@@ -28,7 +28,7 @@ fun PreviewIslandScreen.saveIslandProgress() {
 }
 
 fun clearIslandProgress(metadata: FastIslandMetadata) {
-  Gdx.app.debug("IS PROGRESS", "Clearing progress of island ${metadata.id}")
+  Gdx.app.debug("IS PROGRESS") { "Clearing progress of island ${metadata.id}" }
   metadata.modifier = PreviewModifier.NOTHING
   islandPreferences.remove(getPrefName(metadata.id))
   islandPreferences.remove(getPrefName(metadata.id, true)) // in case the preview is very old

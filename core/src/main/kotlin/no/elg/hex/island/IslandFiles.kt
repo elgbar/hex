@@ -97,7 +97,7 @@ class IslandFiles {
             }
           }
         }
-        Gdx.app.debug(TAG, "Next island created will be $nextIslandId")
+        Gdx.app.debug(TAG) { "Next island created will be $nextIslandId" }
         if (Hex.args.listARtBImprovements) {
           Gdx.app.info(TAG) { "Done creating ARtB improvements list, exiting" }
           Gdx.app.exit()

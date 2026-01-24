@@ -139,7 +139,7 @@ class Assets : AssetManager() {
         Android -> Gdx.graphics.backBufferHeight * 2
         else -> Gdx.graphics.backBufferWidth
       }
-      Gdx.app.debug("SCALE", "Screen size: $size")
+      Gdx.app.debug("SCALE") { "Screen size: $size" }
       (size / 1920).coerceAtLeast(1)
     }
   }
@@ -243,7 +243,7 @@ class Assets : AssetManager() {
     parameter.fontParameters.flip = flip
     parameter.fontFileName = "fonts/UbuntuMono-$boldness$italicness.ttf"
 
-    Gdx.app.debug("ASSET", "loading font '$name'")
+    Gdx.app.debug("ASSET") { "loading font '$name'" }
     if (fileHandleResolver.resolve(parameter.fontFileName).exists()) {
       return load<BitmapFont>(name, parameter)
     } else {
@@ -253,7 +253,7 @@ class Assets : AssetManager() {
 
   init {
     reportTiming("Init assets") {
-      Gdx.app.debug("ASSET", "Using ${scale}x scale")
+      Gdx.app.debug("ASSET") { "Using ${scale}x scale" }
 
       if (Hex.debug) {
         super.getLogger().level = DEBUG
@@ -284,7 +284,7 @@ class Assets : AssetManager() {
 
       // assets above this line must be loaded before the splash screen is shown. Keep it to a minimum
       finishLoading()
-      Gdx.app.debug("Assets", "Initial assets loaded")
+      Gdx.app.debug("Assets") { "Initial assets loaded" }
     }
   }
 
