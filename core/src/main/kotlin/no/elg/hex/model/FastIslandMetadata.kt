@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets.US_ASCII
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 @JsonPropertyOrder("id", "modifier", "forTesting", "authorRoundsToBeat", "userRoundsToBeat", "previewPixmap")
 class FastIslandMetadata(
@@ -92,7 +91,6 @@ class FastIslandMetadata(
   /**
    * Must be called on main thread
    */
-  @OptIn(ExperimentalEncodingApi::class)
   fun save() {
     require(id >= 0) { "Island id must be positive, is $id" }
     requireNotNull(previewPixmap) { "A preview have not been generated" }

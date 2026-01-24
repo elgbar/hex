@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
 
 open class PreferenceDelegate<T : Any>(
   /**
-   * Initial value this setting should have
+   * Initial value this setting should have, cannot be invalid by [invalidate]
    */
   internal val initialValue: T,
   /**
@@ -56,8 +56,8 @@ open class PreferenceDelegate<T : Any>(
   private lateinit var initialLoadedValue: T
 
   @Suppress("unused")
-  private val eventListener = SimpleEventListener.create<SettingsChangeEvent<T>> { (delagate, old, new) ->
-    if (delagate === this) {
+  private val eventListener = SimpleEventListener.create<SettingsChangeEvent<T>> { (delegate, old, new) ->
+    if (delegate === this) {
       afterChange?.invoke(this, old, new)
     }
   }
