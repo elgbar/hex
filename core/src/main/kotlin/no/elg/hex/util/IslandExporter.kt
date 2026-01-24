@@ -77,8 +77,7 @@ data class OngoingExportedIslandData(
         island.restoreState(dto)
 
         // Only save the island if it was successfully deserialized
-        islandPreferences.putString(getPrefName(metadata.id), dto.serialize())
-        islandPreferences.flush()
+        saveIslandProgress(metadata.id, dto)
       }
     } catch (e: Exception) {
       MessagesRenderer.publishError("Failed to import ongoing island $id: ${e.message}")

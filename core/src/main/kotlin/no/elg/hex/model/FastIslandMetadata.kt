@@ -15,7 +15,8 @@ import no.elg.hex.Settings
 import no.elg.hex.island.Island
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.getIslandFile
-import no.elg.hex.util.islandPreferences
+import no.elg.hex.util.readIslandMetadataProgressOrNull
+import no.elg.hex.util.saveIslandMetadataProgress
 import no.elg.hex.util.textureFromBytes
 import java.nio.charset.StandardCharsets.US_ASCII
 import java.util.concurrent.ConcurrentHashMap
@@ -105,8 +106,7 @@ class FastIslandMetadata(
       val file = fileHandle.file()
       Hex.smileMapper.writeValue(file, this)
     } else {
-      islandPreferences.putString(getMetadataFileName(id), Base64.encode(Hex.smileMapper.writeValueAsBytes(this)))
-      islandPreferences.flush()
+      saveIslandMetadataProgress(this)
     }
   }
 
@@ -134,9 +134,9 @@ class FastIslandMetadata(
 
   companion object {
 
-    private fun getMetadataFileName(id: Int) = "island-metadata-$id.smile"
+    fun islandMetadataFileName(id: Int) = "island-metadata-$id.smile"
 
-    fun getFileHandle(id: Int, isForWriting: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${getMetadataFileName(id)}", !isForWriting)
+    private fun getFileHandle(id: Int, isForWriting: Boolean) = getIslandFile("$ISLAND_METADATA_DIR/${islandMetadataFileName(id)}", !isForWriting)
 
     private val initialIslandMetadata: ConcurrentMap<Int, FastIslandMetadata> = ConcurrentHashMap()
 
@@ -160,7 +160,7 @@ class FastIslandMetadata(
       }
 
     fun loadProgress(id: Int): FastIslandMetadata? {
-      val rawString = islandPreferences.getString(getMetadataFileName(id), null) ?: return null
+      val rawString = readIslandMetadataProgressOrNull(id) ?: return null
       val rawBytes = rawString.toByteArray(US_ASCII)
       return try {
         readIslandFromBytes(rawBytes, decode = true)
@@ -173,12 +173,7 @@ class FastIslandMetadata(
       }
     }
 
-    fun loadOrNull(id: Int): FastIslandMetadata? =
-      if (Hex.mapEditor || getMetadataFileName(id) !in islandPreferences || getMetadataFileName(id) !in islandPreferences) {
-        loadInitial(id)
-      } else {
-        loadProgress(id)
-      }
+    fun loadOrNull(id: Int): FastIslandMetadata? = loadProgress(id) ?: loadInitial(id)
 
     fun load(id: Int): FastIslandMetadata = loadOrNull(id) ?: FastIslandMetadata(id)
   }

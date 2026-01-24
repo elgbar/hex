@@ -4,33 +4,55 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import no.elg.hex.Hex
 import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.model.FastIslandMetadata.Companion.islandMetadataFileName
+import no.elg.hex.model.IslandDto
 import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.screens.PreviewIslandScreen
+import kotlin.io.encoding.Base64
 
-val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
-fun getPrefName(id: Int, preview: Boolean = false) = "$id${if (preview) "-preview" else ""}"
-fun getIslandProgress(id: Int, preview: Boolean = false): String? {
-  if (Hex.mapEditor) {
-    return null
-  }
-  val pref = getPrefName(id, preview)
-  return islandPreferences.getString(pref, null)
+private val islandPreferences: Preferences by lazy { Gdx.app.getPreferences("island") }
+
+fun clearIslandPreferences() {
+  islandPreferences.clear()
+  islandPreferences.flush()
 }
+
+private fun islandProgressKey(id: Int, preview: Boolean = false) = "$id${if (preview) "-preview" else ""}"
 
 fun PreviewIslandScreen.saveIslandProgress() {
   Gdx.app.debug("IS PROGRESS") { "Saving progress of island ${metadata.id}" }
   island.select(null)
-  islandPreferences.putString(getPrefName(metadata.id), island.createDto().serialize())
-  islandPreferences.flush()
   if (!Hex.paused) {
+    saveIslandProgress(metadata.id, island.createDto())
     Hex.assets.islandPreviews.updatePreviewFromIsland(metadata, island)
   }
+}
+
+fun saveIslandProgress(id: Int, dto: IslandDto) {
+  islandPreferences.putString(islandProgressKey(id), dto.serialize())
+  islandPreferences.flush()
+}
+
+fun saveIslandMetadataProgress(metadata: FastIslandMetadata) {
+  islandPreferences.putString(islandMetadataFileName(metadata.id), Base64.encode(Hex.smileMapper.writeValueAsBytes(metadata)))
+  islandPreferences.flush()
+}
+
+fun readIslandProgressOrNull(id: Int): String? = readFromIslandPreferences(islandProgressKey(id))
+
+fun readIslandMetadataProgressOrNull(id: Int): String? = readFromIslandPreferences(islandMetadataFileName(id))
+
+private fun readFromIslandPreferences(key: String): String? {
+  if (Hex.mapEditor) {
+    return null
+  }
+  return islandPreferences.getString(key, null)
 }
 
 fun clearIslandProgress(metadata: FastIslandMetadata) {
   Gdx.app.debug("IS PROGRESS") { "Clearing progress of island ${metadata.id}" }
   metadata.modifier = PreviewModifier.NOTHING
-  islandPreferences.remove(getPrefName(metadata.id))
-  islandPreferences.remove(getPrefName(metadata.id, true)) // in case the preview is very old
+  islandPreferences.remove(islandProgressKey(metadata.id))
+  islandPreferences.remove(islandMetadataFileName(metadata.id))
   islandPreferences.flush()
 }

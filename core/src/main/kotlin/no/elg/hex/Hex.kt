@@ -41,9 +41,9 @@ import no.elg.hex.screens.LevelSelectScreen
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.screens.SplashScreen
 import no.elg.hex.util.LOG_TRACE
+import no.elg.hex.util.clearIslandPreferences
 import no.elg.hex.util.debug
 import no.elg.hex.util.info
-import no.elg.hex.util.islandPreferences
 import no.elg.hex.util.logLevelToName
 import no.elg.hex.util.reportTiming
 import no.elg.hex.util.resetHdpi
@@ -147,7 +147,7 @@ object Hex : ApplicationAdapter() {
 
   override fun create() {
     if (args.`reset-all`) {
-      islandPreferences.clear()
+      clearIslandPreferences()
       Settings.resetSettings.onResetConfirmed()
     }
 

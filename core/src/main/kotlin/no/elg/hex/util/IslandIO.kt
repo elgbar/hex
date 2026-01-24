@@ -86,7 +86,7 @@ fun loadInitialIsland(id: Int): Island = Island.deserialize(getIslandFile(id))
 
 fun loadIslandSync(id: Int): Island {
   try {
-    val progress = getIslandProgress(id)
+    val progress = readIslandProgressOrNull(id)
     Gdx.app.trace("IS SPLASH") { "progress: $progress" }
     return if (!Hex.mapEditor && !progress.isNullOrBlank()) {
       Gdx.app.debug("IS SPLASH") { "Found progress for island $id" }
@@ -108,8 +108,7 @@ fun loadIslandSync(id: Int): Island {
 }
 
 fun resetAllIslandProgress() {
-  islandPreferences.clear()
-  islandPreferences.flush()
+  clearIslandPreferences()
   Hex.assets.islandPreviews.updateAllPreviewsFromIslandFiles()
   Hex.assets.islandPreviews.sortIslands()
 }
