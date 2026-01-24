@@ -180,7 +180,6 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
             return visImageButton {
               pad(10f)
 
-              visTextTooltip(tooltip)
               style.imageUp = drawableToTextureRegion(up)
 
               if (down != null) {
@@ -190,7 +189,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               if (disabled != null) {
                 style.disabled = drawableToTextureRegion(disabled)
               }
-              onInteract(stage, *keyShortcut, playClick = playClick, interaction = onClick)
+              onInteract(stage, *keyShortcut, playClick = playClick, additionalTooltip = tooltip, interaction = onClick)
               disableChecker[this] = disableCheck
 
               background = null

@@ -87,7 +87,7 @@ fun Button.onInteract(
   vararg allPressedKeyShortcuts: Int,
   playClick: Boolean = true,
   catchEvent: Boolean = false,
-  createTooltip: Boolean = true,
+  additionalTooltip: String? = null,
   interaction: Button.() -> Unit
 ) {
   this.onInteract(
@@ -95,7 +95,7 @@ fun Button.onInteract(
     allPressedKeyShortcuts = arrayOf(allPressedKeyShortcuts),
     playClick = playClick,
     catchEvent = catchEvent,
-    createTooltip = createTooltip,
+    additionalTooltip = additionalTooltip,
     interaction = interaction
   )
 }
@@ -109,7 +109,7 @@ fun Button.onInteract(
   vararg allPressedKeyShortcuts: IntArray,
   catchEvent: Boolean = false,
   playClick: Boolean = true,
-  createTooltip: Boolean = true,
+  additionalTooltip: String? = null,
   interaction: Button.() -> Unit
 ) {
   val interactionWithSound: Button.() -> Unit = {
@@ -119,8 +119,10 @@ fun Button.onInteract(
     interaction()
   }
   onChange(interactionWithSound)
-  if (createTooltip) {
+  if (additionalTooltip == null) {
     visTextTooltip("Shortcut: ${allPressedKeyShortcuts.filter { it.isNotEmpty() }.joinToString(" / ") { it.joinToString("+") { Input.Keys.toString(it) } }}")
+  } else {
+    visTextTooltip("$additionalTooltip\nShortcut: ${allPressedKeyShortcuts.filter { it.isNotEmpty() }.joinToString(" / ") { it.joinToString("+") { Input.Keys.toString(it) } }}")
   }
 
   if (allPressedKeyShortcuts.isNotEmpty()) {
