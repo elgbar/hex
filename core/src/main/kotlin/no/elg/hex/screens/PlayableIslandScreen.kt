@@ -295,7 +295,7 @@ class PlayableIslandScreen(metadata: FastIslandMetadata, island: Island) : Previ
               labelCell.right()
 
               disableChecker[this] = { interactDisabled() }
-              onInteract(stage, Keys.ENTER) {
+              onInteract(stage, intArrayOf(Keys.ENTER), intArrayOf(Keys.SPACE)) {
                 endTurn()
               }
             }

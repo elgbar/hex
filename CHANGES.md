@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improve import screen visually
 * Imported islands which are surrendered will not be filled with "winning" team anymore
 * Add keyboard shortcuts in map create screen
+* Space will now end turn on desktop
 
 ### Fixed
 
