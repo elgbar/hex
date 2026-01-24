@@ -297,27 +297,24 @@ class LevelCreationScreen :
 
         val metadata = FastIslandMetadata(nextId)
         val island = createIsland(instantly)
-        val showIslandCreationScreen = if (instantly) {
-          if (!island.validate()) {
-            (0 until 5).any { attempt ->
+        if (instantly) {
+          val valid = (1..5).any { attempt ->
+            if (saveInitialIsland(metadata, island)) {
+              Gdx.app.info("CREATOR") { "Instant island created in $attempt attempts" }
+              true
+            } else {
               Gdx.app.info("CREATOR") { "Island created not valid, reshuffling the teams. Attempt: $attempt" }
               island.shuffleAllTeams()
-              if (island.validate()) {
-                Gdx.app.info("CREATOR") { "Island created valid after reshuffle." }
-                return@any !saveInitialIsland(metadata, island)
-              }
               false
             }
+          }
+          if (valid) {
+            Hex.screen = LevelSelectScreen()
           } else {
-            !saveInitialIsland(metadata, island)
+            play(metadata, island)
           }
         } else {
-          true
-        }
-        if (showIslandCreationScreen) {
           play(metadata, island)
-        } else {
-          Hex.screen = LevelSelectScreen()
         }
       }
 
