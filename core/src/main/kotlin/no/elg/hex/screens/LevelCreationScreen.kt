@@ -47,6 +47,7 @@ import no.elg.hex.island.IslandGeneration
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
 import no.elg.hex.util.debug
+import no.elg.hex.util.ensureTreesGrownOnTeamTurn
 import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.info
 import no.elg.hex.util.onInteract
@@ -382,6 +383,7 @@ class LevelCreationScreen :
     if (instantly) {
       island.removeSmallerIslands()
       island.fixWrongTreeTypes()
+      island.ensureTreesGrownOnTeamTurn()
       island.regenerateCapitals()
       island.cleanPiecesOnInvisibleHexagons()
     }

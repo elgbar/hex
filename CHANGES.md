@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fix clearing progress not clearing up the old island progress, just the metadata
+* Fix instant creating island not working due to tree turns not being initialized
 
 ### Removed
 
