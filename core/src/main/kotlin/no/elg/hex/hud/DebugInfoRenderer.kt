@@ -18,8 +18,6 @@ import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.calculateStrength
 import no.elg.hex.util.getData
 import no.elg.hex.util.isPartOfATerritory
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 /** @author Elg */
 class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) :
@@ -59,8 +57,12 @@ class DebugInfoRenderer(private val islandScreen: PreviewIslandScreen) :
             " id ",
             islandScreen.metadata::id,
             next = prefixText(
-              " for testing ",
-              islandScreen.metadata::forTesting
+              " revision ",
+              islandScreen.metadata::revision,
+              next = prefixText(
+                " for testing ",
+                islandScreen.metadata::forTesting
+              )
             )
           )
         )

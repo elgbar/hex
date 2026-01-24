@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Allow players to see the best author rounds to beat on the level select screen
+* Each island has a revision number which is incremented each time the island is edited in the map editor
+  * It is used to force clear outdated islands, making updates to islands more obvious to Willy
 
 ### Changed
 
@@ -21,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix clearing progress not clearing up the old island progress, just the metadata
+
 ### Removed
 
 ---
@@ -29,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Improve AI debugging by visualising where the AI just clicked. 
+* Improve AI debugging by visualising where the AI just clicked.
   * Enabled with the `debug AI Action` setting
 * Added `Smooth Scrolling` setting to enable prefetching of island metatadata islands.
   * Defaults to enabled on desktop and disabled on mobile
@@ -45,11 +49,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Change how trees propagate
   * A tree will now grow one round after it was created or propagated
   * Pine trees will now also allow to propagate with other pine tees which are not themselves not ready to propagate. This should make them be harder to contain.
-  * This will also fix palm trees growing from one teams hex into another which then next turn propagates father.  
+  * This will also fix palm trees growing from one teams hex into another which then next turn propagates father.
 * Allow test maps to be saved even when invalid
 * Log what AI thinks when `debugAIAction` setting is enabled
 * Bump minimum sdk to 27 as sdk 26 does not work on emulated devices
-  * Thus, it cannot be used verified to work 
+  * Thus, it cannot be used verified to work
 * Updated island ARtB
   * Island 148 improved from 20 to 12 rounds
   * Island 248 improved from 27 to 23 rounds
@@ -109,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Island 303: Nerf southern Forest territory and add a second Leaf territories
   * Island 313: Nerf northern Forest territory, remove tree from leaf territory spawn, add third Leaf territory
   * Island 314: Add second Leaf territory, tweak tree spawns
-  * Island 318: Enlarge eastern Leaf territory 
+  * Island 318: Enlarge eastern Leaf territory
   * Island 325: Nerf eastern Forest territory, add second Leaf territory
   * Island 330: Rework map to be north leaf vs south Stone with loads of small territories in the middle
   * Island 331: Make it easier to connect the two middle leaf territories

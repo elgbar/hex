@@ -37,7 +37,11 @@ class FastIslandMetadata(
    * If this island is for debugging and testing purposes only
    */
   var forTesting: Boolean = false,
-  var userRoundsToBeat: Int = Island.NEVER_PLAYED
+  var userRoundsToBeat: Int = Island.NEVER_PLAYED,
+  /**
+   * Revision number for the island, used to delete progress of old versions
+   */
+  var revision: Int = 0
 ) : Comparable<FastIslandMetadata>,
   Disposable {
 
@@ -96,11 +100,11 @@ class FastIslandMetadata(
     requireNotNull(previewPixmap) { "A preview have not been generated" }
     // ok to write to file when Hex.args.writeARtBImprovements is true as the app will exit afterwards
     if (Hex.mapEditor || Hex.args.writeARtBImprovements) {
-      // preview check only happens when we save it. For local saving we dont really care (user might have ran out of memory)
+      // preview check only happens when we save it. For local saving we don't really care (user might have run out of memory)
       requireNotNull(preview) { "Cannot save a preview that is not loadable, size of byte array is ${previewPixmap?.size}" }
       require(modifier == PreviewModifier.NOTHING) { "Cannot save a modified preview in the map editor, is $modifier" }
       require(userRoundsToBeat == Island.NEVER_PLAYED) { "userRoundsToBeat must be ${Island.NEVER_PLAYED} when saving initial island, is $userRoundsToBeat" }
-
+      revision++
       val fileHandle = getFileHandle(id, isForWriting = true)
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()

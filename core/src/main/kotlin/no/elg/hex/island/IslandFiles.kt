@@ -10,6 +10,7 @@ import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
 import no.elg.hex.Hex
 import no.elg.hex.model.FastIslandMetadata
+import no.elg.hex.util.clearIslandProgress
 import no.elg.hex.util.debug
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.getIslandFileName
@@ -83,7 +84,16 @@ class IslandFiles {
                 } else {
                   listARtBImprovements(id)
                   loadIsland(id)
-                  previewToRender[id] = metadata
+                  val initalMetadaa = FastIslandMetadata.loadInitial(id)
+                  if (initalMetadaa != null && initalMetadaa.revision > metadata.revision) {
+                    Gdx.app.debug(TAG) {
+                      "Island $id has older revision (${metadata.revision}) than initial (${initalMetadaa.revision}), clearing progress"
+                    }
+                    clearIslandProgress(metadata)
+                    previewToRender[id] = initalMetadaa
+                  } else {
+                    previewToRender[id] = metadata
+                  }
                 }
               }
             } else {
