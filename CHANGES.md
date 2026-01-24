@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Each island has a revision number which is incremented each time the island is edited in the map editor
   * It is used to force clear outdated islands, making updates to islands more obvious to Willy
 * Tooltip on keyboard shortcuts
+* Add button to import user pb as ARtB
 
 ### Changed
 
@@ -31,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix instant creating island not working due to tree turns not being initialized
 
 ### Removed
+
+* Exporting and importing is disabled in map editor
 
 ---
 

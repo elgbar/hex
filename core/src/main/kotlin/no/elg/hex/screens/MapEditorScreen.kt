@@ -55,6 +55,7 @@ import no.elg.hex.island.Island.Companion.NEVER_PLAYED
 import no.elg.hex.island.Island.Companion.SPECIAL_MAP
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.IslandDto
+import no.elg.hex.preview.PreviewModifier
 import no.elg.hex.util.cleanPiecesOnInvisibleHexagons
 import no.elg.hex.util.confirmWindow
 import no.elg.hex.util.createHandInstance
@@ -62,6 +63,7 @@ import no.elg.hex.util.fixWrongTreeTypes
 import no.elg.hex.util.getIslandFile
 import no.elg.hex.util.hide
 import no.elg.hex.util.onInteract
+import no.elg.hex.util.padAndSpace
 import no.elg.hex.util.play
 import no.elg.hex.util.regenerateCapitals
 import no.elg.hex.util.removeSmallerIslands
@@ -105,6 +107,8 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
 
   init {
     stageScreen.stage.actors {
+      var savedRev = metadata.revision
+      var savedARtB = metadata.authorRoundsToBeat
 
       confirmExit = confirmWindow(
         "Confirm exit",
@@ -120,9 +124,14 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
       )
 
       visWindow("Additional options") {
-        visTable {
+        visTable { cell ->
+          padAndSpace(cell)
+
+          val progress = FastIslandMetadata.loadProgress(metadata.id, true)
+          val progressCanBeSaved = progress != null && progress.modifier == PreviewModifier.WON
 
           visTable {
+            padAndSpace(it)
             visTextTooltip(
               """
               Test maps are not shown in the level 
@@ -140,9 +149,9 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
           }
           row()
           separator()
-          row()
 
           visTable {
+            padAndSpace(it)
             visTextTooltip(
               """
               Author Round to Beat (ARtB) is the 
@@ -154,24 +163,39 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
 
             visLabel(
               """
-              Previous ARtB: ${metadata.authorRoundsToBeat}
+              Previous ARtB: $savedARtB
+              User ARtB: ${if (progressCanBeSaved) progress.userRoundsToBeat else "Not won"}
               $NEVER_PLAYED = not played
               ${NEVER_PLAYED - 1} = always last
               $NEVER_BEATEN = never beaten (but played)
               """.trimIndent()
             )
             row()
-            spinner("ARtB", artbSpinner) {
+            spinner("ARtB", artbSpinner) { spinnerCell ->
               textFieldEventPolicy = Spinner.TextFieldEventPolicy.ON_KEY_TYPED
               onChange {
                 val parsedInt = textField.text?.toIntOrNull() ?: NEVER_PLAYED
                 metadata.authorRoundsToBeat = if (parsedInt == NEVER_PLAYED - 1) SPECIAL_MAP else parsedInt
               }
-              it.prefWidth(Value.percentWidth(0.5f, this@visWindow))
-              it.prefWidth(Value.percentHeight(0.5f, this@visWindow))
+              spinnerCell.prefWidth(Value.percentWidth(0.5f, this@visWindow))
+              spinnerCell.prefWidth(Value.percentHeight(0.5f, this@visWindow))
             }
-            pack()
           }
+
+          row()
+          visTable {
+            padAndSpace(it)
+            visTextButton("Set ARtB from user") {
+              isDisabled = !progressCanBeSaved
+              if (progressCanBeSaved) {
+                onClick {
+                  artbSpinner.setValue(progress.userRoundsToBeat, true)
+                  publishMessage("Loaded ARtB ${progress.userRoundsToBeat} from progression data")
+                }
+              }
+            }
+          }
+          pack()
         }
         keepWithinStage()
         pack()
@@ -182,7 +206,7 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
       }
 
       fun exit() {
-        if (!getIslandFile(metadata.id).exists() || initialIsland != island.createDto()) {
+        if (!getIslandFile(metadata.id).exists() || (initialIsland != island.createDto() && savedRev == metadata.revision) || metadata.authorRoundsToBeat != savedARtB) {
           confirmExit.centerWindow()
           confirmExit.toggleShown(stage)
         } else {
@@ -321,6 +345,8 @@ class MapEditorScreen(metadata: FastIslandMetadata, island: Island) : PreviewIsl
             menuItem("Save") {
               onInteract(this@MapEditorScreen.stageScreen.stage, Keys.CONTROL_LEFT, Keys.S) {
                 saveInitialIsland(metadata, island)
+                savedARtB = metadata.authorRoundsToBeat
+                savedRev = metadata.revision
               }
             }
             menuItem("Reload") {
