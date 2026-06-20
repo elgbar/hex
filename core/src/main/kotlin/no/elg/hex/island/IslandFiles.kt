@@ -77,20 +77,20 @@ class IslandFiles {
               launch(Dispatchers.Default) {
                 // If there are any islands in progress, we need to load them anyway so no point in just loading initial
                 val metadata = FastIslandMetadata.loadOrNull(id, false)
-                if (metadata == null || metadata.forTesting && (!Hex.debug && !Hex.mapEditor)) {
+                if (metadata == null || (metadata.forTesting && !Hex.debug && !Hex.mapEditor)) {
                   Gdx.app.debug(TAG) { "Skipping island $id as it is for null or for debugging purposes only" }
                   FastIslandMetadata.clearInitialIslandMetadataCache(id)
                   islandIds -= id
                 } else {
                   listARtBImprovements(id)
                   loadIsland(id)
-                  val initalMetadaa = FastIslandMetadata.loadInitial(id)
-                  if (initalMetadaa != null && initalMetadaa.revision > metadata.revision) {
+                  val initialMetadata = FastIslandMetadata.loadInitial(id)
+                  if (initialMetadata != null && initialMetadata.revision > metadata.revision) {
                     Gdx.app.debug(TAG) {
-                      "Island $id has older revision (${metadata.revision}) than initial (${initalMetadaa.revision}), clearing progress"
+                      "Island $id has older revision (${metadata.revision}) than initial (${initialMetadata.revision}), clearing progress"
                     }
                     clearIslandProgress(metadata)
-                    previewToRender[id] = initalMetadaa
+                    previewToRender[id] = initialMetadata
                   } else {
                     previewToRender[id] = metadata
                   }

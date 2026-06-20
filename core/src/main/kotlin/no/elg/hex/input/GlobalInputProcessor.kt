@@ -22,6 +22,7 @@ object GlobalInputProcessor : AbstractInput() {
           return true
         }
       }
+
       ALT_LEFT, ENTER -> {
         if (Gdx.input.isKeyPressed(ALT_LEFT) && Gdx.input.isKeyPressed(ENTER)) {
           val mode = Gdx.graphics.displayMode

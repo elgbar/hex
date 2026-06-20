@@ -590,18 +590,22 @@ class Island(
               // Prefer to place capitals next to castles, as they provide more defense
               // This will almost always happen during gameplay, and a placed castle hints at a good location for a capital
               data.piece is Castle -> 3.0
+
               // Normal defended friendly hexagons
               // Note: We do not consider living pieces as they can and will be moved around
               else -> return@sumOf 1.0
             }
+
           // An invisible hexagon cannot become enemy territories, and are thus always safe
           // Note: a visible friendly hexagon is better than an invisible hexagon,
           //       so the boost should be so small it only matters when there is a tie
           data.invisible -> 0.5
+
           // A small boost for hexagons which are not part of a territory
           // Note: a visible friendly hexagon is better than an invisible hexagon,
           //       so the boost should be so small it only matters when there is a tie
           data.visible && data.team != hexTeam && !it.isPartOfATerritory(this) -> 0.1
+
           else -> 0.0
         }
         Gdx.app.trace("ISLAND") { "\t${origin.coordinates}: +$score from ${it.coordinates}" }

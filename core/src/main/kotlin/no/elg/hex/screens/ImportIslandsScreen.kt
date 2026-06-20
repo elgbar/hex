@@ -59,6 +59,7 @@ class ImportIslandsScreen(private val jobs: List<Deferred<Pair<FastIslandMetadat
       val jobsLeft = maxRenderingJobs - renderIslandCount
       val renderTimeLeft = when (renderIslandCount) {
         0 -> "???.???"
+
         else -> {
           val msLeft = (renderIslandTotalTime / renderIslandCount) * jobsLeft
           "${"%7.3f".format(msLeft / 1000.0)} s"

@@ -421,9 +421,13 @@ class Assets : AssetManager() {
       }
 
       is PalmTree -> palm
+
       is PineTree -> pine
+
       is Castle -> castle
+
       is Grave -> grave
+
       is LivingPiece -> {
         val pieceAnimation = when (piece) {
           is Peasant -> peasant
@@ -481,7 +485,9 @@ class Assets : AssetManager() {
   fun audioLoaded(wait: Boolean): Boolean =
     when {
       !Settings.enableAudio || Hex.audioDisabled -> false
+
       audioLoadCalled -> true
+
       else -> {
         loadAudio(wait)
         false

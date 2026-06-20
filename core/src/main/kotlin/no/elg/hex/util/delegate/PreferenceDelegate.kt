@@ -116,13 +116,11 @@ open class PreferenceDelegate<T : Any>(
       is Float -> preferences.getFloat(propertyName, initialValue as Float)
       is CharSequence -> preferences.getString(propertyName, initialValue.toString())
       is Long -> preferences.getLong(propertyName, initialValue as Long)
-
       is Byte -> preferences.getInteger(propertyName, (initialValue as Byte).toInt()).toByte()
       is Short -> preferences.getInteger(propertyName, (initialValue as Short).toInt()).toShort()
       is Char -> preferences.getInteger(propertyName, (initialValue as Char).code).toChar()
       is Double -> preferences.getFloat(propertyName, (initialValue as Double).toFloat()).toDouble()
       is Enum<*> -> preferences.getString(propertyName, null)?.toEnumOrNull(initialValue::class) ?: initialValue
-
       else -> error("Nullable types are not allowed")
     } as T
   }

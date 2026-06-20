@@ -148,8 +148,11 @@ class LevelSelectScreen :
           if (Hex.mapEditor || Hex.debug || Settings.showWorldRecord) {
             val txt = when (metadata.authorRoundsToBeat) {
               Island.NEVER_PLAYED -> "Author never played"
+
               Island.NEVER_BEATEN -> "Author never beaten"
+
               Island.SPECIAL_MAP -> "Special map"
+
               else -> if (Hex.mapEditor) {
                 "ARtB ${metadata.authorRoundsToBeat}"
               } else {

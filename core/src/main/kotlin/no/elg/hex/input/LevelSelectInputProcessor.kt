@@ -79,6 +79,7 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
     Gdx.app.debug("SELECT") { "Clicked on id $id" }
     when {
       id == 0 - PREVIEWS_PER_ROW -> Hex.screen = SettingsScreen()
+
       id == 1 - PREVIEWS_PER_ROW -> {
         if (Hex.mapEditor) {
           Hex.screen = LevelCreationScreen()
@@ -88,7 +89,9 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       }
 
       id == 2 - PREVIEWS_PER_ROW -> Settings.musicPaused = !Settings.musicPaused
+
       id == 3 - PREVIEWS_PER_ROW -> Hex.screen = TutorialScreen()
+
       id != INVALID_ISLAND_INDEX -> tryPlayIsland(id)
 
       else -> return false
@@ -177,10 +180,15 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
       }
 
       Keys.BACK -> Hex.platform.pause()
+
       Keys.HOME -> scroll(Float.NEGATIVE_INFINITY)
+
       Keys.END -> scroll(Float.POSITIVE_INFINITY)
+
       Keys.PAGE_UP -> scroll(-Gdx.graphics.height.toFloat())
+
       Keys.PAGE_DOWN -> scroll(Gdx.graphics.height.toFloat())
+
       Keys.N -> if (Hex.mapEditor && (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT))) {
         Hex.screen = LevelCreationScreen()
       }

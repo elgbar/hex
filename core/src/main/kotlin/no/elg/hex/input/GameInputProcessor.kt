@@ -45,6 +45,7 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
 
     when (keycode) {
       ESCAPE, BACK -> return false
+
       BACKSPACE, SPACE -> {
         when {
           screen.island.hand != null -> screen.island.hand = null
@@ -54,13 +55,16 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
       }
 
       F12 -> if (Hex.debug || Hex.args.cheating) gameInteraction.cheating = !gameInteraction.cheating
+
       F11 -> if (gameInteraction.cheating) screen.acceptAISurrender.toggleShown(screen.stage)
+
       F10 -> if (gameInteraction.cheating) {
         screen.island.selected?.hexagons?.forEach {
           val piece = screen.island.getData(it).piece
           (piece as? LivingPiece)?.moved = false
         }
       }
+
       F9 -> if (gameInteraction.cheating) {
         val island = screen.island
         island.visibleHexagons.filter { Random.nextBoolean() }.forEach {
@@ -68,11 +72,13 @@ class GameInputProcessor(val screen: PlayableIslandScreen) : AbstractInput(true)
           data.team = island.currentTeam
         }
       }
+
       F6 -> if (Hex.debug) {
         gameInteraction.animate = !gameInteraction.animate
       }
 
       Z -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.undo()
+
       Y -> if (Keys.CONTROL_LEFT.isKeyPressed() || Keys.CONTROL_RIGHT.isKeyPressed()) screen.island.history.redo()
 
       else -> {
