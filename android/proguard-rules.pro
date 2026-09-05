@@ -35,18 +35,23 @@
                 AnnotationDefault,
                 Exceptions
 
-# kotlin-reflect reads @Metadata for every sealedSubclasses / primaryConstructor
-# / declaredMemberProperties / companionObjectInstance call in the game.
--keep class kotlin.Metadata { *; }
--keep class kotlin.reflect.jvm.internal.** { *; }
--dontwarn kotlin.reflect.jvm.internal.**
+# kotlin-reflect is mandatory here (jackson-module-kotlin declares a compile
+# dependency on it, and the game calls sealedSubclasses / objectInstance /
+# primaryConstructor.callBy / declaredMemberProperties / companionObjectInstance).
+# But it needs NO rules from us: its jar ships consumer rules that keep
+# kotlin.Metadata, the two ServiceLoader interfaces (BuiltInsLoader,
+# ExternalOverridabilityCondition) and -dontwarn. R8 traces the rest from our
+# call sites and rewrites META-INF/services correctly when it renames.
+# A blanket -keep here pinned 2351 classes / 15365 methods for nothing.
 
 # --- Entry point -------------------------------------------------------------
 -keep class no.elg.hex.platform.android.AndroidLauncher { *; }
 -keep class no.elg.hex.platform.android.AndroidPlatform { *; }
 
 # --- Game code ---------------------------------------------------------------
--keepnames class no.elg.hex.** { *; }
+# -keepnames is -keep,allowshrinking: it forbids renaming AND optimization.
+# We only need the names (they are the save format), so allow optimization back.
+-keep,allowshrinking,allowoptimization class no.elg.hex.** { *; }
 # Jackson resolves Map<CubeCoordinate, HexagonData> keys - and the
 # territoryCoordinate / handCoordinate values - through the static factory
 # CubeCoordinate.fromAxialKey(String), declared by CubeCoordinateMixIn's
@@ -101,10 +106,6 @@
 # --- libGDX ------------------------------------------------------------------
 # JNI-bound classes, Json/Skin reflection and ClassReflection lookups.
 -keep class com.badlogic.gdx.** { *; }
--keepclassmembers class com.badlogic.gdx.** {
-    <init>(...);
-    native <methods>;
-}
 -dontwarn com.badlogic.gdx.**
 -dontwarn org.lwjgl.**
 -dontwarn java.awt.**
