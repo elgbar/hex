@@ -74,6 +74,8 @@ subprojects {
 
       // https://kotlinlang.org/docs/whatsnew22.html#preview-of-context-sensitive-resolution (experimental in 2.2)
       freeCompilerArgs.add("-Xcontext-sensitive-resolution")
+      //Keep the styling
+      freeCompilerArgs.add("-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled")
     }
   }
 }
