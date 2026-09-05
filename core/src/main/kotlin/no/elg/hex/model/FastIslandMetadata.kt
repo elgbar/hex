@@ -109,6 +109,9 @@ class FastIslandMetadata(
       fileHandle.parent().mkdirs()
       val file = fileHandle.file()
       Hex.smileMapper.writeValue(file, this)
+      if (Settings.allowIslandsAsJson) {
+        Hex.mapper.writeValue(file.resolveSibling("${file.nameWithoutExtension}.json"), this)
+      }
     } else {
       saveIslandMetadataProgress(this)
     }
@@ -148,7 +151,15 @@ class FastIslandMetadata(
 
     private fun readIslandFromBytes(rawBytes: ByteArray, decode: Boolean): FastIslandMetadata {
       val serialized = if (decode) Base64.decode(rawBytes) else rawBytes
-      return Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+      return if (Settings.allowIslandsAsJson) {
+        try {
+          Hex.mapper.readValue<FastIslandMetadata>(serialized)
+        } catch (_: Exception) {
+          Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+        }
+      } else {
+        Hex.smileMapper.readValue<FastIslandMetadata>(serialized)
+      }
     }
 
     fun loadInitial(id: Int): FastIslandMetadata? =

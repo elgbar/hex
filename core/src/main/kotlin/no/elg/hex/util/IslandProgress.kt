@@ -3,6 +3,7 @@ package no.elg.hex.util
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import no.elg.hex.Hex
+import no.elg.hex.Settings
 import no.elg.hex.model.FastIslandMetadata
 import no.elg.hex.model.FastIslandMetadata.Companion.islandMetadataFileName
 import no.elg.hex.model.IslandDto
@@ -34,7 +35,11 @@ fun saveIslandProgress(id: Int, dto: IslandDto) {
 }
 
 fun saveIslandMetadataProgress(metadata: FastIslandMetadata) {
-  islandPreferences.putString(islandMetadataFileName(metadata.id), Base64.encode(Hex.smileMapper.writeValueAsBytes(metadata)))
+  val key = islandMetadataFileName(metadata.id)
+  islandPreferences.putString(key, Base64.encode(Hex.smileMapper.writeValueAsBytes(metadata)))
+  if (Settings.allowIslandsAsJson) {
+    islandPreferences.putString(key.replace("smile", "json"), Base64.encode(Hex.mapper.writeValueAsBytes(metadata)))
+  }
   islandPreferences.flush()
 }
 

@@ -13,6 +13,7 @@ import no.elg.hex.hexagon.HexagonData
 import no.elg.hex.screens.PreviewIslandScreen
 import no.elg.hex.util.debug
 import no.elg.hex.util.getData
+import no.elg.hex.util.trace
 
 class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
   FrameUpdatable,
@@ -34,7 +35,7 @@ class VerticesRenderer(private val islandScreen: PreviewIslandScreen) :
       ShaderProgram.pedantic = false
       val shader = ShaderProgram(vertShader, fragShader)
       if (shader.isCompiled) {
-        Gdx.app.debug("Shader Log") { shader.log }
+        Gdx.app.trace("Shader Log") { shader.log }
       } else {
         throw GdxRuntimeException(shader.log)
       }
