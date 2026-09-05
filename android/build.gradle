@@ -27,10 +27,6 @@ android {
   var fullVersion = "$hexVersion-avc$androidVersionCode"
   packagingOptions {
     resources {
-      // R8 rewrites Kotlin module metadata and re-emits it under the internal
-      // module name 'hex:core'; the colon is an illegal bundle entry name.
-      // These files are compile-time only - the pre-R8 bundle shipped none.
-      excludes += ['META-INF/*.kotlin_module']
       excludes += ['META-INF/robovm/ios/robovm.xml']
       excludes += ['islands/**']
       excludes += ['sprites/**']
@@ -50,14 +46,17 @@ android {
   }
   buildTypes {
     release {
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      optimization {
+        enable = true
+      }
       resValue("string", "version", hexVersion)
       resValue("string", "args", "")
     }
     debug {
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      // Left off deliberately: AGP injects -dontobfuscate and -dontoptimize into any debuggable build
+      optimization {
+        enable = false
+      }
       resValue("string", "version", hexVersion)
       resValue("string", "args", "")
 //      resValue("string", "args", "--trace")
