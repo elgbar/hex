@@ -21,14 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # v2.8.2 - 2026-09-05
 
-
 ### Added
 
+* Added 100 new islands
 * Added audio disabled icon when audio is completely disabled
 
 ### Changed
 
-* Android can now disable audio completely
+* Android can now disable audio completely 
 
 ---
 
