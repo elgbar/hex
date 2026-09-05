@@ -24,8 +24,7 @@ object Settings {
     afterChange = { _, _, new ->
       Hex.audioDisabled = !new
       Hex.music.toggleMute()
-    },
-    shouldHide = { !Hex.platform.canControlAudio }
+    }
   )
 
   const val VSYNC_PATH = "vsync" // Settings::vsync.name
