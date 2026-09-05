@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.dataformat.smile.SmileGenerator
 import com.fasterxml.jackson.dataformat.smile.databind.SmileMapper
 import com.fasterxml.jackson.module.kotlin.jsonMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
@@ -60,7 +61,8 @@ object Hex : ApplicationAdapter() {
   val smileMapper: SmileMapper =
     SmileMapper.builder().apply {
       addModule(kotlinModule())
-      configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+      disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+      disable(SmileGenerator.Feature.ENCODE_BINARY_AS_7BIT) // save bytes for safety
     }.build()
 
   @JvmStatic
