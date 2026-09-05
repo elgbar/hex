@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.audio.MusicHandler
 import no.elg.hex.hud.MessagesRenderer.publishMessage
 import no.elg.hex.hud.MessagesRenderer.publishWarning
 import no.elg.hex.model.FastIslandMetadata
@@ -88,7 +89,9 @@ class LevelSelectInputProcessor(private val screen: LevelSelectScreen) : Abstrac
         }
       }
 
-      id == 2 - PREVIEWS_PER_ROW -> Settings.musicPaused = !Settings.musicPaused
+      id == 2 - PREVIEWS_PER_ROW -> if (MusicHandler.audioEnabled) {
+        Settings.musicPaused = !Settings.musicPaused
+      }
 
       id == 3 - PREVIEWS_PER_ROW -> Hex.screen = TutorialScreen()
 

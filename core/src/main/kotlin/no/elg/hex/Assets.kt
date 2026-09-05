@@ -213,6 +213,7 @@ class Assets : AssetManager() {
   val unmuted by lazy { findSprite("unmuted") }
   val mutedSelected by lazy { findSprite("muted_selected") }
   val unmutedSelected by lazy { findSprite("unmuted_selected") }
+  val audioDisabled by lazy { findSprite("audio_disabled") }
 
   val hex1Music: Music? by lazy { fetchOrNull<Music>(WILLY_HEX1_MUSIC) }
 

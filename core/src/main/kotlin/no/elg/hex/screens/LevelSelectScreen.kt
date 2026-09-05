@@ -102,7 +102,9 @@ class LevelSelectScreen :
         // Draw the first row of non-islands
         if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
           drawScreenSprite(Hex.assets.settingsDown, Hex.assets.settings, 0)
-          if (MusicHandler.audioEnabled) {
+          if (MusicHandler.audioDisabled) {
+            drawScreenSprite(Hex.assets.audioDisabled, Hex.assets.audioDisabled, PREVIEWS_PER_ROW - 2)
+          } else {
             drawScreenSprite(Hex.music.iconSelected, Hex.music.icon, PREVIEWS_PER_ROW - 2)
           }
           drawScreenSprite(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
