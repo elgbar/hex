@@ -13,13 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Android can now disable audio
-
 ### Fixed
 
-* Android can now disable audio completely  
-
 ### Removed
+
+---
+
+# v2.8.2 - 2026-09-05
+
+
+### Added
+
+* Added audio disabled icon when audio is completely disabled
+
+### Changed
+
+* Android can now disable audio completely
 
 ---
 
