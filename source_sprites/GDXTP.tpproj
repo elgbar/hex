@@ -34,7 +34,7 @@ prettyPrint=false
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:nearest}]
-inputFiles=[{path:recreation/flag.png,type:Ignore},{path:.,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:recreation/flag.png,type:Ignore},{path:.,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:background.png,type:Ignore}]
 keepInputFileExtensions=false
 
 
