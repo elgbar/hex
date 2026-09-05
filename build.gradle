@@ -62,6 +62,7 @@ subprojects {
 
   tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
+      moduleName = "${rootProject.name}_${project.name}" // default name "${rootProject.name}:${project.name}" is invalid in an bundle file
       jvmTarget = JvmTarget.fromTarget(javaVersion)
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]

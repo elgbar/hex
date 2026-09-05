@@ -71,6 +71,7 @@ object Hex : ApplicationAdapter() {
   val mapper = jsonMapper {
     addModule(kotlinModule())
     defaultPropertyInclusion(JsonInclude.Value.construct(NON_DEFAULT, NON_DEFAULT))
+    //Note if more mixin are added the R8 file must be updated
     addMixIn(CubeCoordinate::class.java, CubeCoordinateMixIn::class.java)
     addModule(SimpleModule().also { module -> module.setDeserializerModifier(HexagonDataDeserializerModifier()) })
     configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)

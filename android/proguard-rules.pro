@@ -1,0 +1,133 @@
+###############################################################################
+# Hex - R8 rules
+#
+# Strategy: shrink and optimise everywhere, but do not RENAME anything in
+# no.elg.hex. Class simple names and Kotlin property names are load-bearing:
+#
+#   islands/*.is              "pieceType":"Capital" -> Piece subclass simpleName
+#                             (HexagonData.getPieceTypeName / PIECES_MAP)
+#   islands/metadata/*.smile  PreviewModifier travels by NAME - smileMapper
+#                             (Hex.kt:64-68) does not set WRITE_ENUMS_USING_INDEX
+#                             the way `mapper` does (Hex.kt:79)
+#   SharedPreferences keys    Settings property names (PreferenceDelegate.kt:83)
+#   Editor UI labels          Editor subclass simpleName (Editor.kt:15)
+#
+# Renaming any of those silently corrupts all 704 bundled islands and every
+# existing player save. It fails at island load, not at build time.
+#
+# -keepnames == -keep,allowshrinking: unused code is STILL removed, survivors
+# merely keep their original names. no.elg.hex is 910 of 10604 classes, and the
+# measured cost of not renaming it is 93 KB uncompressed = 0.66% of the dex.
+#
+# NOTE: deliberately conservative first pass. The blanket -keep rules on gdx /
+# VisUI / Jackson / kotlin-reflect also block OPTIMISATION of those packages,
+# not just renaming. That is the headroom for a second pass.
+###############################################################################
+
+# --- Attributes needed by kotlin-reflect and Jackson -------------------------
+# R8 full mode (default since AGP 8) does not keep these implicitly.
+-keepattributes Signature,
+                InnerClasses,
+                EnclosingMethod,
+                RuntimeVisibleAnnotations,
+                RuntimeVisibleParameterAnnotations,
+                RuntimeVisibleTypeAnnotations,
+                AnnotationDefault,
+                Exceptions
+
+# kotlin-reflect reads @Metadata for every sealedSubclasses / primaryConstructor
+# / declaredMemberProperties / companionObjectInstance call in the game.
+-keep class kotlin.Metadata { *; }
+-keep class kotlin.reflect.jvm.internal.** { *; }
+-dontwarn kotlin.reflect.jvm.internal.**
+
+# --- Entry point -------------------------------------------------------------
+-keep class no.elg.hex.platform.android.AndroidLauncher { *; }
+-keep class no.elg.hex.platform.android.AndroidPlatform { *; }
+
+# --- Game code ---------------------------------------------------------------
+-keepnames class no.elg.hex.** { *; }
+# Jackson resolves Map<CubeCoordinate, HexagonData> keys - and the
+# territoryCoordinate / handCoordinate values - through the static factory
+# CubeCoordinate.fromAxialKey(String), declared by CubeCoordinateMixIn's
+# @JsonCreator. That annotation lives on the MIXIN, not on CubeCoordinate, so
+# the @com.fasterxml.jackson.annotation.* catch-all below cannot see it, and
+# nothing calls it from Kotlin. -keepnames (= -keep,allowshrinking) therefore
+# let R8 delete it, and every island failed to load at runtime.
+# Rule of thumb: every addMixIn(X, ...) target needs a hard -keep on X.
+# The whole package is 27 classes, so keeping it outright is free.
+-keep class org.hexworks.mixite.** { *; }
+
+# Jackson reaches these purely by reflection, so their members must survive
+# shrinking too - not merely keep their names.
+-keep class no.elg.hex.hexagon.HexagonData { *; }
+-keep class no.elg.hex.hexagon.Piece { *; }
+-keep class * extends no.elg.hex.hexagon.Piece { *; }
+-keep class no.elg.hex.island.Island { *; }
+-keep class no.elg.hex.model.** { *; }
+-keep class no.elg.hex.jackson.** { *; }
+-keep class * implements no.elg.hex.util.ExportedIsland { *; }
+
+# Hand.Companion.RestoreAction is resolved via sealedSubclasses + objectInstance
+# (Hand.kt:51). It serialises through an explicit `serializedName` string, NOT
+# its class name, so this is a reflection keep and not a save-format keep.
+-keep class no.elg.hex.island.Hand$Companion$* { *; }
+
+# Enums that cross the wire by name.
+-keep enum no.elg.hex.preview.PreviewModifier { *; }
+-keep enum no.elg.hex.hexagon.Team { *; }
+-keep enum no.elg.hex.hexagon.HexType { *; }
+-keep enum no.elg.hex.ai.Difficulty { *; }
+
+# Settings: declaredMemberProperties + isAccessible (Settings.kt:188), and every
+# property name IS the SharedPreferences key. Renaming resets player settings.
+-keep class no.elg.hex.Settings { *; }
+-keep class no.elg.hex.util.delegate.** { *; }
+
+# Sealed hierarchies walked at runtime.
+-keep class * implements no.elg.hex.event.events.Event { *; }
+-keep class * implements no.elg.hex.input.editor.Editor { *; }
+
+# Event companions are resolved via companionObjectInstance (Events.kt:67).
+-keepclassmembers class no.elg.hex.** {
+    public static ** Companion;
+    ** INSTANCE;
+}
+
+# argparser derives CLI flag names from property names.
+-keep class no.elg.hex.ApplicationArgumentsParser { *; }
+-keep class com.xenomachina.argparser.** { *; }
+
+# --- libGDX ------------------------------------------------------------------
+# JNI-bound classes, Json/Skin reflection and ClassReflection lookups.
+-keep class com.badlogic.gdx.** { *; }
+-keepclassmembers class com.badlogic.gdx.** {
+    <init>(...);
+    native <methods>;
+}
+-dontwarn com.badlogic.gdx.**
+-dontwarn org.lwjgl.**
+-dontwarn java.awt.**
+-dontwarn javax.swing.**
+
+# --- VisUI -------------------------------------------------------------------
+# uiskin.json names *Style classes as strings; Skin resolves them reflectively.
+-keep class com.kotcrab.vis.ui.** { *; }
+-dontwarn com.kotcrab.vis.ui.**
+
+# --- Jackson -----------------------------------------------------------------
+-keep class com.fasterxml.jackson.** { *; }
+-keepclassmembers class * {
+    @com.fasterxml.jackson.annotation.* *;
+    @com.fasterxml.jackson.annotation.JsonCreator <init>(...);
+}
+-dontwarn com.fasterxml.jackson.**
+-dontwarn java.beans.**
+
+# --- Misc --------------------------------------------------------------------
+-dontwarn org.tukaani.xz.**
+-dontwarn org.jetbrains.annotations.**
+
+# Artefacts for debugging a bad shrink.
+-printusage build/outputs/mapping/release/usage.txt
+-printseeds build/outputs/mapping/release/seeds.txt
