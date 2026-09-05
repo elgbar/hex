@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.runBlocking
 import ktx.async.onRenderingThread
 import no.elg.hex.event.events.Event
+import no.elg.hex.util.debug
 import no.elg.hex.util.trace
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.hasAnnotation
@@ -61,7 +63,7 @@ object Events {
   /**
    * Internal function to get the list of listener for an event
    */
-  fun <T : Event> getEventList(eventClass: KClass<T>): MutableList<(T) -> Unit> {
+  fun <T : Event> getEventList(eventClass: KClass<T>): ConcurrentLinkedQueue<(T) -> Unit> {
     val companionInstance = eventClass.companionObjectInstance ?: error("No companion object found for ${eventClass.simpleName}")
 
     @Suppress("UNCHECKED_CAST")
