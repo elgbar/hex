@@ -31,7 +31,6 @@ import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
-import kotlin.sequences.forEach
 
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData =

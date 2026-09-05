@@ -5,8 +5,6 @@ import no.elg.hex.ai.Difficulty
 import no.elg.hex.audio.MusicHandler
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
-import no.elg.hex.hud.MessagesRenderer
-import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.model.PreviewSortingOrder
 import no.elg.hex.platform.PlatformType
 import no.elg.hex.util.delegate.PreferenceDelegate

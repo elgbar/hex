@@ -8,7 +8,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Preferences
-import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.graphics.GL20
@@ -22,14 +21,11 @@ import com.fasterxml.jackson.dataformat.smile.databind.SmileMapper
 import com.fasterxml.jackson.module.kotlin.jsonMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.kotcrab.vis.ui.VisUI
-import ktx.assets.disposeSafely
 import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
-import no.elg.hex.audio.DisabledMusicHandler
 import no.elg.hex.audio.MusicHandler
-import no.elg.hex.audio.RealMusicHandler
 import no.elg.hex.event.Events
 import no.elg.hex.hud.GLProfilerRenderer
 import no.elg.hex.hud.MessagesRenderer

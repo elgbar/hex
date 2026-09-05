@@ -35,15 +35,12 @@ import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
-import ktx.scene2d.tooltip
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visImage
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import ktx.scene2d.vis.visTextTooltip
-import ktx.scene2d.vis.visTooltip
 import no.elg.hex.Hex
 import no.elg.hex.island.Island
 import no.elg.hex.island.IslandGeneration

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.Disposable
 import ktx.assets.disposeSafely
 import no.elg.hex.Settings
-import no.elg.hex.util.isLazyInitialized
 
 sealed interface MusicHandler : Disposable {
   val icon: TextureAtlas.AtlasRegion

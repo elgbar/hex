@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.runBlocking
 import ktx.async.onRenderingThread
 import no.elg.hex.event.events.Event
-import no.elg.hex.util.debug
 import no.elg.hex.util.trace
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass

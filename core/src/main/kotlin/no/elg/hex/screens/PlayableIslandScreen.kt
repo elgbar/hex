@@ -23,7 +23,6 @@ import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import ktx.scene2d.vis.visTextTooltip
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.event.SimpleEventListener
