@@ -50,8 +50,19 @@
 
 # --- Game code ---------------------------------------------------------------
 # -keepnames is -keep,allowshrinking: it forbids renaming AND optimization.
-# We only need the names (they are the save format), so allow optimization back.
--keep,allowshrinking,allowoptimization class no.elg.hex.** { *; }
+# Both constraints are load-bearing - do NOT add allowoptimization here.
+#
+# With allowoptimization, R8 prunes the InnerClasses / dalvik.annotation.
+# MemberClasses attribute on these classes (58 -> 9 of them). Class
+# .getDeclaredClasses() then returns empty, so kotlin-reflect's nestedClasses
+# is empty, companionObjectInstance returns null, and Events.getEventList
+# (Events.kt:67) throws "No companion object found for <Event>" the moment any
+# island is deserialized. Crashes on startup.
+#
+# -keepattributes InnerClasses above is NOT sufficient: it only permits the
+# attribute to survive, while DONT_OPTIMIZE is what actually preserves it.
+-keepnames class no.elg.hex.** { *; }
+
 # Jackson resolves Map<CubeCoordinate, HexagonData> keys - and the
 # territoryCoordinate / handCoordinate values - through the static factory
 # CubeCoordinate.fromAxialKey(String), declared by CubeCoordinateMixIn's
