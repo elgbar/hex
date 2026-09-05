@@ -13,6 +13,7 @@ import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisWindow
 import no.elg.hex.Hex
 import no.elg.hex.Settings
+import no.elg.hex.audio.MusicHandler
 import no.elg.hex.hud.MessagesRenderer
 import no.elg.hex.input.LevelSelectInputProcessor
 import no.elg.hex.island.Island
@@ -101,7 +102,9 @@ class LevelSelectScreen :
         // Draw the first row of non-islands
         if (sy + sheight > camera.position.y - camera.viewportHeight / 2f) {
           drawScreenSprite(Hex.assets.settingsDown, Hex.assets.settings, 0)
-          drawScreenSprite(Hex.music.iconSelected, Hex.music.icon, PREVIEWS_PER_ROW - 2)
+          if (MusicHandler.audioEnabled) {
+            drawScreenSprite(Hex.music.iconSelected, Hex.music.icon, PREVIEWS_PER_ROW - 2)
+          }
           drawScreenSprite(Hex.assets.helpDown, Hex.assets.help, PREVIEWS_PER_ROW - 1)
 
           if (Hex.mapEditor) {

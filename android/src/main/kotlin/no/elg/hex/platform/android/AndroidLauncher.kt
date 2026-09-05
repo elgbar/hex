@@ -13,6 +13,8 @@ import com.xenomachina.argparser.ArgParser
 import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.R
+import no.elg.hex.Settings
+import no.elg.hex.audio.MusicHandler
 
 
 class AndroidLauncher : AndroidApplication() {
@@ -33,7 +35,7 @@ class AndroidLauncher : AndroidApplication() {
 
     config.depth = 0
 
-    val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+    val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager?
     val configurationInfo = activityManager?.deviceConfigurationInfo
     val glVersion = configurationInfo?.glEsVersion?.toFloatOrNull() ?: 2f
 
@@ -45,9 +47,11 @@ class AndroidLauncher : AndroidApplication() {
     config.useAccelerometer = false
     config.useGyroscope = false
     config.useRotationVectorSensor = false
-    config.disableAudio = false
 
-    Hex.audioDisabled = config.disableAudio
+    val enableAudio = Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH, true)
+    config.disableAudio = !enableAudio
+    MusicHandler.setupAudio(enableAudio = enableAudio)
+
     Hex.platform.platformInit()
     initialize(Hex, config)
   }

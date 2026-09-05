@@ -10,6 +10,7 @@ import no.elg.hex.ApplicationArgumentsParser
 import no.elg.hex.Hex
 import no.elg.hex.Settings
 import no.elg.hex.Settings.MSAA_SAMPLES_PATH
+import no.elg.hex.audio.MusicHandler
 import no.elg.hex.util.defaultDisplayHeight
 import no.elg.hex.util.defaultDisplayWidth
 
@@ -20,7 +21,6 @@ fun main(args: Array<String>) {
   Hex.launchPreference = Lwjgl3Preferences(Hex.LAUNCH_PREF, config.preferencesDirectory)
 
   Hex.platform = DesktopPlatform(config)
-  Hex.audioDisabled = !Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH)
 
   config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
 
@@ -38,7 +38,9 @@ fun main(args: Array<String>) {
   }
   config.setInitialBackgroundColor(Hex.backgroundColor)
   config.title = "Hex"
-
+  val enableAudio = Hex.launchPreference.getBoolean(Settings.ENABLE_AUDIO_PATH, true)
+  config.disableAudio(!enableAudio)
+  MusicHandler.setupAudio(enableAudio = enableAudio)
   Hex.platform.platformInit()
   Lwjgl3Application(Hex, config)
 }

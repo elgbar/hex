@@ -2,8 +2,11 @@ package no.elg.hex
 
 import com.badlogic.gdx.Gdx
 import no.elg.hex.ai.Difficulty
+import no.elg.hex.audio.MusicHandler
 import no.elg.hex.hexagon.Team
 import no.elg.hex.hud.GLProfilerRenderer
+import no.elg.hex.hud.MessagesRenderer
+import no.elg.hex.hud.ScreenRenderer
 import no.elg.hex.model.PreviewSortingOrder
 import no.elg.hex.platform.PlatformType
 import no.elg.hex.util.delegate.PreferenceDelegate
@@ -21,9 +24,11 @@ object Settings {
     preferences = Hex.launchPreference,
     requireRestart = true,
     priority = 200,
-    afterChange = { _, _, new ->
-      Hex.audioDisabled = !new
-      Hex.music.toggleMute()
+    runAfterChangeOnInit = false,
+    afterChange = { _, _, enable ->
+      if (MusicHandler.audioEnabled && !enable) {
+        MusicHandler.disableAudio()
+      }
     }
   )
 
@@ -44,7 +49,7 @@ object Settings {
     afterChange = { _, _, _ ->
       Hex.music.updateMusicVolume()
     },
-    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
+    shouldHide = { !Hex.platform.canControlAudio || MusicHandler.audioDisabled }
   ) { it !in 0f..1f }
 
   var musicVolume by PreferenceDelegate(
@@ -53,9 +58,9 @@ object Settings {
     afterChange = { _, _, _ ->
       Hex.music.updateMusicVolume()
     },
-    shouldHide = { !Hex.platform.canControlAudio || Hex.audioDisabled }
+    shouldHide = { !Hex.platform.canControlAudio || MusicHandler.audioDisabled }
   ) { it !in 0f..1f }
-  var musicPaused by PreferenceDelegate(false, priority = 211, afterChange = { _, _, _ -> Hex.music.toggleMute() })
+  var musicPaused by PreferenceDelegate(false, priority = 211, afterChange = { _, _, _ -> Hex.music.toggleMute() }, shouldHide = { MusicHandler.audioDisabled })
 
   var confirmEndTurn by PreferenceDelegate(true, priority = 100)
   var confirmSurrender by PreferenceDelegate(true, priority = 100)

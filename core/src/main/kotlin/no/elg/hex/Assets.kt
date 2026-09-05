@@ -53,6 +53,7 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.hex.Hex.scale
 import no.elg.hex.assets.IslandAsynchronousAssetLoader
+import no.elg.hex.audio.MusicHandler
 import no.elg.hex.hexagon.Baron
 import no.elg.hex.hexagon.Capital
 import no.elg.hex.hexagon.Castle
@@ -484,7 +485,7 @@ class Assets : AssetManager() {
    */
   fun audioLoaded(wait: Boolean): Boolean =
     when {
-      !Settings.enableAudio || Hex.audioDisabled -> false
+      MusicHandler.audioDisabled -> false
 
       audioLoadCalled -> true
 

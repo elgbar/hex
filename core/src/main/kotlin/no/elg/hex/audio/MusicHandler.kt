@@ -2,82 +2,70 @@ package no.elg.hex.audio
 
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import no.elg.hex.Hex
-import no.elg.hex.Hex.audioDisabled
+import com.badlogic.gdx.utils.Disposable
+import ktx.assets.disposeSafely
 import no.elg.hex.Settings
+import no.elg.hex.util.isLazyInitialized
 
-class MusicHandler {
-
-  private var music: Music? = null
-    set(value) {
-      if (audioDisabled || field == value) {
-        return
-      }
-      field?.stop()
-      field = value
-      value?.apply {
-        volume = Settings.masterVolume * Settings.musicVolume
-        if (Settings.musicPaused) {
-          pause()
-        } else {
-          play()
-        }
-      }
-    }
-
-  val icon: TextureAtlas.AtlasRegion get() = if (Settings.musicPaused) Hex.assets.muted else Hex.assets.unmuted
-  val iconSelected: TextureAtlas.AtlasRegion get() = if (Settings.musicPaused) Hex.assets.mutedSelected else Hex.assets.unmutedSelected
-
-  fun updateMusicVolume() {
-    music?.volume = Settings.masterVolume * Settings.musicVolume
-  }
+sealed interface MusicHandler : Disposable {
+  val icon: TextureAtlas.AtlasRegion
+  val iconSelected: TextureAtlas.AtlasRegion
+  fun updateMusicVolume()
 
   /**
    * Play a random song and change when each of them ends
    */
-  fun playRandom() {
-    if (audioDisabled) {
-      return
-    }
-    if (Hex.assets.songs.size <= 1) {
-      // Only one song, play it on a loop
-      loop(Hex.assets.songs.firstOrNull())
-    } else {
-      music = Hex.assets.songs.randomOrNull()?.apply {
-        isLooping = false
-        setOnCompletionListener {
-          music = Hex.assets.songs.filter { it != this }.randomOrNull()
-        }
-      }
-    }
-  }
+  fun playRandom()
 
   /**
    * Play the given music on a loop
    */
-  fun loop(newMusic: Music?) {
-    if (audioDisabled) {
-      return
-    }
-    music = newMusic?.apply {
-      isLooping = true
-      setOnCompletionListener(null)
-    }
-  }
+  fun loop(newMusic: Music?)
 
   /**
    * @return If the music was toggled
    */
-  fun toggleMute(): Boolean {
-    music?.run {
-      if (Settings.musicPaused || audioDisabled) {
-        pause()
-        return true
+  fun toggleMute(): Boolean
+
+  companion object {
+
+    var instance: MusicHandler? = null
+      private set(value) {
+        field?.disposeSafely()
+        field = value
+      }
+
+    /**
+     * If audio is enabled and we are playing something
+     */
+    val audioPlaying get() = audioEnabled && !Settings.musicPaused
+
+    /**
+     * If audio is disabled or we are not playing something
+     */
+    val audioNotPlaying get() = !audioPlaying
+
+    val audioEnabled
+      get() = when (instance) {
+        is RealMusicHandler -> true
+        DisabledMusicHandler -> false
+        null -> error("Audio not setup yet!")
+      }
+    val audioDisabled get() = !audioEnabled
+
+    val isAudioSetup get() = instance != null
+
+    fun disableAudio() {
+      instance = DisabledMusicHandler
+    }
+
+    fun setupAudio(enableAudio: Boolean) {
+      require(instance == null) { "Cannot setup auto twice" }
+      instance = if (enableAudio) {
+        RealMusicHandler()
       } else {
-        play()
-        return true
+        DisabledMusicHandler
       }
     }
-    return false
   }
 }
