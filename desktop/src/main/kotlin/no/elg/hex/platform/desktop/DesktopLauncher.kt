@@ -2,6 +2,7 @@ package no.elg.hex.platform.desktop
 
 import com.badlogic.gdx.Files.FileType.Internal
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Preferences
 import com.badlogic.gdx.backends.lwjgl3.ReadableLwjgl3ApplicationConfiguration
 import com.xenomachina.argparser.ArgParser
@@ -23,7 +24,7 @@ fun main(args: Array<String>) {
   Hex.platform = DesktopPlatform(config)
 
   config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
-
+  config.glEmulation = Lwjgl3ApplicationConfiguration.GLEmulation.GL32
   config.foregroundFPS = 0
   config.isVSync = Hex.launchPreference.getBoolean(Settings.VSYNC_PATH, true)
   config.setWindowIcon(Internal, "icons/icon32.png", "icons/icon128.png")
