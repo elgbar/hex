@@ -31,6 +31,10 @@ public class ReadableLwjgl3ApplicationConfiguration extends Lwjgl3ApplicationCon
     return glEmulation;
   }
 
+  public void setGlEmulation(GLEmulation glEmulation){
+    this.glEmulation = glEmulation;
+  }
+
   public int getGles30ContextMajorVersion() {
     return gles30ContextMajorVersion;
   }
