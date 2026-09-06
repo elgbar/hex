@@ -80,8 +80,11 @@ object Hex : ApplicationAdapter() {
 
   private const val RENDER_FAILED_THRESHOLD = 3
 
-  val AA_BUFFER_CLEAR =
-    lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
+  val AA_BUFFER_CLEAR by lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
+
+  val PLAY_BACKGROUND_COLOR: Color = Color.valueOf("#172D62")
+  val MAP_EDITOR_BACKGROUND_COLOR: Color = Color.valueOf("#60173F")
+  val backgroundColor: Color by lazy { if (args.mapEditor) MAP_EDITOR_BACKGROUND_COLOR else PLAY_BACKGROUND_COLOR }
 
   lateinit var args: ApplicationArgumentsParser
 
@@ -118,7 +121,6 @@ object Hex : ApplicationAdapter() {
   val scale by lazy {
     if (args.scale <= 0) Assets.nativeScale else args.scale
   }
-  val backgroundColor: Color by lazy { if (args.mapEditor) Color.valueOf("#60173F") else Color.valueOf("#172D62") }
 
   val island: Island? get() = (screen as? PreviewIslandScreen)?.island
 
@@ -198,7 +200,7 @@ object Hex : ApplicationAdapter() {
   }
 
   override fun render() {
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR.value)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or AA_BUFFER_CLEAR)
     if (paused) {
       return
     }

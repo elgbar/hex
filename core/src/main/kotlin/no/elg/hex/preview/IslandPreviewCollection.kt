@@ -74,7 +74,7 @@ class IslandPreviewCollection : Disposable {
     buffer.safeUse {
       Hex.setClearColorAlpha(0f)
       Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR.value)
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR)
       islandScreen.render(0f)
       val camera = islandScreen.camera
       camera.zoom = .25f

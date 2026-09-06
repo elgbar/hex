@@ -1,42 +1,36 @@
 package no.elg.hex.util
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
-import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.utils.ScreenUtils
-import com.badlogic.gdx.utils.TimeUtils
+import no.elg.hex.Hex
 import java.util.Timer
 import java.util.TimerTask
-import java.util.zip.Deflater
 import kotlin.concurrent.schedule
 
-fun FrameBuffer.takeScreenshot(fileHandle: FileHandle) {
+/**
+ * Encode the contents of this frame buffer as a palette PNG.
+ *
+ * @param backgroundRgb Packed `0xRRGGBB` colour that translucent pixels are composited onto, see [PalettePng.encode].
+ * Defaults to [Hex.PLAY_BACKGROUND_COLOR] rather than [Hex.backgroundColor], because previews are generated in the
+ * map editor but displayed while playing, and the two use different backgrounds.
+ */
+fun FrameBuffer.toBytes(backgroundRgb: Int = Color.rgb888(Hex.PLAY_BACKGROUND_COLOR)): ByteArray {
+  val encoded: ByteArray
   this.safeUse {
-    val bufferWidth = this.width
-    val bufferHeight = this.height
-    val pixels = ScreenUtils.getFrameBufferPixels(0, 0, bufferWidth, bufferHeight, false)
-
-    Pixmap(bufferWidth, bufferHeight, Pixmap.Format.RGBA8888).useDispose { screenshotImage ->
-      BufferUtils.copy(pixels, 0, screenshotImage.pixels, pixels.size)
-      PixmapIO.writePNG(fileHandle, screenshotImage, Deflater.BEST_COMPRESSION, false)
-    }
+    val pixels = ScreenUtils.getFrameBufferPixels(0, 0, width, height, false)
+    encoded = PalettePng.encode(width, height, pixels, backgroundRgb)
   }
+  return encoded
 }
 
-fun FrameBuffer.toBytes(): ByteArray {
-  val tmpFile = Gdx.files.local("tmp/${TimeUtils.nanoTime()}")
-  takeScreenshot(tmpFile)
-  return tmpFile.file().readBytes().also {
-    tmpFile.delete()
-  }
-}
+fun FrameBuffer.takeScreenshot(fileHandle: FileHandle) = fileHandle.writeBytes(toBytes(), false)
 
 fun textureFromBytes(encoded: ByteArray): Texture = Texture(Pixmap(encoded, 0, encoded.size))
 
