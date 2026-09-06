@@ -17,12 +17,12 @@ interface Hexagon<T : SatelliteData> {
   /**
    * Returns a list containing the [Point]s of this [Hexagon].
    */
-  val points: List<Point>
+  val points: Array<Point>
 
   /**
    * Returns an array of the vertices of this [Hexagon].
    */
-  val vertices: List<Double>
+  val vertices: DoubleArray
 
   /**
    * Returns a rectangle defining the **external** boundary box of this [Hexagon]

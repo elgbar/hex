@@ -39,7 +39,7 @@ data class CubeCoordinate(val gridX: Int, val gridZ: Int) : Comparable<CubeCoord
     fun fromAxialKey(axialKey: String): CubeCoordinate {
       val result: CubeCoordinate
       try {
-        val coords = axialKey.split(SEP.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val coords = axialKey.split(SEP).dropLastWhile { it.isEmpty() }.toTypedArray()
         result = fromCoordinates(coords[0].toInt(), coords[1].toInt())
       } catch (e: Exception) {
         throw IllegalArgumentException("Failed to create CubeCoordinate from key: $axialKey", e)

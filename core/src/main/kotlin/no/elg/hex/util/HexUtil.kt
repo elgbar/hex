@@ -35,7 +35,7 @@ import kotlin.reflect.KClass
 /** @return HexagonData of this hexagon */
 fun Island.getData(hexagon: Hexagon<HexagonData>): HexagonData =
   hexagon.satelliteData.orElseGet {
-    (if (isEdgeHexagon(hexagon) || !Hex.mapEditor) EDGE_DATA else HexagonData(disabled = true, Team.EARTH)).also {
+    (if (!Hex.mapEditor || isEdgeHexagon(hexagon)) EDGE_DATA else HexagonData(disabled = true, Team.EARTH)).also {
       hexagon.setSatelliteData(it)
     }
   }

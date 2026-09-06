@@ -111,4 +111,6 @@ interface HexagonalGrid<T : SatelliteData> {
    * @return the [Hexagon]'s neighbors
    */
   fun getNeighborsOf(hexagon: Hexagon<T>): Collection<Hexagon<T>>
+
+  fun isEdgeHexagon(hexagon: Hexagon<T>): Boolean
 }

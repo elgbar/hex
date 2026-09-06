@@ -1,5 +1,6 @@
 package org.hexworks.mixite.core.internal.impl
 
+import com.badlogic.gdx.utils.ObjectIntMap
 import org.hexworks.cobalt.datatypes.Maybe
 import org.hexworks.mixite.core.api.CoordinateConverter
 import org.hexworks.mixite.core.api.CubeCoordinate
@@ -167,6 +168,21 @@ class HexagonalGridImpl<T : SatelliteData>(builder: HexagonalGridBuilder<T>) : H
     return neighbors
   }
 
+  val edgeCache = ObjectIntMap<String>((gridData.hexagonWidth * gridData.hexagonHeight).toInt() / 2)
+
+  override fun isEdgeHexagon(hexagon: Hexagon<T>): Boolean {
+    val cachedSize = edgeCache.get(hexagon.id, -1)
+    val size = if (cachedSize == -1) {
+      val calcSize = getNeighborsOf(hexagon).size
+      edgeCache.put(hexagon.id, calcSize)
+      calcSize
+    } else {
+      cachedSize
+    }
+    return size != EXPECTED_NEIGHBORS
+  }
+
+
   /*
    * Returns either the original center hex or the nearest (real) hex around it
    */
@@ -207,6 +223,8 @@ class HexagonalGridImpl<T : SatelliteData>(builder: HexagonalGridBuilder<T>) : H
       intArrayOf(-1, +1),
       intArrayOf(0, +1)
     )
+
+    private const val EXPECTED_NEIGHBORS = 6
     private const val NEIGHBOR_X_INDEX = 0
     private const val NEIGHBOR_Z_INDEX = 1
   }

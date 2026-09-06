@@ -184,9 +184,7 @@ class HexagonData(
      */
     const val SELECTED = 0.1f
 
-    private const val EXPECTED_NEIGHBORS = 6
-
-    fun Island.isEdgeHexagon(hex: Hexagon<HexagonData>) = grid.getNeighborsOf(hex).size != EXPECTED_NEIGHBORS
+    fun Island.isEdgeHexagon(hex: Hexagon<HexagonData>) = grid.isEdgeHexagon(hex)
 
     val EDGE_DATA = HexagonData(disabled = true, team = Team.SUN, edge = true)
   }

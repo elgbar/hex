@@ -22,10 +22,31 @@ class HexagonImpl<T : SatelliteData> internal constructor(
   private val hexagonDataStorage: DefaultHexagonDataStorage<T>
 ) : Hexagon<T> {
 
-  override val vertices: List<Double>
-  override val points: List<Point>
-  override val externalBoundingBox: Rectangle
-  override val internalBoundingBox: Rectangle
+  override val points: Array<Point> by lazy(::calculatePoints)
+  override val vertices: DoubleArray by lazy {
+    DoubleArray(12) { i ->
+      if (i % 2 == 0) {
+        points[i / 2].coordinateX
+      } else {
+        points[(i - 1) / 2].coordinateY
+      }
+    }
+  }
+  override val externalBoundingBox: Rectangle by lazy {
+    val x1 = points[3].coordinateX
+    val y1 = points[2].coordinateY
+    val x2 = points[0].coordinateX
+    val y2 = points[5].coordinateY
+    Rectangle(x1, y1, x2 - x1, y2 - y1)
+  }
+  override val internalBoundingBox: Rectangle by lazy {
+    Rectangle(
+      (center.coordinateX - 1.25 * sharedData.radius / 2),
+      (center.coordinateY - 1.25 * sharedData.radius / 2),
+      (1.25f * sharedData.radius),
+      (1.25f * sharedData.radius)
+    )
+  }
   override val center: Point = calculateCenter()
 
   override val id: String
@@ -49,28 +70,6 @@ class HexagonImpl<T : SatelliteData> internal constructor(
   override val satelliteData: Maybe<T>
     get() = hexagonDataStorage.getSatelliteDataBy(cubeCoordinate)
 
-  init {
-    this.points = calculatePoints()
-    val x1 = points[3].coordinateX
-    val y1 = points[2].coordinateY
-    val x2 = points[0].coordinateX
-    val y2 = points[5].coordinateY
-
-    externalBoundingBox = Rectangle(x1, y1, x2 - x1, y2 - y1)
-    internalBoundingBox = Rectangle(
-      (center.coordinateX - 1.25 * sharedData.radius / 2),
-      (center.coordinateY - 1.25 * sharedData.radius / 2),
-      (1.25f * sharedData.radius),
-      (1.25f * sharedData.radius)
-    )
-
-    this.vertices = ArrayList(12)
-    for (point in points) {
-      vertices.add(point.coordinateX)
-      vertices.add(point.coordinateY)
-    }
-  }
-
   private fun calculateCenter(): Point {
     return if (HexagonOrientation.FLAT_TOP == sharedData.orientation) {
       Point.fromPosition(
@@ -85,15 +84,11 @@ class HexagonImpl<T : SatelliteData> internal constructor(
     }
   }
 
-  private fun calculatePoints(): List<Point> {
-    val points = ArrayList<Point>(6)
-    for (i in 0..5) {
-      val angle = 2 * PI / 6 * (i + sharedData.orientation.coordinateOffset)
-      val x = center.coordinateX + sharedData.radius * cos(angle)
-      val y = center.coordinateY + sharedData.radius * sin(angle)
-      points.add(Point.fromPosition(x, y))
-    }
-    return points
+  private fun calculatePoints(): Array<Point> = Array(6) { i ->
+    val angle = 2 * PI / 6 * (i + sharedData.orientation.coordinateOffset)
+    val x = center.coordinateX + sharedData.radius * cos(angle)
+    val y = center.coordinateY + sharedData.radius * sin(angle)
+    Point.fromPosition(x, y)
   }
 
   override fun setSatelliteData(data: T) {
