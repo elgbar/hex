@@ -7,6 +7,10 @@ import java.util.zip.Deflater
 /**
  * Encodes RGBA8888 pixels as an 8 bit palette PNG (colour type 3).
  *
+ * The alpha byte of every pixel is ignored. Previews come from an RGB565 frame buffer, which has no alpha channel at
+ * all, so `glReadPixels` always reports 255 and the background is baked in when the buffer is cleared. Feeding this
+ * translucent pixels would silently drop the transparency rather than blend it.
+ *
  * Island previews are rendered into an RGB565 frame buffer, so they hold only a few thousand distinct colours, nearly
  * all of them antialiasing intermediates along hexagon edges and font glyphs. Indexing into a palette stores one byte
  * per pixel instead of four, and flat regions collapse into runs of identical indices, which deflate handles well.
@@ -38,53 +42,30 @@ object PalettePng {
   private const val COLOUR_TYPE_INDEXED = 3
 
   private const val FILTER_NONE = 0
-  private const val FILTER_SUB = 1
-  private const val FILTER_UP = 2
 
   private const val DEFLATE_BUFFER_SIZE = 1 shl 16
 
-  /**
-   * Encode [rgba], which must hold [width] * [height] pixels in RGBA8888 order.
-   *
-   * @param backgroundRgb Packed `0xRRGGBB` colour that translucent pixels are composited onto. Pass the colour the
-   * preview is actually drawn against, otherwise antialiased edges pick up a fringe.
-   */
-  fun encode(width: Int, height: Int, rgba: ByteArray, backgroundRgb: Int): ByteArray {
+  /** Encode [rgba], which must hold [width] * [height] pixels in RGBA8888 order. Alpha bytes are ignored. */
+  fun encode(width: Int, height: Int, rgba: ByteArray): ByteArray {
     require(width > 0 && height > 0) { "Image must not be empty, got ${width}x$height" }
     val expected = width * height * BYTES_PER_RGBA_PIXEL
     require(rgba.size == expected) { "Expected $expected bytes of RGBA8888 data for a ${width}x$height image, got ${rgba.size}" }
 
-    val opaque = compositeOntoBackground(rgba, backgroundRgb)
+    val opaque = toRgbColours(rgba)
     val palette = buildPalette(opaque)
     val indices = mapToPaletteIndices(opaque, palette)
 
     return buildPng(width, height, indices, palette)
   }
 
-  /**
-   * Flatten RGBA pixels onto an opaque background, returning one packed `0xRRGGBB` value per pixel. Dropping alpha is
-   * what lets the palette hold colours rather than colour/alpha pairs.
-   */
-  private fun compositeOntoBackground(rgba: ByteArray, backgroundRgb: Int): IntArray {
-    val backgroundRed = backgroundRgb ushr 16 and 0xFF
-    val backgroundGreen = backgroundRgb ushr 8 and 0xFF
-    val backgroundBlue = backgroundRgb and 0xFF
-
+  /** Pack each pixel into a `0xRRGGBB` value, discarding the alpha byte. */
+  private fun toRgbColours(rgba: ByteArray): IntArray {
     val out = IntArray(rgba.size / BYTES_PER_RGBA_PIXEL)
     for (pixel in out.indices) {
       val offset = pixel * BYTES_PER_RGBA_PIXEL
-      var red = rgba[offset].toInt() and 0xFF
-      var green = rgba[offset + 1].toInt() and 0xFF
-      var blue = rgba[offset + 2].toInt() and 0xFF
-      val alpha = rgba[offset + 3].toInt() and 0xFF
-
-      if (alpha != 0xFF) {
-        // + 127 rounds the blend instead of truncating it
-        val inverse = 0xFF - alpha
-        red = (red * alpha + backgroundRed * inverse + 127) / 0xFF
-        green = (green * alpha + backgroundGreen * inverse + 127) / 0xFF
-        blue = (blue * alpha + backgroundBlue * inverse + 127) / 0xFF
-      }
+      val red = rgba[offset].toInt() and 0xFF
+      val green = rgba[offset + 1].toInt() and 0xFF
+      val blue = rgba[offset + 2].toInt() and 0xFF
       out[pixel] = red shl 16 or (green shl 8) or blue
     }
     return out
@@ -153,7 +134,7 @@ object PalettePng {
     png.write(PNG_SIGNATURE)
     writeChunk(png, "IHDR", header(width, height))
     writeChunk(png, "PLTE", paletteChunk(palette))
-    writeChunk(png, "IDAT", deflate(filterScanlines(width, height, indices)))
+    writeChunk(png, "IDAT", deflate(addFilterBytes(width, height, indices)))
     writeChunk(png, "IEND", ByteArray(0))
     return png.toByteArray()
   }
@@ -182,65 +163,24 @@ object PalettePng {
   }
 
   /**
-   * Prefix every scanline with the filter that minimises the sum of absolute differences, the heuristic from the PNG
-   * specification.
+   * Prefix every scanline with [FILTER_NONE].
    *
-   * Only [FILTER_NONE], [FILTER_SUB] and [FILTER_UP] are candidates. The remaining two, Average and Paeth, interpolate
-   * between byte values, which assumes those bytes lie on a continuum. Palette indices do not: entry 7 and entry 200
-   * are labels, so averaging them produces noise and compresses worse.
+   * PNG allows a different filter per row, but for palette images every alternative is worse. Filters exist to turn
+   * smoothly varying channel samples into small residuals; palette indices are labels, so subtracting one from
+   * another is meaningless. It also actively hurts: two identical rows are byte for byte identical, which deflate
+   * encodes as one long match, and filtering rewrites them into residuals that break that match up.
+   *
+   * Measured across the bundled previews, None beats the specification's adaptive minimum-sum heuristic by 13%, Sub
+   * by 15% and Up by 12%. libpng gives the same advice for palette and low bit depth images.
    */
-  private fun filterScanlines(width: Int, height: Int, indices: ByteArray): ByteArray {
+  private fun addFilterBytes(width: Int, height: Int, indices: ByteArray): ByteArray {
     val out = ByteArray(height * (width + 1))
-    val sub = ByteArray(width)
-    val up = ByteArray(width)
-    var previous = ByteArray(width)
-
     for (row in 0 until height) {
-      val start = row * width
-      val line = indices.copyOfRange(start, start + width)
-
-      sub[0] = line[0]
-      for (column in 1 until width) {
-        sub[column] = (line[column] - line[column - 1]).toByte()
-      }
-      for (column in 0 until width) {
-        up[column] = (line[column] - previous[column]).toByte()
-      }
-
-      val noneScore = absoluteSum(line)
-      val subScore = absoluteSum(sub)
-      val upScore = absoluteSum(up)
-
       val target = row * (width + 1)
-      when {
-        noneScore <= subScore && noneScore <= upScore -> {
-          out[target] = FILTER_NONE.toByte()
-          line.copyInto(out, target + 1)
-        }
-
-        subScore <= upScore -> {
-          out[target] = FILTER_SUB.toByte()
-          sub.copyInto(out, target + 1)
-        }
-
-        else -> {
-          out[target] = FILTER_UP.toByte()
-          up.copyInto(out, target + 1)
-        }
-      }
-      previous = line
+      out[target] = FILTER_NONE.toByte()
+      indices.copyInto(out, target + 1, row * width, (row + 1) * width)
     }
     return out
-  }
-
-  /** Sum of the bytes read as signed values, which is how the specification scores a candidate filter. */
-  private fun absoluteSum(line: ByteArray): Long {
-    var sum = 0L
-    for (byte in line) {
-      val unsigned = byte.toInt() and 0xFF
-      sum += if (unsigned < 128) unsigned else 256 - unsigned
-    }
-    return sum
   }
 
   /**

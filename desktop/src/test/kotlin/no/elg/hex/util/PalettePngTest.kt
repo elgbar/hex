@@ -3,8 +3,8 @@ package no.elg.hex.util
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.utils.GdxNativesLoader
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -22,9 +22,6 @@ import java.util.zip.Deflater
 class PalettePngTest {
 
   companion object {
-
-    /** Any opaque colour will do here; the encoder takes it as a parameter so the tests need no libGDX app. */
-    private const val BACKGROUND = 0x172D62
 
     @JvmStatic
     @BeforeAll
@@ -88,7 +85,7 @@ class PalettePngTest {
         val centre = size / 2
         val distance = Math.hypot((x - centre).toDouble(), (y - centre).toDouble()).toInt()
         when {
-          distance > centre - 2 -> 0x00000000
+          distance > centre - 2 -> 0x172D62FF.toInt()
           distance > centre - 12 -> 0xC02040FF.toInt()
           (x / 16 + y / 16) % 2 == 0 -> 0x3070C0FF.toInt()
           else -> 0x2050A0FF.toInt()
@@ -98,7 +95,7 @@ class PalettePngTest {
 
   @Test
   fun `produces a png that libgdx can decode at the original size`() {
-    val encoded = PalettePng.encode(64, 32, previewLike(64).copyOf(64 * 32 * 4), BACKGROUND)
+    val encoded = PalettePng.encode(64, 32, previewLike(64).copyOf(64 * 32 * 4))
     val decoded = decode(encoded)
     try {
       assertEquals(64, decoded.width)
@@ -112,7 +109,7 @@ class PalettePngTest {
   fun `images within the palette limit round trip exactly`() {
     // 16 * 16 = 256 distinct opaque colours, exactly the palette limit, so nothing may be remapped
     val rgba = image(16, 16) { x, y -> (x * 16 shl 24) or (y * 16 shl 16) or (0x80 shl 8) or 0xFF }
-    val decoded = decode(PalettePng.encode(16, 16, rgba, BACKGROUND))
+    val decoded = decode(PalettePng.encode(16, 16, rgba))
     try {
       for (y in 0 until 16) {
         for (x in 0 until 16) {
@@ -129,32 +126,12 @@ class PalettePngTest {
   }
 
   @Test
-  fun `fully transparent pixels become the background colour`() {
-    val rgba = image(4, 4) { _, _ -> 0x00000000 }
-    val decoded = decode(PalettePng.encode(4, 4, rgba, BACKGROUND))
-    try {
-      assertEquals(BACKGROUND, decoded.rgbAt(0, 0))
-      assertEquals(BACKGROUND, decoded.rgbAt(3, 3))
-    } finally {
-      decoded.dispose()
-    }
-  }
-
-  @Test
-  fun `half transparent pixels are blended towards the background`() {
-    val white = 0xFFFFFF80.toInt() // opaque white at 50% alpha
-    val decoded = decode(PalettePng.encode(2, 2, image(2, 2) { _, _ -> white }, BACKGROUND))
-    try {
-      val blended = decoded.rgbAt(0, 0)
-      assertNotEquals(0xFFFFFF, blended, "a half transparent pixel must not stay fully white")
-      assertNotEquals(BACKGROUND, blended, "a half transparent pixel must not collapse to the background")
-      // each channel should sit roughly midway between white and the background
-      val red = blended ushr 16 and 0xFF
-      val backgroundRed = BACKGROUND ushr 16 and 0xFF
-      assertTrue(red > backgroundRed + 50, "expected red to be blended upwards, was $red")
-    } finally {
-      decoded.dispose()
-    }
+  fun `alpha is ignored`() {
+    // Previews come from an RGB565 frame buffer, which cannot carry alpha, so the encoder reads only RGB. Two images
+    // differing solely in their alpha bytes must therefore encode identically.
+    val opaque = image(8, 8) { x, y -> (x * 32 shl 24) or (y * 32 shl 16) or (0x40 shl 8) or 0xFF }
+    val translucent = image(8, 8) { x, y -> (x * 32 shl 24) or (y * 32 shl 16) or (0x40 shl 8) or 0x00 }
+    assertArrayEquals(PalettePng.encode(8, 8, opaque), PalettePng.encode(8, 8, translucent))
   }
 
   @Test
@@ -174,7 +151,7 @@ class PalettePngTest {
       (red shl 24) or ((255 - b) shl 16) or ((b * 7) % 256 shl 8) or 0xFF
     }
 
-    val decoded = decode(PalettePng.encode(size, size, rgba, BACKGROUND))
+    val decoded = decode(PalettePng.encode(size, size, rgba))
     try {
       var worst = 0
       for (y in 0 until size) {
@@ -203,7 +180,7 @@ class PalettePngTest {
   fun `is smaller than what PixmapIO would write`() {
     val size = 256
     val rgba = previewLike(size)
-    val palette = PalettePng.encode(size, size, rgba, BACKGROUND)
+    val palette = PalettePng.encode(size, size, rgba)
     val rgbaPng = encodeWithPixmapIo(size, size, rgba)
     assertTrue(
       palette.size < rgbaPng.size,
@@ -213,11 +190,11 @@ class PalettePngTest {
 
   @Test
   fun `rejects a buffer that does not match the given dimensions`() {
-    assertThrows<IllegalArgumentException> { PalettePng.encode(8, 8, ByteArray(8 * 8 * 4 - 1), BACKGROUND) }
+    assertThrows<IllegalArgumentException> { PalettePng.encode(8, 8, ByteArray(8 * 8 * 4 - 1)) }
   }
 
   @Test
   fun `rejects an empty image`() {
-    assertThrows<IllegalArgumentException> { PalettePng.encode(0, 8, ByteArray(0), BACKGROUND) }
+    assertThrows<IllegalArgumentException> { PalettePng.encode(0, 8, ByteArray(0)) }
   }
 }

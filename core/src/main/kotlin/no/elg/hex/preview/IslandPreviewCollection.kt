@@ -65,15 +65,21 @@ class IslandPreviewCollection : Disposable {
     val islandScreen = PreviewIslandScreen(FastIslandMetadata(-1), island, true)
     islandScreen.resize(previewWidth, previewHeight)
 
+    // RGB565 snaps every colour to a 5/6/5 grid, which keeps the distinct colour count low enough that the 256 entry
+    // palette in PalettePng barely has to approximate anything. At full RGBA8888 precision the linear filtering used
+    // when minifying sprites generates far more intermediate colours, and quantisation error goes up.
     val buffer = FrameBuffer(
-      Pixmap.Format.RGBA8888,
+      Pixmap.Format.RGB565,
       previewWidth.coerceAtLeast(1),
       previewHeight.coerceAtLeast(1),
       false
     )
     buffer.safeUse {
-      Hex.setClearColorAlpha(0f)
-      Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+      // RGB565 has no alpha channel, so the background has to be baked in here rather than composited when encoding:
+      // a transparent clear would read back as black. PLAY_BACKGROUND_COLOR, not Hex.backgroundColor, because
+      // previews are generated in the map editor but displayed while playing.
+      val background = Hex.PLAY_BACKGROUND_COLOR
+      Gdx.gl.glClearColor(background.r, background.g, background.b, 1f)
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or Hex.AA_BUFFER_CLEAR)
       islandScreen.render(0f)
       val camera = islandScreen.camera

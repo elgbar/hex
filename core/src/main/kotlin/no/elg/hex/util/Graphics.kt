@@ -3,29 +3,21 @@ package no.elg.hex.util
 import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.utils.ScreenUtils
-import no.elg.hex.Hex
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.concurrent.schedule
 
-/**
- * Encode the contents of this frame buffer as a palette PNG.
- *
- * @param backgroundRgb Packed `0xRRGGBB` colour that translucent pixels are composited onto, see [PalettePng.encode].
- * Defaults to [Hex.PLAY_BACKGROUND_COLOR] rather than [Hex.backgroundColor], because previews are generated in the
- * map editor but displayed while playing, and the two use different backgrounds.
- */
-fun FrameBuffer.toBytes(backgroundRgb: Int = Color.rgb888(Hex.PLAY_BACKGROUND_COLOR)): ByteArray {
+/** Encode the contents of this frame buffer as a palette PNG, see [PalettePng.encode]. */
+fun FrameBuffer.toBytes(): ByteArray {
   val encoded: ByteArray
   this.safeUse {
     val pixels = ScreenUtils.getFrameBufferPixels(0, 0, width, height, false)
-    encoded = PalettePng.encode(width, height, pixels, backgroundRgb)
+    encoded = PalettePng.encode(width, height, pixels)
   }
   return encoded
 }
