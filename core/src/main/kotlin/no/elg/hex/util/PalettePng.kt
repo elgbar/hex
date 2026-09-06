@@ -1,5 +1,6 @@
 package no.elg.hex.util
 
+import com.badlogic.gdx.utils.IntIntMap
 import java.io.ByteArrayOutputStream
 import java.util.zip.CRC32
 import java.util.zip.Deflater
@@ -45,6 +46,12 @@ object PalettePng {
 
   private const val DEFLATE_BUFFER_SIZE = 1 shl 16
 
+  /** Sentinel for [IntIntMap.get], which needs a default rather than returning null. */
+  private const val NOT_IN_PALETTE = -1
+
+  /** Previews hold a few thousand distinct colours, so start the histogram large enough to avoid rehashing. */
+  private const val INITIAL_COLOUR_CAPACITY = 4096
+
   /** Encode [rgba], which must hold [width] * [height] pixels in RGBA8888 order. Alpha bytes are ignored. */
   fun encode(width: Int, height: Int, rgba: ByteArray): ByteArray {
     require(width > 0 && height > 0) { "Image must not be empty, got ${width}x$height" }
@@ -79,29 +86,45 @@ object PalettePng {
    * quantise badly here.
    */
   private fun buildPalette(opaque: IntArray): IntArray {
-    val frequencies = HashMap<Int, Int>()
+    // IntIntMap rather than HashMap<Int, Int>: the latter is HashMap<Integer, Integer>, and since packed colours are
+    // far outside the Integer cache every one of the million or so pixels allocated two or three boxes. That was 61%
+    // of the whole application's allocation in a profile.
+    val frequencies = IntIntMap(INITIAL_COLOUR_CAPACITY)
     for (colour in opaque) {
-      frequencies[colour] = (frequencies[colour] ?: 0) + 1
+      frequencies.getAndIncrement(colour, 0, 1)
     }
-    return frequencies.entries
-      .sortedByDescending { it.value }
-      .take(MAX_PALETTE_SIZE)
-      .map { it.key }
-      .toIntArray()
+
+    // Pack the count above the colour so the sort is a primitive LongArray sort instead of a boxed comparator over
+    // map entries. Colours are 24 bit and never negative, so the count always dominates the ordering.
+    val packed = LongArray(frequencies.size)
+    var next = 0
+    for (entry in frequencies) {
+      packed[next++] = (entry.value.toLong() shl Int.SIZE_BITS) or entry.key.toLong()
+    }
+    packed.sort()
+
+    val size = minOf(MAX_PALETTE_SIZE, packed.size)
+    return IntArray(size) { packed[packed.size - 1 - it].toInt() }
   }
 
-  /** Cached per distinct colour rather than per pixel, so the nearest neighbour search runs at most a few thousand times. */
+  /**
+   * One map serves as both the exact lookup and the cache of approximated colours, so the nearest neighbour search
+   * runs once per distinct colour rather than once per pixel.
+   */
   private fun mapToPaletteIndices(opaque: IntArray, palette: IntArray): ByteArray {
-    val exact = HashMap<Int, Int>(palette.size * 2)
+    val lookup = IntIntMap(palette.size * 2)
     for (index in palette.indices) {
-      exact[palette[index]] = index
+      lookup.put(palette[index], index)
     }
-    val approximated = HashMap<Int, Int>()
 
     val indices = ByteArray(opaque.size)
     for (pixel in opaque.indices) {
       val colour = opaque[pixel]
-      val index = exact[colour] ?: approximated.getOrPut(colour) { nearestPaletteIndex(colour, palette) }
+      var index = lookup.get(colour, NOT_IN_PALETTE)
+      if (index == NOT_IN_PALETTE) {
+        index = nearestPaletteIndex(colour, palette)
+        lookup.put(colour, index)
+      }
       indices[pixel] = index.toByte()
     }
     return indices
