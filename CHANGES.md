@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Optimize app with R8 rules
+* Optimize previews bundled (about 50% less space used)
+  * PNGs are now encoded as palette-8 indices instead of 4 byte real RBGA
+  * Smiley format used a transport safe encoding not needed
 
 ### Fixed
 
